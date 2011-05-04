@@ -1,0 +1,139 @@
+/* Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License. */
+
+body, html, #view, #sensor, #coordinateControlsCanvas, #live, #status, #info,
+#requestReal
+{
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+}
+
+html {
+    background: black;
+}
+
+body {
+    background: black;
+}
+
+#loadIndicator {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+}
+
+#content {
+    /* Hides the content, and works with all browsers. Relying just on setting
+      the opacity didn't prove to work well with Internet Explorer version 8,
+      though perhaps it is doable. Setting display to "none" and later to
+      "block" seems IE6 to, at least sometimes, not draw all vector graphics.
+    */
+    width: 0;
+    height: 0;
+
+    overflow: hidden;
+}
+
+#errorMessage {
+    position: relative;
+    margin: 0 auto;
+    text-align: left;
+    width: 240px;
+}
+
+#sensor {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#sensorRealBlocksCanvas, #sensorPendingBlocksCanvas, #sensorShadowCanvas, 
+#sensorNewBlockCanvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#coordinateControlsCanvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#live {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: #808080;
+}
+
+#status, #about, #requestReal {
+    font-size: 12px;
+    color: white;
+}
+
+#status, #requestReal {
+    cursor: default;
+}
+
+#status {
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    width: 150px;
+}
+
+#requestReal {
+    display: block;
+    position: absolute;
+    right: 35px;
+    top: 22px;
+    font-size: 14px;
+    padding: 5px;
+    color: white;
+    border: 1px solid white;
+}
+
+#requestReal:hover, #requestReal:active, #requestReal:focus {
+    color: red;
+    border: 1px solid red;
+}
+
+#about, #about:link, #about:visited {
+    display: block;
+    position: absolute;
+    right: 12px;
+    bottom: 10px;
+}
+
+#about:hover, #about:active, #about:focus {
+    color: red;
+}
+
+table#contentContainer {
+    position: absolute;
+}
+
+table#contentContainer td {
+    vertical-align: middle;
+}
+
+#view {
+    position: relative;
+    margin: 0 auto;
+    text-align: left;
+}

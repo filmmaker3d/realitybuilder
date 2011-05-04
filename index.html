@@ -1,0 +1,112 @@
+{%comment%}
+  Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+{%endcomment%}
+
+{%extends "base.html"%}
+
+{%block head%}
+  <meta name="description" 
+    content="A tool for remote construction.">
+  {# media="all" hides style sheets from Netscape 4 #}
+  <link rel="stylesheet" href="/stylesheets/index.css" media="all">
+  <!--[if IE 6]>
+    <link rel="stylesheet" href="/stylesheets/index_IE_6.css">
+  <![endif]-->
+  <title>Reality Builder</title>        
+  {%if debug%}
+    <script type="text/javascript">
+      var djConfig = {parseOnLoad: false, isDebug: true, 
+        debugContainerId: 'firebugLite'};
+    </script>
+    <script type="text/javascript" 
+      src="/source/javascript/dojo-release-1.4.3-src/dojo/dojo.js">
+    </script>
+  {%else%}
+    <script type="text/javascript">
+      var djConfig = {parseOnLoad: true, isDebug: false};
+    </script>
+    <script type="text/javascript" src="/javascript/dojo/dojo.js"></script>
+    <script type="text/javascript" 
+      src="/javascript/dojo/realitybuilder.js"></script>
+  {%endif%}
+  <!--[if IE]>
+    <script type="text/javascript" src="/javascript/excanvas_r73.js"></script>
+  <![endif]-->
+  {%block script%}
+    <script type="text/javascript" src="/javascript/DetectImageState.js">
+    </script>
+    <script type="text/javascript" 
+      src="/javascript/pages/common_index_admin.js"></script>
+    <script type="text/javascript" src="/javascript/pages/index.js"></script>
+  {%endblock%}
+{%endblock%}
+
+{%block body%}
+  {%comment%}Certain content is added dynamically instead of being hidden and
+  later unhidden using CSS. Rationale: browsers that neither support CSS nor
+  JavaScript should only show the JavaScript-not-supported error
+  message.{%endcomment%}
+  <div id="loadIndicator"></div>
+  <table id="contentContainer">
+    <tr>
+      <td>
+        <div id="errorMessage">
+          <noscript>
+            <p class="first">The Reality Builder does not work because your
+            browser does not support <a 
+            href="http://developer.mozilla.org/en/JavaScript/About_JavaScript"
+            >JavaScript</a>, or because JavaScript is disabled.</p>
+            <p><a href="about">About the Reality Builder</a></p>
+          </noscript>
+          <div id="noCanvasErrorMessage">
+          </div>
+          <div id="noImagesErrorMessage">
+          </div>
+          <div id="noDojoErrorMessage">
+            <script type="text/javascript">
+              <!--
+                if (!realityBuilderIsDojoSupported()) {
+                    // May be an old browser. Thus, it is better to stick to
+                    // "document.write".
+                    document.write('<p class="first">The Reality Builder ' +
+                        'does not work because your browser is not ' +
+                        'supported by the ' +
+                        '<a href="http://www.dojotoolkit.org/">Dojo ' +
+                        'Toolkit<\/a>.<\/p>' +
+                        '<p><a href="about">About the Reality ' + 
+                        'Builder<\/a><\/p>');
+                }
+              // -->
+            </script>
+          </div>
+        </div>
+        <div id="content">
+          <div id="view"></div>
+
+          {# For admin mode. #}
+          {%block sideBar%}{%endblock%}
+          {%block bottomBar%}{%endblock%}
+        </div>
+      </td>
+    </tr>
+    {%if debug%}
+      <tr>
+        <td id="firebugLite">
+        </td>
+      </tr>
+    {%endif%}
+  </table>
+  <div id="DetectImageState"></div>
+{%endblock%}

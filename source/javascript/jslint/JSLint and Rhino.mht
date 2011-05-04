@@ -1,0 +1,39 @@
+Content-Type: multipart/related; start=<op.mhtml.1279670476403.f3d95d7a5622f104@10.205.13.9>; boundary=----------mHg1LSfjuQjaNtRBOInYu3
+Content-Location: http://www.jslint.com/rhino/index.html
+Subject: =?utf-8?Q?JSLint=20and=20Rhino?=
+MIME-Version: 1.0
+
+------------mHg1LSfjuQjaNtRBOInYu3
+Content-Disposition: inline; filename=index.html
+Content-Type: text/html; name=index.html
+Content-ID: <op.mhtml.1279670476403.f3d95d7a5622f104@10.205.13.9>
+Content-Location: http://www.jslint.com/rhino/index.html
+Content-Transfer-Encoding: 8bit
+
+<html>
+<head>
+<title>JSLint and Rhino</title></head>
+
+<body bgcolor=linen>
+<h1>JSLint and Rhino</h1>
+<p><a href="http://www.mozilla.org/rhino/">Rhino</a> is a Javascript engine that 
+  is written entirely in Java. It can be used to run <a href="http://www.JSLint.com">JSLint</a> 
+  from the command line on systems with Java interpreters.</p>
+<p>The file <a href="jslint.js">jslint.js</a> can be run by Rhino. It will read 
+  a JavaScript program from a file. If there are no problems, it terminates quietly. 
+  If there is a problem, it outputs a message. The WSH edition of JSLint does 
+  not produce a Function Report.</p>
+<p></p>
+<p>One way to run JSLint is with this command:</p>
+<blockquote> 
+  <p><code><b>C:\&gt;</b> java org.mozilla.javascript.tools.shell.Main jslint.js 
+    myprogram.js</code></p>
+</blockquote>
+<p>It runs <code>java</code> which loads and runs Rhino which loads and runs <code>jslint.js</code>, 
+  which will read the file <code>myprogram.js</code> and report an error if found. 
+</p>
+<p>Download <a href="jslint.js">jslint.js</a>.</p>
+</body>
+</html>
+
+------------mHg1LSfjuQjaNtRBOInYu3--
