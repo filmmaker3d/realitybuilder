@@ -67,8 +67,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     constructor: function (camera, positionB, constructionBlocks) {
         this._state = 1;
         this._constructionBlocks = constructionBlocks;
-        this._shadow = new com.realitybuilder.Shadow
-            (this, camera, constructionBlocks);
+        this._shadow = new com.realitybuilder.Shadow(this, camera, 
+                                                     constructionBlocks);
         this._camera = camera;
     },
 
@@ -125,8 +125,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         if (status !== 0) {
             testZB = this._positionB[2] + 1;
             while (this._wouldIntersectWithRealBlock(
-                [this._positionB[0], this._positionB[1], testZB]))
-            {
+                [this._positionB[0], this._positionB[1], testZB])) {
                 testZB += 1;
             }
             this._positionB[2] = testZB;
@@ -216,8 +215,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             if (vS[0] >= block._boundingBoxS[0][0] &&
                 vS[0] <= block._boundingBoxS[1][0] &&
                 vS[1] >= block._boundingBoxS[0][1] &&
-                vS[1] <= block._boundingBoxS[1][1])
-            {
+                vS[1] <= block._boundingBoxS[1][1]) {
                 return true;
             }
         }
@@ -308,8 +306,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         for (i = 0; i < 2; i += 1) {
             for (j = 0; j < 7; j += 1) {
                 if (com.realitybuilder.util.pointsIdenticalB(
-                    deltas[i], cases[j]))
-                {
+                    deltas[i], cases[j])) {
                     return true;
                 }
             }
@@ -408,6 +405,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // block and a real block.
     _removeHiddenLines: function () {
         var realBlocksSorted, i, realBlock;
+
+        /* FIXME
         this._edges = this._INITIAL_EDGES;
         realBlocksSorted = this._constructionBlocks.realBlocksSorted();
 
@@ -423,13 +422,13 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             if (this._fulfillsBlockSpaceHidingConditions(realBlock)) {
                 realBlock.updateSensorSpace();
                 if (this._boundingBoxesOverlap(realBlock) && 
-                    this._anyVertexInBoundingBox(realBlock))
-                {
+                    this._anyVertexInBoundingBox(realBlock)) {
                     this._subtract(realBlock);
                     this._updateSensorSpaceBoundingBox();
                 }
             }
         }
+        */
     },
 
     // Updates the shadow, i.e. (re-)draws it or removes it. But only only when
@@ -438,12 +437,12 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // ("sensorSpaceHasChanged" is true), or when the construction blocks have
     // changed.
     _renderShadow: function (stateHasChanged, sensorSpaceHasChanged) {
+        /* FIXME: finally reactivate
         var constructionBlocksHaveChanged = (
             this._lastConstructionBlocksVersion !==
             this._constructionBlocks.versionOnServer());
         if (stateHasChanged || sensorSpaceHasChanged || 
-            constructionBlocksHaveChanged)
-        {
+            constructionBlocksHaveChanged) {
             if (this.isMovable()) {
                 this._shadow.render();
             } else {
@@ -452,6 +451,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         }
         this._lastConstructionBlocksVersion =
             this._constructionBlocks.versionOnServer();
+        */
     },
 
     // Draws the block with shadow on the sensor of the camera. Depends on the
