@@ -1,3 +1,5 @@
+// Admin interface.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,12 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// Admin interface.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-// Interpreted by JSLint:
-/*global logoutUrl */
-
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.AdminControls');
 
@@ -29,7 +29,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
 
     // Creates the admin interface associated with the construction
     // "construction".
-    constructor: function(construction) {
+    constructor: function (construction) {
         this._construction = construction;
 
         dojo.byId('bottomBar').style.width = 
@@ -52,23 +52,23 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     },
 
     // Logs the administrator out, sending him back to the login screen.
-    logOut: function() {
+    logOut: function () {
         location.href = logoutUrl;
     },
 
-    updateToggleRealButton: function() {
+    updateToggleRealButton: function () {
         dojo.byId('toggleRealButton').innerHTML = 
             (this._construction.showReal() ? "Hide" : "Show") + " Real Blocks";
     },
 
-    updateTogglePendingButton: function() {
+    updateTogglePendingButton: function () {
         dojo.byId('togglePendingButton').innerHTML = 
             (this._construction.showPending() ? "Hide" : "Show") + 
             " Pending Blocks";
     },
 
     // Updates controls defining the camera "camera".
-    updateCameraControls: function(camera) {
+    updateCameraControls: function (camera) {
         var position = camera.position();
         dojo.byId('cameraX').value = position[0];
         dojo.byId('cameraY').value = position[1];
@@ -80,7 +80,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
         dojo.byId('cameraSensorResolution').value = camera.sensorResolution();
     },
 
-    updateImageControls: function(image) {
+    updateImageControls: function (image) {
         dojo.byId('imageURL').value = image.url();
         dojo.byId('imageUpdateIntervalServer').value = 
             image.updateIntervalServer();
@@ -90,7 +90,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
 
     // Returns data describing the image settings in a format that is a subset
     // of that used for exchanging image data with the server.
-    readImageControls: function() {
+    readImageControls: function () {
         var data = {
             'url': dojo.byId('imageURL').value || '',
             'updateIntervalServer': 
@@ -102,7 +102,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
 
     // Returns data describing the camera settings in a format that is a subset
     // of that used for exchanging camera data with the server.
-    readCameraControls: function() {
+    readCameraControls: function () {
         var data = {
             "x": parseFloat(dojo.byId('cameraX').value) || 0,
             "y": parseFloat(dojo.byId('cameraY').value) || 0,
@@ -117,11 +117,11 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     },
 
     // Updates the camera, reading data from the camera controls.
-    updateCamera: function() {
+    updateCamera: function () {
         this._construction.camera().update(this.readCameraControls());
     },
 
-    updateCoordinateDisplays: function() {
+    updateCoordinateDisplays: function () {
         var positionB = this._construction.newBlock().positionB();
         dojo.byId('newBlockX').innerHTML = positionB[0].toString();
         dojo.byId('newBlockY').innerHTML = positionB[1].toString();
@@ -129,7 +129,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     },
 
     // Sorting function for sorting blocks for display in the table.
-    _sortForTable: function(x, y) {
+    _sortForTable: function (x, y) {
         // Sorts first by state (pending < real < deleted), and then by
         // date-time.
         if (x.state() === y.state()) {
@@ -152,11 +152,11 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
 
     // Returns the list of all blocks, except the new block, sorted for display
     // in the table.
-    _blocksSortedForTable: function() {
+    _blocksSortedForTable: function () {
         // The blocks array is copied since the original array should not be
         // changed.
         var tmp = dojo.map(this._construction.constructionBlocks().blocks(),
-            function(block) {
+            function (block) {
                 return block;
             });
         tmp.sort(this._sortForTable);
@@ -165,7 +165,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
 
     // Reads the value of the state selector "select" associated with the block
     // "block" and triggers setting of the state.
-    _applyStateFromStateSelector: function(select, block) {
+    _applyStateFromStateSelector: function (select, block) {
         this._construction.constructionBlocks().
             setBlockStateOnServer(block.positionB(), 
                 parseInt(select.value, 10));
@@ -173,7 +173,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
 
     // Returns a node representing a select button for the state of the block
     // "block", with the state of that block preselected.
-    _stateSelector: function(block) {
+    _stateSelector: function (block) {
         var select = document.createElement('select'),
             stateNames = ['Deleted', 'Pending', 'Real'],
             state, stateName, option;
@@ -189,7 +189,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
             select.appendChild(option);
         }
 
-        dojo.connect(select, 'onchange', this, function(event) {
+        dojo.connect(select, 'onchange', this, function (event) {
             this._applyStateFromStateSelector(select, block);
         });
         
@@ -198,7 +198,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
 
     // Adds a row for the block "block" to the table body "tableBody"
     // displaying the list of blocks.
-    _appendBlocksTableRow: function(block, tableBody) {
+    _appendBlocksTableRow: function (block, tableBody) {
         var positionB = block.positionB(),
             row = document.createElement('tr'),
             date = new Date(block.timeStamp() * 1000),
@@ -208,7 +208,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
                 positionB[0], positionB[1], positionB[2], dateTimeFormatted,
                 this._stateSelector(block)],
             cell;
-        dojo.forEach(rowValues, function(rowValue, i) {
+        dojo.forEach(rowValues, function (rowValue, i) {
             cell = document.createElement('td');
             if (i < 4) {
                 cell.innerHTML = rowValue;
@@ -224,13 +224,13 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     },
 
     // Refreshes the table displaying the list of blocks.
-    updateBlocksTable: function() {
+    updateBlocksTable: function () {
         var matches = dojo.query('#blocksTable tbody'),
             tableBody = matches[0],
             blocks = this._blocksSortedForTable(),
             that = this;
         dojo.empty(tableBody);
-        dojo.forEach(blocks, function(block) {
+        dojo.forEach(blocks, function (block) {
             that._appendBlocksTableRow(block, tableBody);
         });
     }

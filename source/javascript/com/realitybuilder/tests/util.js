@@ -1,3 +1,5 @@
+// Unit tests for utility functions.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,7 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// Unit tests for utility functions.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl, doh */
 
 dojo.provide("tests.util");
 
@@ -46,9 +51,9 @@ doh.register("tests.util.all", [
             pointsIdenticalS(p, [-1.182, -2.757]));
     },
     function cartesianToPolarTest() {
-        var pp; // polar point
-
-        var toleranceA = 0.001; // tolerance when comparing angles
+        var
+        pp, // polar point
+        toleranceA = 0.001; // tolerance when comparing angles
 
         // right
         pp = com.realitybuilder.util.cartesianToPolar([5, 0]);
@@ -99,27 +104,27 @@ doh.register("tests.util.all", [
         points = [[2, 1.5], [3, -20], [2, 1.5], [2, 1.5], [4, 89]];
         newPoints = com.realitybuilder.util.withDuplicatesRemoved(points);
         doh.assertTrue(
-            newPoints[0] == points[1] && newPoints[1] == points[3] && 
-            newPoints[2] == points[4] && newPoints.length == 3);
+            newPoints[0] === points[1] && newPoints[1] === points[3] && 
+            newPoints[2] === points[4] && newPoints.length === 3);
 
         // All the same.
         points = [[2, 1.5], [2, 1.5], [2, 1.5], [2, 1.5], [2, 1.5]];
         newPoints = com.realitybuilder.util.withDuplicatesRemoved(points);
         doh.assertTrue(
-            newPoints[0] == points[4] && newPoints.length == 1);
+            newPoints[0] === points[4] && newPoints.length === 1);
 
         // Only one entry.
         points = [[2, 1.5]];
         newPoints = com.realitybuilder.util.withDuplicatesRemoved(points);
         doh.assertTrue(
-            newPoints[0] == points[0] && newPoints.length == 1);
+            newPoints[0] === points[0] && newPoints.length === 1);
 
         // Coordinates of identical points differ by a small value.
         points = [[2, 1.500001], [3, -20], [2.00001, 1.5], [2, 1.5], [4, 89]];
         newPoints = com.realitybuilder.util.withDuplicatesRemoved(points);
         doh.assertTrue(
-            newPoints[0] == points[1] && newPoints[1] == points[3] && 
-            newPoints[2] == points[4] && newPoints.length == 3);
+            newPoints[0] === points[1] && newPoints[1] === points[3] && 
+            newPoints[2] === points[4] && newPoints.length === 3);
     },
     function pointIsBetweenLineTest() {
         var between;

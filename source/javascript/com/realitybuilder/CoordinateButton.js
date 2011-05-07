@@ -1,3 +1,5 @@
+// A button for changing the value of a coordinate of the new block.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,9 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// A button for changing the value of a coordinate of the new block.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.CoordinateButton');
 
@@ -64,7 +67,7 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
     // plus-button, meaning that clicking on it increases the coordinate.
     // Otherwise it is a minus-button. Initially the button is in disabled
     // state. It is rendered on the canvas "canvas".
-    constructor: function(newBlock, centerS, coordinate, plus, canvas) {
+    constructor: function (newBlock, centerS, coordinate, plus, canvas) {
         this.centerS = centerS;
         this._plus = plus;
         this._newBlock = newBlock;
@@ -73,22 +76,22 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
         this._createNode();
     },
 
-    highlight: function() {
+    highlight: function () {
         if (!this._disabled) {
             this._render(this._highlightColor);
         }
     },
 
-    unhighlight: function() {
+    unhighlight: function () {
         this._render(this._standardColor);
     },
 
-    radiusS: function() {
+    radiusS: function () {
         return this._radiusS;
     },
 
     // Moves the center of the button to the sensor space point "centerS".
-    move: function(centerS) {
+    move: function (centerS) {
         var l = this._sideLengthS;
         this._canvas.style.left = (centerS[0] - l/2) + 'px';
         this._canvas.style.top = (centerS[1] - l/2) + 'px';
@@ -98,7 +101,7 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
     // Disables the button, if "alwaysDisable" is true. Otherwise, enables the
     // button iff moving the block "newBlock" in the associated direction is
     // possible.
-    update: function(alwaysDisable) {
+    update: function (alwaysDisable) {
         var deltaB, i;
         if (alwaysDisable) {
             this._disable();
@@ -116,11 +119,11 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
     },
 
     // Triggers moving of the new block, i.e. changing its coordinate.
-    moveNewBlock: function() {
+    moveNewBlock: function () {
         this._newBlock.move(this._deltaB);
     },
 
-    _computeDeltaB: function() {
+    _computeDeltaB: function () {
         this._deltaB = [];
         for (var i = 0; i < 3; i += 1) {
             this._deltaB[i] = (i === this._coordinate) ? this._delta() : 0;
@@ -128,17 +131,17 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
     },
 
     // Direction for moving the block (-1 or +1).
-    _direction: function() {
+    _direction: function () {
         return (this._plus ? 1 : -1);
     },
 
     // Delta by which to change the coordinate of the block.
-    _delta: function() {
+    _delta: function () {
         return this._direction();
     },
 
     // Disables the button.
-    _disable: function() {
+    _disable: function () {
         if (!this._disabled) {
             dojo.disconnect(this._onclickHandle);
 
@@ -150,7 +153,7 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
     },
 
     // Enables the button.
-    _enable: function() {
+    _enable: function () {
         if (this._disabled) {
             this._onclickHandle = 
                 dojo.connect(this._canvas, 'onclick', this, this.moveNewBlock);
@@ -162,13 +165,13 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
     // over the area of the surface "surface". This is a necessary for IE8
     // which seems to need something to be drawn in every place where the
     // button should receive mouse events.
-    _drawRectangle: function(surface) {
+    _drawRectangle: function (surface) {
         surface.createRect({x1: 0, y1: 0, 
             x2: surface.width, y2: surface.height}).setFill([0, 0, 0, 0]);
     },
 
     // Creates the DOM node with the button drawn on it.
-    _createNode: function() {
+    _createNode: function () {
         var l = this._sideLengthS;
         this._canvas = dojo.create('canvas', 
             {
@@ -189,7 +192,7 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
     },
 
     // Renders the button in the color "color" (CSS format).
-    _render: function(color) {
+    _render: function (color) {
         var canvas = this._canvas,
             l = this._sideLengthS,
             context;

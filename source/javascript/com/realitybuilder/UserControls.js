@@ -1,3 +1,5 @@
+// User controls. These controls allow, for example, moving a block.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,9 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// User controls. These controls allow, for example, moving a block.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.UserControls');
 
@@ -28,7 +31,7 @@ dojo.declare('com.realitybuilder.UserControls', null, {
     _node: null,
 
     // Creates user controls for the construction "construction".
-    constructor: function(construction) { 
+    constructor: function (construction) { 
         this._construction = construction;
         this._coordinateControls = 
             new com.realitybuilder.CoordinateControls(
@@ -38,16 +41,16 @@ dojo.declare('com.realitybuilder.UserControls', null, {
             construction, construction.requestReal);
     },
 
-    updateCoordinateControls: function(disableAll) {
+    updateCoordinateControls: function (disableAll) {
         this._coordinateControls.update(disableAll);
     },
 
-    renderCoordinateControls: function() {
+    renderCoordinateControls: function () {
         this._coordinateControls.render();
     },
 
     // Updates the button which allows making the current block real.
-    updateRequestRealButton: function() {
+    updateRequestRealButton: function () {
         var buttonNode = dojo.byId('requestReal'),
             newBlock = this._construction.newBlock();
         if (newBlock.isMovable() && newBlock.canBeMadeReal()) {
@@ -60,7 +63,7 @@ dojo.declare('com.realitybuilder.UserControls', null, {
 
     // Updates the status message to reflect the response to the last request
     // "responseToLastRequest".
-    updateStatusMessage: function(responseToLastRequest) {
+    updateStatusMessage: function (responseToLastRequest) {
         var html = "",
             newBlock = this._construction.newBlock();
         switch (responseToLastRequest) {

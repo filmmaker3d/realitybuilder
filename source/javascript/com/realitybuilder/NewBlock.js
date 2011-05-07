@@ -1,3 +1,11 @@
+// The new block in the construction. It may be positioned by the user.
+// Published topics:
+//
+// - When the block has been stopped: com/realitybuilder/NewBlock/stopped
+// 
+// - When the block has been made movable: 
+//   com/realitybuilder/NewBlock/madeMovable
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,15 +20,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// The new block in the construction. It may be positioned by the user.
-// Published topics:
-//
-// - When the block has been stopped: com/realitybuilder/NewBlock/stopped
-// 
-// - When the block has been made movable: 
-//   com/realitybuilder/NewBlock/madeMovable
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.NewBlock');
 
@@ -61,7 +64,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // calculating hidden lines, the block needs to know about the other blocks
     // in the construction: "constructionBlocks" When the block is rendered, it
     // is as seen by the sensor of the camera "camera".
-    constructor: function(camera, positionB, constructionBlocks) {
+    constructor: function (camera, positionB, constructionBlocks) {
         this._state = 1;
         this._constructionBlocks = constructionBlocks;
         this._shadow = new com.realitybuilder.Shadow
@@ -70,7 +73,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // See same function in super class.
-    _sensorSpaceNeedsToBeUpdated: function() {
+    _sensorSpaceNeedsToBeUpdated: function () {
         return (this._lastPositionB === null ||
             !com.realitybuilder.util.pointsIdenticalB(
                 this._lastPositionB, this._positionB) ||
@@ -78,14 +81,14 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // See same function in super class.
-    _onSensorSpaceUpdated: function() {
+    _onSensorSpaceUpdated: function () {
         this._lastPositionB = dojo.clone(this._positionB);
         this.inherited(arguments);
     },
 
     // Moves the block in block space, by "delta", unless the move would make
     // it go out of range.
-    move: function(deltaB) {
+    move: function (deltaB) {
         if (!this.wouldGoOutOfRange(deltaB)) {
             this._positionB = com.realitybuilder.util.addVectorsB(
                 this._positionB, deltaB);
@@ -93,20 +96,20 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         dojo.publish('com/realitybuilder/NewBlock/moved');
     },
 
-    isMovable: function() {
+    isMovable: function () {
         return this._state === 1;
     },
 
-    isStopped: function() {
+    isStopped: function () {
         return this._state === 0;
     },
 
-    stop: function() {
+    stop: function () {
         this._state = 0;
         dojo.publish('com/realitybuilder/NewBlock/stopped');
     },
 
-    makeMovable: function() {
+    makeMovable: function () {
         this._state = 1;
         dojo.publish('com/realitybuilder/NewBlock/madeMovable');
     },
@@ -115,7 +118,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // does, it is elevated step by step until it sits on top of another block.
     // Only updates the position of the block in block space. Does not update
     // any of the other coordinates.
-    updatePositionB: function() {
+    updatePositionB: function () {
         var status = this._constructionBlocks.realBlockIntersectionState(
             this._positionB),
             testZB;
@@ -135,7 +138,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // outside of the space where it is allowed to be moved. This space may be
     // larger than the building space, allowing movement of the block alongside
     // the exterior of the construction, for positioning.
-    wouldGoOutOfRange: function(deltaB) {
+    wouldGoOutOfRange: function (deltaB) {
         var testB = com.realitybuilder.util.addVectorsB(
             this._positionB, deltaB);
         return (this._wouldIntersectWithRealBlock(testB) ||
@@ -146,7 +149,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // in block space at the position "testB". The move space is above the
     // ground and just as large as to allow a block to be moved anywhere
     // outside the boundary of the build space.
-    _wouldBeInMoveSpace: function(testB) {
+    _wouldBeInMoveSpace: function (testB) {
         var b1B = this._BUILD_SPACE_1B, b2B = this._BUILD_SPACE_2B;
         return (
             testB[0] >= b1B[0] - 2 && testB[0] <= b2B[0] &&
@@ -155,7 +158,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // Returns true, iff this block is in the space where blocks may be build.
-    _isInBuildSpace: function() {
+    _isInBuildSpace: function () {
         var xB = this._positionB[0],
             yB = this._positionB[1],
             zB = this._positionB[2],
@@ -170,7 +173,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // ground. That is the case when there is the ground plate or another block
     // immediately below this block, or if there is another block immediately
     // above this block.
-    _isAttachable: function() {
+    _isAttachable: function () {
         var xB = this._positionB[0],
             yB = this._positionB[1],
             zB = this._positionB[2];
@@ -182,20 +185,20 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
     // Returns true, iff the new block can be made real in its current
     // position.
-    canBeMadeReal: function() {
+    canBeMadeReal: function () {
         return this._isInBuildSpace() && this._isAttachable();
     },
 
     // Returns true, if this block would intersect with any real block if it
     // was in block space at the position "testB".
-    _wouldIntersectWithRealBlock: function(testB) {
+    _wouldIntersectWithRealBlock: function (testB) {
         return (this._constructionBlocks.
             realBlockIntersectionState(testB) !== 0);
     },
 
     // Returns true, iff the bounding box of the current block overlaps with
     // that of the block "block", in sensor space.
-    _boundingBoxesOverlap: function(block) {
+    _boundingBoxesOverlap: function (block) {
         return (
             (this._boundingBoxS[1][0] >= block._boundingBoxS[0][0]) &&
             (this._boundingBoxS[0][0] <= block._boundingBoxS[1][0]) &&
@@ -206,7 +209,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Returns true, iff any vertex of the current block is inside the bounding
     // box of the block "block", in sensor space. If the block "block" is
     // obscuring part or all of the current block, then this is the case.
-    _anyVertexInBoundingBox: function(block) {
+    _anyVertexInBoundingBox: function (block) {
         var verticesS = this._verticesS, i, vS;
         for (i = 0; i < verticesS.length; i += 1) {
             vS = verticesS[i];
@@ -225,9 +228,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // "line", and the border of the block "block", in sensor space. The line
     // has inifinite extension and goes through the points "line[0]" and
     // "line[1]".
-    _intersectionLineBlock: function(line, block) {
+    _intersectionLineBlock: function (line, block) {
         var ips = [], bvsS = block._verticesS, segment, p;
-        dojo.forEach(this._BORDER_EDGES, function(edge) {
+        dojo.forEach(this._BORDER_EDGES, function (edge) {
             segment = [bvsS[edge[0]], bvsS[edge[1]]];
             p = com.realitybuilder.util.intersectionSegmentLine(
                 segment, line);
@@ -241,7 +244,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Subtracts the block "block" from the edge "edge". Returns the resulting
     // edge, or - if the edge has been completely removed - false. May modify
     // the vertices in sensor space.
-    _subtractFromEdge: function(edge, block) {
+    _subtractFromEdge: function (edge, block) {
         var verticesS = this._verticesS,
             edgePoint1 = verticesS[edge[0]],
             edgePoint2 = verticesS[edge[1]],
@@ -288,7 +291,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // True, if - in block space - an edge of the border of the current block
     // touches an edge of the border of the block "block". The border is the
     // set of edges that make up the border of the block in sensor space.
-    _borderTouchesBorder: function(block) {
+    _borderTouchesBorder: function (block) {
         var deltas = [], cases, i, j;
         deltas[0] = com.realitybuilder.util.subtractVectorsB(
             block.positionB(), this._positionB);
@@ -317,7 +320,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Returns true, iff the edge "edge" is an inside edge, i.e. it is not a
     // border edge, and iff it is touched by the border of the block "block".
     // The block "block" has to be a cutting block.
-    _edgeIsInsideEdgeAndTouchedByBorder: function(edge, block) {
+    _edgeIsInsideEdgeAndTouchedByBorder: function (edge, block) {
         var deltaB = com.realitybuilder.util.subtractVectorsB(
             block.positionB(), this._positionB),
             cases = [], i;
@@ -348,7 +351,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // Returns true, if the edge "edge" should not be cut by the block "block".
-    _edgeShouldNotBeCut: function(edge, block) {
+    _edgeShouldNotBeCut: function (edge, block) {
         // If the edge is an inside edge and lies on the border of the block
         // then it should not be cut. Cutting it would not be wrong, but in the
         // authors opinion, not cutting it looks better.
@@ -358,9 +361,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Subtracts the block "block" from the current block, in sensor space.
     // What this means is that any line segments of the current block that lie
     // within the block "block" are removed.
-    _subtract: function(block) {
+    _subtract: function (block) {
         var newEdges = [], that = this, newEdge;
-        dojo.forEach(this._edges, function(edge) {
+        dojo.forEach(this._edges, function (edge) {
             if (!that._edgeShouldNotBeCut(edge, block)) {
                 newEdge = that._subtractFromEdge(edge, block);
                 if (newEdge) {
@@ -375,7 +378,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
     // Returns true, if the block "block" is a cutting block, i.e. if it is a
     // block in front of the current block.
-    _isCuttingBlock: function(block) {
+    _isCuttingBlock: function (block) {
         return (
             block.xB() >= this.xB() - 1 && 
             block.yB() <= this.yB() + 1 &&
@@ -386,7 +389,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // that are necessary for it hiding part of the current block. The
     // conditions work because the construction is oriented in a certain way.
     // It is assumed that the blocks do not intersect in block space.
-    _fulfillsBlockSpaceHidingConditions: function(block) {
+    _fulfillsBlockSpaceHidingConditions: function (block) {
         // Only blocks in front of the current block are allowed to cut it. If
         // the blocks - in block space - touch along the border, then nothing
         // should be hidden. Without this check, the result is correct, but may
@@ -403,7 +406,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // simplifies things: There is no overlap that cuts away from the middle of
     // an edge. And also - in world space - there is no overlap between this
     // block and a real block.
-    _removeHiddenLines: function() {
+    _removeHiddenLines: function () {
         var realBlocksSorted, i, realBlock;
         this._edges = this._INITIAL_EDGES;
         realBlocksSorted = this._constructionBlocks.realBlocksSorted();
@@ -434,7 +437,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // ("stateHasChanged" is true), when the state of the new block has changed
     // ("sensorSpaceHasChanged" is true), or when the construction blocks have
     // changed.
-    _renderShadow: function(stateHasChanged, sensorSpaceHasChanged) {
+    _renderShadow: function (stateHasChanged, sensorSpaceHasChanged) {
         var constructionBlocksHaveChanged = (
             this._lastConstructionBlocksVersion !==
             this._constructionBlocks.versionOnServer());
@@ -457,7 +460,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // state has changed. The shadow is updated only when the sensor space
     // projection of the new block has changed, when the state of the new block
     // has changed, or when the construction blocks have changed.
-    render: function() {
+    render: function () {
         var canvas = this._camera.sensor().newBlockCanvas(),
             sensorSpaceHasChanged = this.updateSensorSpace(),
             stateHasChanged = (this._lastState !== this._state),

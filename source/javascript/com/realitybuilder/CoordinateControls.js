@@ -1,3 +1,6 @@
+// The coordinate controls that control the movement of the new block in the
+// construction.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,10 +15,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// The coordinate controls that control the movement of the new block in the
-// construction.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.CoordinateControls');
 
@@ -38,7 +41,7 @@ dojo.declare('com.realitybuilder.CoordinateControls', null, {
     // Creates the coordinate controls that control the movement of the new
     // block "newBlock" in the construction. For calculating perspective
     // projection, the camera "camera" is used.
-    constructor: function(newBlock, camera) {
+    constructor: function (newBlock, camera) {
         this._newBlock = newBlock;
         this._camera = camera;
         this._coordinateButtons = [];
@@ -47,7 +50,7 @@ dojo.declare('com.realitybuilder.CoordinateControls', null, {
         this.render();
     },
 
-    _setCanvasDimensions: function() {
+    _setCanvasDimensions: function () {
         var sensor = this._camera.sensor(),
             width = sensor.width(), height = sensor.height();
         dojo.attr(this._canvas, 'width', width);
@@ -59,15 +62,15 @@ dojo.declare('com.realitybuilder.CoordinateControls', null, {
     // Updates the coordinate buttons, setting their enabled/disabled state. If
     // "disableAll" is true, then the coordinate buttons are disabled in any
     // case.
-    update: function(disableAll) {
+    update: function (disableAll) {
         var cbs = this._coordinateButtons;
-        dojo.forEach(cbs, function(cb) {
+        dojo.forEach(cbs, function (cb) {
             cb.update(disableAll);
         });
     },
 
     // Draws the controls.
-    render: function() {
+    render: function () {
         if (this._canvas.getContext) {
             var context = this._canvas.getContext('2d');
             context.clearRect(0, 0, this._canvas.width, this._canvas.height);
@@ -78,7 +81,7 @@ dojo.declare('com.realitybuilder.CoordinateControls', null, {
     },
 
     // Draws a line connecting the buttons "button1" and "button2".
-    _renderLine: function(button1, button2) {
+    _renderLine: function (button1, button2) {
         var center1S, center2S, radiusS, connectionS, polarConnectionS,
             angle, distance, offset1S, offset2S, point1S, point2S, context;
 
@@ -117,7 +120,7 @@ dojo.declare('com.realitybuilder.CoordinateControls', null, {
     // has not been drawn before, it is created. Otherwise the position of the
     // existing button is updated. Whether the button is a plus button is
     // determined by the value of "plus". Returns the button.
-    _renderButton: function(coordinate, plus, pointB) {
+    _renderButton: function (coordinate, plus, pointB) {
         var pointS = this._camera.blockToSensor(pointB),
             i = 2 * coordinate + (plus ? 1 : 0),
             button;
@@ -136,7 +139,7 @@ dojo.declare('com.realitybuilder.CoordinateControls', null, {
     // "point1B" and the plus button at "point2B". The buttons are connected by
     // a line. The coordinate that these buttons control is "coordinate" (0, 1,
     // or 2 for x, y, or z). If the buttons already exist, then they are moved.
-    _renderButtonPair: function(coordinate, point1B, point2B) {
+    _renderButtonPair: function (coordinate, point1B, point2B) {
         var button1 = this._renderButton(coordinate, false, point1B),
             button2 = this._renderButton(coordinate, true, point2B);
         this._renderLine(button1, button2);

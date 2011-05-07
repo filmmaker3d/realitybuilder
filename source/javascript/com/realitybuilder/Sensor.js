@@ -1,3 +1,6 @@
+// The sensor of the camera, displaying the live image plus objects on top of
+// it.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,10 +15,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// The sensor of the camera, displaying the live image plus objects on top of
-// it.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.Sensor');
 
@@ -32,7 +35,7 @@ dojo.declare('com.realitybuilder.Sensor', null, {
 
     // Sets up the sensor of the camera, with width "width" and height
     // "height".
-    constructor: function(width, height) {
+    constructor: function (width, height) {
         this._realBlocksCanvas = dojo.byId('sensorRealBlocksCanvas');
         this._pendingBlocksCanvas = dojo.byId('sensorPendingBlocksCanvas');
         this._shadowCanvas = dojo.byId('sensorShadowCanvas');
@@ -51,14 +54,14 @@ dojo.declare('com.realitybuilder.Sensor', null, {
     },
 
     // Sets the dimensions of the canvases.
-    _setCanvasesDimensions: function() {
+    _setCanvasesDimensions: function () {
         var canvases = [
                 this._realBlocksCanvas, 
                 this._pendingBlocksCanvas, 
                 this._shadowCanvas, 
                 this._newBlockCanvas],
             width = this._width, height = this._height;
-        dojo.forEach(canvases, function(canvas){
+        dojo.forEach(canvases, function (canvas){
             dojo.attr(canvas, 'width', width);
             dojo.attr(canvas, 'height', height);
             dojo.style(canvas, 'width', width + 'px');
@@ -66,41 +69,41 @@ dojo.declare('com.realitybuilder.Sensor', null, {
         });        
     },
 
-    realBlocksCanvas: function() {
+    realBlocksCanvas: function () {
         return this._realBlocksCanvas;
     },
 
-    pendingBlocksCanvas: function() {
+    pendingBlocksCanvas: function () {
         return this._pendingBlocksCanvas;
     },
 
-    shadowCanvas: function() {
+    shadowCanvas: function () {
         return this._shadowCanvas;
     },
 
-    newBlockCanvas: function() {
+    newBlockCanvas: function () {
         return this._newBlockCanvas;
     },
 
-    _setCanvasVisibility: function(canvas, show) {
+    _setCanvasVisibility: function (canvas, show) {
         dojo.style(canvas, 'visibility', show ? 'visible' : 'hidden');
     },
 
     // Iff show is true, then shows the real blocks.
-    showRealBlocks: function(show) {
+    showRealBlocks: function (show) {
         this._setCanvasVisibility(this._realBlocksCanvas, show);
     },
 
     // Iff show is true, then shows the pending blocks.
-    showPendingBlocks: function(show) {
+    showPendingBlocks: function (show) {
         this._setCanvasVisibility(this._pendingBlocksCanvas, show);
     },
 
-    width: function() {
+    width: function () {
         return this._width;
     },
 
-    height: function() {
+    height: function () {
         return this._height;
     }
 });

@@ -1,3 +1,5 @@
+// The construction and the controls.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,9 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// The construction and the controls.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.Construction');
 
@@ -74,7 +77,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // Creates a construction. Iff "showAdminControls" is true, then the admin
     // controls are shown, and - in the rendering - the real and pending
     // blocks.
-    constructor: function(showAdminControls) {
+    constructor: function (showAdminControls) {
         this._insertLoadIndicator();
         this._insertView();
 
@@ -125,41 +128,41 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._checkIfHasLoaded();
     },
 
-    newBlock: function() {
+    newBlock: function () {
         return this._newBlock;
     },
 
-    camera: function() {
+    camera: function () {
         return this._camera;
     },
 
-    showPending: function() {
+    showPending: function () {
         return this._showPending;
     },
 
-    showReal: function() {
+    showReal: function () {
         return this._showReal;
     },
 
-    constructionBlocks: function() {
+    constructionBlocks: function () {
         return this._constructionBlocks;
     },
 
     // Called when the new block is stopped.
-    _onNewBlockStopped: function() {
+    _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
         this._userControls.updateCoordinateControls(true);
     },
 
     // Called when the new block is made movable.
-    _onNewBlockMadeMovable: function() {
+    _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
         this._userControls.updateCoordinateControls(false);
     },
 
     // Toggles the state of a block from virtual to pending. Also updates the
     // last-request-state.
-    requestReal: function() {
+    requestReal: function () {
         if (this._newBlock.isMovable()) {
             this._newBlock.stop();
             this._constructionBlocks.createPendingOnServer(
@@ -171,21 +174,21 @@ dojo.declare('com.realitybuilder.Construction', null, {
     },
 
     // Toggles display of real blocks.
-    toggleReal: function() {
+    toggleReal: function () {
         this._showReal = !this._showReal;
         this._camera.sensor().showRealBlocks(this._showReal);
         this._adminControls.updateToggleRealButton();
     },
 
     // Toggles display of pending blocks.
-    togglePending: function() {
+    togglePending: function () {
         this._showPending = !this._showPending;
         this._camera.sensor().showPendingBlocks(this._showPending);
         this._adminControls.updateTogglePendingButton();
     },
 
     // Handles keys events for demoing the application.
-    _onDemoKeyPress: function(event) {
+    _onDemoKeyPress: function (event) {
         if (event.shiftKey && event.keyCode === dojo.keys.F11) {
             // Makes the block at the position of the new block real on the
             // server. This only works if there is a block at that position in
@@ -197,14 +200,14 @@ dojo.declare('com.realitybuilder.Construction', null, {
     },
 
     // Sets up (hidden) functionality for demoing the application.
-    _setupDemoFunctionality: function() {
+    _setupDemoFunctionality: function () {
         dojo.connect(null, "onkeypress", 
             dojo.hitch(this, this._onDemoKeyPress));
     },
 
     // Called when the new block has been moved. Lets it redraw and updates
     // controls.
-    _onNewBlockMoved: function() {
+    _onNewBlockMoved: function () {
         this._newBlock.render();
         this._userControls.updateRequestRealButton();
         this._userControls.updateStatusMessage(this._responseToLastRequest);
@@ -217,7 +220,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // Updates the position and state of the block to reflect changes in the
     // construction. Also sets the status text. Depends on up to date lists of
     // blocks and real blocks.
-    _updateNewBlockPositionAndState: function() {
+    _updateNewBlockPositionAndState: function () {
         var positionB = this._newBlock.positionB(), tmp, state;
 
         // Discovers the correct status text and updates the new block state:
@@ -259,7 +262,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     },
 
     // Called after the construction blocks have changed.
-    _onConstructionBlocksChanged: function() {
+    _onConstructionBlocksChanged: function () {
         this._updateNewBlockPositionAndState();
         this._userControls.updateRequestRealButton();
         this._userControls.updateCoordinateControls(
@@ -284,7 +287,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     },
 
     // Called after the camera settings have changed.
-    _onCameraChanged: function() {
+    _onCameraChanged: function () {
         if (this._showAdminControls) {
             this._adminControls.updateCameraControls(this._camera);
         }
@@ -305,19 +308,19 @@ dojo.declare('com.realitybuilder.Construction', null, {
     },
 
     // Called after settings describing the live image have changed.
-    _onImageChanged: function() {
+    _onImageChanged: function () {
         if (this._showAdminControls) {
             this._adminControls.updateImageControls(this._image);
         }
     },
 
-    _insertLoadIndicator: function() {
+    _insertLoadIndicator: function () {
         dojo.attr('loadIndicator', 'innerHTML', 'Loading...');
     },
 
     // Returns HTML code for the request real button. For IE6 the button is a
     // link instead of a div. Otherwise CSS for hovering doesn't get triggered.
-    _requestRealButtonHtml: function() {
+    _requestRealButtonHtml: function () {
         var tmp1, tmp2;
         if (dojo.isIE && dojo.isIE === 6) {
             tmp1 = 'a href="javascript:void(0)"';
@@ -329,7 +332,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     },
 
     // Inserts the base HTML code for the "view". It is initially hidden.
-    _insertView: function() {
+    _insertView: function () {
         // Instead of using a CSS background image, an image tag is used.
         // Reason: In Firefox 3.5/Win32, replacing the background image caused
         // flickering, even when making sure that the replacement image has
@@ -369,7 +372,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
     // Regularly checks if the construction has been loaded, so that the
     // content on the web page can be unhidden.
-    _checkIfHasLoaded: function() {
+    _checkIfHasLoaded: function () {
         if (this._camera.hasAlreadyBeenUpdatedWithServerData() &&
             this._constructionBlocks.hasAlreadyBeenUpdatedWithServerData() &&
             this._image.imageLoaded())
@@ -388,7 +391,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // construction data, which implicitly triggers rendering and update of
     // controls. Only updates data if there is a new version. Sets timeout
     // after which a new check for an update is performed.
-    _updateSucceeded: function(data, ioargs) {
+    _updateSucceeded: function (data, ioargs) {
         if (data.blocksData.changed) {
             this._constructionBlocks.updateWithServerData(data.blocksData, 
                 this._image);
@@ -417,7 +420,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // Triggers an update of the construction with the data stored on the
     // server. Only updates the blocks if there is a new version. Fails
     // silently on error.
-    _update: function() {
+    _update: function () {
         // Without the admin controls being shown, deleted blocks are of no use
         // (pending blocks are needed to determine whether a request has been
         // denied):
@@ -438,7 +441,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
     // Unhides the content. Fades in the content, unless the browser is Internet
     // Explorer version 8 or earlier.
-    _unhideContent: function() {
+    _unhideContent: function () {
         var contentNode = dojo.byId('content'),
             doFadeIn = (!dojo.isIE || dojo.isIE > 8),
             fadeSettings;
@@ -466,13 +469,13 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // succeeded. Triggers retrieval of the latest settings from the server,
     // which would happen anyhow sooner or later, since the version of the
     // settings has changed.
-    _storeSettingsOnServerSucceeded: function() {
+    _storeSettingsOnServerSucceeded: function () {
         this._update(); // Will check for new settings.
     },
 
     // Updates the camera and live image settings on the server. Fails silently
     // on error.
-    storeSettingsOnServer: function() {
+    storeSettingsOnServer: function () {
         var imageData = com.realitybuilder.addPrefix(
                 'image.', this._adminControls.readImageControls()),
             cameraData = com.realitybuilder.addPrefix(

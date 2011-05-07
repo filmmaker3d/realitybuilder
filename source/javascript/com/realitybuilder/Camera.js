@@ -1,17 +1,3 @@
-// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy
-// of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
 // A camera at position "x", "y", "z" looking along the direction defined by
 // the angles "aZ", "aX". With the angles set to zero, the directions of the
 // view space and the block space axes coincide: The camera looks along the
@@ -28,7 +14,24 @@
 //
 // The resolution of the camera sensor is 'sensorResolution' (px/mm).
 
-"use strict";
+// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
+
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.Camera');
 
@@ -68,7 +71,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
     // on every change of camera settings, not only on those on the server.
     _id: null,
 
-    constructor: function(sensorWidth, sensorHeight) {
+    constructor: function (sensorWidth, sensorHeight) {
         this._position = [0, 0, 1];
         this._sensor = 
             new com.realitybuilder.Sensor(sensorWidth, sensorHeight);
@@ -76,58 +79,58 @@ dojo.declare('com.realitybuilder.Camera', null, {
         
     },
 
-    _updateId: function() {
+    _updateId: function () {
         this._id = Math.random().toString();
     },
 
-    sensor: function() {
+    sensor: function () {
         return this._sensor;
     },
 
-    versionOnServer: function() {
+    versionOnServer: function () {
         return this._versionOnServer;
     },
 
-    version: function() {
+    version: function () {
     },
 
     // Returns false when the object is new and has not yet been updated with
     // server data.
-    hasAlreadyBeenUpdatedWithServerData: function() {
+    hasAlreadyBeenUpdatedWithServerData: function () {
         return this._versionOnServer !== '-1';
     },
 
-    position: function() {
+    position: function () {
         return this._position;
     },
 
-    aX: function() {
+    aX: function () {
         return this._aX;
     },
 
-    aY: function() {
+    aY: function () {
         return this._aY;
     },
 
-    aZ: function() {
+    aZ: function () {
         return this._aZ;
     },
 
-    fl: function() {
+    fl: function () {
         return this._fl;
     },
 
-    sensorResolution: function() {
+    sensorResolution: function () {
         return this._sensorResolution;
     },
 
-    id: function() {
+    id: function () {
         return this._id;
     },
 
     // Updates the settings of the camera using the "data" which is a subset of
     // the data that also the server delivers.
-    update: function(data) {
+    update: function (data) {
         this._position = [data.x, data.y, data.z];
         this._aX = data.aX;
         this._aY = data.aY;
@@ -142,14 +145,14 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
     // Updates the settings of the camera to the version on the server, which
     // is described by "serverData".
-    updateWithServerData: function(serverData) {
+    updateWithServerData: function (serverData) {
         this._versionOnServer = serverData.version;
         this.update(serverData);
     },
 
     // Updates matrices describing the rotation of the camera. Should be called
     // every time the rotation angles have been changed.
-    _updateRotationMatrices: function() {
+    _updateRotationMatrices: function () {
         // Matrices are for rotating view space points, and that rotation is in
         // the oposite direction as that of the camera, which is rotated
         // counter clockwise. Therefore the matrices rotate clockwise.
@@ -170,7 +173,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
     },
 
     // Returns the coordinates of the world space point "point" in view space.
-    worldToView: function(point) {
+    worldToView: function (point) {
         var tmp = com.realitybuilder.util.subtractVectors(
             point, this._position);
 
@@ -184,13 +187,13 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
     // Scale of distances parallel to the screen at view space position "zV",
     // when projected to the screen.
-    scale: function(zV) {
+    scale: function (zV) {
         return this._sensorResolution * this._fl / zV; // px / mm
     }, 
 
     // Returns the coordinates of the view space point "pointV" in sensor
     // space.
-    viewToSensor: function(pointV) {
+    viewToSensor: function (pointV) {
         var tmp = pointV, scale;
 
         // Projection on sensor:
@@ -207,7 +210,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
     // Returns the coordinates of the block space point "pointB" in sensor
     // space.
-    blockToSensor: function(pointB) {
+    blockToSensor: function (pointB) {
         return this.viewToSensor(this.worldToView(
             com.realitybuilder.util.blockToWorld(pointB)));
     }

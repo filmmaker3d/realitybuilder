@@ -58,3 +58,6 @@ skip_files:
 - ^(.*/)?.*\.bak$
 - ^source$
 - ^documentation$
+- ^LICENSE$
+- ^NOTICE$
+- ^README$

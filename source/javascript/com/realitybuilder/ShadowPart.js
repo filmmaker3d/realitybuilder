@@ -1,3 +1,5 @@
+// Part of the shadow under the new block.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,9 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// Part of the shadow under the new block.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.ShadowPart');
 
@@ -59,7 +62,7 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
     // part is rendered, it is as seen by the sensor of the camera "camera".
     // For finding which parts of the shadow have to be obscured, the list of
     // non-new blocks in the construction is used: "constructionBlocks"
-    constructor: function(deltaXB, deltaYB, newBlock, camera, 
+    constructor: function (deltaXB, deltaYB, newBlock, camera, 
         constructionBlocks)
     {
         this._deltaXB = deltaXB;
@@ -69,26 +72,26 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
         this._constructionBlocks = constructionBlocks;
     },
 
-    zB: function() {
+    zB: function () {
         return this._zB;
     },
 
     // Returns the shadow's position in block space. From the position the
     // block extends in positive direction along the x- and y-axis. Depends on
     // up to date coordinates in world space.
-    positionB: function() {
+    positionB: function () {
         return [this._newBlock.xB(), this._newBlock.yB(), this._zB];
     },
 
     // Updates the vertices in world space.
-    _updateWorldSpace: function() {
+    _updateWorldSpace: function () {
         var xB = this._newBlock.xB() + this._deltaXB,
             yB = this._newBlock.yB() + this._deltaYB,
             zB = this._constructionBlocks.
                 zBOfUpperSideOfRealBlockBelow(xB, yB, this._newBlock.zB() + 1),
             relativeVerticesB = [[0, 0], [1, 0], [1, 1], [0, 1]];
 
-        this._vertices = dojo.map(relativeVerticesB, function(rVB) {
+        this._vertices = dojo.map(relativeVerticesB, function (rVB) {
             return com.realitybuilder.util.blockToWorld
                 ([xB + rVB[0], yB  + rVB[1], zB]);
         });
@@ -99,7 +102,7 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
     },
 
     // Calculates the vertices in view space.
-    _updateViewSpace: function() {
+    _updateViewSpace: function () {
         this._updateWorldSpace();
         this._verticesV = dojo.map(this._vertices, 
             dojo.hitch(this._camera, this._camera.worldToView));
@@ -107,7 +110,7 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
 
     // Calculates the vertices of the shadow and its bounding box in sensor
     // space. The camera is positioned in the center of the sensor.
-    updateSensorSpace: function() {
+    updateSensorSpace: function () {
         this._updateViewSpace();
         this._verticesS = dojo.map(this._verticesV,
             dojo.hitch(this._camera, this._camera.viewToSensor));
@@ -116,7 +119,7 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
 
     // Returns true, iff the bounding box of the shadow overlaps with that of
     // the block "block", in sensor space.
-    _boundingBoxesOverlap: function(block) {
+    _boundingBoxesOverlap: function (block) {
         var bBS = block.boundingBoxS();
         return (
             this._boundingBoxS[1][0] >= bBS[0][0] &&
@@ -128,7 +131,7 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
     // Returns true, iff any vertex of the shadow is inside the bounding box of
     // the block "block", in sensor space. If the block "block" is obscuring
     // part or all of the shadow, then this is the case.
-    _anyVertexInBoundingBox: function(block) {
+    _anyVertexInBoundingBox: function (block) {
         var bBS = block.boundingBoxS(), i, vS;
         for (i = 0; i < this._verticesS.length; i += 1) {
             vS = this._verticesS[i];
@@ -146,10 +149,10 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
     // Updates the vertices (top left, lower right) defining the bounding box
     // of the shadow in sensor space. Depends on the vertices of the shadow in
     // sensor space.
-    _updateSensorSpaceBoundingBox: function() {
+    _updateSensorSpaceBoundingBox: function () {
         var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE,
             maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE;
-        dojo.forEach(this._verticesS, function(tmp) {
+        dojo.forEach(this._verticesS, function (tmp) {
             if (tmp[0] < minX) {
                 minX = tmp[0];
             } else if (tmp[0] > maxX) {
@@ -167,7 +170,7 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
 
     // Returns true, if the block "block" is a cutting block, i.e. if it is a
     // block in front of the shadow part.
-    _isCuttingBlock: function(block) {
+    _isCuttingBlock: function (block) {
         return (
             block.xB() >= this._xB - 1 && 
             block.yB() <= this._yB + 1 &&
@@ -178,7 +181,7 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
     // drawing on the canvas context "context". Needs to be called for each sub
     // shadow individually since a sub shadow may be on a block that hides
     // another sub shadow.
-    _subtractRealBlocks: function(context) {
+    _subtractRealBlocks: function (context) {
         var realBlocksSorted = this._constructionBlocks.realBlocksSorted(),
             i, realBlock;
 
@@ -205,7 +208,7 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
     // Draws the shadow on the canvas context "context". The shadow is drawn in
     // front of everything else on the surface of the canvas. Depends on up to
     // date vertices in sensor space.
-    render: function(context) {
+    render: function (context) {
         var verticesS = this._verticesS, i;
         context.fillStyle = 'rgba(255,0,0,0.2)';
         context.beginPath();

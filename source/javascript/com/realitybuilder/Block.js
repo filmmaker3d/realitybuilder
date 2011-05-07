@@ -1,3 +1,5 @@
+// A building block.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,9 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// A building block.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager */
 
 dojo.provide('com.realitybuilder.Block');
 
@@ -81,7 +84,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     // "yB", "zB") = "positionB". A blocks extents are defined by two corners:
     // ("xB", "yB", "zB"), ("xB" + 2, "yB" + 2, "zB" + 1). When the block is
     // rendered, it is as seen by the sensor of the camera "camera".
-    constructor: function(camera, positionB, image) {
+    constructor: function (camera, positionB, image) {
         this._positionB = positionB;
         this._camera = camera;
         this._edges = this._INITIAL_EDGES;
@@ -89,24 +92,24 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     // Returns the block's position in block space. From the position the block
     // extends in positive direction along the x-, y-, and z-axis.
-    positionB: function() {
+    positionB: function () {
         return this._positionB;
     },
 
-    xB: function() {
+    xB: function () {
         return this._positionB[0];
     },
 
-    yB: function() {
+    yB: function () {
         return this._positionB[1];
     },
 
-    zB: function() {
+    zB: function () {
         return this._positionB[2];
     },
 
     // Updates the vertices of the block in world space.
-    _updateWorldSpace: function() {
+    _updateWorldSpace: function () {
         var xB = this.positionB()[0],
             yB = this.positionB()[1],
             zB = this.positionB()[2],
@@ -128,19 +131,19 @@ dojo.declare('com.realitybuilder.Block', null, {
     },
 
     // Calculates the vertices of the block in view space.
-    _updateViewSpace: function() {
+    _updateViewSpace: function () {
         this._updateWorldSpace();
         this._verticesV = dojo.map(this._verticesB, 
             dojo.hitch(this._camera, this._camera.worldToView));
     },
 
     // Returns true, iff the sensor space needs to be updated.
-    _sensorSpaceNeedsToBeUpdated: function() {
+    _sensorSpaceNeedsToBeUpdated: function () {
         return this._lastCameraId !== this._camera.id();
     },
 
     // Called after the sensor space has been updated.
-    _onSensorSpaceUpdated: function() {
+    _onSensorSpaceUpdated: function () {
         this._lastCameraId = this._camera.id();
     },
 
@@ -148,7 +151,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     // space. The camera is positioned in the center of the sensor. Returns
     // true, iff there have been any changes in the result since the last call
     // to this function.
-    updateSensorSpace: function() {
+    updateSensorSpace: function () {
         if (this._sensorSpaceNeedsToBeUpdated()) {
             this._updateViewSpace();
             this._verticesS = dojo.map(this._verticesV,
@@ -172,10 +175,10 @@ dojo.declare('com.realitybuilder.Block', null, {
     // Updates the vertices (top left, lower right) defining the bounding box
     // of the block in sensor space. Depends on the vertices of the block in
     // sensor space.
-    _updateSensorSpaceBoundingBox: function() {
+    _updateSensorSpaceBoundingBox: function () {
         var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE,
             maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE;
-        dojo.forEach(this._verticesS, function(vertexS) {
+        dojo.forEach(this._verticesS, function (vertexS) {
             if (vertexS[0] < minX) {
                 minX = vertexS[0];
             } else if (vertexS[0] > maxX) {
@@ -193,11 +196,11 @@ dojo.declare('com.realitybuilder.Block', null, {
     // Draws the block in the color "color" (CSS format) as seen by the sensor,
     // on the canvas rendering context "context". Depends on the vertices in
     // view coordinates.
-    render: function(context, color) {
+    render: function (context, color) {
         var verticesS, vertexS1, vertexS2;
         this.updateSensorSpace();
         verticesS = this._verticesS;
-        dojo.forEach(this._edges, function(edge) {
+        dojo.forEach(this._edges, function (edge) {
             vertexS1 = verticesS[edge[0]];
             vertexS2 = verticesS[edge[1]];
             context.globalAlpha = edge[3] ? 0.2 : 1;

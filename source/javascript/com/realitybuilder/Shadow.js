@@ -1,3 +1,6 @@
+// The shadow under the new block. It is used to indicate where the block is
+// hovering.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,10 +15,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// The shadow under the new block. It is used to indicate where the block is
-// hovering.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.Shadow');
 
@@ -39,7 +42,7 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     // it is as seen by the sensor of the camera "camera". For finding which
     // parts of the shadow have to be obscured, the list of non-new blocks in
     // the construction is used: "constructionBlocks"
-    constructor: function(newBlock, camera, constructionBlocks) {
+    constructor: function (newBlock, camera, constructionBlocks) {
         var i, deltaX, deltaY;
 
         this._newBlock = newBlock;
@@ -59,7 +62,7 @@ dojo.declare('com.realitybuilder.Shadow', null, {
 
     // Sort function, for ordering shadow parts by height/layer. From bottom to
     // top.
-    _sortByHeight: function(shadowPart1, shadowPart2) {
+    _sortByHeight: function (shadowPart1, shadowPart2) {
         if (shadowPart1.zB() > shadowPart2.zB()) {
             return 1;
         } else if (shadowPart1.zB() < shadowPart2.zB()) {
@@ -70,34 +73,34 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     },
 
     // Updates the sensor space of the shadow parts.
-    _updateSensorSpace: function() {
-        dojo.forEach(this._shadowParts, function(shadowPart) {
+    _updateSensorSpace: function () {
+        dojo.forEach(this._shadowParts, function (shadowPart) {
             shadowPart.updateSensorSpace();
         });
     },
 
     // Orders the shadow parts, from bottom to top.
-    _sortShadowParts: function() {
+    _sortShadowParts: function () {
         this._shadowParts.sort(this._sortByHeight);
     },
 
     // Draws the shadow as seen by the sensor of the camera. Depends on the
     // vertices in view coordinates.
-    render: function() {
+    render: function () {
         var canvas = this._camera.sensor().shadowCanvas(), context;
         this._updateSensorSpace();
         this._sortShadowParts();
         if (canvas.getContext) {
             context = canvas.getContext('2d');
             context.clearRect(0, 0, canvas.width, canvas.height);
-            dojo.forEach(this._shadowParts, function(shadowPart) {
+            dojo.forEach(this._shadowParts, function (shadowPart) {
                 shadowPart.render(context);
             });
         }
     },
 
     // Makes sure that the shadow is not shown on the sensor.
-    clear: function() {
+    clear: function () {
         var canvas = this._camera.sensor().shadowCanvas(), context;
         if (canvas.getContext) {
             context = canvas.getContext('2d');

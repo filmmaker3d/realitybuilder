@@ -1,3 +1,6 @@
+// A block that is permanently part of the construction, though it may be
+// marked as deleted or pending.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,10 +15,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// A block that is permanently part of the construction, though it may be
-// marked as deleted or pending.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.ConstructionBlock');
 
@@ -39,35 +42,35 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // seconds since the epoch - of the date-time when the bocks status was
     // last changed is "timeStamp". When the block is rendered, it is as seen
     // by the sensor of the camera "camera".
-    constructor: function(camera, positionB, state, timeStamp) {
+    constructor: function (camera, positionB, state, timeStamp) {
         this._state = state;
         this._timeStamp = timeStamp;
     },
 
-    timeStamp: function() {
+    timeStamp: function () {
         return this._timeStamp;
     },
 
-    isDeleted: function() {
+    isDeleted: function () {
         return this._state === 0;
     },
 
-    isPending: function() {
+    isPending: function () {
         return this._state === 1;
     },
 
-    isReal: function() {
+    isReal: function () {
         return this._state === 2;
     },
 
-    state: function() {
+    state: function () {
         return this._state;
     },
 
     // If not deleted, draws the block as seen by the sensor on the canvas
     // rendering context "context". Depends on the vertices in view
     // coordinates.
-    render: function(context) {
+    render: function (context) {
         if (!this.isDeleted()) {
             var color = this.isReal() ? "green" : "white";
             this.inherited(arguments, [arguments[0], color]);
@@ -76,14 +79,14 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
 
     // Subtracts the shape of the block from the drawing on the canvas context
     // "context".
-    subtract: function(context) {
+    subtract: function (context) {
         var verticesS, x, y;
         this.updateSensorSpace();
         context.globalCompositeOperation = "destination-out";
         context.fillStyle = "black";
         verticesS = this._verticesS;
         context.beginPath();
-        dojo.forEach(this._BORDER_VERTEX_INDEXES, function(vertexIndex, i) {
+        dojo.forEach(this._BORDER_VERTEX_INDEXES, function (vertexIndex, i) {
             x = verticesS[vertexIndex][0];
             y = verticesS[vertexIndex][1];
             if (i === 0) {

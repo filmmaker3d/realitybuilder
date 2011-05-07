@@ -1,3 +1,5 @@
+// The live image, being updated regularly.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,9 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// The live image, being updated regularly.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
 
 dojo.provide('com.realitybuilder.Image');
 
@@ -45,7 +48,7 @@ dojo.declare('com.realitybuilder.Image', null, {
 
     // Sets the dimensions of the image to those of the sensor of the camera
     // "camera" and starts the update cicle.
-    constructor: function(camera) {
+    constructor: function (camera) {
         this._node = dojo.byId('live');
 
         this._node.style.width = camera.sensor().width() + 'px';
@@ -57,29 +60,29 @@ dojo.declare('com.realitybuilder.Image', null, {
         this._refresh();
     },
 
-    imageLoaded: function() {
+    imageLoaded: function () {
         return this._imageLoaded;
     },
 
-    versionOnServer: function() {
+    versionOnServer: function () {
         return this._versionOnServer;
     },
 
-    url: function() {
+    url: function () {
         return this._url;
     },
 
-    updateIntervalServer: function() {
+    updateIntervalServer: function () {
         return this._updateIntervalServer;
     },
 
-    updateIntervalClient: function() {
+    updateIntervalClient: function () {
         return this._updateIntervalClient;
     },
 
     // Updates the settings of the image to the version on the server, which is
     // described by "serverData".
-    updateWithServerData: function(serverData) {
+    updateWithServerData: function (serverData) {
         this._versionOnServer = serverData.version;
         this._updateIntervalClient = serverData.updateIntervalClient;
         this._updateIntervalServer = serverData.updateIntervalServer;
@@ -90,13 +93,13 @@ dojo.declare('com.realitybuilder.Image', null, {
 
     // Called when an image has been loaded for the first time. Notes that in a
     // flag and stops listening to the onload event.
-    _onFirstImageLoad: function() {
+    _onFirstImageLoad: function () {
         this._imageLoaded = true;
         dojo.disconnect(this._onloadHandle);
     },
 
     // Updates the image and schedules the next update.
-    _refresh: function() {
+    _refresh: function () {
         this._node.src = 
             '/images/live.jpg?nocache=' + Math.random().toString();
         setTimeout(dojo.hitch(this, this._refresh), 
