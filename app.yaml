@@ -34,6 +34,9 @@ handlers:
 - url: /images
   static_dir: images
 
+- url: /documentation
+  script: documentation.py
+
 - url: /admin
   script: main.py
   login: required # admin check is done separately

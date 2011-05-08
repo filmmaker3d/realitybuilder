@@ -1,0 +1,206 @@
+Introduction
+============
+
+This directory contains documentation for developers of Reality Builder.
+
+Less well-known file extensions used:
+
+* xar: Xara Xtreme (or compatible)
+
+* 3dm: Rhino 3D
+
+
+Conventions and Terminology
+===========================
+
+* Specifiers coordinates:
+
+  - Those ending in "B", e.g. "xB", denote coordinates in building block space.
+    "xB" and "yB" are the position on the ground plane, and "zB" is the
+    elevation. Relative to what the user sees in perspective view as oriented
+    in the application:
+
+      xB, yB, zB: left, front, bottom corner of a building block
+
+  - Those ending in "V" denote coordinates in view space, i.e. the space
+    relative to the lens, approximated as a pinhole, of the camera:
+
+      +---x
+      |\
+      | \
+      |  z
+      y
+
+    Units: mm
+
+    The origin of the view space is in the pinhole.
+
+  - Those ending in "S" denote coordinates in sensor space, i.e. coordinates of
+    projected points. The origin of the sensor is in one of its corners.
+
+    Units: mm
+
+  - All others are in world space.
+
+    Units: pixels
+
+* Point: Is specified as an array with two or three numbers: the coordinates.
+  It is regarded as a vector, with its origin in the origin of the coordinate
+  system.
+
+* Edge: Connects two vertices. Is specified as an array with two indices to a
+  vertex array, and a third index whose value is the original index/name of the
+  edge. The third value is important to identify edges in case they are
+  reordered.
+
+* Line: straight line with infinite extends. Is specified as an array with two
+  points that lie on it. If the points coincide, then the result of any
+  function making use of the line is undefined.
+
+* Line segment: similar to a line but with finite extends, connecting the
+  points by which it is defined.
+
+
+Miscellaneous
+=============
+
+* Canvas seems to have automatic "double buffering", i.e. Gecko and WebKit
+  browsers don't draw to screen while executing code.
+
+  According to a mailing list post by Robert O'Callahan <robert@ocallahan.org>:
+
+    I assume you have a setTimeout handler (or similar) which renders a
+    complete frame before returning. If so, then in Gecko and I think also in
+    Webkit the canvas will not be drawn to the screen while your script is
+    running, only between frames. So I suspect your performance problem has
+    some other cause.
+
+    Rob
+
+  Source: <url:http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2009-Septemb
+  er/022702.html>
+
+* Centering of HTML content is done with the help of a table, since other
+  solutions don't seem to work decently with older browsers such as IE6. The
+  problem often is that when the window is too small, content is clipped from
+  the top.
+
+  When changing the implementation for centering, don't forget to check whether
+  the content is still displayed correctly when the browser window is smaller
+  than the content.
+
+* It seems that it's better to not set the interval of image updates by the
+  server too low, if the image source is slow. If it is not available, then
+  this may lead to many requests being stuck, at least on the client.
+
+* Image URLs at the same domain as the app don't seem to work.
+
+* The server directory "/javascript" is in part based on a so called custom
+  Dojo build. One reason for using a custom build are limitations on the number
+  and size of files on Google App Engine, as of April 2010.
+  
+  How I created the build:
+
+  1. I ran the following command in the Dojo "buildscripts" directory, from the
+    Windows XP command line:
+
+    build.bat profile=realitybuilder action=clean,release optimize=shrinksafe
+
+  2. I copied dojo and dojox related files and directories to "/javascript":
+
+    - dojo/realitybuilder.js: The so called layer, containing code written by
+      me, plus dojo code that it depends on, except for Dojo Base and some
+      special resources.
+
+    - dojo/dojo.js: The layer, containing the Dojo Base
+
+    - dojo/_firebug: needed for Dojo debug mode
+
+    - dojo/nls: needed for at least "dojox.date.posix.strftime"
+
+    - dojox/gfx: provides interfaces to different graphics description
+      standards, such as SVG or Canvas.
+
+    Source of the above resources, relative to the directory containing the
+    Dojo SDK: release/dojo/
+
+    Including the following dependencies into the build profile seems to break
+    rendering. Perhaps it is simply not possible to merge more than one
+    renderer into a layer. 
+
+      dojox.gfx.canvas, dojox.gfx.svg, dojox.gfx.silverlight, dojox.gfx.vml
+
+* The application depends on having the construction oriented in a certain way,
+  relative to the camera.
+
+* Certain RPC calls require admin priveledges, namely those that are available
+  only via the admin interface. This is necessary so that users cannot hack
+  into the system and, for example, delete blocks.
+
+* The maximum buildling height makes it possible to always have a place to
+  position the new block, even when there is little space left in the
+  construction.
+
+* The date-time in the admin controls is shown in the time zone of the
+  system/browser.
+
+* States of blocks:
+
+  - virtual: the new block which may be moved around has this state
+
+  - pending: a block that has been requested to be build
+
+  - real: a block that has been built
+
+  - deleted: a block that has been removed or that is not planned to be build.
+
+* To initialize the set of blocks to some example set, visit the following URL,
+  relative to the root of the web site.
+
+    /admin/update
+
+* Polar coordinates are described by an array with two entries:
+
+  0 - angle: Angle measured counter clockwise against the positive x axis. Its
+    value is between -PI and PI.
+
+    |   /
+    |  /
+    | /\
+    |/  |angle
+    +------
+
+  1 - distance: Distance from the origin.
+
+* After a block has been built in place of a request, the formerly used new
+  block becomes a movable/virtual new block again. In other words: Through an
+  entire session, there is only one new block object which changes state, from
+  from virtual to pending to virtual and so on.
+
+* In the database, there are never two blocks at the same block space position.
+
+
+Legal
+=====
+
+Copyright 2011 Felix E. Klee <felix.klee@inka.de>
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
+
+-- 
+The following settings are interpreted by EMACS, do not remove them.
+Local Variables:
+mode:text
+fill-column:79
+coding: utf-8
+End:
+Local IspellDict: american
