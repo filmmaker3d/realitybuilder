@@ -26,16 +26,19 @@ com.realitybuilder.util.TOLERANCE_S = 0.5;
 
 // Block dimensions in world space. The side length of a block is approximately
 // two times the grid spacing in the respective direction.
-com.realitybuilder.util.GRID_SPACING_X = 8; // mm
-com.realitybuilder.util.GRID_SPACING_Y = 8; // mm
-com.realitybuilder.util.HEIGHT = 9.6; // mm
+com.realitybuilder.util.BLOCK_POSITION_SPACING_XY = 8; // mm
+com.realitybuilder.util.BLOCK_POSITION_SPACING_Z = 9.6; // mm
+
+// Outline of the block in the xy plane, with coordinates in block space,
+// counter clockwise:
+com.realitybuilder.util.BLOCK_OUTLINE_B = [[0, 0], [2, 0], [2, 2], [0, 2]];
 
 // Returns the coordinates of the block space point "pointB" in world space.
 com.realitybuilder.util.blockToWorld = function (pointB) {
-    var gX = com.realitybuilder.util.GRID_SPACING_X,
-        gY = com.realitybuilder.util.GRID_SPACING_Y,
-        h = com.realitybuilder.util.HEIGHT;
-    return [pointB[0] * gX, pointB[1] * gY, pointB[2] * h];
+    var factorX = com.realitybuilder.util.BLOCK_POSITION_SPACING_XY,
+        factorY = com.realitybuilder.util.BLOCK_POSITION_SPACING_XY,
+        factorZ = com.realitybuilder.util.BLOCK_POSITION_SPACING_Z;
+    return [pointB[0] * factorX, pointB[1] * factorY, pointB[2] * factorZ];
 };
 
 // Returns true, iff the point "point" lies somewhere between the points

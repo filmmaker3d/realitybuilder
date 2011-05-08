@@ -23,7 +23,7 @@ dojo.provide('com.realitybuilder.Block');
 
 dojo.declare('com.realitybuilder.Block', null, {
     // Initial edges of the block, defined using indices of the array
-    // "this._verticesB". Only edges, that are visible when the construction is
+    // "this._vertexesB". Only edges, that are visible when the construction is
     // oriented a certain way, are included. The third value is an index used
     // for identifying the edge (important if the position of the edge is
     // changed). The fourth value specifies whether the edge is a background
@@ -50,7 +50,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     _camera: null,
 
     // Edges of the block, defined using indices of the array
-    // "this._verticesB". Only edges, that are visible when the construction is
+    // "this._vertexesB". Only edges, that are visible when the construction is
     // oriented a certain way, are included. The third number is an index used
     // for identifying the edge (important if the position of the edge is
     // changed).
@@ -62,23 +62,27 @@ dojo.declare('com.realitybuilder.Block', null, {
         [2, 3, 2], [3, 0, 3], [0, 4, 8], 
         [4, 5, 4], [5, 6, 5], [2, 6, 10]],
 
-    // Indexes of the vertices, describing the border of any block, when it is
-    // oriented in a certain way. Sorted so that following the vertices creates
+    // Indexes of the vertexes, describing the border of any block, when it is
+    // oriented in a certain way. Sorted so that following the vertexes creates
     // the outline.
     _BORDER_VERTEX_INDEXES: [2, 3, 0, 4, 5, 6],
 
-    // Coordinates of the vertices in block space, view space, and sensor
+    // Coordinates of the vertexes in block space, view space, and sensor
     // space.
-    _verticesB: null,
-    _verticesV: null,
-    _verticesS: null,
-
-    // The sensor space bounding box of the block, i.e. the smallest rectangle,
-    // which encloses the block in sensor space.
-    _boundingBoxS: null,
+    _vertexesBottomB: null,
+    _vertexesBottomV: null,
+    _vertexesBottomS: null,
+    _vertexesTopB: null,
+    _vertexesTopV: null,
+    _vertexesTopS: null,
 
     // Camera id when last calculating the sensor space coordinates.
     _lastCameraId: null,
+
+    // Horizontal extents of the block in sensor space (same index for top and
+    // bottom):
+    _indexOfLeftmostVertex: null,
+    _indexOfRightmostVertex: null,
 
     // Creates a 2x2x1 building block at the position in block space ("xB",
     // "yB", "zB") = "positionB". A blocks extents are defined by two corners:
@@ -108,33 +112,39 @@ dojo.declare('com.realitybuilder.Block', null, {
         return this._positionB[2];
     },
 
-    // Updates the vertices of the block in world space.
+    // Updates the vertexes of the block in world space.
     _updateWorldSpace: function () {
-        var xB = this.positionB()[0],
-            yB = this.positionB()[1],
-            zB = this.positionB()[2],
-            vs = [];
+        var 
+        xB = this.positionB()[0],
+        yB = this.positionB()[1],
+        zB = this.positionB()[2],
+        vsBottom = [], vsTop = [],
+        blockOutlineB = com.realitybuilder.util.BLOCK_OUTLINE_B;
 
-        // bottom, clock wise:
-        vs.push(com.realitybuilder.util.blockToWorld([xB, yB, zB]));
-        vs.push(com.realitybuilder.util.blockToWorld([xB, yB + 2, zB]));
-        vs.push(com.realitybuilder.util.blockToWorld([xB + 2, yB + 2, zB]));
-        vs.push(com.realitybuilder.util.blockToWorld([xB + 2, yB, zB]));
+        // top, counter clock wise:
+        dojo.forEach(blockOutlineB, function (vertexXYB) {
+            vsBottom.push(com.realitybuilder.util.blockToWorld(
+                [xB + vertexXYB[0], 
+                 yB + vertexXYB[1], 
+                 zB]));
+            vsTop.push(com.realitybuilder.util.blockToWorld([xB + vertexXYB[0], 
+                                                             yB + vertexXYB[1], 
+                                                             zB + 1]));
+        });
 
-        // top, clock wise:
-        vs.push(com.realitybuilder.util.blockToWorld([xB, yB, zB + 1]));
-        vs.push(com.realitybuilder.util.blockToWorld([xB, yB + 2, zB + 1]));
-        vs.push(com.realitybuilder.util.blockToWorld([xB + 2, yB + 2, zB + 1]));
-        vs.push(com.realitybuilder.util.blockToWorld([xB + 2, yB, zB + 1]));
-
-        this._verticesB = vs;
+        this._vertexesBottomB = vsBottom;
+        this._vertexesTopB = vsTop;
     },
 
-    // Calculates the vertices of the block in view space.
+    // Calculates the vertexes of the block in view space.
     _updateViewSpace: function () {
         this._updateWorldSpace();
-        this._verticesV = dojo.map(this._verticesB, 
-            dojo.hitch(this._camera, this._camera.worldToView));
+        this._vertexesBottomV = dojo.map(this._vertexesBottomB, 
+                                         dojo.hitch(this._camera, 
+                                                    this._camera.worldToView));
+        this._vertexesTopV = dojo.map(this._vertexesTopB, 
+                                      dojo.hitch(this._camera, 
+                                                 this._camera.worldToView));
     },
 
     // Returns true, iff the sensor space needs to be updated.
@@ -147,16 +157,26 @@ dojo.declare('com.realitybuilder.Block', null, {
         this._lastCameraId = this._camera.id();
     },
 
-    // Calculates the vertices and the bounding box of the block in sensor
-    // space. The camera is positioned in the center of the sensor. Returns
-    // true, iff there have been any changes in the result since the last call
-    // to this function.
+    _updateHorizontalSensorSpaceExtents: function () {
+        // FIXME: actually calculate - perhaps compare with calculation of
+        // bounding box
+        this._indexOfLeftmostVertex = 0;
+        this._indexOfRightmostVertex = 2;
+    },
+
+    // Calculates the vertexes of the block in sensor space. The camera is
+    // positioned in the center of the sensor. Returns true, iff there have
+    // been any changes in the result since the last call to this function.
     updateSensorSpace: function () {
+        var cam = this._camera;
         if (this._sensorSpaceNeedsToBeUpdated()) {
             this._updateViewSpace();
-            this._verticesS = dojo.map(this._verticesV,
-                dojo.hitch(this._camera, this._camera.viewToSensor));
-            this._updateSensorSpaceBoundingBox();
+            this._vertexesBottomS = dojo.map(this._vertexesBottomV,
+                                             dojo.hitch(cam, 
+                                                        cam.viewToSensor));
+            this._vertexesTopS = dojo.map(this._vertexesTopV,
+                                          dojo.hitch(cam, cam.viewToSensor));
+            this._updateHorizontalSensorSpaceExtents();
             this._onSensorSpaceUpdated();
 
             return true;
@@ -165,50 +185,54 @@ dojo.declare('com.realitybuilder.Block', null, {
         }
     },
 
-    // Returns the sensor space bounding box, as an array of two points in
-    // sensor space, which describe the corners of the box.
-    boundingBoxS: function () {
-        this.updateSensorSpace();
-        return this._boundingBoxS;
+    // Renders the foreground of the block, i.e. the part of that block that
+    // was visible were the block solid.
+    _renderForeground: function (context) {
+        var
+        vertexesS = this._vertexesTopS,
+        vertexS, firstVertexS, i, 
+        ilv = this._indexOfLeftmostVertex,
+        irv = this._indexOfRightmostVertex;
+
+        firstVertexS = vertexesS[0];
+
+        context.globalAlpha = 1;
+        context.beginPath();
+        context.moveTo(firstVertexS[0], firstVertexS[1]);
+        for (i = 1; i < vertexesS.length; i += 1) {
+            vertexS = vertexesS[i];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+        context.lineTo(firstVertexS[0], firstVertexS[1]);
+        context.stroke();
     },
 
-    // Updates the vertices (top left, lower right) defining the bounding box
-    // of the block in sensor space. Depends on the vertices of the block in
-    // sensor space.
-    _updateSensorSpaceBoundingBox: function () {
-        var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE,
-            maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE;
-        dojo.forEach(this._verticesS, function (vertexS) {
-            if (vertexS[0] < minX) {
-                minX = vertexS[0];
-            } else if (vertexS[0] > maxX) {
-                maxX = vertexS[0];
-            } if (vertexS[1] < minY) {
-                minY = vertexS[1];
-            } else if (vertexS[1] > maxY) {
-                maxY = vertexS[1];
-            }
-        });
+    // Renders the background of the block, i.e. the part of that block that
+    // was invisible were the block solid.
+    _renderBackground: function (context) {
+        var vertexesS, vertexS, firstVertexS, i;
+        vertexesS = this._vertexesBottomS;
+        firstVertexS = vertexesS[0];
 
-        this._boundingBoxS = [[minX, minY], [maxX, maxY]];
+        context.globalAlpha = 0.2;
+        context.beginPath();
+        context.moveTo(firstVertexS[0], firstVertexS[1]);
+        for (i = 1; i < vertexesS.length; i += 1) {
+            vertexS = vertexesS[i];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+        context.lineTo(firstVertexS[0], firstVertexS[1]);
+        context.stroke();
     },
 
     // Draws the block in the color "color" (CSS format) as seen by the sensor,
-    // on the canvas rendering context "context". Depends on the vertices in
+    // on the canvas rendering context "context". Depends on the vertexes in
     // view coordinates.
     render: function (context, color) {
-        var verticesS, vertexS1, vertexS2;
         this.updateSensorSpace();
-        verticesS = this._verticesS;
-        dojo.forEach(this._edges, function (edge) {
-            vertexS1 = verticesS[edge[0]];
-            vertexS2 = verticesS[edge[1]];
-            context.globalAlpha = edge[3] ? 0.2 : 1;
-            context.strokeStyle = color;
-            context.beginPath();
-            context.moveTo(vertexS1[0], vertexS1[1]);
-            context.lineTo(vertexS2[0], vertexS2[1]);
-            context.stroke();
-        });
+
+        context.strokeStyle = color;
+        this._renderForeground(context);
+        this._renderBackground(context);
     }
 });

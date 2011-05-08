@@ -50,6 +50,15 @@ Conventions and Terminology
 
     Units: mm
 
+    To get from block space to world space, multiply block space coordinates by
+    factors in mm. The multiplication factors for "xB" and "yB" are identical.
+    Otherwise a block that is rotated in a plane would deform. The
+    multiplication factor for "zB", however, is independent. Example:
+
+    . Multiplication factor x, y: 5mm
+
+    . Multiplication factor z: 3mm
+
 * Point: Is specified as an array with two or three numbers: the coordinates.
   It is regarded as a vector, with its origin in the origin of the coordinate
   system.
@@ -65,6 +74,9 @@ Conventions and Terminology
 
 * Line segment: similar to a line but with finite extends, connecting the
   points by which it is defined.
+
+* Block: A block is described by an outline in the xy plane, in block space.
+  Its height in block space is always: 1
 
 
 Miscellaneous
