@@ -174,8 +174,8 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
     // Returns the coordinates of the world space point "point" in view space.
     worldToView: function (point) {
-        var tmp = com.realitybuilder.util.subtractVectors(
-            point, this._position);
+        var tmp = com.realitybuilder.util.subtractVectors(point, 
+                                                          this._position);
 
         // Rotation matrices are applied to the vector tmp, from the left side:
         tmp = dojox.math.matrix.transpose([tmp]);
@@ -198,8 +198,8 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
         // Projection on sensor:
         scale = this.scale(tmp[2]);
-        tmp[0] *= scale; // mm
-        tmp[1] *= scale; // mm
+        tmp[0] *= scale; // px
+        tmp[1] *= scale; // px
     
         // Puts camera (and, thus, vanishing point) in the center of the sensor:
         tmp[0] += this._sensor.width() / 2;

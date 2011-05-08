@@ -13,17 +13,22 @@ Less well-known file extensions used:
 Conventions and Terminology
 ===========================
 
-* Specifiers coordinates:
+* Specifiers for coordinates (see also "perspective.xar"):
 
-  - Those ending in "B", e.g. "xB", denote coordinates in building block space.
-    "xB" and "yB" are the position on the ground plane, and "zB" is the
-    elevation. Relative to what the user sees in perspective view as oriented
-    in the application:
+  - The coordinate specifiers ending in "B", e.g. "xB", denote block positions:
 
-      xB, yB, zB: left, front, bottom corner of a building block
+      xB, yB, zB: Position of the left ("xB"), front ("yB"), bottom ("zB")
+        corner of a block's bounding box.
 
-  - Those ending in "V" denote coordinates in view space, i.e. the space
-    relative to the lens, approximated as a pinhole, of the camera:
+    Units: none
+
+    Value: integer
+
+    The space comprised by those coordinates is called "block space".
+
+  - The coordinate specifiers ending in "V" denote coordinates in "view space",
+    i.e. the space relative to the lens, approximated as a pinhole, of the
+    camera:
 
       +---x
       |\
@@ -35,14 +40,15 @@ Conventions and Terminology
 
     The origin of the view space is in the pinhole.
 
-  - Those ending in "S" denote coordinates in sensor space, i.e. coordinates of
-    projected points. The origin of the sensor is in one of its corners.
+  - The coordinate specifiers ending in "S" denote coordinates in "sensor
+    space", i.e. coordinates of projected points. The origin of the sensor is
+    in one of its corners.
+
+    Units: px
+
+  - All other coordinates are in world space.
 
     Units: mm
-
-  - All others are in world space.
-
-    Units: pixels
 
 * Point: Is specified as an array with two or three numbers: the coordinates.
   It is regarded as a vector, with its origin in the origin of the coordinate

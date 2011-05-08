@@ -93,8 +93,8 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
     // Moves the center of the button to the sensor space point "centerS".
     move: function (centerS) {
         var l = this._sideLengthS;
-        this._canvas.style.left = (centerS[0] - l/2) + 'px';
-        this._canvas.style.top = (centerS[1] - l/2) + 'px';
+        this._canvas.style.left = (centerS[0] - l / 2) + 'px';
+        this._canvas.style.top = (centerS[1] - l / 2) + 'px';
         this.centerS = centerS;
     },
 
@@ -124,8 +124,9 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
     },
 
     _computeDeltaB: function () {
+        var i;
         this._deltaB = [];
-        for (var i = 0; i < 3; i += 1) {
+        for (i = 0; i < 3; i += 1) {
             this._deltaB[i] = (i === this._coordinate) ? this._delta() : 0;
         }
     },
@@ -179,8 +180,8 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
                 height: l, 
                 style: {
                     position: 'absolute', 
-                    left: (this.centerS[0] - l/2) + 'px',
-                    top: (this.centerS[1] - l/2) + 'px'}}, 
+                    left: (this.centerS[0] - l / 2) + 'px',
+                    top: (this.centerS[1] - l / 2) + 'px'}}, 
             'coordinateControls');
         if (dojo.isIE) {
             G_vmlCanvasManager.initElement(this._canvas);
@@ -203,17 +204,17 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
             context.strokeStyle = color;
 
             context.beginPath();
-            context.arc(l/2, l/2, this._radiusS, 0, Math.PI*2, true); 
+            context.arc(l / 2, l / 2, this._radiusS, 0, Math.PI * 2, true); 
             context.stroke();
 
             if (this._plus) {
-                context.moveTo(l/2, 4);
-                context.lineTo(l/2, l - 4);
+                context.moveTo(l / 2, 4);
+                context.lineTo(l / 2, l - 4);
                 context.stroke();
             }
 
-            context.moveTo(4, l/2);
-            context.lineTo(l - 4, l/2);
+            context.moveTo(4, l / 2);
+            context.lineTo(l - 4, l / 2);
             context.stroke();
         }
     }
