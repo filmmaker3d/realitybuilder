@@ -155,7 +155,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
     _updateRotationMatrices: function () {
         // Matrices are for rotating view space points, and that rotation is in
         // the oposite direction as that of the camera, which is rotated
-        // counter clockwise. Therefore the matrices rotate clockwise.
+        // counterclockwise. Therefore the matrices rotate clockwise.
         this._rX = [
             [1, 0, 0], 
             [0, Math.cos(-this._aX), Math.sin(-this._aX)], 

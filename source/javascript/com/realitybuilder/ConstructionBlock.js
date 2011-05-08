@@ -68,7 +68,7 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     },
 
     // If not deleted, draws the block as seen by the sensor on the canvas
-    // rendering context "context". Depends on the vertices in view
+    // rendering context "context". Depends on the vertexes in view
     // coordinates.
     render: function (context) {
         if (!this.isDeleted()) {
@@ -80,23 +80,48 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // Subtracts the shape of the block from the drawing on the canvas context
     // "context".
     subtract: function (context) {
-        var verticesS, x, y;
+        var
+        vertexesBottomS, vertexesTopS,
+        len, vertexS, i, ilv, irv;
+
         this.updateSensorSpace();
+
+        vertexesBottomS = this._vertexesBottomS;
+        vertexesTopS = this._vertexesTopS;
+        len = vertexesTopS.length; // same for top and bottom
+        ilv = this._indexOfLeftmostVertex;
+        irv = this._indexOfRightmostVertex;
+
         context.globalCompositeOperation = "destination-out";
         context.fillStyle = "black";
-        verticesS = this._verticesS;
+        context.globalAlpha = 1;
+
+        // top, from rightmost to leftmost vertex, counterclockwise:
         context.beginPath();
-        dojo.forEach(this._BORDER_VERTEX_INDEXES, function (vertexIndex, i) {
-            x = verticesS[vertexIndex][0];
-            y = verticesS[vertexIndex][1];
-            if (i === 0) {
-                context.moveTo(x, y);
-            } else {
-                context.lineTo(x, y);
-            }
-        });
+        vertexS = vertexesTopS[irv];
+        context.moveTo(vertexS[0], vertexS[1]);
+        for (i = irv + 1; i <= len + ilv; i += 1) {
+            vertexS = vertexesTopS[i % len];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+
+        // line from leftmost vertex on top to leftmost vertex on bottom:
+        vertexS = vertexesBottomS[ilv];
+        context.lineTo(vertexS[0], vertexS[1]);
+
+        // bottom, from leftmost to rightmost vertex, counterclockwise:
+        for (i = ilv + 1; i <= len + irv; i += 1) {
+            vertexS = vertexesBottomS[i % len];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+
+        // line from rightmost vertex on bottom to rightmost vertex on top:
+        vertexS = vertexesBottomS[irv];
+        context.lineTo(vertexS[0], vertexS[1]);
+
         context.closePath();
         context.fill();
+
         context.globalCompositeOperation = "source-over";
     }
 });

@@ -25,14 +25,14 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
-    // Vertices in world space.
-    _vertices: null,
+    // Vertexes in world space.
+    _vertexes: null,
 
-    // Vertices in view space.
-    _verticesV: null,
+    // Vertexes in view space.
+    _vertexesV: null,
 
-    // Vertices in sensor space.
-    _verticesS: null,
+    // Vertexes in sensor space.
+    _vertexesS: null,
 
     // Camera object, used for calculating the projection on the camera sensor.
     _camera: null,
@@ -83,17 +83,18 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
         return [this._newBlock.xB(), this._newBlock.yB(), this._zB];
     },
 
-    // Updates the vertices in world space.
+    // Updates the vertexes in world space.
     _updateWorldSpace: function () {
         var xB = this._newBlock.xB() + this._deltaXB,
             yB = this._newBlock.yB() + this._deltaYB,
             zB = this._constructionBlocks.
                 zBOfUpperSideOfRealBlockBelow(xB, yB, this._newBlock.zB() + 1),
-            relativeVerticesB = [[0, 0], [1, 0], [1, 1], [0, 1]];
+            relativeVertexesB = [[0, 0], [1, 0], [1, 1], [0, 1]];
 
-        this._vertices = dojo.map(relativeVerticesB, function (rVB) {
-            return com.realitybuilder.util.blockToWorld
-                ([xB + rVB[0], yB  + rVB[1], zB]);
+        this._vertexes = dojo.map(relativeVertexesB, function (rVB) {
+            return com.realitybuilder.util.blockToWorld([xB + rVB[0], 
+                                                         yB  + rVB[1], 
+                                                         zB]);
         });
 
         this._xB = xB;
@@ -101,18 +102,18 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
         this._zB = zB;
     },
 
-    // Calculates the vertices in view space.
+    // Calculates the vertexes in view space.
     _updateViewSpace: function () {
         this._updateWorldSpace();
-        this._verticesV = dojo.map(this._vertices, 
+        this._vertexesV = dojo.map(this._vertexes, 
             dojo.hitch(this._camera, this._camera.worldToView));
     },
 
-    // Calculates the vertices of the shadow and its bounding box in sensor
+    // Calculates the vertexes of the shadow and its bounding box in sensor
     // space. The camera is positioned in the center of the sensor.
     updateSensorSpace: function () {
         this._updateViewSpace();
-        this._verticesS = dojo.map(this._verticesV,
+        this._vertexesS = dojo.map(this._vertexesV,
             dojo.hitch(this._camera, this._camera.viewToSensor));
         this._updateSensorSpaceBoundingBox();
     },
@@ -133,26 +134,25 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
     // part or all of the shadow, then this is the case.
     _anyVertexInBoundingBox: function (block) {
         var bBS = block.boundingBoxS(), i, vS;
-        for (i = 0; i < this._verticesS.length; i += 1) {
-            vS = this._verticesS[i];
+        for (i = 0; i < this._vertexesS.length; i += 1) {
+            vS = this._vertexesS[i];
             if (vS[0] >= bBS[0][0] &&
                 vS[0] <= bBS[1][0] &&
                 vS[1] >= bBS[0][1] &&
-                vS[1] <= bBS[1][1])
-            {
+                vS[1] <= bBS[1][1]) {
                 return true;
             }
         }
         return false;
     },
 
-    // Updates the vertices (top left, lower right) defining the bounding box
-    // of the shadow in sensor space. Depends on the vertices of the shadow in
+    // Updates the vertexes (top left, lower right) defining the bounding box
+    // of the shadow in sensor space. Depends on the vertexes of the shadow in
     // sensor space.
     _updateSensorSpaceBoundingBox: function () {
         var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE,
             maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE;
-        dojo.forEach(this._verticesS, function (tmp) {
+        dojo.forEach(this._vertexesS, function (tmp) {
             if (tmp[0] < minX) {
                 minX = tmp[0];
             } else if (tmp[0] > maxX) {
@@ -197,8 +197,7 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
             // Only blocks in front of the shadow are allowed to cut it.
             if (this._isCuttingBlock(realBlock)) {
                 if (this._boundingBoxesOverlap(realBlock) && 
-                    this._anyVertexInBoundingBox(realBlock))
-                {
+                    this._anyVertexInBoundingBox(realBlock)) {
                     realBlock.subtract(context);
                 }
             }
@@ -207,18 +206,18 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
 
     // Draws the shadow on the canvas context "context". The shadow is drawn in
     // front of everything else on the surface of the canvas. Depends on up to
-    // date vertices in sensor space.
+    // date vertexes in sensor space.
     render: function (context) {
-        var verticesS = this._verticesS, i;
+        var vertexesS = this._vertexesS, i;
         context.fillStyle = 'rgba(255,0,0,0.2)';
         context.beginPath();
-        context.moveTo(verticesS[0][0], verticesS[0][1]);
+        context.moveTo(vertexesS[0][0], vertexesS[0][1]);
         for (i = 1; i < 4; i += 1) {
-            context.lineTo(verticesS[i][0], verticesS[i][1]);
+            context.lineTo(vertexesS[i][0], vertexesS[i][1]);
         }
         context.closePath();
         context.fill();
 
-        this._subtractRealBlocks(context);
+//FIXME - eventuall reactivate:        this._subtractRealBlocks(context);
     }
 });

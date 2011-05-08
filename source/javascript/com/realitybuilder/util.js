@@ -30,7 +30,7 @@ com.realitybuilder.util.BLOCK_POSITION_SPACING_XY = 8; // mm
 com.realitybuilder.util.BLOCK_POSITION_SPACING_Z = 9.6; // mm
 
 // Outline of the block in the xy plane, with coordinates in block space,
-// counter clockwise:
+// counterclockwise:
 com.realitybuilder.util.BLOCK_OUTLINE_B = [[0, 0], [2, 0], [2, 2], [0, 2]];
 
 // Returns the coordinates of the block space point "pointB" in world space.

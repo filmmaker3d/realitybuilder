@@ -53,8 +53,10 @@ dojo.declare('com.realitybuilder.Shadow', null, {
         i = 0;
         for (deltaX = 0; deltaX < 2; deltaX += 1) {
             for (deltaY = 0; deltaY < 2; deltaY += 1) {
-                this._shadowParts[i] = new com.realitybuilder.ShadowPart
-                    (deltaX, deltaY, newBlock, camera, constructionBlocks);
+                this._shadowParts[i] = 
+                    new com.realitybuilder.ShadowPart(deltaX, deltaY, newBlock,
+                                                      camera, 
+                                                      constructionBlocks);
                 i += 1;
             }
         }
@@ -85,8 +87,9 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     },
 
     // Draws the shadow as seen by the sensor of the camera. Depends on the
-    // vertices in view coordinates.
+    // vertexes in view coordinates.
     render: function () {
+        /* FIXME - reactivate:
         var canvas = this._camera.sensor().shadowCanvas(), context;
         this._updateSensorSpace();
         this._sortShadowParts();
@@ -97,6 +100,7 @@ dojo.declare('com.realitybuilder.Shadow', null, {
                 shadowPart.render(context);
             });
         }
+        */
     },
 
     // Makes sure that the shadow is not shown on the sensor.

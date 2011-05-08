@@ -80,7 +80,8 @@ dojo.declare('com.realitybuilder.Block', null, {
     _lastCameraId: null,
 
     // Horizontal extents of the block in sensor space (same index for top and
-    // bottom):
+    // bottom). Note: depending on orientation of the block, the leftmost index
+    // may be bigger than the rightmost index!
     _indexOfLeftmostVertex: null,
     _indexOfRightmostVertex: null,
 
@@ -204,6 +205,31 @@ dojo.declare('com.realitybuilder.Block', null, {
             return true;
         } else {
             return false;
+        }
+    },
+
+    // Subtracts the shapes of the real blocks in front of the block from the
+    // drawing on the canvas context "context".
+    _subtractRealBlocks: function (context) {
+        var realBlocksSorted = this._constructionBlocks.realBlocksSorted(),
+            i, realBlock;
+
+        // Idea behind the following loop: the shadow may be covered by blocks
+        // in a layer above or in the same layer.
+        for (i = 0; i < realBlocksSorted.length; i += 1) {
+            realBlock = realBlocksSorted[i];
+
+            if (realBlock.zB() < this._zB) {
+                break;
+            }
+
+            // Only blocks in front of the shadow are allowed to cut it.
+            if (this._isCuttingBlock(realBlock)) {
+                if (this._boundingBoxesOverlap(realBlock) && 
+                    this._anyVertexInBoundingBox(realBlock)) {
+                    realBlock.subtract(context);
+                }
+            }
         }
     },
 

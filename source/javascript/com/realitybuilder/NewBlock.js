@@ -198,20 +198,23 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Returns true, iff the bounding box of the current block overlaps with
     // that of the block "block", in sensor space.
     _boundingBoxesOverlap: function (block) {
-        return (
+        return true;
+
+        /* FIXME - reactivate: (
             (this._boundingBoxS[1][0] >= block._boundingBoxS[0][0]) &&
             (this._boundingBoxS[0][0] <= block._boundingBoxS[1][0]) &&
             (this._boundingBoxS[1][1] >= block._boundingBoxS[0][1]) &&
             (this._boundingBoxS[0][1] <= block._boundingBoxS[1][1]));
+            */
     },
 
     // Returns true, iff any vertex of the current block is inside the bounding
     // box of the block "block", in sensor space. If the block "block" is
     // obscuring part or all of the current block, then this is the case.
     _anyVertexInBoundingBox: function (block) {
-        var verticesS = this._verticesS, i, vS;
-        for (i = 0; i < verticesS.length; i += 1) {
-            vS = verticesS[i];
+        var vertexesS = this._vertexesS, i, vS;
+        for (i = 0; i < vertexesS.length; i += 1) {
+            vS = vertexesS[i];
             if (vS[0] >= block._boundingBoxS[0][0] &&
                 vS[0] <= block._boundingBoxS[1][0] &&
                 vS[1] >= block._boundingBoxS[0][1] &&
@@ -227,7 +230,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // has inifinite extension and goes through the points "line[0]" and
     // "line[1]".
     _intersectionLineBlock: function (line, block) {
-        var ips = [], bvsS = block._verticesS, segment, p;
+        var ips = [], bvsS = block._vertexesS, segment, p;
         dojo.forEach(this._BORDER_EDGES, function (edge) {
             segment = [bvsS[edge[0]], bvsS[edge[1]]];
             p = com.realitybuilder.util.intersectionSegmentLine(
@@ -241,11 +244,11 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
     // Subtracts the block "block" from the edge "edge". Returns the resulting
     // edge, or - if the edge has been completely removed - false. May modify
-    // the vertices in sensor space.
+    // the vertexes in sensor space.
     _subtractFromEdge: function (edge, block) {
-        var verticesS = this._verticesS,
-            edgePoint1 = verticesS[edge[0]],
-            edgePoint2 = verticesS[edge[1]],
+        var vertexesS = this._vertexesS,
+            edgePoint1 = vertexesS[edge[0]],
+            edgePoint2 = vertexesS[edge[1]],
             line = [edgePoint1, edgePoint2],
             intersectionPoints = this._intersectionLineBlock(line, block),
             iPoint1, iPoint2, edgePoint1Between, edgePoint2Between,
@@ -278,9 +281,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             // Stores the visible part of the edge:
             iPoint1Between = com.realitybuilder.util.pointIsBetween(
                 iPoint1, edgePoint1, edgePoint2);
-            newVertexIndex1 = verticesS.push(
+            newVertexIndex1 = vertexesS.push(
                 edgePoint1Between ? edgePoint2 : edgePoint1) - 1;
-            newVertexIndex2 = verticesS.push(
+            newVertexIndex2 = vertexesS.push(
                 iPoint1Between ? iPoint1 : iPoint2) - 1;
             return [newVertexIndex1, newVertexIndex2, edge[2], edge[3]];
         }
@@ -431,6 +434,30 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         */
     },
 
+    // Subtracts the shapes of the real blocks in front of the block from the
+    // drawing on the canvas context "context".
+    _subtractRealBlocks: function (context) {
+        var realBlocksSorted = this._constructionBlocks.realBlocksSorted(),
+            i, realBlock;
+
+        // Idea behind the following loop: the shadow may be covered by blocks
+        // in a layer above or the same layer.
+        for (i = 0; i < realBlocksSorted.length; i += 1) {
+            realBlock = realBlocksSorted[i];
+
+            if (realBlock.zB() < this._zB) {
+                break;
+            }
+
+            // Only blocks in front of the shadow are allowed to cut it.
+            if (this._isCuttingBlock(realBlock)) {
+                if (this._boundingBoxesOverlap(realBlock)) {
+                    realBlock.subtract(context);
+                }
+            }
+        }
+    },
+
     // Updates the shadow, i.e. (re-)draws it or removes it. But only only when
     // the sensor space projection of the new block has changed
     // ("stateHasChanged" is true), when the state of the new block has changed
@@ -453,7 +480,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // Draws the block with shadow on the sensor of the camera. Depends on the
-    // vertices in view coordinates. Only re-renders the new block when
+    // vertexes in view coordinates. Only re-renders the new block when
     // necessary, i.e. when its sensor space projection has changed or when its
     // state has changed. The shadow is updated only when the sensor space
     // projection of the new block has changed, when the state of the new block
@@ -463,20 +490,18 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             sensorSpaceHasChanged = this.updateSensorSpace(),
             stateHasChanged = (this._lastState !== this._state),
             context, color;
-        if (sensorSpaceHasChanged) {
-            this._removeHiddenLines();
-        }
+
         if (canvas.getContext) {
             context = canvas.getContext('2d');
             color = this.isMovable() ? 'red' : 'white';
-            // The shadow is only drawn if the browser is not Internet
-            // Explorer, since the current drawing code does not work with
-            // IE 6-8.
             this._renderShadow(stateHasChanged, sensorSpaceHasChanged);
 
             if (sensorSpaceHasChanged || stateHasChanged) {
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 this.inherited(arguments, [context, color]);
+
+                // hidden lines removal:
+                this._subtractRealBlocks(context);
             }
         }
         this._lastState = this._state;
