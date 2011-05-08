@@ -157,11 +157,33 @@ dojo.declare('com.realitybuilder.Block', null, {
         this._lastCameraId = this._camera.id();
     },
 
-    _updateHorizontalSensorSpaceExtents: function () {
-        // FIXME: actually calculate - perhaps compare with calculation of
-        // bounding box
-        this._indexOfLeftmostVertex = 0;
-        this._indexOfRightmostVertex = 2;
+    // Finds the index of - in screen space - the leftmost and the rightmost
+    // vertex. This index is the same for the bottom and the top vertexes.
+    _updateHorizontalExtentsInSensorSpace: function () {
+        var
+        vertexesBottomS = this._vertexesBottomS,
+        vertexS,
+        leftmostVertexS,
+        rightmostVertexS,
+        i, ilv, irv;
+
+        leftmostVertexS = rightmostVertexS = vertexesBottomS[0];
+        ilv = irv = 0;
+
+        for (i = 1; i < vertexesBottomS.length; i += 1) {
+            vertexS = vertexesBottomS[i];
+            if (vertexS[0] < leftmostVertexS[0]) {
+                leftmostVertexS = vertexS;
+                ilv = i;
+            }
+            if (vertexS[0] > rightmostVertexS[0]) {
+                rightmostVertexS = vertexS;
+                irv = i;
+            }
+        }
+
+        this._indexOfLeftmostVertex = ilv;
+        this._indexOfRightmostVertex = irv;
     },
 
     // Calculates the vertexes of the block in sensor space. The camera is
@@ -176,7 +198,7 @@ dojo.declare('com.realitybuilder.Block', null, {
                                                         cam.viewToSensor));
             this._vertexesTopS = dojo.map(this._vertexesTopV,
                                           dojo.hitch(cam, cam.viewToSensor));
-            this._updateHorizontalSensorSpaceExtents();
+            this._updateHorizontalExtentsInSensorSpace();
             this._onSensorSpaceUpdated();
 
             return true;
@@ -189,40 +211,79 @@ dojo.declare('com.realitybuilder.Block', null, {
     // was visible were the block solid.
     _renderForeground: function (context) {
         var
-        vertexesS = this._vertexesTopS,
+        vertexesTopS = this._vertexesTopS,
+        vertexesBottomS = this._vertexesBottomS,
+        len = vertexesTopS.length, // same for top and bottom
         vertexS, firstVertexS, i, 
         ilv = this._indexOfLeftmostVertex,
         irv = this._indexOfRightmostVertex;
 
-        firstVertexS = vertexesS[0];
-
         context.globalAlpha = 1;
+
+        // bottom:
         context.beginPath();
+        firstVertexS = vertexesBottomS[ilv];
         context.moveTo(firstVertexS[0], firstVertexS[1]);
-        for (i = 1; i < vertexesS.length; i += 1) {
-            vertexS = vertexesS[i];
+        for (i = ilv + 1; i <= irv; i += 1) {
+            vertexS = vertexesBottomS[i];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+        context.stroke();
+
+        // top:
+        context.beginPath();
+        firstVertexS = vertexesTopS[0];
+        context.moveTo(firstVertexS[0], firstVertexS[1]);
+        for (i = 1; i <= vertexesTopS.length; i += 1) {
+            vertexS = vertexesTopS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
         }
         context.lineTo(firstVertexS[0], firstVertexS[1]);
         context.stroke();
+
+        // vertical lines:
+        for (i = ilv; i <= irv; i += 1) {
+            context.beginPath();
+            vertexS = vertexesBottomS[i % len];
+            context.moveTo(vertexS[0], vertexS[1]);
+            vertexS = vertexesTopS[i % len];
+            context.lineTo(vertexS[0], vertexS[1]);
+            context.stroke();
+        }
     },
 
     // Renders the background of the block, i.e. the part of that block that
     // was invisible were the block solid.
     _renderBackground: function (context) {
-        var vertexesS, vertexS, firstVertexS, i;
-        vertexesS = this._vertexesBottomS;
-        firstVertexS = vertexesS[0];
+        var
+        vertexesBottomS = this._vertexesBottomS,
+        vertexesTopS = this._vertexesTopS,
+        len = vertexesTopS.length, // same for top and bottom
+        vertexS, i, 
+        ilv = this._indexOfLeftmostVertex,
+        irv = this._indexOfRightmostVertex;
 
         context.globalAlpha = 0.2;
+
+        // bottom:
         context.beginPath();
-        context.moveTo(firstVertexS[0], firstVertexS[1]);
-        for (i = 1; i < vertexesS.length; i += 1) {
-            vertexS = vertexesS[i];
+        vertexS = vertexesBottomS[irv];
+        context.moveTo(vertexS[0], vertexS[1]);
+        for (i = irv + 1; i <= len + ilv; i += 1) {
+            vertexS = vertexesBottomS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
         }
-        context.lineTo(firstVertexS[0], firstVertexS[1]);
         context.stroke();
+
+        // vertical lines:
+        for (i = irv + 1; i <= len + ilv - 1; i += 1) {
+            context.beginPath();
+            vertexS = vertexesBottomS[i % len];
+            context.moveTo(vertexS[0], vertexS[1]);
+            vertexS = vertexesTopS[i % len];
+            context.lineTo(vertexS[0], vertexS[1]);
+            context.stroke();
+        }
     },
 
     // Draws the block in the color "color" (CSS format) as seen by the sensor,

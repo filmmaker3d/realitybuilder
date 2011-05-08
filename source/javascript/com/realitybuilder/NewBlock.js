@@ -437,7 +437,6 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // ("sensorSpaceHasChanged" is true), or when the construction blocks have
     // changed.
     _renderShadow: function (stateHasChanged, sensorSpaceHasChanged) {
-        /* FIXME: finally reactivate
         var constructionBlocksHaveChanged = (
             this._lastConstructionBlocksVersion !==
             this._constructionBlocks.versionOnServer());
@@ -451,7 +450,6 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         }
         this._lastConstructionBlocksVersion =
             this._constructionBlocks.versionOnServer();
-        */
     },
 
     // Draws the block with shadow on the sensor of the camera. Depends on the
@@ -471,12 +469,10 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         if (canvas.getContext) {
             context = canvas.getContext('2d');
             color = this.isMovable() ? 'red' : 'white';
-            if (!dojo.isIE) {
-                // The shadow is only drawn if the browser is not Internet
-                // Explorer, since the current drawing code does not work with
-                // IE 6-8.
-                this._renderShadow(stateHasChanged, sensorSpaceHasChanged);
-            }
+            // The shadow is only drawn if the browser is not Internet
+            // Explorer, since the current drawing code does not work with
+            // IE 6-8.
+            this._renderShadow(stateHasChanged, sensorSpaceHasChanged);
 
             if (sensorSpaceHasChanged || stateHasChanged) {
                 context.clearRect(0, 0, canvas.width, canvas.height);
