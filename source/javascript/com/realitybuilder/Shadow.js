@@ -24,6 +24,8 @@ dojo.provide('com.realitybuilder.Shadow');
 
 dojo.require('com.realitybuilder.ShadowPart');
 
+dojo.require('com.realitybuilder.LayerShadow');
+
 dojo.declare('com.realitybuilder.Shadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
@@ -86,9 +88,44 @@ dojo.declare('com.realitybuilder.Shadow', null, {
         this._shadowParts.sort(this._sortByHeight);
     },
 
+    // Graphically subtract real blocks with elevation "zB" from the canvas
+    // with the rendering context "context".
+    _subtractRealBlocks: function (context, zB) {
+        var 
+        realBlocksOnLayer = this._constructionBlocks.realBlocksOnLayer(zB),
+        i, realBlock;
+
+        dojo.forEach(realBlocksOnLayer, function (realBlock) {
+            realBlock.subtract(context);
+        });
+    },
+
     // Draws the shadow as seen by the sensor of the camera. Depends on the
-    // vertexes in view coordinates.
+    // vertexes in view coordinates. (FIXME: what?)
     render: function () {
+        var 
+        canvas = this._camera.sensor().shadowCanvas(), context, 
+        layerShadow, layerZB,
+        newBlock = this._newBlock, camera = this._camera,
+        constructionBlocks = this._constructionBlocks;
+
+        if (canvas.getContext) {
+            context = canvas.getContext('2d');
+            com.realitybuilder.util.clearCanvas(canvas);
+
+            for (layerZB = -1; layerZB < newBlock.zB(); layerZB += 1) {
+                layerShadow = 
+                    new com.realitybuilder.LayerShadow(newBlock, camera, 
+                                                       constructionBlocks,
+                                                       layerZB);
+                layerShadow.render();
+                context.globalAlpha = 0.2;
+                context.drawImage(layerShadow.canvas(), 0, 0);
+                context.globalAlpha = 1;
+                this._subtractRealBlocks(context, layerZB + 1);
+            }
+        }
+
         /* FIXME - reactivate:
         var canvas = this._camera.sensor().shadowCanvas(), context;
         this._updateSensorSpace();

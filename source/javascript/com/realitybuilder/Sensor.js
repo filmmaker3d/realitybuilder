@@ -61,7 +61,7 @@ dojo.declare('com.realitybuilder.Sensor', null, {
                 this._shadowCanvas, 
                 this._newBlockCanvas],
             width = this._width, height = this._height;
-        dojo.forEach(canvases, function (canvas){
+        dojo.forEach(canvases, function (canvas) {
             dojo.attr(canvas, 'width', width);
             dojo.attr(canvas, 'height', height);
             dojo.style(canvas, 'width', width + 'px');

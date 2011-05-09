@@ -62,13 +62,7 @@ body {
 }
 
 #sensorRealBlocksCanvas, #sensorPendingBlocksCanvas, #sensorShadowCanvas, 
-#sensorNewBlockCanvas {
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-#coordinateControlsCanvas {
+#sensorNewBlockCanvas, #coordinateControlsCanvas {
     position: absolute;
     left: 0;
     top: 0;

@@ -199,7 +199,7 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
             context;
         if (canvas.getContext) {
             context = canvas.getContext("2d");
-            context.clearRect(0, 0, canvas.width, canvas.height);
+            com.realitybuilder.util.clearCanvas(canvas);
 
             context.strokeStyle = color;
 

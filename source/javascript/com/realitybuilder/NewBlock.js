@@ -435,7 +435,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // Subtracts the shapes of the real blocks in front of the block from the
-    // drawing on the canvas context "context".
+    // drawing on the canvas with rendering context "context".
     _subtractRealBlocks: function (context) {
         var realBlocksSorted = this._constructionBlocks.realBlocksSorted(),
             i, realBlock;
@@ -497,7 +497,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             this._renderShadow(stateHasChanged, sensorSpaceHasChanged);
 
             if (sensorSpaceHasChanged || stateHasChanged) {
-                context.clearRect(0, 0, canvas.width, canvas.height);
+                com.realitybuilder.util.clearCanvas(canvas);
                 this.inherited(arguments, [context, color]);
 
                 // hidden lines removal:

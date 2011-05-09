@@ -31,7 +31,7 @@ com.realitybuilder.util.BLOCK_POSITION_SPACING_Z = 9.6; // mm
 
 // Outline of the block in the xy plane, with coordinates in block space,
 // counterclockwise:
-com.realitybuilder.util.BLOCK_OUTLINE_B = [[0, 0], [2, 0], [2, 2], [0, 2]];
+com.realitybuilder.util.BLOCK_OUTLINE_B = [[0, 0], [2, 0], [2, 1], [0, 2]];
 
 // Returns the coordinates of the block space point "pointB" in world space.
 com.realitybuilder.util.blockToWorld = function (pointB) {
@@ -233,4 +233,21 @@ com.realitybuilder.showNoImagesErrorMessage = function () {
         '<p class="first">The Reality Builder does not work because your ' +
         'browser does not load images.</p>' +
         com.realitybuilder.aboutMessage());
+};
+
+// Clears the canvas "canvas".
+com.realitybuilder.util.clearCanvas = function (canvas) {
+    if (canvas.getContext) {
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+};
+
+// Fills the canvas "canvas" with color "color".
+com.realitybuilder.util.fillCanvas = function (canvas, color) {
+    if (canvas.getContext) {
+        var context = canvas.getContext('2d');
+        context.fillStyle = color;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
 };

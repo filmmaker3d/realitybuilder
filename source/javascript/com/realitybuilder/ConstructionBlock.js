@@ -67,7 +67,7 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
         return this._state;
     },
 
-    // If not deleted, draws the block as seen by the sensor on the canvas
+    // If not deleted, draws the block as seen by the sensor on the canvas with
     // rendering context "context". Depends on the vertexes in view
     // coordinates.
     render: function (context) {
@@ -77,46 +77,66 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
         }
     },
 
-    // Subtracts the shape of the block from the drawing on the canvas context
-    // "context".
+    // Draws the top of the block solidly filled, onto the canvas with
+    // rendering context "context".
+    renderSolidTop: function (context) {
+        var topVertexesS, vertexS, i;
+
+        this.updateSensorSpace();
+
+        topVertexesS = this._topVertexesS;
+
+        // counterclockwise:
+        vertexS = topVertexesS[0];
+        context.beginPath();
+        context.moveTo(vertexS[0], vertexS[1]);
+        for (i = 1; i < topVertexesS.length; i += 1) {
+            vertexS = topVertexesS[i];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+        context.closePath();
+        context.fill();
+    },
+
+    // Subtracts the shape of the block from the drawing on the canvas with
+    // rendering context "context".
     subtract: function (context) {
         var
-        vertexesBottomS, vertexesTopS,
+        bottomVertexesS, topVertexesS,
         len, vertexS, i, ilv, irv;
 
         this.updateSensorSpace();
 
-        vertexesBottomS = this._vertexesBottomS;
-        vertexesTopS = this._vertexesTopS;
-        len = vertexesTopS.length; // same for top and bottom
+        bottomVertexesS = this._bottomVertexesS;
+        topVertexesS = this._topVertexesS;
+        len = topVertexesS.length; // same for top and bottom
         ilv = this._indexOfLeftmostVertex;
         irv = this._indexOfRightmostVertex;
 
         context.globalCompositeOperation = "destination-out";
         context.fillStyle = "black";
-        context.globalAlpha = 1;
 
         // top, from rightmost to leftmost vertex, counterclockwise:
         context.beginPath();
-        vertexS = vertexesTopS[irv];
+        vertexS = topVertexesS[irv];
         context.moveTo(vertexS[0], vertexS[1]);
         for (i = irv + 1; i <= len + ilv; i += 1) {
-            vertexS = vertexesTopS[i % len];
+            vertexS = topVertexesS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
         }
 
         // line from leftmost vertex on top to leftmost vertex on bottom:
-        vertexS = vertexesBottomS[ilv];
+        vertexS = bottomVertexesS[ilv];
         context.lineTo(vertexS[0], vertexS[1]);
 
         // bottom, from leftmost to rightmost vertex, counterclockwise:
         for (i = ilv + 1; i <= len + irv; i += 1) {
-            vertexS = vertexesBottomS[i % len];
+            vertexS = bottomVertexesS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
         }
 
         // line from rightmost vertex on bottom to rightmost vertex on top:
-        vertexS = vertexesBottomS[irv];
+        vertexS = bottomVertexesS[irv];
         context.lineTo(vertexS[0], vertexS[1]);
 
         context.closePath();

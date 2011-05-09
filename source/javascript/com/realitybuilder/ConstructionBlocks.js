@@ -71,6 +71,22 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         return this._realBlocksSorted;
     },
 
+    // Returns all blocks positioned at z coordinate "zB", in block space.
+    realBlocksOnLayer: function (zB) {
+        var blocks = [], i, realBlocksSorted = this._realBlocksSorted, block;
+
+        for (i = 0; i < realBlocksSorted.length; i += 1) {
+            block = realBlocksSorted[i];
+            if (block.zB() === zB) {
+                blocks.push(block);
+            } else if (block.zB() < zB) {
+                break; // no further possible blocks in sorted array
+            }
+        }
+
+        return blocks;
+    },
+
     versionOnServer: function () {
         return this._versionOnServer;
     },
@@ -88,8 +104,12 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
         var camera = this._construction.camera();
         this._blocks = dojo.map(serverData.blocks, function (bd) {
-            return new com.realitybuilder.ConstructionBlock
-                (camera, [bd.xB, bd.yB, bd.zB], bd.state, bd.timeStamp);
+            return new com.realitybuilder.ConstructionBlock(camera, 
+                                                            [bd.xB, 
+                                                             bd.yB, 
+                                                             bd.zB], 
+                                                            bd.state, 
+                                                            bd.timeStamp);
         });
 
         this._updateRealBlocksSorted();
@@ -322,7 +342,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     _renderBlocks: function (canvas, blocks) {
         if (canvas.getContext) {
             var context = canvas.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
+            com.realitybuilder.util.clearCanvas(canvas);
             dojo.forEach(blocks, function (b) {
                 b.render(context);
             });
