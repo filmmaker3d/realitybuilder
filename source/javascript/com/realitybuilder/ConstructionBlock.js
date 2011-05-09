@@ -96,52 +96,5 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
         }
         context.closePath();
         context.fill();
-    },
-
-    // Subtracts the shape of the block from the drawing on the canvas with
-    // rendering context "context".
-    subtract: function (context) {
-        var
-        bottomVertexesS, topVertexesS,
-        len, vertexS, i, ilv, irv;
-
-        this.updateSensorSpace();
-
-        bottomVertexesS = this._bottomVertexesS;
-        topVertexesS = this._topVertexesS;
-        len = topVertexesS.length; // same for top and bottom
-        ilv = this._indexOfLeftmostVertex;
-        irv = this._indexOfRightmostVertex;
-
-        context.globalCompositeOperation = "destination-out";
-        context.fillStyle = "black";
-
-        // top, from rightmost to leftmost vertex, counterclockwise:
-        context.beginPath();
-        vertexS = topVertexesS[irv];
-        context.moveTo(vertexS[0], vertexS[1]);
-        for (i = irv + 1; i <= len + ilv; i += 1) {
-            vertexS = topVertexesS[i % len];
-            context.lineTo(vertexS[0], vertexS[1]);
-        }
-
-        // line from leftmost vertex on top to leftmost vertex on bottom:
-        vertexS = bottomVertexesS[ilv];
-        context.lineTo(vertexS[0], vertexS[1]);
-
-        // bottom, from leftmost to rightmost vertex, counterclockwise:
-        for (i = ilv + 1; i <= len + irv; i += 1) {
-            vertexS = bottomVertexesS[i % len];
-            context.lineTo(vertexS[0], vertexS[1]);
-        }
-
-        // line from rightmost vertex on bottom to rightmost vertex on top:
-        vertexS = bottomVertexesS[irv];
-        context.lineTo(vertexS[0], vertexS[1]);
-
-        context.closePath();
-        context.fill();
-
-        context.globalCompositeOperation = "source-over";
     }
 });

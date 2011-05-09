@@ -1,0 +1,173 @@
+// "Shadow obscuring blocks": Blocks that are used for graphically removing
+// that parts of a shadow that are not actually visible.
+//
+// Example 1:
+//
+// * Real blocks with new block hovering above (NN), and shadow (_) how it
+//   should look:
+//
+//          NN
+//          __
+//       [][][]
+//     [][]  [][]
+//     [][]  [][]
+//
+// * Corresponding shadow obscuring blocks:
+//
+//          NN
+//          __
+//       [][][]
+//     [][][][][]
+//     [][][][][]
+//
+//   Without the two additional blocks, a shadow would falsely be visible below
+//   one of the real blocks:
+//
+//          NN
+//          __
+//       [][][]
+//       []  []
+//     [][] _[][]
+//
+// Example 2:
+//
+// * Same as above, but with different position of new block. How it should
+//   look:
+//
+//       [][][]
+//     [][]NN[][]
+//     [][]__[][]
+//
+// * Corresponding shadow obscuring blocks (only blocks whose bounding boxes
+//   that overlap with bounding box of shadow are taken into account - depends
+//   on camera location):
+//
+//       [][][]
+//     [][]NN[][]
+//     [][]__[][]
+//
+//   This time, no additional blocks are used because otherwise the shadow
+//   would not appear at all.
+//
+// In a nutshell, the shadow obscuring blocks in each layer are comprised of:
+//
+// * Copies of all real blocks in that layer.
+//
+// * If the layer is below the new block: Copies of all shadow obscuring blocks
+//   from the layer above.
+
+// Sometimes the term "full shadow" is used, which refers to the shadow how it
+// would look if the all blocks in the layer would form an infinite plane
+// without holes.
+
+// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
+
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
+
+dojo.provide('com.realitybuilder.ShadowObscuringBlocks');
+
+dojo.declare('com.realitybuilder.ShadowObscuringBlocks', null, {
+    // The blocks, sorted by height, from top to bottom.
+    _blocksSorted: null,
+
+    // New block that the shadow is associated with.
+    _newBlock: null,
+
+    // Camera object, used for calculating the projection on the camera sensor.
+    _camera: null,
+
+    // Permament blocks in the construction, including real and pending blocks.
+    // Needed for hidden lines removal and collision detection.
+    _constructionBlocks: null,
+
+    constructor: function (newBlock, camera, constructionBlocks) {
+        this._newBlock = newBlock;
+        this._camera = camera;
+        this._constructionBlocks = constructionBlocks;
+    },
+
+    _copyBlocksToLayer: function (srcBlocks, dstZB) {
+        var blocks = [], camera = this._camera;
+
+        dojo.forEach(srcBlocks, function (srcBlock) {
+            var dstBlock, dstPositionB;
+
+            dstPositionB = [srcBlock.xB(), srcBlock.yB(), dstZB];
+            dstBlock = new com.realitybuilder.Block(camera, dstPositionB);
+            blocks.push(dstBlock);
+        });
+
+        return blocks;
+    },
+
+    // Updates the list of blocks (see definition of "shadow obscuring
+    // blocks").
+    update: function () {
+        var 
+        zB, 
+        newBlock = this._newBlock, 
+        cbs = this._constructionBlocks,
+        blocks = [],
+        blocksInLayer, blocksInPrevLayer = [], copiedBlocks;
+
+        for (zB = newBlock.maxZB() - 1; zB >= 0; zB -= 1) {
+            // Collects shadow obscuring blocks for current layer:
+            blocksInLayer = cbs.realBlocksInLayer(zB);
+
+            if (zB < newBlock.zB()) {
+                copiedBlocks = this._copyBlocksToLayer(blocksInPrevLayer, zB);
+                blocksInLayer = blocksInLayer.concat(blocksInLayer, 
+                                                     copiedBlocks);
+            }
+
+            blocks = blocks.concat(blocksInLayer);
+
+            blocksInPrevLayer = blocksInLayer;
+        }
+
+        this._blocksSorted = blocks;
+    },
+
+    // Returns the blocks with the z coordination "zB", in block space.
+    _blocksInLayer: function (zB) {
+        var blocksSorted, block, i, blocks = [];
+
+        blocksSorted = this._blocksSorted;
+
+        for (i = 0; i < blocksSorted.length; i += 1) {
+            block = blocksSorted[i];
+            if (block.zB() === zB) {
+                blocks.push(block);
+            } else if (block.zB() < zB) {
+                break; // no further matching blocks in sorted array
+            }
+        }
+
+        return blocks;
+    },
+
+    // Graphically subtract the shadow obscuring blocks with vertical position
+    // "zB" from the canvas with the rendering context "context".
+    subtract: function (context, zB) {
+        var blocksInLayer = this._blocksInLayer(zB);
+
+        dojo.forEach(blocksInLayer, function (block) {
+            block.subtract(context);
+        });
+    }
+});

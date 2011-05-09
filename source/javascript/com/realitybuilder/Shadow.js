@@ -22,16 +22,12 @@
 
 dojo.provide('com.realitybuilder.Shadow');
 
-dojo.require('com.realitybuilder.ShadowPart');
-
 dojo.require('com.realitybuilder.LayerShadow');
+dojo.require('com.realitybuilder.ShadowObscuringBlocks');
 
 dojo.declare('com.realitybuilder.Shadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
-
-    // Parts of the shadow:
-    _shadowParts: null,
 
     // Camera object, used for calculating the projection on the camera sensor.
     _camera: null,
@@ -40,28 +36,22 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     // Needed for hidden lines removal and collision detection.
     _constructionBlocks: null,
 
+    // Blocks that are used for graphically removing that parts of a shadow
+    // that are not actually visible.
+    _shadowObscuringBlocks: null,
+
     // Creates the shadow of the block "newBlock". When the shadow is rendered,
     // it is as seen by the sensor of the camera "camera". For finding which
     // parts of the shadow have to be obscured, the list of non-new blocks in
     // the construction is used: "constructionBlocks"
     constructor: function (newBlock, camera, constructionBlocks) {
-        var i, deltaX, deltaY;
-
         this._newBlock = newBlock;
         this._camera = camera;
         this._constructionBlocks = constructionBlocks;
 
-        this._shadowParts = [];
-        i = 0;
-        for (deltaX = 0; deltaX < 2; deltaX += 1) {
-            for (deltaY = 0; deltaY < 2; deltaY += 1) {
-                this._shadowParts[i] = 
-                    new com.realitybuilder.ShadowPart(deltaX, deltaY, newBlock,
-                                                      camera, 
-                                                      constructionBlocks);
-                i += 1;
-            }
-        }
+        this._shadowObscuringBlocks =
+            new com.realitybuilder.ShadowObscuringBlocks(newBlock, camera,
+                                                         constructionBlocks);
     },
 
     // Sort function, for ordering shadow parts by height/layer. From bottom to
@@ -88,16 +78,18 @@ dojo.declare('com.realitybuilder.Shadow', null, {
         this._shadowParts.sort(this._sortByHeight);
     },
 
-    // Graphically subtract real blocks with elevation "zB" from the canvas
-    // with the rendering context "context".
-    _subtractRealBlocks: function (context, zB) {
-        var 
-        realBlocksOnLayer = this._constructionBlocks.realBlocksOnLayer(zB),
-        i, realBlock;
+    _renderLayerShadow: function (context, newBlock, camera, 
+                                  constructionBlocks, layerZB) {
+        var layerShadow;
 
-        dojo.forEach(realBlocksOnLayer, function (realBlock) {
-            realBlock.subtract(context);
-        });
+        layerShadow = 
+            new com.realitybuilder.LayerShadow(newBlock, camera, 
+                                               constructionBlocks,
+                                               layerZB);
+        layerShadow.render();
+        context.globalAlpha = 0.2;
+        context.drawImage(layerShadow.canvas(), 0, 0);
+        context.globalAlpha = 1;
     },
 
     // Draws the shadow as seen by the sensor of the camera. Depends on the
@@ -105,24 +97,22 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     render: function () {
         var 
         canvas = this._camera.sensor().shadowCanvas(), context, 
-        layerShadow, layerZB,
+        layerZB,
         newBlock = this._newBlock, camera = this._camera,
         constructionBlocks = this._constructionBlocks;
+
+        this._shadowObscuringBlocks.update();
 
         if (canvas.getContext) {
             context = canvas.getContext('2d');
             com.realitybuilder.util.clearCanvas(canvas);
 
-            for (layerZB = -1; layerZB < newBlock.zB(); layerZB += 1) {
-                layerShadow = 
-                    new com.realitybuilder.LayerShadow(newBlock, camera, 
-                                                       constructionBlocks,
-                                                       layerZB);
-                layerShadow.render();
-                context.globalAlpha = 0.2;
-                context.drawImage(layerShadow.canvas(), 0, 0);
-                context.globalAlpha = 1;
-                this._subtractRealBlocks(context, layerZB + 1);
+            for (layerZB = -1; layerZB <= newBlock.maxZB() - 1; layerZB += 1) {
+                if (layerZB < newBlock.zB()) {
+                    this._renderLayerShadow(context, newBlock, camera, 
+                                            constructionBlocks, layerZB);
+                }
+                this._shadowObscuringBlocks.subtract(context, layerZB + 1);
             }
         }
 

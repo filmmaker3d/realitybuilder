@@ -89,7 +89,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     // "yB", "zB") = "positionB". A blocks extents are defined by two corners:
     // ("xB", "yB", "zB"), ("xB" + 2, "yB" + 2, "zB" + 1). When the block is
     // rendered, it is as seen by the sensor of the camera "camera".
-    constructor: function (camera, positionB, image) {
+    constructor: function (camera, positionB) {
         this._positionB = positionB;
         this._camera = camera;
         this._edges = this._INITIAL_EDGES;
@@ -111,6 +111,24 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     zB: function () {
         return this._positionB[2];
+    },
+
+    // Returns true, iff the current block collides with the block "block".
+    collidesWith: function (block) {
+        var xB, yB, zB, blockXB, blockYB, blockZB;
+
+        xB = this.xB();
+        yB = this.yB();
+        zB = this.zB();
+        blockXB = block.xB();
+        blockYB = block.yB();
+        blockZB = block.zB();
+
+        return (com.realitybuilder.util.pointsIdenticalB(this.positionB(), 
+                                                         block.positionB()) ||
+                (xB >= blockXB - 1 && xB <= blockXB + 1 &&
+                 yB >= blockYB - 1 && yB <= blockYB + 1 &&
+                 zB === blockZB));
     },
 
     // Updates the vertexes of the block in world space.
@@ -206,6 +224,53 @@ dojo.declare('com.realitybuilder.Block', null, {
         } else {
             return false;
         }
+    },
+
+    // Subtracts the shape of the block from the drawing on the canvas with
+    // rendering context "context".
+    subtract: function (context) {
+        var
+        bottomVertexesS, topVertexesS,
+        len, vertexS, i, ilv, irv;
+
+        this.updateSensorSpace();
+
+        bottomVertexesS = this._bottomVertexesS;
+        topVertexesS = this._topVertexesS;
+        len = topVertexesS.length; // same for top and bottom
+        ilv = this._indexOfLeftmostVertex;
+        irv = this._indexOfRightmostVertex;
+
+        context.globalCompositeOperation = "destination-out";
+        context.fillStyle = "black";
+
+        // top, from rightmost to leftmost vertex, counterclockwise:
+        context.beginPath();
+        vertexS = topVertexesS[irv];
+        context.moveTo(vertexS[0], vertexS[1]);
+        for (i = irv + 1; i <= len + ilv; i += 1) {
+            vertexS = topVertexesS[i % len];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+
+        // line from leftmost vertex on top to leftmost vertex on bottom:
+        vertexS = bottomVertexesS[ilv];
+        context.lineTo(vertexS[0], vertexS[1]);
+
+        // bottom, from leftmost to rightmost vertex, counterclockwise:
+        for (i = ilv + 1; i <= len + irv; i += 1) {
+            vertexS = bottomVertexesS[i % len];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+
+        // line from rightmost vertex on bottom to rightmost vertex on top:
+        vertexS = bottomVertexesS[irv];
+        context.lineTo(vertexS[0], vertexS[1]);
+
+        context.closePath();
+        context.fill();
+
+        context.globalCompositeOperation = "source-over";
     },
 
     // Subtracts the shapes of the real blocks in front of the block from the

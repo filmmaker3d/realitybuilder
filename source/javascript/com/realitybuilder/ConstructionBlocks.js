@@ -72,7 +72,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     },
 
     // Returns all blocks positioned at z coordinate "zB", in block space.
-    realBlocksOnLayer: function (zB) {
+    realBlocksInLayer: function (zB) {
         var blocks = [], i, realBlocksSorted = this._realBlocksSorted, block;
 
         for (i = 0; i < realBlocksSorted.length; i += 1) {
@@ -151,43 +151,27 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         for (i = 0; i < blocks.length; i += 1) {
             block = blocks[i];
             if (com.realitybuilder.util.pointsIdenticalB(
-                    positionB, block.positionB()))
-            {
+                positionB, block.positionB())) {
                 return block;
             }
         }
         return false;
     },
 
-    // Returns 0, if a block positioned at the block space point "positionB"
-    // does not intersect with a real block. Returns 1, if the block and a real
-    // block are identical. Otherwise returns 2.
-    realBlockIntersectionState: function (positionB) {
-        var xB, yB, zB, realBlocks, realBlock, realBlockPositionB,
-            realBlockXB, realBlockYB, realBlockZB, i;
-        xB = positionB[0];
-        yB = positionB[1];
-        zB = positionB[2];
-        realBlocks = this._realBlocksSorted;
+    // Returns true, iff there is any collision between real blocks and the
+    // block "block".
+    realBlocksCollideWith: function (block) {
+        var 
+        realBlocks = this.realBlocksSorted(), 
+        realBlock, i;
+
         for (i = 0; i < realBlocks.length; i += 1) {
             realBlock = realBlocks[i];
-            realBlockPositionB = realBlock.positionB();
-            realBlockXB = realBlockPositionB[0];
-            realBlockYB = realBlockPositionB[1];
-            realBlockZB = realBlockPositionB[2];
-            if (com.realitybuilder.util.pointsIdenticalB(
-                    positionB, realBlockPositionB))
-            {
-                return 1;
-            } else if (
-                xB >= realBlockXB - 1 && xB <= realBlockXB + 1 &&
-                yB >= realBlockYB - 1 && yB <= realBlockYB + 1 &&
-                zB === realBlockZB)
-            {
-                return 2;
+            if (realBlock.collidesWith(block)) {
+                return true;
             }
         }
-        return 0;
+        return false;
     },
 
     // Called if making the block pending on the server succeeded.

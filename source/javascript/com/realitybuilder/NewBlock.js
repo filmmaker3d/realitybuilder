@@ -72,6 +72,11 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         this._camera = camera;
     },
 
+    // Returns true, iff the current block collides with any real block.
+    collidesWithRealBlock: function () {
+        return this._constructionBlocks.realBlocksCollideWith(this);
+    },
+
     // See same function in super class.
     _sensorSpaceNeedsToBeUpdated: function () {
         return (this._lastPositionB === null ||
@@ -114,20 +119,27 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         dojo.publish('com/realitybuilder/NewBlock/madeMovable');
     },
 
+    // Maximum vertical position of the new block. Note that this position is
+    // higher than the position in which blocks may be build, by 1.
+    maxZB: function () {
+        return this._BUILD_SPACE_2B[2];
+    },
+
     // Makes sure that this block does not intersect with any real block. If it
     // does, it is elevated step by step until it sits on top of another block.
     // Only updates the position of the block in block space. Does not update
     // any of the other coordinates.
     updatePositionB: function () {
-        var status = this._constructionBlocks.realBlockIntersectionState(
-            this._positionB),
-            testZB;
-        if (status !== 0) {
-            testZB = this._positionB[2] + 1;
-            while (this._wouldIntersectWithRealBlock(
-                [this._positionB[0], this._positionB[1], testZB])) {
+        var 
+        testBlock, cbs = this._constructionBlocks, 
+        xB = this.xB(), yB = this.yB(), testZB;
+        if (this.collidesWithRealBlock()) {
+            testZB = this.zB();
+            do {
                 testZB += 1;
-            }
+                testBlock = new com.realitybuilder.Block(this._camera,
+                                                         [xB, yB, testZB]);
+            } while (cbs.realBlocksCollideWith(testBlock));
             this._positionB[2] = testZB;
         }
     },
@@ -138,10 +150,14 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // larger than the building space, allowing movement of the block alongside
     // the exterior of the construction, for positioning.
     wouldGoOutOfRange: function (deltaB) {
-        var testB = com.realitybuilder.util.addVectorsB(
-            this._positionB, deltaB);
-        return (this._wouldIntersectWithRealBlock(testB) ||
-            !this._wouldBeInMoveSpace(testB));
+        var testPositionB, testBlock, cbs = this._constructionBlocks;
+
+        testPositionB = 
+            com.realitybuilder.util.addVectorsB(this._positionB, deltaB);
+        testBlock = new com.realitybuilder.Block(this._camera, testPositionB);
+
+        return (cbs.realBlocksCollideWith(testBlock) ||
+                !this._wouldBeInMoveSpace(testPositionB));
     },
 
     // Returns true, if this block would be outside the move space, if it was
@@ -173,26 +189,25 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // immediately below this block, or if there is another block immediately
     // above this block.
     _isAttachable: function () {
-        var xB = this._positionB[0],
-            yB = this._positionB[1],
-            zB = this._positionB[2];
-        return (
-            this._wouldIntersectWithRealBlock([xB, yB, zB - 1]) ||
-            this._wouldIntersectWithRealBlock([xB, yB, zB + 1]) ||
-            zB === 0);
+        var 
+        cbs = this._constructionBlocks, 
+        testBlockAbove, testBlockBelow,
+        xB = this.xB(), yB = this.yB(), zB = this.zB();
+
+        testBlockBelow = new com.realitybuilder.Block(this._camera, 
+                                                      [xB, yB, zB - 1]);
+        testBlockAbove = new com.realitybuilder.Block(this._camera, 
+                                                      [xB, yB, zB + 1]);
+
+        return (cbs.realBlocksCollideWith(testBlockBelow) ||
+                cbs.realBlocksCollideWith(testBlockAbove) ||
+                zB === 0);
     },
 
     // Returns true, iff the new block can be made real in its current
     // position.
     canBeMadeReal: function () {
         return this._isInBuildSpace() && this._isAttachable();
-    },
-
-    // Returns true, if this block would intersect with any real block if it
-    // was in block space at the position "testB".
-    _wouldIntersectWithRealBlock: function (testB) {
-        return (this._constructionBlocks.
-            realBlockIntersectionState(testB) !== 0);
     },
 
     // Returns true, iff the bounding box of the current block overlaps with

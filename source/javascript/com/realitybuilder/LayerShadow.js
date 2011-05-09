@@ -1,5 +1,6 @@
-// The shadow under the new block, projected onto a certain layer of blocks
-// under the assumption that there are no layers below and above.
+// "Layer shadow": The shadow under the new block, projected onto a layer of
+// blocks under the assumption that there are no layers below and above that
+// layer.
 
 // Sometimes the term "full shadow" is used, which refers to the shadow how it
 // would look if the all blocks in the layer would form an infinite plane
@@ -117,7 +118,7 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     _renderTops: function (context) {
         var 
         realBlocksOnLayer = 
-            this._constructionBlocks.realBlocksOnLayer(this._layerZB);
+            this._constructionBlocks.realBlocksInLayer(this._layerZB);
 
         dojo.forEach(realBlocksOnLayer, function (realBlock) {
             realBlock.renderSolidTop(context);
