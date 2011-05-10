@@ -90,6 +90,8 @@ dojo.declare('com.realitybuilder.Shadow', null, {
         context.globalAlpha = 0.2;
         context.drawImage(layerShadow.canvas(), 0, 0);
         context.globalAlpha = 1;
+
+        layerShadow = null; // FIXME
     },
 
     // Draws the shadow as seen by the sensor of the camera. Depends on the

@@ -33,6 +33,14 @@ com.realitybuilder.util.BLOCK_POSITION_SPACING_Z = 9.6; // mm
 // counterclockwise:
 com.realitybuilder.util.BLOCK_OUTLINE_B = [[0, 0], [2, 0], [2, 2], [0, 2]];
 
+// Two blocks are defined to collide, iff one block is offset against the
+// other in the x-y-plane by:
+com.realitybuilder.util.COLLISION_OFFSETS = [[0, 0], 
+                                             [-1, 0], 
+                                             [-1, 1], [0, 1], [1, 1],
+                                             [1, 0],
+                                             [1, -1], [0, -1], [-1, -1]];
+
 // Returns the coordinates of the block space point "pointB" in world space.
 com.realitybuilder.util.blockToWorld = function (pointB) {
     var factorX = com.realitybuilder.util.BLOCK_POSITION_SPACING_XY,

@@ -115,20 +115,24 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     // Returns true, iff the current block collides with the block "block".
     collidesWith: function (block) {
-        var xB, yB, zB, blockXB, blockYB, blockZB;
+        var 
+        testPosition,
+        collisionOffsets = com.realitybuilder.util.COLLISION_OFFSETS,
+        collisionOffset,
+        i;
 
-        xB = this.xB();
-        yB = this.yB();
-        zB = this.zB();
-        blockXB = block.xB();
-        blockYB = block.yB();
-        blockZB = block.zB();
+        for (i = 0; i < collisionOffsets.length; i += 1) {
+            collisionOffset = collisionOffsets[i];
+            testPosition = [this.xB() + collisionOffset[0],
+                            this.yB() + collisionOffset[1],
+                            this.zB()];
+            if (com.realitybuilder.util.pointsIdenticalB(block.positionB(),
+                                                         testPosition)) {
+                return true;
+            }
+        }
 
-        return (com.realitybuilder.util.pointsIdenticalB(this.positionB(), 
-                                                         block.positionB()) ||
-                (xB >= blockXB - 1 && xB <= blockXB + 1 &&
-                 yB >= blockYB - 1 && yB <= blockYB + 1 &&
-                 zB === blockZB));
+        return false;
     },
 
     // Updates the vertexes of the block in world space.
