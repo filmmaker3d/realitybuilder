@@ -185,23 +185,10 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // Returns true, iff this block is attachable to another block or to the
-    // ground. That is the case when there is the ground plate or another block
-    // immediately below this block, or if there is another block immediately
-    // above this block.
+    // ground.
     _isAttachable: function () {
-        var 
-        cbs = this._constructionBlocks, 
-        testBlockAbove, testBlockBelow,
-        xB = this.xB(), yB = this.yB(), zB = this.zB();
-
-        testBlockBelow = new com.realitybuilder.Block(this._camera, 
-                                                      [xB, yB, zB - 1]);
-        testBlockAbove = new com.realitybuilder.Block(this._camera, 
-                                                      [xB, yB, zB + 1]);
-
-        return (cbs.realBlocksCollideWith(testBlockBelow) ||
-                cbs.realBlocksCollideWith(testBlockAbove) ||
-                zB === 0);
+        return (this._constructionBlocks.realBlocksAreAttachableTo(this) || 
+                this.zB() === 0);
     },
 
     // Returns true, iff the new block can be made real in its current

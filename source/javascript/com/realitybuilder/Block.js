@@ -116,18 +116,40 @@ dojo.declare('com.realitybuilder.Block', null, {
     // Returns true, iff the current block collides with the block "block".
     collidesWith: function (block) {
         var 
-        testPosition,
-        collisionOffsets = com.realitybuilder.util.COLLISION_OFFSETS,
-        collisionOffset,
+        testPositionB,
+        collisionOffsetsB = com.realitybuilder.util.COLLISION_OFFSETS_B,
+        collisionOffsetB,
         i;
 
-        for (i = 0; i < collisionOffsets.length; i += 1) {
-            collisionOffset = collisionOffsets[i];
-            testPosition = [this.xB() + collisionOffset[0],
-                            this.yB() + collisionOffset[1],
-                            this.zB()];
+        for (i = 0; i < collisionOffsetsB.length; i += 1) {
+            collisionOffsetB = collisionOffsetsB[i];
+            testPositionB = [this.xB() + collisionOffsetB[0],
+                             this.yB() + collisionOffsetB[1],
+                             this.zB()];
             if (com.realitybuilder.util.pointsIdenticalB(block.positionB(),
-                                                         testPosition)) {
+                                                         testPositionB)) {
+                return true;
+            }
+        }
+
+        return false;
+    },
+
+    // Returns true, iff the current block is attachable to the block "block".
+    attachableTo: function (block) {
+        var
+        testPositionB,
+        attachmentOffsetsB = com.realitybuilder.util.ATTACHMENT_OFFSETS_B,
+        attachmentOffsetB,
+        i;
+
+        for (i = 0; i < attachmentOffsetsB.length; i += 1) {
+            attachmentOffsetB = attachmentOffsetsB[i];
+            testPositionB = 
+                com.realitybuilder.util.addVectorsB(this.positionB(),
+                                                    attachmentOffsetB);
+            if (com.realitybuilder.util.pointsIdenticalB(block.positionB(),
+                                                         testPositionB)) {
                 return true;
             }
         }

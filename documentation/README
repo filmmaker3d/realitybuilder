@@ -79,6 +79,19 @@ Conventions and Terminology
   Its height in block space is always: 1
 
 
+Collision detection
+===================
+
+All configurations when two blocks collide can be configured freely. This is
+done in block space.
+
+At first it seems as if collision detection is better done in world space, and
+automatically, without any configuration. However, when blocks touch each
+other, then rounding errors can lead to unwanted results. Furthermore,
+collision detection, as described above, in block space is probably simpler and
+faster.
+
+
 Miscellaneous
 =============
 

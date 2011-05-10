@@ -174,6 +174,20 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         return false;
     },
 
+    // Returns true, iff there are real blocks that are attachable to the block
+    // "block".
+    realBlocksAreAttachableTo: function (block) {
+        var realBlocks = this.realBlocksSorted(), realBlock, i;
+
+        for (i = 0; i < realBlocks.length; i += 1) {
+            realBlock = realBlocks[i];
+            if (realBlock.attachableTo(block)) {
+                return true;
+            }
+        }
+        return false;
+    },
+
     // Called if making the block pending on the server succeeded.
     _makePendingOnServerSucceeded: function () {
         dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');

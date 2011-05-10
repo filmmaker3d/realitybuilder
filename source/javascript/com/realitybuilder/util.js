@@ -35,11 +35,21 @@ com.realitybuilder.util.BLOCK_OUTLINE_B = [[0, 0], [2, 0], [2, 2], [0, 2]];
 
 // Two blocks are defined to collide, iff one block is offset against the
 // other in the x-y-plane by:
-com.realitybuilder.util.COLLISION_OFFSETS = [[0, 0], 
-                                             [-1, 0], 
-                                             [-1, 1], [0, 1], [1, 1],
-                                             [1, 0],
-                                             [1, -1], [0, -1], [-1, -1]];
+com.realitybuilder.util.COLLISION_OFFSETS_B = [[0, 0], 
+                                               [-1, 0], 
+                                               [-1, 1], [0, 1], [1, 1],
+                                               [1, 0],
+                                               [1, -1], [0, -1], [-1, -1]];
+
+// A block is defined to be attachable to another block, if it is in any of the
+// following positions relative to the other block, in block space:
+com.realitybuilder.util.ATTACHMENT_OFFSETS_B = 
+    [[0, 0, -1],
+     [0, 1, -1], [-1, 1, -1], [-1, 0, -1], [-1, -1, -1],
+     [0, -1, -1], [1, -1, -1], [1, 0, -1], [1, 1, -1],
+     [0, 0, 1],
+     [0, 1, 1], [-1, 1, 1], [-1, 0, 1], [-1, -1, 1],
+     [0, -1, 1], [1, -1, 1], [1, 0, 1], [1, 1, 1]];
 
 // Returns the coordinates of the block space point "pointB" in world space.
 com.realitybuilder.util.blockToWorld = function (pointB) {

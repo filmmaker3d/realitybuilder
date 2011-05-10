@@ -1,17 +1,26 @@
 Introduction
 ============
 
-A cuboid as a building block, which can be positioned shifted.
+A sample scene with 2×2 Lego bricks, that Felix E. Klee <felix.klee@inka.de>
+set up in 2010.
 
-Outline of block in the block space xy plane:
 
-  (0, 0), (0, 2), (2, 2), (2, 0)
+Dimensions
+==========
+
+Information concerning dimensions of Lego bricks:
+
+  http://www.robertcailliau.eu/Lego/Dimensions/zMeasurements-en.xhtml
+
+  http://www.lohmueller.business.t-online.de/pov_tut/lego/lg2pov300e.htm
 
 
 Legal
 =====
 
-Copyright 2011 Felix E. Klee <felix.klee@inka.de>
+All files in this directory are licensed as follows, unless noted otherwise.
+
+Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
 this file except in compliance with the License. You may obtain a copy of the
@@ -32,3 +41,4 @@ fill-column:79
 coding: utf-8
 End:
 Local IspellDict: american
+LocalWords: URL
