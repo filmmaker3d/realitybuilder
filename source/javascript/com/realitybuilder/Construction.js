@@ -90,9 +90,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._showReal = showAdminControls;
         this._showPending = showAdminControls;
 
-        this._camera = new com.realitybuilder.Camera(640, 480);
-        this._image = new com.realitybuilder.Image(this._camera);
         this._blockProperties = new com.realitybuilder.BlockProperties();
+        this._camera = new com.realitybuilder.Camera(this._blockProperties, 
+                                                     640, 480);
+        this._image = new com.realitybuilder.Image(this._camera);
         this._constructionBlocks = 
             new com.realitybuilder.ConstructionBlocks(this, 
                                                       this._blockProperties);
@@ -126,8 +127,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this, this._onConstructionBlocksChanged);
         dojo.subscribe('com/realitybuilder/Camera/changed',
             this, this._onCameraChanged);
-        dojo.subscribe('com/realitybuilder/Image/changed',
-            this, this._onImageChanged);
+        dojo.subscribe('com/realitybuilder/BlockProperties/changed',
+            this, this._onBlockPropertiesChanged);
 
         this._setupDemoFunctionality();
 
@@ -268,29 +269,50 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
     },
 
+    // (Re-)renders blocks, but only if all necessary components have been
+    // initialized, which is relevant only in the beginning.
+    _renderBlocksIfFullyInitialized: function () {
+        if (this._constructionBlocks.isInitializedWithServerData() &&
+            this._camera.isInitializedWithServerData() &&
+            this._blockProperties.isInitializedWithServerData()) {
+            if (this._showAdminControls) {
+                this._constructionBlocks.render();
+            }
+            this._newBlock.render();
+        }
+    },
+
+    // (Re-)renders user controls, but only if all necessary components have
+    // been initialized, which is relevant only in the beginning.
+    _renderCoordinateControlsIfFullyInitialized: function () {
+        if (this._camera.isInitializedWithServerData()) {
+            this._userControls.renderCoordinateControls();
+        }
+    },
+
+    // Updates the state of the new block (and related controls), but only if
+    // all necessary components have been initialized, which is relevant only
+    // in the beginning.
+    _updateNewBlockStateIfFullyInitialized: function () {
+        if (this._constructionBlocks.isInitializedWithServerData() &&
+            this._blockProperties.isInitializedWithServerData()) {
+            this._updateNewBlockPositionAndState();
+            this._userControls.updateRequestRealButton();
+            this._userControls.updateCoordinateControls(
+                !this._newBlock.isMovable());
+        }
+    },
+
     // Called after the construction blocks have changed.
     _onConstructionBlocksChanged: function () {
-        this._updateNewBlockPositionAndState();
-        this._userControls.updateRequestRealButton();
-        this._userControls.updateCoordinateControls(
-            !this._newBlock.isMovable());
         this._userControls.updateStatusMessage(this._responseToLastRequest);
 
         if (this._showAdminControls) {
             this._adminControls.updateBlocksTable();
         }
 
-        // (Re-)renders blocks, but only if the camera is already fully
-        // initialized, which is relevant only in the beginning.
-        if (this._camera.hasAlreadyBeenUpdatedWithServerData()) {
-            if (this._showAdminControls) {
-                this._constructionBlocks.render();
-            }
-
-            // Even if the position of the new block remains the same, its
-            // shadow may have to be recalculated.
-            this._newBlock.render();
-        }
+        this._updateNewBlockStateIfFullyInitialized();
+        this._renderBlocksIfFullyInitialized();
     },
 
     // Called after the camera settings have changed.
@@ -299,19 +321,28 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this._adminControls.updateCameraControls(this._camera);
         }
 
-        // Updates the rendering of the coordinate controls, which depends
-        // on the camera position:
+        // Updates the rendering of the coordinate controls, which depend on
+        // the camera position:
+        this._renderCoordinateControlsIfFullyInitialized();
+
+        this._renderBlocksIfFullyInitialized();
+    },
+
+    // Called after the block properties have changed.
+    _onBlockPropertiesChanged: function () {
+        // Updates the rendering of the coordinate controls, which depend on
+        // some of the block properties:
         this._userControls.renderCoordinateControls();
 
-        // (Re-)renders blocks, but only if the construction blocks have
-        // already been fully initialized, which is relevant only in the
-        // beginning.
-        if (this._constructionBlocks.hasAlreadyBeenUpdatedWithServerData()) {
-            if (this._showAdminControls) {
-                this._constructionBlocks.render();
-            }
-            this._newBlock.render();
-        }
+        // Updates the rendering of the coordinate controls, which depend on
+        // the block properties:
+        this._renderCoordinateControlsIfFullyInitialized();
+
+        // Updates the state (and related controls) of the new block, because
+        // they depend on block properties such as collision settings:
+        this._updateNewBlockStateIfFullyInitialized();
+
+        this._renderBlocksIfFullyInitialized();
     },
 
     // Called after settings describing the live image have changed.
@@ -380,8 +411,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // Regularly checks if the construction has been loaded, so that the
     // content on the web page can be unhidden.
     _checkIfHasLoaded: function () {
-        if (this._camera.hasAlreadyBeenUpdatedWithServerData() &&
-            this._constructionBlocks.hasAlreadyBeenUpdatedWithServerData() &&
+        if (this._constructionBlocks.isInitializedWithServerData() &&
+            this._camera.isInitializedWithServerData() &&
+            this._blockProperties.isInitializedWithServerData() &&
             this._image.imageLoaded()) {
             // Shows the contents and removes the load indicator.
             dojo.destroy(dojo.byId('loadIndicator'));
@@ -404,8 +436,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _updateSucceeded: function (data, ioargs) {
         var that = this;
 
-        // FIXME: On first update, do something with the block properties data.
-
         if (data.blocksData.changed) {
             this._constructionBlocks.updateWithServerData(data.blocksData, 
                                                           this._image);
@@ -417,6 +447,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
         if (data.imageData.changed) {
             this._image.updateWithServerData(data.imageData);
+        }
+
+        if (data.blockPropertiesData.changed) {
+            this._blockProperties.
+                updateWithServerData(data.blockPropertiesData);
         }
 
         if (this._updateTimeout) {
@@ -450,11 +485,12 @@ dojo.declare('com.realitybuilder.Construction', null, {
             url: "/rpc/construction",
             content: {
                 "blocksDataVersion": 
-                    this._constructionBlocks.versionOnServer(),
+                this._constructionBlocks.versionOnServer(),
                 "getDeletedBlocks": getDeletedBlocks,
                 "cameraDataVersion": this._camera.versionOnServer(),
                 "imageDataVersion": this._image.versionOnServer(),
-                "getBlockProperties": firstUpdate
+                "blockPropertiesDataVersion": 
+                this._blockProperties.versionOnServer()
             },
             handleAs: "json",
             load: function (data, ioargs) {

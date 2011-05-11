@@ -97,7 +97,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Returns false when the object is new and has not yet been updated with
     // server data.
-    hasAlreadyBeenUpdatedWithServerData: function () {
+    isInitializedWithServerData: function () {
         return this._versionOnServer !== '-1';
     },
 

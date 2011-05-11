@@ -27,6 +27,9 @@ from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+from google.appengine.dist import use_library
+use_library('django', '0.96')
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
@@ -96,7 +99,7 @@ class Construction(db.Model):
         if construction:
             return construction
         else:
-            raise Exception('Could not find construction.')
+            raise Exception('could not find construction')
 
 class Block(db.Model):
     xB = db.IntegerProperty()
@@ -190,7 +193,12 @@ class Block(db.Model):
         self.put()
         self.parent().increase_blocks_data_version()
 
-class BlockShape(db.Model):
+# Properties of the block: shape, size, how to attach blocks, etc.
+class BlockProperties(db.Model):
+    # The data version is increased every time the data is changed. The client
+    # uses this data to determine when to update the display.
+    data_version = db.StringProperty()
+
     # Block dimensions in world space. The side length of a block is
     # approximately two times the grid spacing in the respective direction.
     position_spacing_xy = db.FloatProperty() # mm
@@ -301,11 +309,11 @@ class RPCConstruction(webapp.RequestHandler):
     # Returns JSON serializable data related to blocks. The data only contains
     # deleted blocks, if "get_deleted_blocks" is true.
     @staticmethod
-    def get_blocks_data(construction, blocks_data_version_on_client, 
+    def get_blocks_data(construction, blocks_data_version_client, 
                         get_deleted_blocks):
         blocks_data_version = construction.blocks_data_version
         blocks_data_changed = \
-            (blocks_data_version != blocks_data_version_on_client)
+            (blocks_data_version != blocks_data_version_client)
         data = {
             'version': blocks_data_version,
             'changed': blocks_data_changed}
@@ -320,10 +328,10 @@ class RPCConstruction(webapp.RequestHandler):
 
     # Returns JSON serializable data related to the camera.
     @staticmethod
-    def get_camera_data(construction, camera_data_version_on_client):
+    def get_camera_data(construction, camera_data_version_client):
         camera_data_version = construction.camera_data_version
         camera_data_changed = \
-            (camera_data_version != camera_data_version_on_client)
+            (camera_data_version != camera_data_version_client)
         data = {
             'version': camera_data_version,
             'changed': camera_data_changed}
@@ -343,10 +351,10 @@ class RPCConstruction(webapp.RequestHandler):
 
     # Returns JSON serializable data related to the live image.
     @staticmethod
-    def get_image_data(construction, image_data_version_on_client):
+    def get_image_data(construction, image_data_version_client):
         image_data_version = construction.image_data_version
         image_data_changed = (image_data_version != 
-                              image_data_version_on_client)
+                              image_data_version_client)
         data = {
             'version': image_data_version,
             'changed': image_data_changed}
@@ -361,45 +369,83 @@ class RPCConstruction(webapp.RequestHandler):
                         construction.image_update_interval_client})
         return data
 
+    # Returns JSON serializable data related to the block properties.
+    @staticmethod
+    def get_block_properties_data(construction, 
+                                  block_properties_data_version_client):
+        query = BlockProperties.all().ancestor(construction)
+        block_properties = query.get()
+        if block_properties is None:
+            raise Exception('could not get block properties')
+
+        block_properties_data_version = block_properties.data_version
+        block_properties_data_changed = \
+            (block_properties_data_version != 
+             block_properties_data_version_client)
+        data = {
+            'version': block_properties_data_version,
+            'changed': block_properties_data_changed}
+        if block_properties_data_changed:
+            # Block properties data version on server not the same as on
+            # client. => Deliver all the data.
+            data.update({'positionSpacingXY': 
+                         block_properties.position_spacing_xy,
+                         'positionSpacingZ': 
+                         block_properties.position_spacing_z,
+                         'outlineB': 
+                         simplejson.loads(block_properties.outline_b),
+                         'collisionOffsetsB':
+                         simplejson.loads(block_properties.collision_offsets_b),
+                         'attachmentOffsetsB':
+                             simplejson.loads(block_properties.
+                                              attachment_offsets_b)})
+        return data
+
     # A transaction may not be necessary, but it ensures data integrity for
     # example if there is a transaction missing somewhere else.
     @staticmethod
-    def transaction(blocks_data_version_on_client, 
+    def transaction(blocks_data_version_client, 
                     get_deleted_blocks,
-                    camera_data_version_on_client,
-                    image_data_version_on_client):
+                    camera_data_version_client,
+                    image_data_version_client,
+                    block_properties_data_version_client):
         construction = Construction.get_main()
         data = {
             'blocksData': RPCConstruction.get_blocks_data(
-                construction, blocks_data_version_on_client, 
+                construction, blocks_data_version_client, 
                 get_deleted_blocks),
             'cameraData': RPCConstruction.get_camera_data(
-                construction, camera_data_version_on_client),
+                construction, camera_data_version_client),
             'imageData': RPCConstruction.get_image_data(
-                construction, camera_data_version_on_client)
+                construction, camera_data_version_client),
+            'blockPropertiesData': RPCConstruction.get_block_properties_data(
+                construction, block_properties_data_version_client)
         }
         return data
 
     def get(self):
         try:
-            blocks_data_version_on_client = \
+            blocks_data_version_client = \
                 self.request.get('blocksDataVersion')
             if self.request.get('getDeletedBlocks') == 'true':
                 get_deleted_blocks = True
             else:
                 get_deleted_blocks = False
-            camera_data_version_on_client = \
+            camera_data_version_client = \
                 self.request.get('cameraDataVersion')
-            image_data_version_on_client = self.request.get('imageDataVersion')
+            image_data_version_client = self.request.get('imageDataVersion')
+            block_properties_data_version_client = \
+                self.request.get('blockPropertiesDataVersion')
 
             data = db.run_in_transaction(RPCConstruction.transaction, 
-                                         blocks_data_version_on_client, 
+                                         blocks_data_version_client, 
                                          get_deleted_blocks,
-                                         camera_data_version_on_client,
-                                         image_data_version_on_client)
+                                         camera_data_version_client,
+                                         image_data_version_client,
+                                         block_properties_data_version_client)
             dump_json(self, data)
         except Exception, e:
-            logging.error('Could not retrieve construction. ' + str(e))
+            logging.error('Could not retrieve data: ' + str(e))
 
 # Changes the status of the block at the provided position to real. If the
 # block isn't in the construction, then the operation fails. If the block
@@ -437,7 +483,7 @@ class RPCAdminMakeReal(webapp.RequestHandler):
             zB = int(self.request.get('zB'))
             db.run_in_transaction(RPCAdminMakeReal.transaction, xB, yB, zB)
         except Exception, e:
-            logging.error('Could not make block real. ' + str(e))
+            logging.error('Could not make block real: ' + str(e))
 
 # Sets the state of the block at the provided position to deleted.
 #
@@ -460,7 +506,7 @@ class RPCAdminDelete(webapp.RequestHandler):
             zB = int(self.request.get('zB'))
             db.run_in_transaction(RPCAdminDelete.transaction, xB, yB, zB)
         except Exception, e:
-            logging.error('Could not delete block. ' + str(e))
+            logging.error('Could not delete block: ' + str(e))
 
 # Creates a block at the given position, with the state: pending to be build.
 # If a block already exists in that position, and if that block is non-real and
@@ -530,7 +576,7 @@ Position: %d, %d, %d
             db.run_in_transaction(RPCCreatePending.transaction, xB, yB, zB)
         except Exception, e:
             logging.error('Could not add pending block or set existing ' + 
-                          'block to pending. ' + str(e))
+                          'block to pending: ' + str(e))
 
 # Changes the status of a real or deleted block to pending, unless the block
 # does intersect with any real block. If there is no block at the provided
@@ -567,7 +613,7 @@ class RPCAdminMakePending(webapp.RequestHandler):
             zB = int(self.request.get('zB'))
             db.run_in_transaction(RPCAdminMakePending.transaction, xB, yB, zB)
         except Exception, e:
-            logging.error('Could not make block pending. ' + str(e))
+            logging.error('Could not make block pending: ' + str(e))
 
 # Updates the camera and live image settings and increases the camera version
 # number.
@@ -612,7 +658,7 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
             db.run_in_transaction(RPCAdminUpdateSettings.transaction, 
                                   data)
         except Exception, e:
-            logging.error('Could not update camera and image data. ' + str(e))
+            logging.error('Could not update camera and image data: ' + str(e))
 
 # Initializes part or all of the database. Use with caution.
 class AdminUpdate(webapp.RequestHandler):
@@ -649,29 +695,32 @@ class AdminUpdate(webapp.RequestHandler):
         construction.put()
 
         # Deletes all block shape entries:
-        queries = [BlockShape.all()]
+        queries = [BlockProperties.all()]
         for query in queries:
             for result in query:
                 result.delete()
 
-        # Creates the block shape:
-        blockShape = BlockShape(key_name = 'main')
-        blockShape.position_spacing_xy = 8.
-        blockShape.position_spacing_z = 9.6
-        blockShape.outline_b = '[[0, 0], [2, 0], [2, 2], [0, 2]]'
-        blockShape.collision_offsets_b = ('[[0, 0], ' +
-                                          '[-1, 0], ' +
-                                          '[-1, 1], [0, 1], [1, 1], ' +
-                                          '[1, 0], ' +
-                                          '[1, -1], [0, -1], [-1, -1]]')
-        blockShape.attachment_offsets_b = \
+        # Sets up the block properties (construction as parent is important so
+        # that the properties form one entity group with the construction,
+        # which is necessary when doing transactions):
+        blockProperties = BlockProperties(parent=construction)
+        blockProperties.data_version = '0'
+        blockProperties.position_spacing_xy = 8.
+        blockProperties.position_spacing_z = 9.6
+        blockProperties.outline_b = '[[0, 0], [2, 0], [2, 2], [0, 2]]'
+        blockProperties.collision_offsets_b = ('[[0, 0], ' +
+                                               '[-1, 0], ' +
+                                               '[-1, 1], [0, 1], [1, 1], ' +
+                                               '[1, 0], ' +
+                                               '[1, -1], [0, -1], [-1, -1]]')
+        blockProperties.attachment_offsets_b = \
             ('[[0, 0, -1], ' +
              '[0, 1, -1], [-1, 1, -1], [-1, 0, -1], [-1, -1, -1], ' +
              '[0, -1, -1], [1, -1, -1], [1, 0, -1], [1, 1, -1], ' +
              '[0, 0, 1], ' +
              '[0, 1, 1], [-1, 1, 1], [-1, 0, 1], [-1, -1, 1], ' +
              '[0, -1, 1], [1, -1, 1], [1, 0, 1], [1, 1, 1]]')
-        blockShape.put()
+        blockProperties.put()
 
         # Deletes all block entries:
         queries = [Block.all()]
@@ -750,7 +799,7 @@ class Image(webapp.RequestHandler):
                 self.redirect(self.request.
                               relative_url('/images/placeholder.gif'))
         except Exception, e:
-            logging.error('Could not retrieve image. ' + str(e))
+            logging.error('Could not retrieve image: ' + str(e))
 
 application = webapp.WSGIApplication([
     ('/', Index), ('/admin', Admin), 

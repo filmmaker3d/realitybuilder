@@ -41,6 +41,9 @@ dojo.require('com.realitybuilder.Sensor');
 dojo.require('dojox.math.matrix');
 
 dojo.declare('com.realitybuilder.Camera', null, {
+    // Properties (shape, dimensions, etc.) of a block:
+    _blockProperties: null,
+
     // Position of the camera in world space (mm):
     _position: null,
 
@@ -71,7 +74,8 @@ dojo.declare('com.realitybuilder.Camera', null, {
     // on every change of camera settings, not only on those on the server.
     _id: null,
 
-    constructor: function (sensorWidth, sensorHeight) {
+    constructor: function (blockProperties, sensorWidth, sensorHeight) {
+        this._blockProperties = blockProperties;
         this._position = [0, 0, 1];
         this._sensor = 
             new com.realitybuilder.Sensor(sensorWidth, sensorHeight);
@@ -96,7 +100,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
     // Returns false when the object is new and has not yet been updated with
     // server data.
-    hasAlreadyBeenUpdatedWithServerData: function () {
+    isInitializedWithServerData: function () {
         return this._versionOnServer !== '-1';
     },
 
@@ -212,6 +216,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
     // space.
     blockToSensor: function (pointB) {
         return this.viewToSensor(this.worldToView(
-            com.realitybuilder.util.blockToWorld(pointB)));
+            com.realitybuilder.util.blockToWorld(pointB, 
+                                                 this._blockProperties)));
     }
 });

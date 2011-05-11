@@ -26,9 +26,66 @@
 dojo.provide('com.realitybuilder.BlockProperties');
 
 dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
+    // Version of data last retrieved from the server, or "-1" initially. Is a
+    // string in order to be able to contain very large integers.
+    _versionOnServer: '-1',
+
     // Block dimensions in world space. The side length of a block is
     // approximately two times the grid spacing in the respective direction.
+    _blockPositionSpacingXY: null, // mm
+    _blockPositionSpacingZ: null, // mm
+
+    // Block dimensions in world space. The side length of a block is
+    // approximately two times the grid spacing in the respective direction.
+    _outlineB: null,
+
+    // Two blocks are defined to collide, iff one block is offset against the
+    // other in the x-y-plane by:
+    _collisionOffsetsB: null,
+
+    // A block is defined to be attachable to another block, if it is in any of
+    // the following positions relative to the other block, in block space:
+    _attachmentOffsetsB: null,
+
+    versionOnServer: function () {
+        return this._versionOnServer;
+    },
+
+    // Returns false when the object is new and has not yet been updated with
+    // server data.
+    isInitializedWithServerData: function () {
+        return this._versionOnServer !== '-1';
+    },
+
+    // Updates the block properties to the version on the server, which is
+    // described by "serverData".
+    updateWithServerData: function (serverData) {
+        this._versionOnServer = serverData.version;
+        this._positionSpacingXY = serverData.positionSpacingXY;
+        this._positionSpacingZ = serverData.positionSpacingZ;
+        this._outlineB = serverData.outlineB;
+        this._collisionOffsetsB = serverData.collisionOffsetsB;
+        this._attachmentOffsetsB = serverData.attachmentOffsetsB;
+        dojo.publish('com/realitybuilder/BlockProperties/changed');
+    },
+
+    positionSpacingXY: function () {
+        return this._positionSpacingXY;
+    },
+
+    positionSpacingZ: function () {
+        return this._positionSpacingZ;
+    },
+
     outlineB: function () {
-        return [[0, 0], [2, 0], [2, 2], [0, 2]];
+        return this._outlineB;
+    },
+
+    collisionOffsetsB: function () {
+        return this._collisionOffsetsB;
+    },
+
+    attachmentOffsetsB: function () {
+        return this._attachmentOffsetsB;
     }
 });

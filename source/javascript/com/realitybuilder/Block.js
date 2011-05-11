@@ -123,7 +123,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     collidesWith: function (block) {
         var 
         testPositionB,
-        collisionOffsetsB = com.realitybuilder.util.COLLISION_OFFSETS_B,
+        collisionOffsetsB = this._blockProperties.collisionOffsetsB(),
         collisionOffsetB,
         i;
 
@@ -145,7 +145,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     attachableTo: function (block) {
         var
         testPositionB,
-        attachmentOffsetsB = com.realitybuilder.util.ATTACHMENT_OFFSETS_B,
+        attachmentOffsetsB = this._blockProperties.attachmentOffsetsB(),
         attachmentOffsetB,
         i;
 
@@ -170,17 +170,21 @@ dojo.declare('com.realitybuilder.Block', null, {
         yB = this.positionB()[1],
         zB = this.positionB()[2],
         vsBottom = [], vsTop = [],
-        blockOutlineB = this._blockProperties.outlineB();
+        blockOutlineB = this._blockProperties.outlineB(),
+        that = this;
 
         // top, counter clock wise:
         dojo.forEach(blockOutlineB, function (vertexXYB) {
             vsBottom.push(com.realitybuilder.util.blockToWorld(
                 [xB + vertexXYB[0], 
                  yB + vertexXYB[1], 
-                 zB]));
-            vsTop.push(com.realitybuilder.util.blockToWorld([xB + vertexXYB[0], 
-                                                             yB + vertexXYB[1], 
-                                                             zB + 1]));
+                 zB],
+                that._blockProperties));
+            vsTop.push(com.realitybuilder.
+                       util.blockToWorld([xB + vertexXYB[0], 
+                                          yB + vertexXYB[1], 
+                                          zB + 1],
+                                         that._blockProperties));
         });
 
         this._bottomVertexes = vsBottom;

@@ -89,12 +89,14 @@ dojo.declare('com.realitybuilder.ShadowPart', null, {
             yB = this._newBlock.yB() + this._deltaYB,
             zB = this._constructionBlocks.
                 zBOfUpperSideOfRealBlockBelow(xB, yB, this._newBlock.zB() + 1),
-            relativeVertexesB = [[0, 0], [1, 0], [1, 1], [0, 1]];
+        relativeVertexesB = [[0, 0], [1, 0], [1, 1], [0, 1]],
+        that = this;
 
         this._vertexes = dojo.map(relativeVertexesB, function (rVB) {
             return com.realitybuilder.util.blockToWorld([xB + rVB[0], 
                                                          yB  + rVB[1], 
-                                                         zB]);
+                                                         zB],
+                                                        that._blockProperties);
         });
 
         this._xB = xB;

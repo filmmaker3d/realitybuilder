@@ -24,34 +24,12 @@ dojo.provide('com.realitybuilder.util');
 // Tolerance when comparing coordinates in sensor space.
 com.realitybuilder.util.TOLERANCE_S = 0.5;
 
-// Block dimensions in world space. The side length of a block is approximately
-// two times the grid spacing in the respective direction.
-com.realitybuilder.util.BLOCK_POSITION_SPACING_XY = 8; // mm
-com.realitybuilder.util.BLOCK_POSITION_SPACING_Z = 9.6; // mm
-
-// Two blocks are defined to collide, iff one block is offset against the
-// other in the x-y-plane by:
-com.realitybuilder.util.COLLISION_OFFSETS_B = [[0, 0], 
-                                               [-1, 0], 
-                                               [-1, 1], [0, 1], [1, 1],
-                                               [1, 0],
-                                               [1, -1], [0, -1], [-1, -1]];
-
-// A block is defined to be attachable to another block, if it is in any of the
-// following positions relative to the other block, in block space:
-com.realitybuilder.util.ATTACHMENT_OFFSETS_B = 
-    [[0, 0, -1],
-     [0, 1, -1], [-1, 1, -1], [-1, 0, -1], [-1, -1, -1],
-     [0, -1, -1], [1, -1, -1], [1, 0, -1], [1, 1, -1],
-     [0, 0, 1],
-     [0, 1, 1], [-1, 1, 1], [-1, 0, 1], [-1, -1, 1],
-     [0, -1, 1], [1, -1, 1], [1, 0, 1], [1, 1, 1]];
-
 // Returns the coordinates of the block space point "pointB" in world space.
-com.realitybuilder.util.blockToWorld = function (pointB) {
-    var factorX = com.realitybuilder.util.BLOCK_POSITION_SPACING_XY,
-        factorY = com.realitybuilder.util.BLOCK_POSITION_SPACING_XY,
-        factorZ = com.realitybuilder.util.BLOCK_POSITION_SPACING_Z;
+com.realitybuilder.util.blockToWorld = function (pointB, blockProperties) {
+    var 
+    factorX = blockProperties.positionSpacingXY(),
+    factorY = blockProperties.positionSpacingXY(),
+    factorZ = blockProperties.positionSpacingZ();
     return [pointB[0] * factorX, pointB[1] * factorY, pointB[2] * factorZ];
 };
 
