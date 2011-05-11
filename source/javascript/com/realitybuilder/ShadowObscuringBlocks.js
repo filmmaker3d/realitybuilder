@@ -60,7 +60,7 @@
 // would look if the all blocks in the layer would form an infinite plane
 // without holes.
 
-// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+// Copyright 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy
@@ -91,24 +91,31 @@ dojo.declare('com.realitybuilder.ShadowObscuringBlocks', null, {
     // Camera object, used for calculating the projection on the camera sensor.
     _camera: null,
 
+    // Properties (shape, dimensions, etc.) of a block:
+    _blockProperties: null,
+
     // Permament blocks in the construction, including real and pending blocks.
     // Needed for hidden lines removal and collision detection.
     _constructionBlocks: null,
 
-    constructor: function (newBlock, camera, constructionBlocks) {
+    constructor: function (newBlock, blockProperties, camera, 
+                           constructionBlocks)
+    {
         this._newBlock = newBlock;
+        this._blockProperties = blockProperties;
         this._camera = camera;
         this._constructionBlocks = constructionBlocks;
     },
 
     _copyBlocksToLayer: function (srcBlocks, dstZB) {
-        var blocks = [], camera = this._camera;
+        var blocks = [], camera = this._camera, that = this;
 
         dojo.forEach(srcBlocks, function (srcBlock) {
             var dstBlock, dstPositionB;
 
             dstPositionB = [srcBlock.xB(), srcBlock.yB(), dstZB];
-            dstBlock = new com.realitybuilder.Block(camera, dstPositionB);
+            dstBlock = new com.realitybuilder.Block(that._blockProperties,
+                                                    camera, dstPositionB);
             blocks.push(dstBlock);
         });
 

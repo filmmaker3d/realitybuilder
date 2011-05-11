@@ -64,10 +64,16 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // calculating hidden lines, the block needs to know about the other blocks
     // in the construction: "constructionBlocks" When the block is rendered, it
     // is as seen by the sensor of the camera "camera".
-    constructor: function (camera, positionB, constructionBlocks) {
+    //
+    // The block's properties, such as shape and size, are described by
+    // "blockProperties".
+    constructor: function (blockProperties, camera, positionB, 
+                           constructionBlocks)
+    {
         this._state = 1;
         this._constructionBlocks = constructionBlocks;
-        this._shadow = new com.realitybuilder.Shadow(this, camera, 
+        this._shadow = new com.realitybuilder.Shadow(this, blockProperties, 
+                                                     camera, 
                                                      constructionBlocks);
         this._camera = camera;
     },
@@ -137,7 +143,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             testZB = this.zB();
             do {
                 testZB += 1;
-                testBlock = new com.realitybuilder.Block(this._camera,
+                testBlock = new com.realitybuilder.Block(this._blockProperties,
+                                                         this._camera,
                                                          [xB, yB, testZB]);
             } while (cbs.realBlocksCollideWith(testBlock));
             this._positionB[2] = testZB;
@@ -154,7 +161,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
         testPositionB = 
             com.realitybuilder.util.addVectorsB(this._positionB, deltaB);
-        testBlock = new com.realitybuilder.Block(this._camera, testPositionB);
+        testBlock = new com.realitybuilder.Block(this._blockProperties,
+                                                 this._camera, testPositionB);
 
         return (cbs.realBlocksCollideWith(testBlock) ||
                 !this._wouldBeInMoveSpace(testPositionB));

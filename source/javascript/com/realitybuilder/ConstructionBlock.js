@@ -42,7 +42,12 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // seconds since the epoch - of the date-time when the bocks status was
     // last changed is "timeStamp". When the block is rendered, it is as seen
     // by the sensor of the camera "camera".
-    constructor: function (camera, positionB, state, timeStamp) {
+    //
+    // The block's properties, such as shape and size, are described by
+    // "blockProperties".
+    constructor: function (blockProperties, camera, positionB, state, 
+                           timeStamp)
+    {
         this._state = state;
         this._timeStamp = timeStamp;
     },

@@ -190,6 +190,24 @@ class Block(db.Model):
         self.put()
         self.parent().increase_blocks_data_version()
 
+class BlockShape(db.Model):
+    # Block dimensions in world space. The side length of a block is
+    # approximately two times the grid spacing in the respective direction.
+    position_spacing_xy = db.FloatProperty() # mm
+    position_spacing_z = db.FloatProperty() # mm
+
+    # Outline of the block in the xy plane, with coordinates in block space,
+    # counterclockwise:
+    outline_b = db.StringProperty() # JSON array
+
+    # Two blocks are defined to collide, iff one block is offset against the
+    # other in the x-y-plane by:
+    collision_offsets_b = db.StringProperty() # JSON array
+
+    # A block is defined to be attachable to another block, if it is in any of
+    # the following positions relative to the other block, in block space:
+    attachment_offsets_b = db.StringProperty() # JSON array
+
 class Index(webapp.RequestHandler):
     def get(self):
         template_values = {'debug': debug}
@@ -609,24 +627,51 @@ class AdminUpdate(webapp.RequestHandler):
             for result in query:
                 result.delete()
 
-        # Creates the construction without the blocks. An image URL is not set
-        # to an image on the same App Engine instance, since urlfetch doesn't
-        # seem to like that.
+        # Creates the construction configuration. An image URL is not set to an
+        # image on the same App Engine instance, since urlfetch doesn't seem to
+        # like that.
         construction = Construction(key_name = 'main')
         construction.blocks_data_version = '0'
         construction.camera_data_version = '0'
-        construction.camera_x = 127.2
-        construction.camera_y = -75.
-        construction.camera_z = 128.
-        construction.camera_a_x = 0.68
-        construction.camera_a_y = 2.48
-        construction.camera_a_z = 0.
-        construction.camera_fl = 2.
-        construction.camera_sensor_resolution = 365.
+        construction.camera_x = 122.05
+        construction.camera_y = -88.81
+        construction.camera_z = 122.37
+        construction.camera_a_x = 2.3363
+        construction.camera_a_y = -0.50827
+        construction.camera_a_z = 0.438
+        construction.camera_fl = 40.1
+        construction.camera_sensor_resolution = 18.2857
         construction.image_data_version = '0'
+        construction.image_url = \
+            'http://sites.inka.de/W1787/realitybuilder/live.jpg';
         construction.image_update_interval_server = 5.
         construction.image_update_interval_client = 5.
         construction.put()
+
+        # Deletes all block shape entries:
+        queries = [BlockShape.all()]
+        for query in queries:
+            for result in query:
+                result.delete()
+
+        # Creates the block shape:
+        blockShape = BlockShape(key_name = 'main')
+        blockShape.position_spacing_xy = 8.
+        blockShape.position_spacing_z = 9.6
+        blockShape.outline_b = '[[0, 0], [2, 0], [2, 2], [0, 2]]'
+        blockShape.collision_offsets_b = ('[[0, 0], ' +
+                                          '[-1, 0], ' +
+                                          '[-1, 1], [0, 1], [1, 1], ' +
+                                          '[1, 0], ' +
+                                          '[1, -1], [0, -1], [-1, -1]]')
+        blockShape.attachment_offsets_b = \
+            ('[[0, 0, -1], ' +
+             '[0, 1, -1], [-1, 1, -1], [-1, 0, -1], [-1, -1, -1], ' +
+             '[0, -1, -1], [1, -1, -1], [1, 0, -1], [1, 1, -1], ' +
+             '[0, 0, 1], ' +
+             '[0, 1, 1], [-1, 1, 1], [-1, 0, 1], [-1, -1, 1], ' +
+             '[0, -1, 1], [1, -1, 1], [1, 0, 1], [1, 1, 1]]')
+        blockShape.put()
 
         # Deletes all block entries:
         queries = [Block.all()]
@@ -637,24 +682,9 @@ class AdminUpdate(webapp.RequestHandler):
         # Creates block entries:
         cs = [
             [0, 0, 0, 2], [2, 0, 0, 2], [6, 0, 0, 2], [8, 0, 0, 2],
-            [0, 2, 0, 2], [8, 2, 0, 2],
-            [0, 4, 0, 2], [8, 4, 0, 2],
-            [0, 6, 0, 2], [8, 6, 0, 2],
-            [0, 8, 0, 2], [2, 8, 0, 2], [4, 8, 0, 2], [6, 8, 0, 2], 
-            [8, 8, 0, 2],
-            [0, 0, 1, 2], [2, 0, 1, 2], [8, 0, 1, 2],
-            [0, 2, 1, 2], [8, 2, 1, 2],
-            [0, 4, 1, 2], [8, 4, 1, 2],
-            [0, 6, 1, 2], [8, 6, 1, 2],
-            [0, 8, 1, 2], [2, 8, 1, 2], [4, 8, 1, 2], [6, 8, 1, 2], 
-            [8, 8, 1, 2],
-            [0, 0, 2, 2], [2, 0, 2, 2],
-            [0, 2, 2, 2], [8, 2, 2, 2],
-            [0, 4, 2, 2], [8, 4, 2, 2],
-            [0, 6, 2, 2], [8, 6, 2, 2],
-            [0, 8, 2, 2], [2, 8, 2, 2], [4, 8, 2, 2], [6, 8, 2, 2], 
-            [8, 8, 2, 2],
-            [4, 4, 0, 2]]
+            [8, 2, 0, 2], [8, 4, 0, 2], [6, 8, 0, 2],
+            [2, 0, 1, 2], [6, 0, 1, 2],
+            [3, 0, 2, 2], [5, 0, 2, 2]]
         for c in cs:
             xB = c[0]
             yB = c[1]

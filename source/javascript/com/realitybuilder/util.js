@@ -29,10 +29,6 @@ com.realitybuilder.util.TOLERANCE_S = 0.5;
 com.realitybuilder.util.BLOCK_POSITION_SPACING_XY = 8; // mm
 com.realitybuilder.util.BLOCK_POSITION_SPACING_Z = 9.6; // mm
 
-// Outline of the block in the xy plane, with coordinates in block space,
-// counterclockwise:
-com.realitybuilder.util.BLOCK_OUTLINE_B = [[0, 0], [2, 0], [2, 2], [0, 2]];
-
 // Two blocks are defined to collide, iff one block is offset against the
 // other in the x-y-plane by:
 com.realitybuilder.util.COLLISION_OFFSETS_B = [[0, 0], 

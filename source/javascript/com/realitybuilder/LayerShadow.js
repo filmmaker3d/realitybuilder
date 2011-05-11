@@ -34,6 +34,9 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     // Camera object, used for calculating the projection on the camera sensor.
     _camera: null,
 
+    // Properties (shape, dimensions, etc.) of a block:
+    _blockProperties: null,
+
     // Permament blocks in the construction, including real and pending blocks.
     // Needed for hidden lines removal and collision detection.
     _constructionBlocks: null,
@@ -56,10 +59,13 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     // weak garbage collectors).
     _helperCanvas: null,
 
-    constructor: function (newBlock, camera, constructionBlocks, layerZB) {
+    constructor: function (newBlock, blockProperties, camera, 
+                           constructionBlocks, layerZB)
+    {
         var shadowCanvas;
 
         this._newBlock = newBlock;
+        this._blockProperties = blockProperties;
         this._camera = camera;
         this._constructionBlocks = constructionBlocks;
         this._layerZB = layerZB;
@@ -85,7 +91,7 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         yB = this._newBlock.yB(),
         zB = this._layerZB + 1,
         vs = [],
-        blockOutlineB = com.realitybuilder.util.BLOCK_OUTLINE_B;
+        blockOutlineB = this._blockProperties.outlineB();
 
         // counterclockwise:
         dojo.forEach(blockOutlineB, function (vertexXYB) {

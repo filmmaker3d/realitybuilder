@@ -35,6 +35,9 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     // Construction that the blocks are associated with.
     _construction: null,
 
+    // Properties (shape, dimensions, etc.) of a block:
+    _blockProperties: null,
+
     // The blocks.
     _blocks: null,
 
@@ -50,7 +53,8 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Creates a container for the blocks associated with the construction
     // "construction".
-    constructor: function (construction) {
+    constructor: function (construction, blockProperties) {
+        this._blockProperties = blockProperties;
         this._blocks = [];
         this._realBlocksSorted = [];
         this._construction = construction;
@@ -97,20 +101,27 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         return this._versionOnServer !== '-1';
     },
 
+    _createBlockFromServerData: function (bd) {
+        var camera = this._construction.camera();
+        return new com.realitybuilder.ConstructionBlock(this._blockProperties,
+                                                        camera, 
+                                                        [bd.xB,
+                                                         bd.yB, 
+                                                         bd.zB], 
+                                                        bd.state, 
+                                                        bd.timeStamp);
+    },
+
     // Sets the list of blocks to the version on the server, which is described
     // by "serverData".
     updateWithServerData: function (serverData) {
         this._versionOnServer = serverData.version;
 
         var camera = this._construction.camera();
-        this._blocks = dojo.map(serverData.blocks, function (bd) {
-            return new com.realitybuilder.ConstructionBlock(camera, 
-                                                            [bd.xB, 
-                                                             bd.yB, 
-                                                             bd.zB], 
-                                                            bd.state, 
-                                                            bd.timeStamp);
-        });
+        // FIXME: dojo.hitch superfluous?
+        this._blocks = dojo.map(serverData.blocks, 
+                                dojo.hitch(this,
+                                           this._createBlockFromServerData));
 
         this._updateRealBlocksSorted();
         this._updatePendingBlocks();

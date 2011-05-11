@@ -21,6 +21,7 @@
 
 dojo.provide('com.realitybuilder.Construction');
 
+dojo.require('com.realitybuilder.BlockProperties');
 dojo.require('com.realitybuilder.ConstructionBlocks');
 dojo.require('com.realitybuilder.ConstructionBlock');
 dojo.require('com.realitybuilder.NewBlock');
@@ -56,6 +57,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _showReal: null,
     _showPending: null,
 
+    // Properties (shape, dimensions, etc.) of a block:
+    _blockProperties: null,
+
     // The new block that the user is supposed to position. Could move once the
     // real blocks are loaded, if there are any intersections.
     _newBlock: null,
@@ -88,9 +92,12 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
         this._camera = new com.realitybuilder.Camera(640, 480);
         this._image = new com.realitybuilder.Image(this._camera);
+        this._blockProperties = new com.realitybuilder.BlockProperties();
         this._constructionBlocks = 
-            new com.realitybuilder.ConstructionBlocks(this);
+            new com.realitybuilder.ConstructionBlocks(this, 
+                                                      this._blockProperties);
         this._newBlock = new com.realitybuilder.NewBlock(
+            this._blockProperties,
             this._camera, [8, 0, 7], this._constructionBlocks, 
             !this._showAdminControls);
         this._userControls = new com.realitybuilder.UserControls(this);
@@ -189,7 +196,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
     // Handles keys events for demoing the application.
     _onDemoKeyPress: function (event) {
-        if (event.shiftKey && event.keyCode === dojo.keys.F11) {
+        if (event.shiftKey && event.keyCode === dojo.keys.F12) {
             // Makes the block at the position of the new block real on the
             // server. This only works if there is a block at that position in
             // the list of construction blocks, and if the user is logged in as
@@ -375,8 +382,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _checkIfHasLoaded: function () {
         if (this._camera.hasAlreadyBeenUpdatedWithServerData() &&
             this._constructionBlocks.hasAlreadyBeenUpdatedWithServerData() &&
-            this._image.imageLoaded())
-        {
+            this._image.imageLoaded()) {
             // Shows the contents and removes the load indicator.
             dojo.destroy(dojo.byId('loadIndicator'));
             this._unhideContent();
@@ -387,14 +393,22 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
     },
 
-    // Second step of the construction update process. Assigns the new
-    // construction data, which implicitly triggers rendering and update of
-    // controls. Only updates data if there is a new version. Sets timeout
-    // after which a new check for an update is performed.
+    // Second step of the construction update process.
+    //
+    // Updates client data with server data, but only where there have been
+    // changes. Note that update of certain client data may trigger a redraw of
+    // blocks and/or controls.
+    //
+    // Finally, sets timeout after which a new check for an update is
+    // performed.
     _updateSucceeded: function (data, ioargs) {
+        var that = this;
+
+        // FIXME: On first update, do something with the block properties data.
+
         if (data.blocksData.changed) {
             this._constructionBlocks.updateWithServerData(data.blocksData, 
-                this._image);
+                                                          this._image);
         }
 
         if (data.cameraData.changed) {
@@ -413,18 +427,24 @@ dojo.declare('com.realitybuilder.Construction', null, {
             clearTimeout(this._updateTimeout);
         }
         this._updateTimeout = 
-            setTimeout(dojo.hitch(this, this._update), 
-                this._UPDATE_INTERVAL);
+            setTimeout(function () {
+                that._update(false);
+            }, this._UPDATE_INTERVAL);
     },
 
     // Triggers an update of the construction with the data stored on the
     // server. Only updates the blocks if there is a new version. Fails
     // silently on error.
-    _update: function () {
+    //
+    // If "firstUpdate" is true, then this is the first time the update is
+    // performed.
+    _update: function (firstUpdate) {
+        var getDeletedBlocks, that = this;
+
         // Without the admin controls being shown, deleted blocks are of no use
         // (pending blocks are needed to determine whether a request has been
         // denied):
-        var getDeletedBlocks = this._showAdminControls ? 'true' : 'false';
+        getDeletedBlocks = this._showAdminControls ? 'true' : 'false';
 
         dojo.xhrGet({
             url: "/rpc/construction",
@@ -433,10 +453,13 @@ dojo.declare('com.realitybuilder.Construction', null, {
                     this._constructionBlocks.versionOnServer(),
                 "getDeletedBlocks": getDeletedBlocks,
                 "cameraDataVersion": this._camera.versionOnServer(),
-                "imageDataVersion": this._image.versionOnServer()},
+                "imageDataVersion": this._image.versionOnServer(),
+                "getBlockProperties": firstUpdate
+            },
             handleAs: "json",
-            load: dojo.hitch(this, this._updateSucceeded)
-        });
+            load: function (data, ioargs) {
+                that._updateSucceeded(data, ioargs, firstUpdate);
+            }});
     },
 
     // Unhides the content. Fades in the content, unless the browser is Internet

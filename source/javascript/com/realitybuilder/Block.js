@@ -49,6 +49,9 @@ dojo.declare('com.realitybuilder.Block', null, {
     // camera sensor.
     _camera: null,
 
+    // Properties (shape, dimensions, etc.) of a block:
+    _blockProperties: null,
+
     // Edges of the block, defined using indices of the array
     // "this._vertexesB". Only edges, that are visible when the construction is
     // oriented a certain way, are included. The third number is an index used
@@ -85,12 +88,15 @@ dojo.declare('com.realitybuilder.Block', null, {
     _indexOfLeftmostVertex: null,
     _indexOfRightmostVertex: null,
 
-    // Creates a 2x2x1 building block at the position in block space ("xB",
-    // "yB", "zB") = "positionB". A blocks extents are defined by two corners:
-    // ("xB", "yB", "zB"), ("xB" + 2, "yB" + 2, "zB" + 1). When the block is
-    // rendered, it is as seen by the sensor of the camera "camera".
-    constructor: function (camera, positionB) {
+    // Creates a block at the position in block space ("xB", "yB", "zB") =
+    // "positionB". When the block is rendered, it is as seen by the sensor of
+    // the camera "camera".
+    //
+    // The block's properties, such as shape and size, are described by
+    // "blockProperties".
+    constructor: function (blockProperties, camera, positionB) {
         this._positionB = positionB;
+        this._blockProperties = blockProperties;
         this._camera = camera;
         this._edges = this._INITIAL_EDGES;
     },
@@ -164,7 +170,7 @@ dojo.declare('com.realitybuilder.Block', null, {
         yB = this.positionB()[1],
         zB = this.positionB()[2],
         vsBottom = [], vsTop = [],
-        blockOutlineB = com.realitybuilder.util.BLOCK_OUTLINE_B;
+        blockOutlineB = this._blockProperties.outlineB();
 
         // top, counter clock wise:
         dojo.forEach(blockOutlineB, function (vertexXYB) {
