@@ -62,30 +62,6 @@ dojo.declare('com.realitybuilder.Shadow', null, {
                                                          constructionBlocks);
     },
 
-    // Sort function, for ordering shadow parts by height/layer. From bottom to
-    // top.
-    _sortByHeight: function (shadowPart1, shadowPart2) {
-        if (shadowPart1.zB() > shadowPart2.zB()) {
-            return 1;
-        } else if (shadowPart1.zB() < shadowPart2.zB()) {
-            return -1;
-        } else {
-            return 0;
-        }
-    },
-
-    // Updates the sensor space of the shadow parts.
-    _updateSensorSpace: function () {
-        dojo.forEach(this._shadowParts, function (shadowPart) {
-            shadowPart.updateSensorSpace();
-        });
-    },
-
-    // Orders the shadow parts, from bottom to top.
-    _sortShadowParts: function () {
-        this._shadowParts.sort(this._sortByHeight);
-    },
-
     _renderLayerShadow: function (context, newBlock, camera, 
                                   constructionBlocks, layerZB) {
         var layerShadow;
@@ -127,27 +103,11 @@ dojo.declare('com.realitybuilder.Shadow', null, {
                 this._shadowObscuringBlocks.subtract(context, layerZB + 1);
             }
         }
-
-        /* FIXME - reactivate:
-        var canvas = this._camera.sensor().shadowCanvas(), context;
-        this._updateSensorSpace();
-        this._sortShadowParts();
-        if (canvas.getContext) {
-            context = canvas.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            dojo.forEach(this._shadowParts, function (shadowPart) {
-                shadowPart.render(context);
-            });
-        }
-        */
     },
 
     // Makes sure that the shadow is not shown on the sensor.
     clear: function () {
-        var canvas = this._camera.sensor().shadowCanvas(), context;
-        if (canvas.getContext) {
-            context = canvas.getContext('2d');
-            context.clearRect(0, 0, canvas.width, canvas.height);
-        }
+        var canvas = this._camera.sensor().shadowCanvas();
+        com.realitybuilder.util.clearCanvas(canvas);
     }
 });

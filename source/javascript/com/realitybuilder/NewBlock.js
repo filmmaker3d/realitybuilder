@@ -34,7 +34,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Points in block space, defining the rectangle which represents the space
     // in which blocks may be build.
     _BUILD_SPACE_1B: [-1, -1, 0],
-    _BUILD_SPACE_2B: [11, 11, 6],
+    _BUILD_SPACE_2B: [13, 13, 4],
 
     // State of the block: 0 = stopped, 1 = movable
     _state: null,
@@ -389,10 +389,21 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Returns true, if the block "block" is a cutting block, i.e. if it is a
     // block in front of the current block.
     _isCuttingBlock: function (block) {
-        return (
-            block.xB() >= this.xB() - 1 && 
-            block.yB() <= this.yB() + 1 &&
-            block.zB() >= this.zB());
+        var lengthXB = 4, lengthYB = 2;
+
+        if (block.zB() === this.zB()) {
+            if (block.xB() >= this.xB() - (lengthXB - 1) && 
+                block.yB() <= this.yB() - (lengthYB - 1)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else if (block.zB() > this.zB()) {
+            return (block.xB() >= this.xB() - (lengthXB - 1) && 
+                    block.yB() <= this.yB() + (lengthYB - 1));
+        } else {
+            return false;
+        }
     },
 
     // Returns true, iff the block "block" fullfills conditions in block space
