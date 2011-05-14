@@ -84,15 +84,15 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // See same function in super class.
-    _sensorSpaceNeedsToBeUpdated: function () {
+    _viewSpaceNeedsToBeUpdated: function () {
         return (this._lastPositionB === null ||
-            !com.realitybuilder.util.pointsIdenticalB(
-                this._lastPositionB, this._positionB) ||
-            this.inherited(arguments));
+                !com.realitybuilder.util.pointsIdenticalB(
+                    this._lastPositionB, this._positionB) ||
+                this.inherited(arguments));
     },
 
     // See same function in super class.
-    _onSensorSpaceUpdated: function () {
+    _onViewSpaceUpdated: function () {
         this._lastPositionB = dojo.clone(this._positionB);
         this.inherited(arguments);
     },
@@ -386,6 +386,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         this._edges = newEdges;
     },
 
+    // FIXME: remove:
+
     // Returns true, if the block "block" is a cutting block, i.e. if it is a
     // block in front of the current block.
     _isCuttingBlock: function (block) {
@@ -455,26 +457,97 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         */
     },
 
+    // Returns true, iff the edge number "i" is in front of the number "j",
+    // when comparted horizontally (H):
+    // FIXME
+    _edgesOverlapH: function (edge1, edge2) {
+
+    },
+
+    // Returns 1, iff edge 1 is in front of edge 2, when comparted horizontally
+    // (H):
+    //
+    // The edge number "i" is in front of the edge number "j", if:
+    //
+    // * The edges overlap in sensor space (S), when projected onto the x-axis,
+    //   i.e. after setting the y-coordinates of the vertexes to 0.
+    //
+    // * Edge 1 is in front of edge 2, when projected onto the x-y-plane in
+    //   view space (V), i.e. after setting the y-coordinates of the vertexes
+    //   to 0.
+    //
+    // For the reverse case, returns -1. For the undecided case, returns 0.
+    _relationBetweenEdgesH: function (edges1S, edges1V, edges2S, edges2V) {
+        return true; // FIXME
+    },
+
+    // If the new block (= the current block) and the block "block" are on the
+    // same layer (SL) and they overlap (O) in sensor space, then this has one
+    // of the following return values:
+    //
+    // True: The block "block" obscures the new block visually. In other words:
+    //   To get a correct result, the block "block" has to be drawn on top of
+    //   the new block.
+    //
+    // False: The new block obscures the block "block" visually.
+    _isObscuredBySLO: function (block) {
+        var i, j, rel, edgesS, edgesV, blockEdgesS, blockEdgesV, nEdges;
+
+        // Compares the top edges of the new block and the other block in
+        // sensor space. Comparing the bottom edges would give the same result.
+        edgesS = this.topEdgesS();
+        edgesV = this.topEdgesV();
+        blockEdgesS = block.topEdgesS();
+        blockEdgesV = block.topEdgesV();
+        nEdges = edgesS.length;
+        for (i = 0; i < nEdges; i += 1) {
+            for (j = i + 1; j < nEdges; j += 1) {
+                rel = this._relationBetweenEdgesH(edgesS, edgesV, 
+                                                  blockEdgesS, blockEdgesV);
+                if (rel > 0) {
+                    return true;
+                } else if (rel < 0) {
+                    return false;
+                }
+            }
+        }
+        return false; // should not be reached
+    },
+
+    // Subtracts the shape of the the real block "realblock" from the canvas
+    // containing the drawing of the new block. The context of that canvas is
+    // "context". To speed up things, the block is only subtracted, if its
+    // sensor space bounding box overlaps with that of the new block.
+    _subtractRealBlock: function (realBlock, context) {
+        if (this._boundingBoxesOverlap(realBlock)) {
+            realBlock.subtract(context);
+        }
+    },
+
     // Subtracts the shapes of the real blocks in front of the block from the
     // drawing on the canvas with rendering context "context".
     _subtractRealBlocks: function (context) {
         var realBlocksSorted = this._constructionBlocks.realBlocksSorted(),
-            i, realBlock;
+        i, realBlock, zB = this.zB();
 
-        // Idea behind the following loop: the shadow may be covered by blocks
-        // in a layer above or the same layer.
+        // Idea behind the following loop: the new block may be obscured by
+        // blocks in a layer above or the same layer. Due to perspective
+        // (camera always above construction), it will never be obscured by
+        // blocks on the layer below.
         for (i = 0; i < realBlocksSorted.length; i += 1) {
             realBlock = realBlocksSorted[i];
 
-            if (realBlock.zB() < this._zB) {
-                break;
-            }
-
-            // Only blocks in front of the shadow are allowed to cut it.
-            if (this._isCuttingBlock(realBlock)) {
-                if (this._boundingBoxesOverlap(realBlock)) {
-                    realBlock.subtract(context);
+            if (realBlock.zB() < zB) {
+                break; // because all the following blocks are also below the
+                       // new block
+            } else if (realBlock.zB() === zB) {
+                if (this._isObscuredBySLO(realBlock)) {
+                    this._subtractRealBlock(realBlock, context);
                 }
+            } else if (realBlock.zB() > zB) {
+                // Real blocks in a layer above always obscure real blocks in
+                // the layer below, due to perspective.
+                this._subtractRealBlock(realBlock, context);
             }
         }
     },
@@ -508,7 +581,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // has changed, or when the construction blocks have changed.
     render: function () {
         var canvas = this._camera.sensor().newBlockCanvas(),
-            sensorSpaceHasChanged = this.updateSensorSpace(),
+            sensorSpaceHasChanged = this._updateSensorSpace(),
             stateHasChanged = (this._lastState !== this._state),
             context, color;
 
@@ -521,7 +594,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                 com.realitybuilder.util.clearCanvas(canvas);
                 this.inherited(arguments, [context, color]);
 
-                // hidden lines removal:
+                // removes parts of the real block obscured by other blocks:
                 this._subtractRealBlocks(context);
             }
         }

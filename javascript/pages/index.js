@@ -1,3 +1,5 @@
+// For the index page.
+
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,10 +14,13 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// For the index page.
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox */
 
 function realityBuilderCreateConstruction() {
-    var construction = new com.realitybuilder.Construction(false);
+    var construction = // to please JSLint
+        new com.realitybuilder.Construction(false);
+    construction = null; // to please JSLint
 }

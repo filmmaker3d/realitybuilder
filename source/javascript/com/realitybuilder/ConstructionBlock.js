@@ -87,7 +87,7 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     renderSolidTop: function (context) {
         var topVertexesS, vertexS, i;
 
-        this.updateSensorSpace();
+        this._updateSensorSpace();
 
         topVertexesS = this._topVertexesS;
 

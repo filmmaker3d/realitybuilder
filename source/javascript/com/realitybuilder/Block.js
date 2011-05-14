@@ -119,6 +119,40 @@ dojo.declare('com.realitybuilder.Block', null, {
         return this._positionB[2];
     },
 
+    // Returns all top edges in the block, as an array of tuples. Each such
+    // tuple describes the vertexes of an edge in sensor space. The edges are
+    // sorted counterclockwise (when viewed from top in block space).
+    topEdgesS: function () {
+        var i, tmp = [], vertexesS, len;
+
+        vertexesS = this._topVertexesS;
+        len = vertexesS.length;
+
+        this._updateSensorSpace();
+        for (i = 0; i < len; i += 1) {
+            tmp.push(vertexesS[i], vertexesS[(i + 1) % len]);
+        }
+
+        return tmp;
+    },
+
+    // Returns all edges in the block, as an array of tuples. Each such tuple
+    // describes the vertexes of an edge in view space. The edges are sorted
+    // counterclockwise (when viewed from top in block space).
+    topEdgesV: function () {
+        var i, tmp = [], vertexesV, len;
+
+        vertexesV = this._topVertexesV;
+        len = vertexesV.length;
+
+        this._updateViewSpace();
+        for (i = 0; i < len; i += 1) {
+            tmp.push(vertexesV[i], vertexesV[(i + 1) % len]);
+        }
+
+        return tmp;
+    },
+
     // Returns true, iff the current block collides with the block "block".
     collidesWith: function (block) {
         var 
@@ -173,7 +207,7 @@ dojo.declare('com.realitybuilder.Block', null, {
         blockOutlineB = this._blockProperties.outlineB(),
         that = this;
 
-        // top, counter clock wise:
+        // top, counterclockwise (when viewed from top in block space):
         dojo.forEach(blockOutlineB, function (vertexXYB) {
             vsBottom.push(com.realitybuilder.util.blockToWorld(
                 [xB + vertexXYB[0], 
@@ -191,28 +225,36 @@ dojo.declare('com.realitybuilder.Block', null, {
         this._topVertexes = vsTop;
     },
 
-    // Calculates the vertexes of the block in view space.
+    // Calculates the vertexes of the block in view space. Returns true, iff
+    // there may have been any changes in the view space since the last call to
+    // this function.
     _updateViewSpace: function () {
-        this._updateWorldSpace();
-        this._bottomVertexesV = dojo.map(this._bottomVertexes, 
-                                         dojo.hitch(this._camera, 
-                                                    this._camera.worldToView));
-        this._topVertexesV = dojo.map(this._topVertexes, 
-                                      dojo.hitch(this._camera, 
-                                                 this._camera.worldToView));
+        if (this._viewSpaceNeedsToBeUpdated()) {
+            this._updateWorldSpace();
+            this._bottomVertexesV = 
+                dojo.map(this._bottomVertexes, 
+                         dojo.hitch(this._camera, this._camera.worldToView));
+            this._topVertexesV = 
+                dojo.map(this._topVertexes, 
+                         dojo.hitch(this._camera, this._camera.worldToView));
+            this._onViewSpaceUpdated();
+            return true;
+        } else {
+            return false;
+        }
     },
 
-    // Returns true, iff the sensor space needs to be updated.
-    _sensorSpaceNeedsToBeUpdated: function () {
+    // Returns true, iff the view space needs to be updated.
+    _viewSpaceNeedsToBeUpdated: function () {
         return this._lastCameraId !== this._camera.id();
     },
 
-    // Called after the sensor space has been updated.
-    _onSensorSpaceUpdated: function () {
+    // Called after the view space has been updated.
+    _onViewSpaceUpdated: function () {
         this._lastCameraId = this._camera.id();
     },
 
-    // Finds the index of - in screen space - the leftmost and the rightmost
+    // Finds the index of - in sensor space - the leftmost and the rightmost
     // vertex. This index is the same for the bottom and the top vertexes.
     _updateHorizontalExtentsInSensorSpace: function () {
         var
@@ -242,19 +284,21 @@ dojo.declare('com.realitybuilder.Block', null, {
     },
 
     // Calculates the vertexes of the block in sensor space. The camera is
-    // positioned in the center of the sensor. Returns true, iff there have
-    // been any changes in the result since the last call to this function.
-    updateSensorSpace: function () {
-        var cam = this._camera;
-        if (this._sensorSpaceNeedsToBeUpdated()) {
-            this._updateViewSpace();
+    // positioned in the center of the sensor. Returns true, iff there may have
+    // been any changes in the sensor space since the last call to this
+    // function.
+    _updateSensorSpace: function () {
+        var cam = this._camera, sensorSpaceNeedsToBeUpdated;
+
+        sensorSpaceNeedsToBeUpdated = this._updateViewSpace();
+
+        if (sensorSpaceNeedsToBeUpdated) {
             this._bottomVertexesS = dojo.map(this._bottomVertexesV,
                                              dojo.hitch(cam, 
                                                         cam.viewToSensor));
             this._topVertexesS = dojo.map(this._topVertexesV,
                                           dojo.hitch(cam, cam.viewToSensor));
             this._updateHorizontalExtentsInSensorSpace();
-            this._onSensorSpaceUpdated();
 
             return true;
         } else {
@@ -269,7 +313,7 @@ dojo.declare('com.realitybuilder.Block', null, {
         bottomVertexesS, topVertexesS,
         len, vertexS, i, ilv, irv;
 
-        this.updateSensorSpace();
+        this._updateSensorSpace();
 
         bottomVertexesS = this._bottomVertexesS;
         topVertexesS = this._topVertexesS;
@@ -280,7 +324,8 @@ dojo.declare('com.realitybuilder.Block', null, {
         context.globalCompositeOperation = "destination-out";
         context.fillStyle = "black";
 
-        // top, from rightmost to leftmost vertex, counterclockwise:
+        // top, from rightmost to leftmost vertex, counterclockwise (when
+        // viewed from top in block space):
         context.beginPath();
         vertexS = topVertexesS[irv];
         context.moveTo(vertexS[0], vertexS[1]);
@@ -293,7 +338,8 @@ dojo.declare('com.realitybuilder.Block', null, {
         vertexS = bottomVertexesS[ilv];
         context.lineTo(vertexS[0], vertexS[1]);
 
-        // bottom, from leftmost to rightmost vertex, counterclockwise:
+        // bottom, from leftmost to rightmost vertex, counterclockwise (when
+        // viewed from top in block space):
         for (i = ilv + 1; i <= len + irv; i += 1) {
             vertexS = bottomVertexesS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
@@ -416,10 +462,9 @@ dojo.declare('com.realitybuilder.Block', null, {
     },
 
     // Draws the block in the color "color" (CSS format) as seen by the sensor,
-    // on the canvas with rendering context "context". Depends on the vertexes
-    // in view coordinates.
+    // on the canvas with rendering context "context".
     render: function (context, color) {
-        this.updateSensorSpace();
+        this._updateSensorSpace();
 
         context.strokeStyle = color;
         this._renderForeground(context);

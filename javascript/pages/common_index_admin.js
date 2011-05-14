@@ -14,10 +14,11 @@
 
 // For the index and admin pages.
 
-// Interpreted by JSLint:
-/*global DetectImageState, realityBuilderCreateConstruction*/
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-"use strict";
+/*global com, dojo, dojox, swfobject, videoId, DetectImageState, 
+  realityBuilderCreateConstruction */
 
 // Returns true, iff the browser works with the Dojo Toolkit.
 function realityBuilderIsDojoSupported() {
@@ -37,10 +38,10 @@ function realityBuilderOnImageStateDetected(disabled) {
 }
 
 function realityBuilderInit() {
-    dojo.addOnLoad(function() {
+    dojo.addOnLoad(function () {
         if (com.realitybuilder.isCanvasSupported()) {
             DetectImageState.init('/images/placeholder.gif', 
-                realityBuilderOnImageStateDetected);
+                                  realityBuilderOnImageStateDetected);
         } else {
             com.realitybuilder.showNoCanvasErrorMessage();
         }

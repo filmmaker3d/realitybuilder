@@ -29,8 +29,8 @@ Getting started
     /admin
 
 
-Conventions and Terminology
-===========================
+Terminology
+===========
 
 * Types of blocks:
 
@@ -129,6 +129,13 @@ automatically, without any configuration. However, when blocks touch each
 other, then rounding errors can lead to unwanted results. Furthermore,
 collision detection, as described above, in block space is probably simpler and
 faster.
+
+
+JSLint
+======
+
+Every Reality Builder JavaScript file contains configuration instructions at
+the top for JSLint.
 
 
 Miscellaneous
