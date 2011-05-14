@@ -43,6 +43,10 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     // that are not actually visible.
     _shadowObscuringBlocks: null,
 
+    // Only one instance of LayerShadow is used, to avoid memory leaks. See the
+    // documentation of LayerShadow for more information.
+    _layerShadow: null,
+
     // Creates the shadow of the block "newBlock". When the shadow is rendered,
     // it is as seen by the sensor of the camera "camera". For finding which
     // parts of the shadow have to be obscured, the list of non-new blocks in
@@ -60,28 +64,22 @@ dojo.declare('com.realitybuilder.Shadow', null, {
                                                          blockProperties,
                                                          camera,
                                                          constructionBlocks);
+
+        this._layerShadow = 
+            new com.realitybuilder.LayerShadow(newBlock, blockProperties,
+                                               camera, constructionBlocks);
     },
 
     _renderLayerShadow: function (context, newBlock, camera, 
-                                  constructionBlocks, layerZB) {
-        var layerShadow;
-
-        layerShadow = 
-            new com.realitybuilder.LayerShadow(newBlock, 
-                                               this._blockProperties,
-                                               camera, 
-                                               constructionBlocks,
-                                               layerZB);
-        layerShadow.render();
+                                  constructionBlocks, layerZB)
+    {
+        this._layerShadow.render(layerZB);
         context.globalAlpha = 0.2;
-        context.drawImage(layerShadow.canvas(), 0, 0);
+        context.drawImage(this._layerShadow.canvas(), 0, 0);
         context.globalAlpha = 1;
-
-        layerShadow = null; // FIXME
     },
 
-    // Draws the shadow as seen by the sensor of the camera. Depends on the
-    // vertexes in view coordinates. (FIXME: what?)
+    // Draws the shadow of the new block as seen by the sensor of the camera.
     render: function () {
         var 
         canvas = this._camera.sensor().shadowCanvas(), context, 

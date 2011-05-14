@@ -1,6 +1,11 @@
 // "Layer shadow": The shadow under the new block, projected onto a layer of
 // blocks under the assumption that there are no layers below and above that
 // layer.
+//
+// Instantiating this class causes creation of DOM elements. These elements may
+// not be removed from memory upon deletion of an instance. This problem
+// happens for example in Firefox 4, thus leading to memory leaks. As a
+// solution, it is recommended that an instance is reused wherever possible.
 
 // Sometimes the term "full shadow" is used, which refers to the shadow how it
 // would look if the all blocks in the layer would form an infinite plane
@@ -41,10 +46,6 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     // Needed for hidden lines removal and collision detection.
     _constructionBlocks: null,
 
-    // Elevation of the layer of blocks, on which the shadow is projected (-1
-    // is the ground plane):
-    _layerZB: null,
-
     // Coordinates of the full shadow's vertexes in world space, view space,
     // and sensor space.
     _fullVertexes: null,
@@ -60,7 +61,7 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     _helperCanvas: null,
 
     constructor: function (newBlock, blockProperties, camera, 
-                           constructionBlocks, layerZB)
+                           constructionBlocks)
     {
         var shadowCanvas;
 
@@ -68,7 +69,6 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         this._blockProperties = blockProperties;
         this._camera = camera;
         this._constructionBlocks = constructionBlocks;
-        this._layerZB = layerZB;
 
         shadowCanvas = camera.sensor().shadowCanvas();
         this._canvas = dojo.create('canvas');
@@ -84,12 +84,13 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         return this._canvas;
     },
 
-    // Updates the vertexes of the full shadow in world space.
-    _updateWorldSpace: function () {
+    // Updates the vertexes of the full shadow, projected onto the layer of
+    // blocks of elevation "layerZB", in world space.
+    _updateWorldSpace: function (layerZB) {
         var 
         xB = this._newBlock.xB(),
         yB = this._newBlock.yB(),
-        zB = this._layerZB + 1,
+        zB = layerZB + 1,
         vs = [],
         blockOutlineB = this._blockProperties.outlineB(),
         that = this;
@@ -106,40 +107,42 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         this._fullVertexes = vs;
     },
 
-    // Calculates the vertexes of the full shadow in view space.
-    _updateViewSpace: function () {
-        this._updateWorldSpace();
+    // Calculates the vertexes of the full shadow, projected onto the layer of
+    // blocks of elevation "layerZB", in view space.
+    _updateViewSpace: function (layerZB) {
+        this._updateWorldSpace(layerZB);
         this._fullVertexesV = dojo.map(this._fullVertexes, 
                                        dojo.hitch(this._camera, 
                                                   this._camera.worldToView));
     },
 
-    // Calculates the vertexes of the full shadow in sensor space. The camera
-    // is positioned in the center of the sensor.
-    updateSensorSpace: function () {
-        this._updateViewSpace();
+    // Calculates the vertexes of the full shadow, projected onto the layer of
+    // blocks of elevation "layerZB", in sensor space. The camera is positioned
+    // in the center of the sensor.
+    _updateSensorSpace: function (layerZB) {
+        this._updateViewSpace(layerZB);
         this._fullVertexesS = dojo.map(this._fullVertexesV,
                                    dojo.hitch(this._camera, 
                                               this._camera.viewToSensor));
     },
 
-    // Renders the tops of the blocks in the layer.
-    _renderTops: function (context) {
+    // Renders the tops of the blocks in the layer "layerZB".
+    _renderTops: function (layerZB, context) {
         var 
         realBlocksOnLayer = 
-            this._constructionBlocks.realBlocksInLayer(this._layerZB);
+            this._constructionBlocks.realBlocksInLayer(layerZB);
 
         dojo.forEach(realBlocksOnLayer, function (realBlock) {
             realBlock.renderSolidTop(context);
         });
     },
 
-    // Draws the full shadow, intersecting it with what is already on the
-    // canvas with rendering context "context".
-    _renderFull: function (context) {
+    // Draws the full shadow, projected onto the layer of blocks of elevation
+    // "layerZB", on the canvas with rendering context "context".
+    _renderFull: function (layerZB, context) {
         var fullVertexesS, vertexS, i;
 
-        this.updateSensorSpace();
+        this._updateSensorSpace(layerZB);
 
         fullVertexesS = this._fullVertexesS;
 
@@ -157,9 +160,13 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         context.fill();
     },
 
-    // Draws the shadow as seen by the sensor of the camera, on the canvas with
-    // rendering context "context".
-    render: function () {
+    // Draws the shadow on top of a layer of blocks, or on the ground plane, on
+    // the canvas with rendering context "context", as seen by the sensor of
+    // the camera.
+    //
+    // "layerZB" is the elevation of the layer of blocks, on which the shadow
+    // is projected (-1 is the ground plane):
+    render: function (layerZB) {
         var 
         canvas = this._canvas, helperCanvas = this._helperCanvas, 
         context, helperContext;
@@ -178,20 +185,20 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
             com.realitybuilder.util.clearCanvas(helperCanvas);
 
             context.globalCompositeOperation = "source-over";
-            if (this._layerZB === -1) {
+            if (layerZB === -1) {
                 com.realitybuilder.util.fillCanvas(canvas, "black");
             } else {
-                this._renderTops(context); // slow with many blocks
+                this._renderTops(layerZB, context); // slow with many blocks
             }
 
             // xor:
             helperContext.globalCompositeOperation = "source-over";
             helperContext.drawImage(canvas, 0, 0);
             helperContext.globalCompositeOperation = "xor";
-            this._renderFull(helperContext); // fast
+            this._renderFull(layerZB, helperContext); // fast
 
             // completes combination:
-            this._renderFull(context); // fast
+            this._renderFull(layerZB, context); // fast
             
             // subtracts:
             context.globalCompositeOperation = "destination-out";

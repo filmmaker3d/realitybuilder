@@ -1,6 +1,6 @@
 // All blocks permanently in the construction, including deleted blocks and
 // pending blocks. The new, user positionable block is not part of the
-// construction yet.
+// construction.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //

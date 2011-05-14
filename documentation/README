@@ -32,6 +32,25 @@ Getting started
 Conventions and Terminology
 ===========================
 
+* Types of blocks:
+
+  - New block: The block that may be positioned by the user.
+
+  - Construction block: A block permanently in the construction.
+
+    Types of construction blocks:
+
+    . Real block: Block that is actually built.
+
+    . Deleted block: Block that was deleted.
+
+    . Pending block: Block that is not yet made real.
+
+    The new, user positionable block is not part of the construction.
+
+  - Shadow obscuring block: Block that is used for graphically removing parts
+    of the new block's shadow that are not actually visible.
+
 * Specifiers for coordinates (see also "perspective.xar"):
 
   - The coordinate specifiers ending in "B", e.g. "xB", denote block positions:
