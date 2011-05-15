@@ -64,8 +64,8 @@ com.realitybuilder.util.pointsIdenticalB = function (point1B, point2B) {
         (point1B[2] - point2B[2]) === 0);
 };
 
-// Subtracts the vectors "vector2" from the vector "vector1" in world space and
-// returns the result.
+// Subtracts the vectors "vector2" from the vector "vector1" in 3D and returns
+// the result.
 com.realitybuilder.util.subtractVectors = function (vector1, vector2) {
     return [
         vector1[0] - vector2[0], 

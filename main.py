@@ -102,9 +102,9 @@ class Construction(db.Model):
             raise Exception('could not find construction')
 
 class Block(db.Model):
-    xB = db.IntegerProperty()
-    yB = db.IntegerProperty()
-    zB = db.IntegerProperty()
+    x_b = db.IntegerProperty()
+    y_b = db.IntegerProperty()
+    z_b = db.IntegerProperty()
 
     # 0 = deleted, 1 = pending, 2 = real
     state = db.IntegerProperty(default=0)
@@ -113,35 +113,35 @@ class Block(db.Model):
     # creation:
     time_stamp = db.IntegerProperty() # s
 
-    # Returns the datastore key name of a block at "xB", "yB", "zB".
+    # Returns the datastore key name of a block at "x_b", "y_b", "z_b".
     @staticmethod
-    def build_key_name(xB, yB, zB):
-        return str(xB) + ',' + str(yB) + ',' + str(zB)
+    def build_key_name(x_b, y_b, z_b):
+        return str(x_b) + ',' + str(y_b) + ',' + str(z_b)
 
-    # Returns the block at the block space position "xB", "yB", "zB" in the
+    # Returns the block at the block space position "x_b", "y_b", "z_b" in the
     # construction "construction", or "None", if the block cannot be found.
     # Also returns blocks in state deleted.
     @staticmethod
-    def get_by_positionB(construction, xB, yB, zB):
+    def get_by_positionB(construction, x_b, y_b, z_b):
         return Block.get_by_key_name(
-            Block.build_key_name(xB, yB, zB), parent=construction)
+            Block.build_key_name(x_b, y_b, z_b), parent=construction)
 
-    # Inserts a block at the block space position "xB", "yB", "zB" in the
+    # Inserts a block at the block space position "x_b", "y_b", "z_b" in the
     # construction "construction", with the initial state deleted. Raises an
     # exception on failure. Returns the block.
     @staticmethod
-    def insert_at_positionB(construction, xB, yB, zB):
+    def insert_at_positionB(construction, x_b, y_b, z_b):
         return Block(parent=construction, 
-                     key_name=Block.build_key_name(xB, yB, zB),
-                     xB=xB, yB=yB, zB=zB, 
+                     key_name=Block.build_key_name(x_b, y_b, z_b),
+                     x_b=x_b, y_b=y_b, z_b=z_b, 
                      time_stamp=long(time.time()))
 
-    # If there is a block at "xB", "yB", "zB" in the state "state" in the
+    # If there is a block at "x_b", "y_b", "z_b" in the state "state" in the
     # construction "construction", returns that block. Otherwise returns
     # "None".
     @staticmethod
-    def get_at(construction, xB, yB, zB, state):
-        block = Block.get_by_key_name(Block.build_key_name(xB, yB, zB), 
+    def get_at(construction, x_b, y_b, z_b, state):
+        block = Block.get_by_key_name(Block.build_key_name(x_b, y_b, z_b), 
                                       parent=construction)
         if block and block.state == state:
             return block
@@ -161,9 +161,9 @@ class Block(db.Model):
     # intersection does not count as intersection.
     def is_intersecting_with_real(self):
         for relative_xy_positionB in self.intersecting_relative_xy_positionsB:
-            testXB = self.xB + relative_xy_positionB[0]
-            testYB = self.yB + relative_xy_positionB[1]
-            testZB = self.zB
+            testXB = self.x_b + relative_xy_positionB[0]
+            testYB = self.y_b + relative_xy_positionB[1]
+            testZB = self.z_b
             testBlock = Block.get_at(self.parent(), 
                                      testXB, testYB, testZB, 2)
             if testBlock:
@@ -176,9 +176,9 @@ class Block(db.Model):
     @staticmethod
     def delete_intersecting_pending_blocks(block):
         for relative_xy_positionB in Block.intersecting_relative_xy_positionsB:
-            testXB = block.xB + relative_xy_positionB[0]
-            testYB = block.yB + relative_xy_positionB[1]
-            testZB = block.zB
+            testXB = block.x_b + relative_xy_positionB[0]
+            testYB = block.y_b + relative_xy_positionB[1]
+            testZB = block.z_b
             testBlock = Block.get_at(block.parent(), testXB, testYB, testZB, 1)
             if testBlock:
                 # Intersecting pending block exists. => It is deleted:
@@ -299,9 +299,9 @@ class RPCConstruction(webapp.RequestHandler):
         blocks = []
         for block in query:
             blocks.append({
-                    'xB': block.xB, 
-                    'yB': block.yB, 
-                    'zB': block.zB,
+                    'xB': block.x_b, 
+                    'yB': block.y_b, 
+                    'zB': block.z_b,
                     'state': block.state,
                     'timeStamp': block.time_stamp})
         return blocks
@@ -455,12 +455,12 @@ class RPCConstruction(webapp.RequestHandler):
 # 
 # Silently fails on error.
 class RPCAdminMakeReal(webapp.RequestHandler):
-    # Tries to make the block at the block position "xB", "yB", "zB" real.
+    # Tries to make the block at the block position "x_b", "y_b", "z_b" real.
     @staticmethod
-    def transaction(xB, yB, zB):
+    def transaction(x_b, y_b, z_b):
         construction = Construction.get_main()
         
-        block = Block.get_by_positionB(construction, xB, yB, zB)
+        block = Block.get_by_positionB(construction, x_b, y_b, z_b)
         if not block or block.state == 2:
             return # No block to update or already real.
         
@@ -478,10 +478,10 @@ class RPCAdminMakeReal(webapp.RequestHandler):
 
     def post(self):
         try:
-            xB = int(self.request.get('xB'))
-            yB = int(self.request.get('yB'))
-            zB = int(self.request.get('zB'))
-            db.run_in_transaction(RPCAdminMakeReal.transaction, xB, yB, zB)
+            x_b = int(self.request.get('xB'))
+            y_b = int(self.request.get('yB'))
+            z_b = int(self.request.get('zB'))
+            db.run_in_transaction(RPCAdminMakeReal.transaction, x_b, y_b, z_b)
         except Exception, e:
             logging.error('Could not make block real: ' + str(e))
 
@@ -489,22 +489,22 @@ class RPCAdminMakeReal(webapp.RequestHandler):
 #
 # The post request fails silently on error.
 class RPCAdminDelete(webapp.RequestHandler):
-    # Tries to delete the block at position "xB", "yB", "zB".
+    # Tries to delete the block at position "x_b", "y_b", "z_b".
     @staticmethod
-    def transaction(xB, yB, zB):
+    def transaction(x_b, y_b, z_b):
         construction = Construction.get_main()
 
-        block = Block.get_by_positionB(construction, xB, yB, zB)
+        block = Block.get_by_positionB(construction, x_b, y_b, z_b)
         if block:
             # block found to be set to state deleted
             block.store_state_and_increase_blocks_data_version(0)
 
     def post(self):
         try:
-            xB = int(self.request.get('xB'))
-            yB = int(self.request.get('yB'))
-            zB = int(self.request.get('zB'))
-            db.run_in_transaction(RPCAdminDelete.transaction, xB, yB, zB)
+            x_b = int(self.request.get('xB'))
+            y_b = int(self.request.get('yB'))
+            z_b = int(self.request.get('zB'))
+            db.run_in_transaction(RPCAdminDelete.transaction, x_b, y_b, z_b)
         except Exception, e:
             logging.error('Could not delete block: ' + str(e))
 
@@ -527,15 +527,15 @@ class RPCAdminDelete(webapp.RequestHandler):
 class RPCCreatePending(webapp.RequestHandler):
     # Tries to send an email, informing that a pending block has been created,
     # or the state of an existing block has been changed to pending. The
-    # position of the block: "xB", "yB", "zB"
+    # position of the block: "x_b", "y_b", "z_b"
     @staticmethod
-    def send_info_email(xB, yB, zB):
+    def send_info_email(x_b, y_b, z_b):
         sender_address = "Reality Builder <felixedgarklee@googlemail.com>"
         recipient_address = "new.pending.blocks@realitybuilder.com"
         subject = "New Pending Block"
         body = """
 Position: %d, %d, %d
-""" % (xB, yB, zB)
+""" % (x_b, y_b, z_b)
 
         try:
             mail.send_mail(sender_address, recipient_address, subject, body)
@@ -544,16 +544,17 @@ Position: %d, %d, %d
 
         return True
 
-    # Tries to create a pending block at the block position "xB", "yB", "zB".
+    # Tries to create a pending block at the block position "x_b", "y_b",
+    # "z_b".
     @staticmethod
-    def transaction(xB, yB, zB):
+    def transaction(x_b, y_b, z_b):
         construction = Construction.get_main()
 
-        block = Block.get_by_positionB(construction, xB, yB, zB)
+        block = Block.get_by_positionB(construction, x_b, y_b, z_b)
         if not block:
             # Block has to be created, with initial state deleted. It is left
             # in that state, if it intersects with a real block - see below.
-            block = Block.insert_at_positionB(construction, xB, yB, zB)
+            block = Block.insert_at_positionB(construction, x_b, y_b, z_b)
 
         if block.state == 2 or block.state == 1:
             # Block is real or block is already pending.
@@ -566,14 +567,14 @@ Position: %d, %d, %d
             return
 
         block.store_state_and_increase_blocks_data_version(1) # Set to pending.
-        RPCCreatePending.send_info_email(xB, yB, zB)
+        RPCCreatePending.send_info_email(x_b, y_b, z_b)
 
     def post(self):
         try:
-            xB = int(self.request.get('xB'))
-            yB = int(self.request.get('yB'))
-            zB = int(self.request.get('zB'))
-            db.run_in_transaction(RPCCreatePending.transaction, xB, yB, zB)
+            x_b = int(self.request.get('xB'))
+            y_b = int(self.request.get('yB'))
+            z_b = int(self.request.get('zB'))
+            db.run_in_transaction(RPCCreatePending.transaction, x_b, y_b, z_b)
         except Exception, e:
             logging.error('Could not add pending block or set existing ' + 
                           'block to pending: ' + str(e))
@@ -585,14 +586,14 @@ Position: %d, %d, %d
 #
 # The post request fails silently on error.
 class RPCAdminMakePending(webapp.RequestHandler):
-    # Tries to turn the block at the block position "xB", "yB", "zB" into a
+    # Tries to turn the block at the block position "x_b", "y_b", "z_b" into a
     # pending block, or sets its state to deleted, if it intersects with a real
     # block.
     @staticmethod
-    def transaction(xB, yB, zB):
+    def transaction(x_b, y_b, z_b):
         construction = Construction.get_main()
 
-        block = Block.get_by_positionB(construction, xB, yB, zB)
+        block = Block.get_by_positionB(construction, x_b, y_b, z_b)
         if not block or block.state == 1:
             # No block found, or block is already pending, or block intersects
             # with real block. => Nothing is done.
@@ -608,10 +609,11 @@ class RPCAdminMakePending(webapp.RequestHandler):
 
     def post(self):
         try:
-            xB = int(self.request.get('xB'))
-            yB = int(self.request.get('yB'))
-            zB = int(self.request.get('zB'))
-            db.run_in_transaction(RPCAdminMakePending.transaction, xB, yB, zB)
+            x_b = int(self.request.get('xB'))
+            y_b = int(self.request.get('yB'))
+            z_b = int(self.request.get('zB'))
+            db.run_in_transaction(RPCAdminMakePending.transaction, 
+                                  x_b, y_b, z_b)
         except Exception, e:
             logging.error('Could not make block pending: ' + str(e))
 
@@ -735,11 +737,11 @@ class AdminUpdate(webapp.RequestHandler):
             [2, 0, 1, 2], [6, 0, 1, 2],
             [3, 0, 2, 2], [5, 0, 2, 2]]
         for c in cs:
-            xB = c[0]
-            yB = c[1]
-            zB = c[2]
+            x_b = c[0]
+            y_b = c[1]
+            z_b = c[2]
             state = c[3]
-            block = Block.insert_at_positionB(construction, xB, yB, zB)
+            block = Block.insert_at_positionB(construction, x_b, y_b, z_b)
             block.state = state
             block.put()
 
