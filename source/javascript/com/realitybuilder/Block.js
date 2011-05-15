@@ -119,6 +119,34 @@ dojo.declare('com.realitybuilder.Block', null, {
         return this._positionB[2];
     },
 
+    // Returns the vertexes of the block projected to the view space x-z-plane.
+    // The vertexes, correspondingly, are x-z pairs.
+    //
+    // The projection is a parallel projection. It works simply by extending
+    // the vertical edges of the block to the x-z-plane.
+    //
+    // If not all vertexes can be determined, for example due to problems with
+    // precision in calculations, returns false. This should normally not
+    // happen.
+    projectedVertexesVXZ: function () {
+        var i, bottomVertexesV, topVertexesV, len, tmp = [], lineV, pointVXZ;
+
+        bottomVertexesV = this._bottomVertexesV;
+        topVertexesV = this._topVertexesV;
+        len = bottomVertexesV.length;
+
+        for (i = 0; i < len; i += 1) {
+            lineV = [bottomVertexesV[i], topVertexesV[i]];
+            pointVXZ = com.realitybuilder.util.intersectionLineVXZ(lineV);
+            if (!pointVXZ) {
+                return false;
+            } else {
+                tmp.push(pointVXZ);
+            }
+        }
+        return tmp;
+    },
+
     // Returns all top edges in the block, as an array of tuples. Each such
     // tuple describes the vertexes of an edge in sensor space. The edges are
     // sorted counterclockwise (when viewed from top in block space).

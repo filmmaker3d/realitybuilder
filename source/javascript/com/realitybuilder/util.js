@@ -45,8 +45,8 @@ com.realitybuilder.util.blockToWorld = function (pB, blockProperties) {
 // false. Otherwise returns the x-z-coordinates (2D) of the intersection point.
 //
 // The tolerance "tolerance" is used for comparison of coordinates.
-com.realitybuilder.util.intersectionLineVXZ = function (line) {
-    var delta, factor, p1 = line[0], p2 = line[1];
+com.realitybuilder.util.intersectionLineVXZ = function (lineV) {
+    var delta, factor, p1 = lineV[0], p2 = lineV[1];
 
     delta = com.realitybuilder.util.subtractVectors3D(p2, p1);
     if (Math.abs(delta[1]) < com.realitybuilder.util.TOLERANCE_V) {

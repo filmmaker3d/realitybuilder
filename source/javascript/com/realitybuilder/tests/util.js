@@ -158,42 +158,42 @@ doh.register("tests.util.all", [
             newPoints[0] === points[1] && newPoints[1] === points[3] && 
             newPoints[2] === points[4] && newPoints.length === 3);
     },
-    function pointIsBetweenLineTest() {
+    function pointIsBetween2DTest() {
         var between;
 
         // Point on origin between, horizontally and vertically.
         between = com.realitybuilder.util.
-            pointIsBetween([0, 0], [-1, -1], [1, 1]);
+            pointIsBetween2D([0, 0], [-1, -1], [1, 1]);
         doh.assertTrue(between);
 
         // Point on origin between, horizontally, but not vertically.
         between = com.realitybuilder.util.
-            pointIsBetween([0, 0], [-1, 2], [1, 1]);
+            pointIsBetween2D([0, 0], [-1, 2], [1, 1]);
         doh.assertTrue(!between);
 
         // Point on origin between, vertically, but not horizontally.
         between = com.realitybuilder.util.
-            pointIsBetween([0, 0], [3, -1], [1, 1]);
+            pointIsBetween2D([0, 0], [3, -1], [1, 1]);
         doh.assertTrue(!between);
 
         // Point on origin not between, neither vertically nor horizontally.
         between = com.realitybuilder.util.
-            pointIsBetween([0, 0], [3, -1], [1, -8]);
+            pointIsBetween2D([0, 0], [3, -1], [1, -8]);
         doh.assertTrue(!between);
 
         // Point between.
         between = com.realitybuilder.util.
-            pointIsBetween([8.17, -4.34], [-4.3, 20.18], [8.7, -4.35]);
+            pointIsBetween2D([8.17, -4.34], [-4.3, 20.18], [8.7, -4.35]);
         doh.assertTrue(between);
 
         // Point not between.
         between = com.realitybuilder.util.
-            pointIsBetween([8.17, -4.34], [-4.3, 20.18], [8.7, -4.33]);
+            pointIsBetween2D([8.17, -4.34], [-4.3, 20.18], [8.7, -4.33]);
         doh.assertTrue(!between);
 
         // Point not between.
         between = com.realitybuilder.util.
-            pointIsBetween([8.17, -4.34], [-4.3, 20.18], [8.16, -4.35]);
+            pointIsBetween2D([8.17, -4.34], [-4.3, 20.18], [8.16, -4.35]);
         doh.assertTrue(!between);
     },
     function intersectionSegmentLineVXZTest() {
