@@ -131,6 +131,8 @@ dojo.declare('com.realitybuilder.Block', null, {
     projectedVertexesVXZ: function () {
         var i, bottomVertexesV, topVertexesV, len, tmp = [], lineV, pointVXZ;
 
+        this._updateViewSpace();
+
         bottomVertexesV = this._bottomVertexesV;
         topVertexesV = this._topVertexesV;
         len = bottomVertexesV.length;

@@ -197,93 +197,123 @@ doh.register("tests.util.all", [
         doh.assertTrue(!between);
     },
     function intersectionSegmentLineVXZTest() {
-        var segment, line, pVXZ, 
+        var segmentVXZ, lineVXZ, pVXZ, 
         tolerance = com.realitybuilder.util.TOLERANCE_VXZ;
 
         // Intersection in the origin:
-        segment = [[-1, 0], [1, 0]];
-        line = [[0, -1], [0, 1]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        segmentVXZ = [[-1, 0], [1, 0]];
+        lineVXZ = [[0, -1], [0, 1]];
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(Math.abs(pVXZ[0]) < tolerance && 
                        Math.abs(pVXZ[1]) < tolerance);
 
         // Parallel horizontal line and segment:
-        segment = [[-1.5, 2], [3, 2]];
-        line = [[-23, 1], [-4, 1]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        segmentVXZ = [[-1.5, 2], [3, 2]];
+        lineVXZ = [[-23, 1], [-4, 1]];
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(!pVXZ);
 
         // Coinciding horizontal line and segment:
-        segment = [[-1.5, 2], [3, 2]];
-        line = [[-23, 2], [-4, 2]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        segmentVXZ = [[-1.5, 2], [3, 2]];
+        lineVXZ = [[-23, 2], [-4, 2]];
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(
             Math.abs(pVXZ[0] - (-1.5)) < tolerance && 
             Math.abs(pVXZ[1] - 2) < tolerance);
 
         // Parallel sloped line and segment:
-        segment = [[-21, 2], [3.749, 5.536]];
-        line = [[-9, 2], [5, 4]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        segmentVXZ = [[-21, 2], [3.749, 5.536]];
+        lineVXZ = [[-9, 2], [5, 4]];
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(!pVXZ);
 
         // Coinciding sloped line and segment:
-        segment = [[-21, 2], [3.749, 5.536]];
-        line = [[-17.608, 2.485], [-3.608, 4.485]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        segmentVXZ = [[-21, 2], [3.749, 5.536]];
+        lineVXZ = [[-17.608, 2.485], [-3.608, 4.485]];
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(
             Math.abs(pVXZ[0] - (-21)) < tolerance && 
             Math.abs(pVXZ[1] - 2) < tolerance);
 
         // Intersection:
-        segment = [[-14, 7], [-7, 2]];
-        line = [[-15, -2], [-2, 9]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        segmentVXZ = [[-14, 7], [-7, 2]];
+        lineVXZ = [[-15, -2], [-2, 9]];
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(Math.abs(pVXZ[0] - (-8.774648)) < tolerance && 
                        Math.abs(pVXZ[1] - 3.267606) < tolerance);
 
         // Line outside of segment:
-        segment = [[-16, 9], [-9, 4]];
-        line = [[-15, -2], [-2, 9]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        segmentVXZ = [[-16, 9], [-9, 4]];
+        lineVXZ = [[-15, -2], [-2, 9]];
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(!pVXZ);
 
         // Intersection:
-        segment = [[-5, 13], [2, 8]];
-        line = [[-15, -2], [-2, 9]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        segmentVXZ = [[-5, 13], [2, 8]];
+        lineVXZ = [[-15, -2], [-2, 9]];
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(
             Math.abs(pVXZ[0] - (-0.809859)) < tolerance && 
             Math.abs(pVXZ[1] - 10.007042) < tolerance);
 
         // Line touches vertex of segment:
-        segment = [[126.38776006477147, 242.92831768175415],
+        segmentVXZ = [[126.38776006477147, 242.92831768175415],
             [178.41121635226813, 209.85042494320865]];
-        line = [[187.41372593502646, 271.6707784935929], 
+        lineVXZ = [[187.41372593502646, 271.6707784935929], 
             [183.06026937785535, 241.77553416683304]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(pVXZ);
 
         // Line misses vertex of segment:
-        segment = [[178.41121635226813, 209.85042494320865],
+        segmentVXZ = [[178.41121635226813, 209.85042494320865],
                    [228.08196920763885, 234.5755718462958]];
-        line = [[187.41372593502646, 271.6707784935929], 
+        lineVXZ = [[187.41372593502646, 271.6707784935929], 
                 [183.06026937785535, 241.77553416683304]];
-        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segment, 
-                                                                  line);
+        pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
+                                                                  lineVXZ);
         doh.assertTrue(
             Math.abs(pVXZ[0] - 178.41121635226816) < 
             tolerance && 
             Math.abs(pVXZ[1] - 209.85042494320865) < 
             tolerance);
+    },
+    function relationPointSegmentVXZTest() {
+        var segmentVXZ, pVXZ, rel,
+        tolerance = com.realitybuilder.util.TOLERANCE_VXZ;
+
+        segmentVXZ = [[-16, 4], [-12, 8]];
+
+        // Point in front of segment:
+        pVXZ = [-12, 4];
+        rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
+                                                              segmentVXZ);
+        doh.assertTrue(rel === -1);
+
+        // Point behind segment:
+        pVXZ = [-21, 9];
+        rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
+                                                              segmentVXZ);
+        doh.assertTrue(rel === 1);
+
+        // Point on segment:
+        pVXZ = [-13, 7];
+        rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
+                                                              segmentVXZ);
+        doh.assertTrue(rel === 0);
+
+        // Point and segment don't overlap in screen space:
+        pVXZ = [-21, 2];
+        rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
+                                                              segmentVXZ);
+        doh.assertTrue(rel === 0);
     }
 ]);

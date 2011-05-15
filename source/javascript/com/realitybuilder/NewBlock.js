@@ -493,6 +493,23 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _isObscuredBySLO: function (block) {
         var i, j, rel, edgesS, edgesV, blockEdgesS, blockEdgesV, nEdges;
 
+        // Compares the projection of the blocks on the view space x-z-plane.
+        // The projection is a parallel projection. It works simply by
+        // extending the vertical edges of the block to the x-z-plane.
+        //
+        // FIXME: explain better
+/*FIXME:        for (i = 0; i < nVertexes; i += 1) {
+            vertex = vertexes[i];
+            rel = com.realitybuilder.util.relationPointSegmentVXZ(camera, 
+                                                                  vertex1VXZ,
+                                                                  edge2VXZ);
+            if (rel < 0) {
+                return true;
+            } else if (rel > 0) {
+                return false;
+            } // else continue
+        }
+
         // Compares the top edges of the new block and the other block in
         // sensor space. Comparing the bottom edges would give the same result.
         edgesS = this.topEdgesS();
@@ -510,7 +527,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                     return false;
                 }
             }
-        }
+        }*/
         return false; // should not be reached
     },
 

@@ -58,6 +58,49 @@ com.realitybuilder.util.intersectionLineVXZ = function (lineV) {
     }
 };
 
+// Investigates the relation between the positions of the point "pointVXZ" and
+// the line segment "segmentVXZ", in the view space x-z-plane, when viewed with
+// the camera "camera".
+//
+// Return values:
+//
+// -1: point is visually in front of line segment
+//
+// 1: point is visually behind line segment
+//
+// 0: point neither in front nor behind line segment (they either don't overlap
+//   in screen space, or the point is on the line segment in the view space
+//   x-z-plane)
+//
+// It is assumed that the point and the segment are in front of the camera,
+// i.e. in front of the plane defined by the camera's sensor. If that's not the
+// case, then the result is undefined.
+com.realitybuilder.util.relationPointSegmentVXZ = function (pointVXZ, 
+                                                            segmentVXZ)
+{
+    var camPositionVXZ, lineVXZ, intersectionVXZ, util;
+
+    util = com.realitybuilder.util;
+
+    camPositionVXZ = [0, 0]; // in origin of view space, naturally
+
+    lineVXZ = [camPositionVXZ, pointVXZ];
+
+    intersectionVXZ = util.intersectionSegmentLineVXZ(segmentVXZ, lineVXZ);
+
+    if (intersectionVXZ === false) {
+        return 0;
+    } else {
+        if (util.pointsIdenticalVXZ(intersectionVXZ, pointVXZ)) {
+            return 0;
+        } else {
+            return util.pointIsBetween2D(pointVXZ, 
+                                         camPositionVXZ, 
+                                         intersectionVXZ) ? -1 : 1;
+        }
+    }
+};
+
 // In 2D, returns true, iff the point "p" lies somewhere between the points
 // "p1" and "p2", horizontally and vertically. If points coincide, the result
 // is undefined.
