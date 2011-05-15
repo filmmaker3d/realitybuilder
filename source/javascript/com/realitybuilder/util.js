@@ -28,7 +28,7 @@ com.realitybuilder.util.TOLERANCE_S = 0.5;
 com.realitybuilder.util.TOLERANCE_V = 0.00001;
 
 // Tolerance when comparing coordinates in the view space x-z-plane.
-com.realitybuilder.util.TOLERANCE_XZV = 0.00001;
+com.realitybuilder.util.TOLERANCE_VXZ = 0.00001;
 
 // Returns the coordinates of the block space point "pB" in world space.
 com.realitybuilder.util.blockToWorld = function (pB, blockProperties) {
@@ -45,7 +45,7 @@ com.realitybuilder.util.blockToWorld = function (pB, blockProperties) {
 // false. Otherwise returns the x-z-coordinates (2D) of the intersection point.
 //
 // The tolerance "tolerance" is used for comparison of coordinates.
-com.realitybuilder.util.intersectionLineXZV = function (line) {
+com.realitybuilder.util.intersectionLineVXZ = function (line) {
     var delta, factor, p1 = line[0], p2 = line[1];
 
     delta = com.realitybuilder.util.subtractVectors3D(p2, p1);
@@ -58,10 +58,10 @@ com.realitybuilder.util.intersectionLineXZV = function (line) {
     }
 };
 
-// Returns true, iff the point "p" lies somewhere between the points "p1" and
-// "p2", horizontally and vertically. If points coincide, the result is
-// undefined.
-com.realitybuilder.util.pointIsBetween = function (p, p1, p2) {
+// In 2D, returns true, iff the point "p" lies somewhere between the points
+// "p1" and "p2", horizontally and vertically. If points coincide, the result
+// is undefined.
+com.realitybuilder.util.pointIsBetween2D = function (p, p1, p2) {
     var horizontally =
         (p[0] >= p1[0] && p[0] <= p2[0]) ||
         (p[0] <= p1[0] && p[0] >= p2[0]),
@@ -71,13 +71,25 @@ com.realitybuilder.util.pointIsBetween = function (p, p1, p2) {
     return horizontally && vertically;
 };
 
+// Returns true, iff the points "p1" and "p2" are in the same position, within
+// the tolerance "tolerance".
+com.realitybuilder.util.pointsIdentical2D = function (p1, p2, tolerance) {
+    return (Math.abs(p1[0] - p2[0]) < tolerance &&
+            Math.abs(p1[1] - p2[1]) < tolerance);
+};
+
 // Returns true, iff the points "p1" and "p2" are in the same position in
 // sensor space.
-com.realitybuilder.util.pointsIdenticalS = function (p1, p2) {
-    return (
-        Math.abs(p1[0] - p2[0]) < 
-            com.realitybuilder.util.TOLERANCE_S &&
-        Math.abs(p1[1] - p2[1]) < com.realitybuilder.util.TOLERANCE_S);
+com.realitybuilder.util.pointsIdenticalS = function (p1S, p2S) {
+    var tolerance = com.realitybuilder.util.TOLERANCE_S;
+    return com.realitybuilder.util.pointsIdentical2D(p1S, p2S, tolerance);
+};
+
+// Returns true, iff the points "p1" and "p2" are in the same position in
+// the view space x-z-plane.
+com.realitybuilder.util.pointsIdenticalVXZ = function (p1VXZ, p2VXZ) {
+    var tolerance = com.realitybuilder.util.TOLERANCE_VXZ;
+    return com.realitybuilder.util.pointsIdentical2D(p1VXZ, p2VXZ, tolerance);
 };
 
 // Returns true, iff the points "p1B" and "p2B" are in the same position in
@@ -139,26 +151,26 @@ com.realitybuilder.util.withDuplicatesRemoved = function (ps) {
 
 // In the view space x-z-plane (2D):
 //
-// * If there is an intersection between the straight line "lineXZV" (infinite
-//   extension) and the line segment "segmentXZV", returns the intersection
+// * If there is an intersection between the straight line "lineVXZ" (infinite
+//   extension) and the line segment "segmentVXZ", returns the intersection
 //   point. If the line and the line segment coincide, returns the first point
 //   of the segment. Otherwise returns false.
 // 
 // * If the line touches a boundary point of a segment, then this is also
 //   regarded as intersection.
-com.realitybuilder.util.intersectionSegmentLineXZV = function (segmentXZV, 
-                                                               lineXZV)
+com.realitybuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ, 
+                                                               lineVXZ)
 {
     // As of 2010-Apr, an explanation can be found e.g. at:
     // http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
 
-    var x1 = segmentXZV[0][0], z1 = segmentXZV[0][1],
-        x2 = segmentXZV[1][0], z2 = segmentXZV[1][1],
-        x3 = lineXZV[0][0], y3 = lineXZV[0][1],
-        x4 = lineXZV[1][0], y4 = lineXZV[1][1],
+    var x1 = segmentVXZ[0][0], z1 = segmentVXZ[0][1],
+        x2 = segmentVXZ[1][0], z2 = segmentVXZ[1][1],
+        x3 = lineVXZ[0][0], y3 = lineVXZ[0][1],
+        x4 = lineVXZ[1][0], y4 = lineVXZ[1][1],
         u1 = (x4 - x3) * (z1 - y3) - (y4 - y3) * (x1 - x3),
         u2 = (y4 - y3) * (x2 - x1) - (x4 - x3) * (z2 - z1),
-        epsilon = 0.01,
+        epsilon = 0.01, // not the same as for comparing position
         u, x, y;
 
     if (Math.abs(u2) < epsilon) {
