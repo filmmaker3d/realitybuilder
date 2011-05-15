@@ -24,13 +24,13 @@ dojo.provide('com.realitybuilder.util');
 // Tolerance when comparing coordinates in sensor space.
 com.realitybuilder.util.TOLERANCE_S = 0.5;
 
-// Returns the coordinates of the block space point "pointB" in world space.
-com.realitybuilder.util.blockToWorld = function (pointB, blockProperties) {
+// Returns the coordinates of the block space point "pB" in world space.
+com.realitybuilder.util.blockToWorld = function (pB, blockProperties) {
     var 
     factorX = blockProperties.positionSpacingXY(),
     factorY = blockProperties.positionSpacingXY(),
     factorZ = blockProperties.positionSpacingZ();
-    return [pointB[0] * factorX, pointB[1] * factorY, pointB[2] * factorZ];
+    return [pB[0] * factorX, pB[1] * factorY, pB[2] * factorZ];
 };
 
 // Tries to calculate the interesection point between the x-z-plane and the 3D
@@ -52,35 +52,35 @@ com.realitybuilder.util.intersectionLineXZ = function (line, tolerance) {
     }
 };
 
-// Returns true, iff the point "point" lies somewhere between the points
-// "point1" and "point2", horizontally and vertically. If points coincide, the
-// result is undefined.
-com.realitybuilder.util.pointIsBetween = function (point, point1, point2) {
+// Returns true, iff the point "p" lies somewhere between the points "p1" and
+// "p2", horizontally and vertically. If points coincide, the result is
+// undefined.
+com.realitybuilder.util.pointIsBetween = function (p, p1, p2) {
     var horizontally =
-        (point[0] >= point1[0] && point[0] <= point2[0]) ||
-        (point[0] <= point1[0] && point[0] >= point2[0]),
+        (p[0] >= p1[0] && p[0] <= p2[0]) ||
+        (p[0] <= p1[0] && p[0] >= p2[0]),
         vertically =
-        (point[1] >= point1[1] && point[1] <= point2[1]) ||
-        (point[1] <= point1[1] && point[1] >= point2[1]);
+        (p[1] >= p1[1] && p[1] <= p2[1]) ||
+        (p[1] <= p1[1] && p[1] >= p2[1]);
     return horizontally && vertically;
 };
 
-// Returns true, iff the points "point1" and "point2" are in the same position
-// in sensor space.
-com.realitybuilder.util.pointsIdenticalS = function (point1, point2) {
+// Returns true, iff the points "p1" and "p2" are in the same position in
+// sensor space.
+com.realitybuilder.util.pointsIdenticalS = function (p1, p2) {
     return (
-        Math.abs(point1[0] - point2[0]) < 
+        Math.abs(p1[0] - p2[0]) < 
             com.realitybuilder.util.TOLERANCE_S &&
-        Math.abs(point1[1] - point2[1]) < com.realitybuilder.util.TOLERANCE_S);
+        Math.abs(p1[1] - p2[1]) < com.realitybuilder.util.TOLERANCE_S);
 };
 
-// Returns true, iff the points "point1B" and "point2B" are in the same
-// position in block space.
-com.realitybuilder.util.pointsIdenticalB = function (point1B, point2B) {
+// Returns true, iff the points "p1B" and "p2B" are in the same position in
+// block space.
+com.realitybuilder.util.pointsIdenticalB = function (p1B, p2B) {
     return (
-        (point1B[0] - point2B[0]) === 0 &&
-        (point1B[1] - point2B[1]) === 0 &&
-        (point1B[2] - point2B[2]) === 0);
+        (p1B[0] - p2B[0]) === 0 &&
+        (p1B[1] - p2B[1]) === 0 &&
+        (p1B[2] - p2B[2]) === 0);
 };
 
 // Subtracts the vectors "vector2" from the vector "vector1" in 3D and returns
@@ -110,25 +110,25 @@ com.realitybuilder.util.subtractVectorsB = function (vector1B, vector2B) {
         vector1B[2] - vector2B[2]];
 };
 
-// Removes duplicate points from the list of points "points". Returns the
-// resulting list. Removes points from the front. Does not change the order.
-com.realitybuilder.util.withDuplicatesRemoved = function (points) {
-    var newPoints = [], i, j, point1, point2, duplicate;
-    for (i = 0; i < points.length; i += 1) {
-        point1 = points[i];
+// Removes duplicate points from the list of points "ps". Returns the resulting
+// list. Removes points from the front. Does not change the order.
+com.realitybuilder.util.withDuplicatesRemoved = function (ps) {
+    var newPs = [], i, j, p1, p2, duplicate;
+    for (i = 0; i < ps.length; i += 1) {
+        p1 = ps[i];
         duplicate = false;
-        for (j = i + 1; j < points.length; j += 1) {
-            point2 = points[j];
-            if (com.realitybuilder.util.pointsIdenticalS(point1, point2)) {
+        for (j = i + 1; j < ps.length; j += 1) {
+            p2 = ps[j];
+            if (com.realitybuilder.util.pointsIdenticalS(p1, p2)) {
                 duplicate = true;
                 break;
             }
         }
         if (!duplicate) {
-            newPoints.push(point1);
+            newPs.push(p1);
         }
     }
-    return newPoints;
+    return newPs;
 };
 
 // If there is an intersection between the line "line" (infinite extension) and
@@ -177,24 +177,24 @@ com.realitybuilder.util.intersectionSegmentLine = function (segment, line) {
     }
 };
 
-// Returns the polar coordinates of the sensor space point "pointS".
-com.realitybuilder.util.cartesianToPolar = function (pointS) {
-    var x = pointS[0], y = pointS[1],
+// Returns the polar coordinates of the sensor space point "pS".
+com.realitybuilder.util.cartesianToPolar = function (pS) {
+    var x = pS[0], y = pS[1],
         angle = Math.atan2(y, x),
         distance = Math.sqrt(x * x + y * y);
     return [angle, distance];
 };
 
 // Returns a new point, whose coordinates are the sum of the coordinates of the
-// points "point1S" and "point2S" in sensor space.
-com.realitybuilder.util.addS = function (point1S, point2S) {
-    return [point1S[0] + point2S[0], point1S[1] + point2S[1]];
+// points "p1S" and "p2S" in sensor space.
+com.realitybuilder.util.addS = function (p1S, p2S) {
+    return [p1S[0] + p2S[0], p1S[1] + p2S[1]];
 };
 
-// Returns the cartesian coordinates of the sensor space point "polarPointS"
-// which is in polar coordinates.
-com.realitybuilder.util.polarToCartesian = function (polarPointS) {
-    var angle = polarPointS[0], distance = polarPointS[1],
+// Returns the cartesian coordinates of the sensor space point "polarPS", which
+// is in polar coordinates.
+com.realitybuilder.util.polarToCartesian = function (polarPS) {
+    var angle = polarPS[0], distance = polarPS[1],
         x = distance * Math.cos(angle),
         y = distance * Math.sin(angle);
     return [x, y];
