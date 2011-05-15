@@ -24,6 +24,12 @@ dojo.provide('com.realitybuilder.util');
 // Tolerance when comparing coordinates in sensor space.
 com.realitybuilder.util.TOLERANCE_S = 0.5;
 
+// Tolerance when comparing coordinates in view space.
+com.realitybuilder.util.TOLERANCE_V = 0.00001;
+
+// Tolerance when comparing coordinates in the view space x-z-plane.
+com.realitybuilder.util.TOLERANCE_XZV = 0.00001;
+
 // Returns the coordinates of the block space point "pB" in world space.
 com.realitybuilder.util.blockToWorld = function (pB, blockProperties) {
     var 
@@ -33,17 +39,17 @@ com.realitybuilder.util.blockToWorld = function (pB, blockProperties) {
     return [pB[0] * factorX, pB[1] * factorY, pB[2] * factorZ];
 };
 
-// Tries to calculate the interesection point between the x-z-plane and the 3D
-// line "line", defined by a pair of points. If the y coordinates of the points
-// defining the line are identical, then returns false. Otherwise returns the
-// x-z-coordinates (2D) of the intersection point.
+// In view space, tries to calculate the interesection point between the
+// x-z-plane and the straight line "line", defined by a pair of points. If the
+// y coordinates of the points defining the line are identical, then returns
+// false. Otherwise returns the x-z-coordinates (2D) of the intersection point.
 //
 // The tolerance "tolerance" is used for comparison of coordinates.
-com.realitybuilder.util.intersectionLineXZ = function (line, tolerance) {
+com.realitybuilder.util.intersectionLineXZV = function (line) {
     var delta, factor, p1 = line[0], p2 = line[1];
 
     delta = com.realitybuilder.util.subtractVectors3D(p2, p1);
-    if (Math.abs(delta[1]) < tolerance) {
+    if (Math.abs(delta[1]) < com.realitybuilder.util.TOLERANCE_V) {
         // line in parallel to plane or undefined => no intersection point
         return false;
     } else {
@@ -131,30 +137,34 @@ com.realitybuilder.util.withDuplicatesRemoved = function (ps) {
     return newPs;
 };
 
-// If there is an intersection between the line "line" (infinite extension) and
-// the line segment "segment", returns the intersection point. If the line and
-// the segment coincide, returns the first point of the segment. Otherwise
-// returns false.
+// In the view space x-z-plane (2D):
+//
+// * If there is an intersection between the straight line "lineXZV" (infinite
+//   extension) and the line segment "segmentXZV", returns the intersection
+//   point. If the line and the line segment coincide, returns the first point
+//   of the segment. Otherwise returns false.
 // 
-// If the line touches a vertex of a segment, then this is also regarded as
-// intersection.
-com.realitybuilder.util.intersectionSegmentLine = function (segment, line) {
+// * If the line touches a boundary point of a segment, then this is also
+//   regarded as intersection.
+com.realitybuilder.util.intersectionSegmentLineXZV = function (segmentXZV, 
+                                                               lineXZV)
+{
     // As of 2010-Apr, an explanation can be found e.g. at:
     // http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
 
-    var x1 = segment[0][0], y1 = segment[0][1],
-        x2 = segment[1][0], y2 = segment[1][1],
-        x3 = line[0][0], y3 = line[0][1],
-        x4 = line[1][0], y4 = line[1][1],
-        u1 = (x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3),
-        u2 = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1),
+    var x1 = segmentXZV[0][0], z1 = segmentXZV[0][1],
+        x2 = segmentXZV[1][0], z2 = segmentXZV[1][1],
+        x3 = lineXZV[0][0], y3 = lineXZV[0][1],
+        x4 = lineXZV[1][0], y4 = lineXZV[1][1],
+        u1 = (x4 - x3) * (z1 - y3) - (y4 - y3) * (x1 - x3),
+        u2 = (y4 - y3) * (x2 - x1) - (x4 - x3) * (z2 - z1),
         epsilon = 0.01,
         u, x, y;
 
     if (Math.abs(u2) < epsilon) {
         if (Math.abs(u1) < epsilon) {
             // The lines coincide.
-            return [x1, y1];
+            return [x1, z1];
         } else {
             // The lines are parallel.
             return false;
@@ -169,7 +179,7 @@ com.realitybuilder.util.intersectionSegmentLine = function (segment, line) {
             // two intersection points are detected, they are later removed by
             // the function "withDuplicatesRemoved".
             x = x1 + u * (x2 - x1);
-            y = y1 + u * (y2 - y1);
+            y = z1 + u * (z2 - z1);
             return [x, y];
         } else {
             return false;
