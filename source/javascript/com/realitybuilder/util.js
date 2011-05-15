@@ -33,6 +33,25 @@ com.realitybuilder.util.blockToWorld = function (pointB, blockProperties) {
     return [pointB[0] * factorX, pointB[1] * factorY, pointB[2] * factorZ];
 };
 
+// Tries to calculate the interesection point between the x-z-plane and the 3D
+// line "line", defined by a pair of points. If the y coordinates of the points
+// defining the line are identical, then returns false. Otherwise returns the
+// x-z-coordinates (2D) of the intersection point.
+//
+// The tolerance "tolerance" is used for comparison of coordinates.
+com.realitybuilder.util.intersectionLineXZ = function (line, tolerance) {
+    var delta, factor, p1 = line[0], p2 = line[1];
+
+    delta = com.realitybuilder.util.subtractVectors3D(p2, p1);
+    if (Math.abs(delta[1]) < tolerance) {
+        // line in parallel to plane or undefined => no intersection point
+        return false;
+    } else {
+        factor = -p1[1] / delta[1];
+        return [p1[0] + factor * delta[0], p1[2] + factor * delta[2]];
+    }
+};
+
 // Returns true, iff the point "point" lies somewhere between the points
 // "point1" and "point2", horizontally and vertically. If points coincide, the
 // result is undefined.
@@ -66,7 +85,7 @@ com.realitybuilder.util.pointsIdenticalB = function (point1B, point2B) {
 
 // Subtracts the vectors "vector2" from the vector "vector1" in 3D and returns
 // the result.
-com.realitybuilder.util.subtractVectors = function (vector1, vector2) {
+com.realitybuilder.util.subtractVectors3D = function (vector1, vector2) {
     return [
         vector1[0] - vector2[0], 
         vector1[1] - vector2[1],

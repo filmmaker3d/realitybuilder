@@ -25,6 +25,37 @@ dojo.registerModulePath("com", "../../com");
 dojo.require("com.realitybuilder.util");
 
 doh.register("tests.util.all", [
+    function intersectionLineXZTest() {
+        var line, pXZ, tolerance = 0.00001;
+
+        // line through origin, along y axis:
+        line = [[0, 0, 0], [0, 1, 0]];
+        pXZ = com.realitybuilder.util.intersectionLineXZ(line, tolerance);
+        doh.assertTrue(Math.abs(pXZ[0]) < tolerance && 
+                       Math.abs(pXZ[1]) < tolerance);
+
+        // some line:
+        line = [[3, 0, 4], [7, -3, -5]];
+        pXZ = com.realitybuilder.util.intersectionLineXZ(line, tolerance);
+        doh.assertTrue(Math.abs(pXZ[0] - 3) < tolerance && 
+                       Math.abs(pXZ[1] - 4) < tolerance);
+
+        // some line:
+        line = [[26, 4, 44], [-42, -11, -18]];
+        pXZ = com.realitybuilder.util.intersectionLineXZ(line, tolerance);
+        doh.assertTrue(Math.abs(pXZ[0] - 7.866667) < tolerance && 
+                       Math.abs(pXZ[1] - 27.466667) < tolerance);
+
+        // line parallel to x-z plane:
+        line = [[26, -2, 44], [-42, -2, -18]];
+        pXZ = com.realitybuilder.util.intersectionLineXZ(line, tolerance);
+        doh.assertTrue(pXZ === false);
+
+        // undefined line (points identical):
+        line = [[1, 2, 3], [1, 2, 3]];
+        pXZ = com.realitybuilder.util.intersectionLineXZ(line, tolerance);
+        doh.assertTrue(pXZ === false);
+    },
     function polarToCartesianTest() {
         var p; // cartesian point
 

@@ -178,8 +178,8 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
     // Returns the coordinates of the world space point "point" in view space.
     worldToView: function (point) {
-        var tmp = com.realitybuilder.util.subtractVectors(point, 
-                                                          this._position);
+        var tmp = com.realitybuilder.util.subtractVectors3D(point, 
+                                                            this._position);
 
         // Rotation matrices are applied to the vector tmp, from the left side:
         tmp = dojox.math.matrix.transpose([tmp]);
