@@ -13,20 +13,28 @@ Less well-known file extensions used:
 Getting started
 ===============
 
-* Start the Reality Builder using Google App Engine.
+1. Start the Reality Builder using Google App Engine.
 
-* Initialize test data, by visting (relative to the root URL):
+2. Initialize sample data, by visting (relative to the root URL):
 
     /admin/update
 
-* Visit the user interface:
+3. Visit the user interface:
 
     /
 
-* Visit the admin interface, where you can change settings and manage state of
+4. Visit the admin interface, where you can change settings and manage state of
   blocks:
 
     /admin
+
+
+Unit tests
+==========
+
+Run unit tests by visiting (relative to the root URL) with debug mode enabled:
+
+  /source/javascript/com/realitybuilder/tests/runTests.html
 
 
 Terminology

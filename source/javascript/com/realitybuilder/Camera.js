@@ -200,19 +200,19 @@ dojo.declare('com.realitybuilder.Camera', null, {
     // Returns the coordinates of the view space point "pointV" in sensor
     // space.
     viewToSensor: function (pointV) {
-        var tmp = pointV, scale;
+        var xV = pointV[0], yV = pointV[1], zV = pointV[2], scale;
 
         // Projection on sensor:
-        scale = this.scale(tmp[2]);
-        tmp[0] *= scale; // px
-        tmp[1] *= scale; // px
+        scale = this.scale(zV);
+        xV *= scale; // px
+        yV *= scale; // px
     
         // Puts camera position (and, thus, vanishing point) in the center of
         // the sensor:
-        tmp[0] += this._sensor.width() / 2;
-        tmp[1] += this._sensor.height() / 2;
+        xV += this._sensor.width() / 2;
+        yV += this._sensor.height() / 2;
 
-        return [tmp[0], tmp[1]];
+        return [xV, yV];
     },
 
     // Returns the coordinates of the block space point "pointB" in sensor

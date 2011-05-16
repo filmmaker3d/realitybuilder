@@ -25,35 +25,35 @@ dojo.registerModulePath("com", "../../com");
 dojo.require("com.realitybuilder.util");
 
 doh.register("tests.util.all", [
-    function intersectionLineVXZTest() {
+    function intersectionLinePlaneVXZTest() {
         var line, pVXZ, tolerance = com.realitybuilder.util.TOLERANCE_V;
 
         // line through origin, along y axis:
         line = [[0, 0, 0], [0, 1, 0]];
-        pVXZ = com.realitybuilder.util.intersectionLineVXZ(line);
+        pVXZ = com.realitybuilder.util.intersectionLinePlaneVXZ(line);
         doh.assertTrue(Math.abs(pVXZ[0]) < tolerance && 
                        Math.abs(pVXZ[1]) < tolerance);
 
         // some line:
         line = [[3, 0, 4], [7, -3, -5]];
-        pVXZ = com.realitybuilder.util.intersectionLineVXZ(line);
+        pVXZ = com.realitybuilder.util.intersectionLinePlaneVXZ(line);
         doh.assertTrue(Math.abs(pVXZ[0] - 3) < tolerance && 
                        Math.abs(pVXZ[1] - 4) < tolerance);
 
         // some line:
         line = [[26, 4, 44], [-42, -11, -18]];
-        pVXZ = com.realitybuilder.util.intersectionLineVXZ(line);
+        pVXZ = com.realitybuilder.util.intersectionLinePlaneVXZ(line);
         doh.assertTrue(Math.abs(pVXZ[0] - 7.866667) < tolerance && 
                        Math.abs(pVXZ[1] - 27.466667) < tolerance);
 
         // line parallel to x-z plane:
         line = [[26, -2, 44], [-42, -2, -18]];
-        pVXZ = com.realitybuilder.util.intersectionLineVXZ(line);
+        pVXZ = com.realitybuilder.util.intersectionLinePlaneVXZ(line);
         doh.assertTrue(pVXZ === false);
 
         // undefined line (points identical):
         line = [[1, 2, 3], [1, 2, 3]];
-        pVXZ = com.realitybuilder.util.intersectionLineVXZ(line);
+        pVXZ = com.realitybuilder.util.intersectionLinePlaneVXZ(line);
         doh.assertTrue(pVXZ === false);
     },
     function polarToCartesianTest() {
@@ -220,9 +220,7 @@ doh.register("tests.util.all", [
         lineVXZ = [[-23, 2], [-4, 2]];
         pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
                                                                   lineVXZ);
-        doh.assertTrue(
-            Math.abs(pVXZ[0] - (-1.5)) < tolerance && 
-            Math.abs(pVXZ[1] - 2) < tolerance);
+        doh.assertTrue(!pVXZ);
 
         // Parallel sloped line and line segment:
         segmentVXZ = [[-21, 2], [3.749, 5.536]];
@@ -236,9 +234,7 @@ doh.register("tests.util.all", [
         lineVXZ = [[-17.608, 2.485], [-3.608, 4.485]];
         pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
                                                                   lineVXZ);
-        doh.assertTrue(
-            Math.abs(pVXZ[0] - (-21)) < tolerance && 
-            Math.abs(pVXZ[1] - 2) < tolerance);
+        doh.assertTrue(!pVXZ);
 
         // Intersection:
         segmentVXZ = [[-14, 7], [-7, 2]];
@@ -329,13 +325,19 @@ doh.register("tests.util.all", [
         pVXZ = [-7.354858, 3.152082];
         rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
                                                               segmentVXZ);
-        doh.assertTrue(rel === -1);
+        doh.assertTrue(rel === 0);
 
         // Line segment in direction of camera with point behind:
         pVXZ = [-21.000000, 9.000000];
         rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
                                                               segmentVXZ);
-        doh.assertTrue(rel === 1);
+        doh.assertTrue(rel === 0);
+
+        // Line segment in direction of camera with point on line segment:
+        pVXZ = [-11.841860, 5.075083];
+        rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
+                                                              segmentVXZ);
+        doh.assertTrue(rel === 0);
 
         // Line segment in direction of camera with point that doesn't overlap
         // in screen space:

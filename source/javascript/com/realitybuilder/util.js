@@ -45,16 +45,64 @@ com.realitybuilder.util.blockToWorld = function (pB, blockProperties) {
 // false. Otherwise returns the x-z-coordinates (2D) of the intersection point.
 //
 // The tolerance "tolerance" is used for comparison of coordinates.
-com.realitybuilder.util.intersectionLineVXZ = function (lineV) {
-    var delta, factor, p1 = lineV[0], p2 = lineV[1];
+com.realitybuilder.util.intersectionLinePlaneVXZ = function (lineV) {
+    var delta, p1 = lineV[0], p2 = lineV[1];
 
     delta = com.realitybuilder.util.subtractVectors3D(p2, p1);
     if (Math.abs(delta[1]) < com.realitybuilder.util.TOLERANCE_V) {
         // line in parallel to plane or undefined => no intersection point
         return false;
     } else {
-        factor = -p1[1] / delta[1];
-        return [p1[0] + factor * delta[0], p1[2] + factor * delta[2]];
+        return [p1[0] - p1[1] * delta[0] / delta[1], 
+                p1[2] - p1[1] * delta[2] / delta[1]];
+    }
+};
+
+// In the view space x-z-plane (2D):
+//
+// * If there is an intersection between the straight line "lineVXZ" (infinite
+//   extension) and the line segment "segmentVXZ", returns the intersection
+//   point. Otherwise returns false.
+//
+// * If the line segment lies on the straight line, they are defined to have no
+//   intersection.
+// 
+// * If the line touches a boundary point of a segment, then this is also
+//   regarded as intersection.
+com.realitybuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ, 
+                                                               lineVXZ)
+{
+    // As of 2010-Apr, an explanation can be found e.g. at:
+    // http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
+
+    var x1 = segmentVXZ[0][0], z1 = segmentVXZ[0][1],
+        x2 = segmentVXZ[1][0], z2 = segmentVXZ[1][1],
+        x3 = lineVXZ[0][0], y3 = lineVXZ[0][1],
+        x4 = lineVXZ[1][0], y4 = lineVXZ[1][1],
+        u1 = (x4 - x3) * (z1 - y3) - (y4 - y3) * (x1 - x3),
+        u2 = (y4 - y3) * (x2 - x1) - (x4 - x3) * (z2 - z1),
+        epsilon = 0.01, // not the same as for comparing position
+        u, x, y;
+
+    if (Math.abs(u2) < epsilon) {
+        // The segment line lies on the straight line (|u1| < epsilon) or the
+        // lines are parallel (|u1| >= epsilon).
+        return false;
+    } else {
+        u = u1 / u2;
+        if (u > -epsilon && u < 1 + epsilon) {
+            // u was between 0 and 1. => Intersection point is on segment.
+            // Reason for using epsilons: For the hidden lines removal
+            // algorithm it is important to not miss any intersections, for
+            // example if the line intersects with the join of two segments. If
+            // two intersection points are detected, they are later removed by
+            // the function "withDuplicatesRemoved".
+            x = x1 + u * (x2 - x1);
+            y = z1 + u * (z2 - z1);
+            return [x, y];
+        } else {
+            return false;
+        }
     }
 };
 
@@ -68,13 +116,15 @@ com.realitybuilder.util.intersectionLineVXZ = function (lineV) {
 //
 // 1: point is visually behind line segment
 //
-// 0: point neither in front nor behind line segment (they either don't overlap
-//   in screen space, or the point is on the line segment in the view space
-//   x-z-plane)
+// 0: point neither in front nor behind line segment. This is the case under
+//   the following conditions:
 //
-// Special case: If the line segment is in the direction of the (i.e. being
-// mapped to a point in screen space), and the point is on the line segment,
-// then the return value is either 1 or -1.
+//   - The point and the line segment don't overlap in screen space.
+//
+//   - The point is on the line segment in the view space x-z-plane.
+//
+//   - In the view space x-z-plane, The line segment is on the straight line
+//     going through the origin (camera) and the point.
 //
 // It is assumed that the point and the segment are in front of the camera,
 // i.e. in front of the plane defined by the camera's sensor. If that's not the
@@ -93,10 +143,12 @@ com.realitybuilder.util.relationPointSegmentVXZ = function (pointVXZ,
     intersectionVXZ = util.intersectionSegmentLineVXZ(segmentVXZ, lineVXZ);
 
     if (intersectionVXZ === false) {
+        // no intersection
         return 0;
     } else {
+        // intersection
         if (util.pointsIdenticalVXZ(intersectionVXZ, pointVXZ)) {
-            return 0;
+            return 0; // point on line segment
         } else {
             return util.pointIsBetween2D(pointVXZ, 
                                          camPositionVXZ, 
@@ -194,56 +246,6 @@ com.realitybuilder.util.withDuplicatesRemoved = function (ps) {
         }
     }
     return newPs;
-};
-
-// In the view space x-z-plane (2D):
-//
-// * If there is an intersection between the straight line "lineVXZ" (infinite
-//   extension) and the line segment "segmentVXZ", returns the intersection
-//   point. If the line and the line segment coincide, returns the first point
-//   of the segment. Otherwise returns false.
-// 
-// * If the line touches a boundary point of a segment, then this is also
-//   regarded as intersection.
-com.realitybuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ, 
-                                                               lineVXZ)
-{
-    // As of 2010-Apr, an explanation can be found e.g. at:
-    // http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
-
-    var x1 = segmentVXZ[0][0], z1 = segmentVXZ[0][1],
-        x2 = segmentVXZ[1][0], z2 = segmentVXZ[1][1],
-        x3 = lineVXZ[0][0], y3 = lineVXZ[0][1],
-        x4 = lineVXZ[1][0], y4 = lineVXZ[1][1],
-        u1 = (x4 - x3) * (z1 - y3) - (y4 - y3) * (x1 - x3),
-        u2 = (y4 - y3) * (x2 - x1) - (x4 - x3) * (z2 - z1),
-        epsilon = 0.01, // not the same as for comparing position
-        u, x, y;
-
-    if (Math.abs(u2) < epsilon) {
-        if (Math.abs(u1) < epsilon) {
-            // The lines coincide.
-            return [x1, z1];
-        } else {
-            // The lines are parallel.
-            return false;
-        }
-    } else {
-        u = u1 / u2;
-        if (u > -epsilon && u < 1 + epsilon) {
-            // u was between 0 and 1. => Intersection point is on segment.
-            // Reason for using epsilons: For the hidden lines removal
-            // algorithm it is important to not miss any intersections, for
-            // example if the line intersects with the join of two segments. If
-            // two intersection points are detected, they are later removed by
-            // the function "withDuplicatesRemoved".
-            x = x1 + u * (x2 - x1);
-            y = z1 + u * (z2 - z1);
-            return [x, y];
-        } else {
-            return false;
-        }
-    }
 };
 
 // Returns the polar coordinates of the sensor space point "pS".

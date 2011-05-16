@@ -515,10 +515,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             return false;
         }
 
-        this._updateCoordinates();
-
         len = vertexesVXZ.length; // same for all blocks
-
         for (i = 0; i < len; i += 1) { // iter. all edges of this block
             edgeVXZ = [vertexesVXZ[i], vertexesVXZ[(i + 1) % len]];
             for (j = 0; j < len; j += 1) { // iter. vertexes of "block"
@@ -532,7 +529,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                     // prisms in the same layer.
                     return true;
                 } else if (relation > 0) {
-                    // Vertex of "block" is in behind edge of this block.
+                    // Vertex of "block" is behind edge of this block.
                     return false;
                 } // else continue since no decision can be made yet
             }

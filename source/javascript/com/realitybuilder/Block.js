@@ -155,7 +155,7 @@ dojo.declare('com.realitybuilder.Block', null, {
 
         for (i = 0; i < len; i += 1) {
             lineV = [bottomVertexesV[i], topVertexesV[i]];
-            pointVXZ = com.realitybuilder.util.intersectionLineVXZ(lineV);
+            pointVXZ = com.realitybuilder.util.intersectionLinePlaneVXZ(lineV);
             if (!pointVXZ) {
                 tmp = null;
                 break;

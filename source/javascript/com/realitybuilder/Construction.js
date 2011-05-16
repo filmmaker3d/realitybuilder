@@ -99,7 +99,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
                                                       this._blockProperties);
         this._newBlock = new com.realitybuilder.NewBlock(
             this._blockProperties,
-            this._camera, [9, 9, 1] /*FIXME: [8, 0, 5]*/, 
+            this._camera, [-3, 1, 0] /*FIXME: [8, 0, 5]*/, 
             this._constructionBlocks, 
             !this._showAdminControls);
         this._userControls = new com.realitybuilder.UserControls(this);
@@ -286,7 +286,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // (Re-)renders user controls, but only if all necessary components have
     // been initialized, which is relevant only in the beginning.
     _renderCoordinateControlsIfFullyInitialized: function () {
-        if (this._camera.isInitializedWithServerData()) {
+        if (this._camera.isInitializedWithServerData() && 
+            this._blockProperties.isInitializedWithServerData()) {
             this._userControls.renderCoordinateControls();
         }
     },
@@ -331,10 +332,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this._adminControls.updateCameraControls(this._camera);
         }
 
-        // Updates the rendering of the coordinate controls, which depend on
-        // the camera position:
+        // Updates the renderings, which depend on the camera position:
         this._renderCoordinateControlsIfFullyInitialized();
-
         this._renderBlocksIfFullyInitialized();
     },
 
@@ -344,9 +343,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
         // some of the block properties:
         this._userControls.renderCoordinateControls();
 
-        // Updates the rendering of the coordinate controls, which depend on
-        // the block properties:
+        // Updates the renderings, which depend on block properties:
         this._renderCoordinateControlsIfFullyInitialized();
+        this._renderBlocksIfFullyInitialized();
 
         // Updates the state (and related controls) of the new block, because
         // they depend on block properties such as collision settings:

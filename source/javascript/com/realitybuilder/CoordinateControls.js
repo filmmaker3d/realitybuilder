@@ -47,7 +47,6 @@ dojo.declare('com.realitybuilder.CoordinateControls', null, {
         this._coordinateButtons = [];
         this._canvas = dojo.byId('coordinateControlsCanvas');
         this._setCanvasDimensions();
-        this.render();
     },
 
     _setCanvasDimensions: function () {
