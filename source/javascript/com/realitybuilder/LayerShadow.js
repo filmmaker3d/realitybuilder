@@ -109,7 +109,7 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
 
     // Calculates the vertexes of the full shadow, projected onto the layer of
     // blocks of elevation "layerZB", in view space.
-    _updateViewSpace: function (layerZB) {
+    _updateViewSpaceCoordinates: function (layerZB) {
         this._updateWorldSpace(layerZB);
         this._fullVertexesV = dojo.map(this._fullVertexes, 
                                        dojo.hitch(this._camera, 
@@ -119,11 +119,19 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     // Calculates the vertexes of the full shadow, projected onto the layer of
     // blocks of elevation "layerZB", in sensor space. The camera is positioned
     // in the center of the sensor.
-    _updateSensorSpace: function (layerZB) {
-        this._updateViewSpace(layerZB);
+    //
+    // Depends on up to date view space coordinates.
+    _updateSensorSpaceCoordinates: function (layerZB) {
         this._fullVertexesS = dojo.map(this._fullVertexesV,
                                    dojo.hitch(this._camera, 
                                               this._camera.viewToSensor));
+    },
+
+    // Updates coordinates for the full shadow, projected onto the layer of
+    // blocks of elevation "layerZB"
+    _updateCoordinates: function (layerZB) {
+        this._updateViewSpaceCoordinates(layerZB);
+        this._updateSensorSpaceCoordinates(layerZB);
     },
 
     // Renders the tops of the blocks in the layer "layerZB".
@@ -142,7 +150,7 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     _renderFull: function (layerZB, context) {
         var fullVertexesS, vertexS, i;
 
-        this._updateSensorSpace(layerZB);
+        this._updateCoordinates(layerZB);
 
         fullVertexesS = this._fullVertexesS;
 
