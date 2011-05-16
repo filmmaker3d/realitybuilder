@@ -491,44 +491,50 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     //
     // False: The new block obscures the block "block" visually.
     _isObscuredBySLO: function (block) {
-        var i, j, rel, edgesS, edgesV, blockEdgesS, blockEdgesV, nEdges;
+        var 
+        i, j, relation, vertexesVXZ, blockVertexesVXZ, len, vertexVXZ,
+        blockVertexVXZ, edgeVXZ, util;
 
-        // Compares the projection of the blocks on the view space x-z-plane.
-        // The projection is a parallel projection. It works simply by
-        // extending the vertical edges of the block to the x-z-plane.
-        //
-        // FIXME: explain better
-/*FIXME:        for (i = 0; i < nVertexes; i += 1) {
-            vertex = vertexes[i];
-            rel = com.realitybuilder.util.relationPointSegmentVXZ(camera, 
-                                                                  vertex1VXZ,
-                                                                  edge2VXZ);
-            if (rel < 0) {
-                return true;
-            } else if (rel > 0) {
-                return false;
-            } // else continue
+        util = com.realitybuilder.util;
+
+        // What follows is a comparison of the projection of the blocks on the
+        // view space x-z-plane, from the point of view of the camera. The
+        // projection is a parallel projection: It works simply by extending
+        // the vertical edges of the prismatic blocks to the view space
+        // x-z-plane.
+
+        this._lastCameraId = ''; // FIXME: remove
+        block._lastCameraId = ''; // FIXME: remove
+
+        vertexesVXZ = this.projectedVertexesVXZ();
+        blockVertexesVXZ = block.projectedVertexesVXZ();
+// FIXME: check for false
+
+        this._updateCoordinates();
+
+        len = vertexesVXZ.length; // same for all blocks
+
+        for (i = 0; i < len; i += 1) { // iter. all edges of this block
+            edgeVXZ = [vertexesVXZ[i], vertexesVXZ[(i + 1) % len]];
+            for (j = 0; j < len; j += 1) { // iter. vertexes of "block"
+                blockVertexVXZ = blockVertexesVXZ[j];
+                relation = util.relationPointSegmentVXZ(blockVertexVXZ,
+                                                        edgeVXZ);
+
+                if (relation < 0) {
+                    // Vertex of "block" is in front of edge of this block. =>
+                    // "block" is in front of this block, as both are convex
+                    // prisms in the same layer.
+                    return true;
+                } else if (relation > 0) {
+                    // Vertex of "block" is in behind edge of this block.
+                    return false;
+                } // else continue since no decision can be made yet
+            }
         }
 
-        // Compares the top edges of the new block and the other block in
-        // sensor space. Comparing the bottom edges would give the same result.
-        edgesS = this.topEdgesS();
-        edgesV = this.topEdgesV();
-        blockEdgesS = block.topEdgesS();
-        blockEdgesV = block.topEdgesV();
-        nEdges = edgesS.length;
-        for (i = 0; i < nEdges; i += 1) {
-            for (j = i + 1; j < nEdges; j += 1) {
-                rel = this._relationBetweenEdgesH(edgesS, edgesV, 
-                                                  blockEdgesS, blockEdgesV);
-                if (rel > 0) {
-                    return true;
-                } else if (rel < 0) {
-                    return false;
-                }
-            }
-        }*/
-        return false; // should not be reached
+        return false; // blocks don't overlap in screen space, and so return
+                      // value is irrelevant (see description of function)
     },
 
     // Subtracts the shape of the the real block "realblock" from the canvas
@@ -569,23 +575,40 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         }
     },
 
-    // Updates the shadow, i.e. (re-)draws it or removes it. But only only when
-    // the sensor space projection of the new block has changed
-    // ("stateHasChanged" is true), when the state of the new block has changed
-    // ("sensorSpaceHasChanged" is true), or when the construction blocks have
-    // changed.
-    _renderShadow: function (stateHasChanged, sensorSpaceHasChanged) {
-        var constructionBlocksHaveChanged = (
-            this._lastConstructionBlocksVersion !==
-            this._constructionBlocks.versionOnServer());
-        if (stateHasChanged || sensorSpaceHasChanged || 
-            constructionBlocksHaveChanged) {
-            if (this.isMovable()) {
-                this._shadow.render();
-            } else {
-                this._shadow.clear();
-            }
+    // Updates the shadow, i.e. (re-)draws it or removes it.
+    _renderShadow: function () {
+        if (this.isMovable()) {
+            this._shadow.render();
+        } else {
+            this._shadow.clear();
         }
+    },
+
+    // Returns true, iff there have been changes that make it necessary to
+    // rerender this block.
+    _needsToBeRendered: function () {
+        var 
+        coordinatesHaveChanged, constructionBlocksHaveChanged, 
+        stateHasChanged;
+
+        coordinatesHaveChanged = this._coordinatesChangedAfterLastRendering;
+
+        // Rerendering is necessary on construction block change, because they
+        // may obscure part of the block and shadow, and are thus part of the
+        // rendering:
+        constructionBlocksHaveChanged = 
+            (this._lastConstructionBlocksVersion !==
+             this._constructionBlocks.versionOnServer());
+
+        stateHasChanged = (this._lastState !== this._state);
+
+        return coordinatesHaveChanged || constructionBlocksHaveChanged ||
+            stateHasChanged;
+    },
+
+    _onRendered: function () {
+        this._coordinatesChangedAfterLastRendering = false;
+        this._lastState = this._state;
         this._lastConstructionBlocksVersion =
             this._constructionBlocks.versionOnServer();
     },
@@ -597,24 +620,24 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // projection of the new block has changed, when the state of the new block
     // has changed, or when the construction blocks have changed.
     render: function () {
-        var canvas = this._camera.sensor().newBlockCanvas(),
-            sensorSpaceHasChanged = this._updateSensorSpace(),
-            stateHasChanged = (this._lastState !== this._state),
-            context, color;
+        var canvas, context, color;
 
-        if (canvas.getContext) {
-            context = canvas.getContext('2d');
-            color = this.isMovable() ? 'red' : 'white';
-            this._renderShadow(stateHasChanged, sensorSpaceHasChanged);
+        this._updateCoordinates();
 
-            if (sensorSpaceHasChanged || stateHasChanged) {
+        if (this._needsToBeRendered()) {
+            canvas = this._camera.sensor().newBlockCanvas();
+            if (canvas.getContext) {
+                context = canvas.getContext('2d');
+                color = this.isMovable() ? 'red' : 'white';
+                this._renderShadow();
+
                 com.realitybuilder.util.clearCanvas(canvas);
                 this.inherited(arguments, [context, color]);
 
                 // removes parts of the real block obscured by other blocks:
                 this._subtractRealBlocks(context);
             }
+            this._onRendered();
         }
-        this._lastState = this._state;
     }
 });

@@ -157,6 +157,8 @@ dojo.declare('com.realitybuilder.Camera', null, {
     // Updates matrices describing the rotation of the camera. Should be called
     // every time the rotation angles have been changed.
     _updateRotationMatrices: function () {
+        var rYX;
+
         // Matrices are for rotating view space points, and that rotation is in
         // the oposite direction as that of the camera, which is rotated
         // counterclockwise. Therefore the matrices rotate clockwise.
@@ -172,7 +174,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
             [Math.cos(-this._aZ), Math.sin(-this._aZ), 0],
             [-Math.sin(-this._aZ), Math.cos(-this._aZ), 0],
             [0, 0, 1]];
-        var rYX = dojox.math.matrix.multiply(this._rY, this._rX);
+        rYX = dojox.math.matrix.multiply(this._rY, this._rX);
         this._rZYX = dojox.math.matrix.multiply(this._rZ, rYX);
     },
 
@@ -205,7 +207,8 @@ dojo.declare('com.realitybuilder.Camera', null, {
         tmp[0] *= scale; // px
         tmp[1] *= scale; // px
     
-        // Puts camera (and, thus, vanishing point) in the center of the sensor:
+        // Puts camera position (and, thus, vanishing point) in the center of
+        // the sensor:
         tmp[0] += this._sensor.width() / 2;
         tmp[1] += this._sensor.height() / 2;
 

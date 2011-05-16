@@ -72,6 +72,10 @@ com.realitybuilder.util.intersectionLineVXZ = function (lineV) {
 //   in screen space, or the point is on the line segment in the view space
 //   x-z-plane)
 //
+// Special case: If the line segment is in the direction of the (i.e. being
+// mapped to a point in screen space), and the point is on the line segment,
+// then the return value is either 1 or -1.
+//
 // It is assumed that the point and the segment are in front of the camera,
 // i.e. in front of the plane defined by the camera's sensor. If that's not the
 // case, then the result is undefined.

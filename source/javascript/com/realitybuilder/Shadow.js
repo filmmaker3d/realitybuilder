@@ -93,6 +93,8 @@ dojo.declare('com.realitybuilder.Shadow', null, {
             context = canvas.getContext('2d');
             com.realitybuilder.util.clearCanvas(canvas);
 
+            // draws shadow from bottom up, in each step removing parts that
+            // are obscured blocks in the layer above:
             for (layerZB = -1; layerZB <= newBlock.maxZB() - 1; layerZB += 1) {
                 if (layerZB < newBlock.zB()) {
                     this._renderLayerShadow(context, newBlock, camera, 

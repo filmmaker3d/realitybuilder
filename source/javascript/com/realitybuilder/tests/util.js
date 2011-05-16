@@ -208,14 +208,14 @@ doh.register("tests.util.all", [
         doh.assertTrue(Math.abs(pVXZ[0]) < tolerance && 
                        Math.abs(pVXZ[1]) < tolerance);
 
-        // Parallel horizontal line and segment:
+        // Parallel horizontal line and line segment:
         segmentVXZ = [[-1.5, 2], [3, 2]];
         lineVXZ = [[-23, 1], [-4, 1]];
         pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
                                                                   lineVXZ);
         doh.assertTrue(!pVXZ);
 
-        // Coinciding horizontal line and segment:
+        // Coinciding horizontal line and line segment:
         segmentVXZ = [[-1.5, 2], [3, 2]];
         lineVXZ = [[-23, 2], [-4, 2]];
         pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
@@ -224,14 +224,14 @@ doh.register("tests.util.all", [
             Math.abs(pVXZ[0] - (-1.5)) < tolerance && 
             Math.abs(pVXZ[1] - 2) < tolerance);
 
-        // Parallel sloped line and segment:
+        // Parallel sloped line and line segment:
         segmentVXZ = [[-21, 2], [3.749, 5.536]];
         lineVXZ = [[-9, 2], [5, 4]];
         pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
                                                                   lineVXZ);
         doh.assertTrue(!pVXZ);
 
-        // Coinciding sloped line and segment:
+        // Coinciding sloped line and line segment:
         segmentVXZ = [[-21, 2], [3.749, 5.536]];
         lineVXZ = [[-17.608, 2.485], [-3.608, 4.485]];
         pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
@@ -248,7 +248,7 @@ doh.register("tests.util.all", [
         doh.assertTrue(Math.abs(pVXZ[0] - (-8.774648)) < tolerance && 
                        Math.abs(pVXZ[1] - 3.267606) < tolerance);
 
-        // Line outside of segment:
+        // Line outside of line segment:
         segmentVXZ = [[-16, 9], [-9, 4]];
         lineVXZ = [[-15, -2], [-2, 9]];
         pVXZ = com.realitybuilder.util.intersectionSegmentLineVXZ(segmentVXZ, 
@@ -264,7 +264,7 @@ doh.register("tests.util.all", [
             Math.abs(pVXZ[0] - (-0.809859)) < tolerance && 
             Math.abs(pVXZ[1] - 10.007042) < tolerance);
 
-        // Line touches vertex of segment:
+        // Line touches boundary point of line segment:
         segmentVXZ = [[126.38776006477147, 242.92831768175415],
             [178.41121635226813, 209.85042494320865]];
         lineVXZ = [[187.41372593502646, 271.6707784935929], 
@@ -273,7 +273,7 @@ doh.register("tests.util.all", [
                                                                   lineVXZ);
         doh.assertTrue(pVXZ);
 
-        // Line misses vertex of segment:
+        // Line misses boundary point of line segment:
         segmentVXZ = [[178.41121635226813, 209.85042494320865],
                    [228.08196920763885, 234.5755718462958]];
         lineVXZ = [[187.41372593502646, 271.6707784935929], 
@@ -292,26 +292,54 @@ doh.register("tests.util.all", [
 
         segmentVXZ = [[-16, 4], [-12, 8]];
 
-        // Point in front of segment:
+        // Point in front of line segment:
         pVXZ = [-12, 4];
         rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
                                                               segmentVXZ);
         doh.assertTrue(rel === -1);
 
-        // Point behind segment:
+        // Point behind line segment:
         pVXZ = [-21, 9];
         rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
                                                               segmentVXZ);
         doh.assertTrue(rel === 1);
 
-        // Point on segment:
+        // Point on line segment:
         pVXZ = [-13, 7];
         rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
                                                               segmentVXZ);
         doh.assertTrue(rel === 0);
 
-        // Point and segment don't overlap in screen space:
+        // Point and line segment don't overlap in screen space:
         pVXZ = [-21, 2];
+        rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
+                                                              segmentVXZ);
+        doh.assertTrue(rel === 0);
+
+        // Point on line segment:
+        segmentVXZ = [[1.823239, 3.208525], [7.178144, 7.020492]];
+        pVXZ = [6.275621, 6.378017];
+        rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
+                                                              segmentVXZ);
+        doh.assertTrue(rel === 0);
+
+        // Line segment in direction of camera (i.e. being mapped to a point in
+        // screen space) with point in front:
+        segmentVXZ = [[-10.520543, 4.508804], [-15.975598, 6.846685]];
+        pVXZ = [-7.354858, 3.152082];
+        rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
+                                                              segmentVXZ);
+        doh.assertTrue(rel === -1);
+
+        // Line segment in direction of camera with point behind:
+        pVXZ = [-21.000000, 9.000000];
+        rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
+                                                              segmentVXZ);
+        doh.assertTrue(rel === 1);
+
+        // Line segment in direction of camera with point that doesn't overlap
+        // in screen space:
+        pVXZ = [-10.974078, 8.291147];
         rel = com.realitybuilder.util.relationPointSegmentVXZ(pVXZ,
                                                               segmentVXZ);
         doh.assertTrue(rel === 0);
