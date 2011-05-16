@@ -508,7 +508,12 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
         vertexesVXZ = this.projectedVertexesVXZ();
         blockVertexesVXZ = block.projectedVertexesVXZ();
-// FIXME: check for false
+
+        if (vertexesVXZ === false || blockVertexesVXZ === false) {
+            // something went wrong during calculation (extremely unlikely) =>
+            // fail silently with an arbitrary return value:
+            return false;
+        }
 
         this._updateCoordinates();
 

@@ -79,6 +79,18 @@ dojo.declare('com.realitybuilder.Block', null, {
     _topVertexesV: null,
     _topVertexesS: null,
 
+    // The vertexes of the block projected to the view space x-z-plane.
+    // 
+    // The vertexes, correspondingly, are x-z pairs.
+    //
+    // The projection is a parallel projection. It works simply by extending
+    // the vertical edges of the block to the x-z-plane.
+    //
+    // If not all vertexes can be determined, for example due to problems with
+    // precision in calculations, the value is null. This should normally not
+    // happen.
+    _projectedVertexesVXZ: null,
+
     // Ids and data version numbers when last updating coordinates:
     _lastCameraId: null,
     _lastBlockPropertiesVersionOnServer: null,
@@ -123,19 +135,19 @@ dojo.declare('com.realitybuilder.Block', null, {
         return this._positionB[2];
     },
 
-    // Returns the vertexes of the block projected to the view space x-z-plane.
-    // The vertexes, correspondingly, are x-z pairs.
-    //
-    // The projection is a parallel projection. It works simply by extending
-    // the vertical edges of the block to the x-z-plane.
-    //
-    // If not all vertexes can be determined, for example due to problems with
-    // precision in calculations, returns false. This should normally not
-    // happen.
+    // If not all vertexes could be determined, for example due to problems
+    // with precision in calculations, the return value is false. This should
+    // normally not happen.
     projectedVertexesVXZ: function () {
-        var i, bottomVertexesV, topVertexesV, len, tmp = [], lineV, pointVXZ;
+        return (this._projectedVertexesVXZ === null) ? 
+            false : this._projectedVertexesVXZ;
+    },
 
-        this._updateCoordinates();
+    // Updates the vertexes of the block projected to the view space x-z-plane.
+    //
+    // Depends on up to date view space coordinates.
+    _updateViewSpaceXZPlaneCoordinates: function () {
+        var i, bottomVertexesV, topVertexesV, len, tmp = [], lineV, pointVXZ;
 
         bottomVertexesV = this._bottomVertexesV;
         topVertexesV = this._topVertexesV;
@@ -145,12 +157,14 @@ dojo.declare('com.realitybuilder.Block', null, {
             lineV = [bottomVertexesV[i], topVertexesV[i]];
             pointVXZ = com.realitybuilder.util.intersectionLineVXZ(lineV);
             if (!pointVXZ) {
-                return false;
+                tmp = null;
+                break;
             } else {
                 tmp.push(pointVXZ);
             }
         }
-        return tmp;
+
+        this._projectedVertexesVXZ = tmp;
     },
 
     // Returns true, iff the current block collides with the block "block".
@@ -306,6 +320,7 @@ dojo.declare('com.realitybuilder.Block', null, {
             this._updateWorldSpaceCoordinates();
             this._updateViewSpaceCoordinates();
             this._updateSensorSpaceCoordinates();
+            this._updateViewSpaceXZPlaneCoordinates();
             this._onCoordinatesUpdated();
         }
     },

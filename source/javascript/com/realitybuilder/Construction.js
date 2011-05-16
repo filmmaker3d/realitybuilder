@@ -99,7 +99,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
                                                       this._blockProperties);
         this._newBlock = new com.realitybuilder.NewBlock(
             this._blockProperties,
-            this._camera, [-3, 1, 0] /*FIXME: [8, 0, 5]*/, 
+            this._camera, [9, 9, 1] /*FIXME: [8, 0, 5]*/, 
             this._constructionBlocks, 
             !this._showAdminControls);
         this._userControls = new com.realitybuilder.UserControls(this);
@@ -304,14 +304,23 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
     },
 
+    // Updates the status message, but only if all necessary components have
+    // been initialized, which is relevant only in the beginning.
+    _updateStatusMessageIfFullyInitialized: function () {
+        if (this._constructionBlocks.isInitializedWithServerData() &&
+            this._blockProperties.isInitializedWithServerData()) {
+            this._userControls.
+                updateStatusMessage(this._responseToLastRequest);
+        }
+    },
+
     // Called after the construction blocks have changed.
     _onConstructionBlocksChanged: function () {
-        this._userControls.updateStatusMessage(this._responseToLastRequest);
-
         if (this._showAdminControls) {
             this._adminControls.updateBlocksTable();
         }
 
+        this._updateStatusMessageIfFullyInitialized();
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
     },
@@ -342,6 +351,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
         // Updates the state (and related controls) of the new block, because
         // they depend on block properties such as collision settings:
         this._updateNewBlockStateIfFullyInitialized();
+
+        // Updates the status message because it depends on the block
+        // properties concerning attachment conditions (attachment of the new
+        // to a real block):
+        this._updateStatusMessageIfFullyInitialized();
 
         this._renderBlocksIfFullyInitialized();
     },
