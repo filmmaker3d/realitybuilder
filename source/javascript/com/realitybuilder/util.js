@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
 
 dojo.provide('com.realitybuilder.util');
 
@@ -283,18 +283,22 @@ com.realitybuilder.addPrefix = function (prefix, object) {
     return tmp;
 };
 
-// Returns true, iff Explorer Canvas has loaded. The detection code is inspired
-// by a blog post: <http://www.stpe.se/2008/12/detect-if-excanvas-is-loaded/>.
-com.realitybuilder.hasExplorerCanvasLoaded = function () {
-    return (typeof G_vmlCanvasManager !== 'undefined');
+// Returns true, iff FlashCanvas has loaded. FlashCanvas implements HTML canvas
+// support for Internet Explorer.
+com.realitybuilder.isFlashCanvasActive = function () {
+    return (typeof FlashCanvas !== 'undefined');
+};
+
+com.realitybuilder.isFlashReadyForFlashCanvas = function () {
+    return swfobject.hasFlashPlayerVersion("9"); // incl. higher versions
 };
 
 // Returns true, iff the canvas functionality is somehow supported, either
 // natively by the browser, or via some emulation.
 com.realitybuilder.isCanvasSupported = function () {
-    return (
-        document.createElement('canvas').getContext ||  // Native support
-        com.realitybuilder.hasExplorerCanvasLoaded());
+    return (document.createElement('canvas').getContext ||  // Native support
+            (com.realitybuilder.isFlashCanvasActive() &&
+             com.realitybuilder.isFlashReadyForFlashCanvas()));
 };
 
 com.realitybuilder.aboutMessage = function () {

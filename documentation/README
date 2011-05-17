@@ -13,7 +13,8 @@ Less well-known file extensions used:
 Getting started
 ===============
 
-1. Start the Reality Builder using Google App Engine.
+1. Start the Reality Builder on Google App Engine or on the development server
+  included with the App Engine Python SDK.
 
 2. Initialize sample data, by visting (relative to the root URL):
 
@@ -35,6 +36,23 @@ Unit tests
 Run unit tests by visiting (relative to the root URL) with debug mode enabled:
 
   /source/javascript/com/realitybuilder/tests/runTests.html
+
+
+Enable support for Internet Explorer versions less than 9
+=========================================================
+
+To make the Reality Builder work with Internet Explorer versions less than 9,
+FlashCanvas Pro is required. For reasons of license, this library is not
+included in the distribution of the Reality Builder. To install it:
+
+1. Download FlashCanvas Pro 1.5 or compatible from: http://flashcanvas.net/
+
+2. Place FlashCanvas Pro into:
+
+  /proprietary/FlashCanvasPro
+
+  The directory "proprietary" is for proprietary software components that
+  should not be redistributed as part of the Reality Builder source code.
 
 
 Terminology

@@ -55,10 +55,9 @@ if (realityBuilderIsDojoSupported()) {
         dojo.require('com.realitybuilder.util');
     }
 
-    if (dojo.isIE) {
+    if (dojo.isIE < 9) {
         // Initialization needs to be deferred, since otherwise it may happen
-        // before excanvas is ready. See <url:http://stackoverflow.com/question
-        // s/3273118>
+        // before FlashCanvas is ready.
         dojo.connect('onload', realityBuilderInit);
     } else {
         realityBuilderInit();

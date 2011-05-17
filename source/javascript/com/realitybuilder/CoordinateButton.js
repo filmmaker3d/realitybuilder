@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
 
 dojo.provide('com.realitybuilder.CoordinateButton');
 
@@ -183,8 +183,8 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
                     left: (this.centerS[0] - l / 2) + 'px',
                     top: (this.centerS[1] - l / 2) + 'px'}}, 
             'coordinateControls');
-        if (dojo.isIE) {
-            G_vmlCanvasManager.initElement(this._canvas);
+        if (com.realitybuilder.isFlashCanvasActive()) {
+            FlashCanvas.initElement(this._canvas);
         }
         dojo.connect(this._canvas, 'onmouseover', this, this.highlight);
         dojo.connect(this._canvas, 'onmouseout', this, this.unhighlight);

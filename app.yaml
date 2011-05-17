@@ -24,6 +24,10 @@ handlers:
 - url: /javascript
   static_dir: javascript
 
+# For proprietary components such as FlashCanvas:
+- url: /proprietary
+  static_dir: proprietary
+
 # For development/debugging.
 - url: /source
   static_dir: source

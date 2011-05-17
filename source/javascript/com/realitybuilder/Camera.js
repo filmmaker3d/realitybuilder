@@ -31,7 +31,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
 
 dojo.provide('com.realitybuilder.Camera');
 

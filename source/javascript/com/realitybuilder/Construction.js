@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
 
 dojo.provide('com.realitybuilder.Construction');
 
@@ -413,14 +413,12 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
         // Initializes Explorer Canvas for elements that were added later to
         // the DOM.
-        if (dojo.isIE) {
-            G_vmlCanvasManager.initElement(dojo.byId('sensorShadowCanvas'));
-            G_vmlCanvasManager.initElement(dojo.byId('sensorRealBlocksCanvas'));
-            G_vmlCanvasManager.initElement(
-                dojo.byId('sensorPendingBlocksCanvas'));
-            G_vmlCanvasManager.initElement(dojo.byId('sensorNewBlockCanvas'));
-            G_vmlCanvasManager.initElement(
-                dojo.byId('coordinateControlsCanvas'));
+        if (com.realitybuilder.isFlashCanvasActive()) {
+            FlashCanvas.initElement(dojo.byId('sensorShadowCanvas'));
+            FlashCanvas.initElement(dojo.byId('sensorRealBlocksCanvas'));
+            FlashCanvas.initElement(dojo.byId('sensorPendingBlocksCanvas'));
+            FlashCanvas.initElement(dojo.byId('sensorNewBlockCanvas'));
+            FlashCanvas.initElement(dojo.byId('coordinateControlsCanvas'));
         }
     },
 

@@ -28,7 +28,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
 
 dojo.provide('com.realitybuilder.LayerShadow');
 
@@ -77,6 +77,11 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         this._helperCanvas = dojo.create('canvas');
         dojo.attr(this._helperCanvas, 'width', shadowCanvas.width);
         dojo.attr(this._helperCanvas, 'height', shadowCanvas.height);
+
+        if (com.realitybuilder.isFlashCanvasActive()) {
+            FlashCanvas.initElement(this._canvas);
+            FlashCanvas.initElement(this._helperCanvas);
+        }
     },
 
     // Returns the canvas onto which the layer shadow is drawn:

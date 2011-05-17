@@ -23,7 +23,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, G_vmlCanvasManager, logoutUrl */
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
 
 dojo.provide('com.realitybuilder.NewBlock');
 
@@ -503,9 +503,6 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         // the vertical edges of the prismatic blocks to the view space
         // x-z-plane.
 
-        this._lastCameraId = ''; // FIXME: remove
-        block._lastCameraId = ''; // FIXME: remove
-
         vertexesVXZ = this.projectedVertexesVXZ();
         blockVertexesVXZ = block.projectedVertexesVXZ();
 
@@ -631,7 +628,11 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
                 color = this.isMovable() ? 'red' : 'white';
-                this._renderShadow();
+
+                // Shadow does currently not work with FlashCanvas.
+                if (!com.realitybuilder.isFlashCanvasActive()) {
+                    this._renderShadow();
+                }
 
                 com.realitybuilder.util.clearCanvas(canvas);
                 this.inherited(arguments, [context, color]);
