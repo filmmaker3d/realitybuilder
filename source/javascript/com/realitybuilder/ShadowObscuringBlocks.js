@@ -29,6 +29,10 @@
 //       []  []
 //     [][] _[][]
 //
+//   Note that for obscuring the shadow with the two additional blocks, only
+//   their bottom is drawn. Otherwise too much would be obscured. This is the
+//   case for all additional blocks.
+//
 // Example 2:
 //
 // * Same as above, but with different position of new block. How it should
@@ -116,6 +120,7 @@ dojo.declare('com.realitybuilder.ShadowObscuringBlocks', null, {
             dstPositionB = [srcBlock.xB(), srcBlock.yB(), dstZB];
             dstBlock = new com.realitybuilder.Block(that._blockProperties,
                                                     camera, dstPositionB);
+            dstBlock.onlySubtractBottom();
             blocks.push(dstBlock);
         });
 

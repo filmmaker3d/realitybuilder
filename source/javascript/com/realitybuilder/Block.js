@@ -104,6 +104,10 @@ dojo.declare('com.realitybuilder.Block', null, {
     _indexOfLeftmostVertex: null,
     _indexOfRightmostVertex: null,
 
+    // True, iff only the bottom of the block should be subtracted when using
+    // the "subtract" function:
+    _onlySubtractBottom: false,
+
     // Creates a block at the position in block space ("xB", "yB", "zB") =
     // "positionB". When the block is rendered, it is as seen by the sensor of
     // the camera "camera".
@@ -271,8 +275,11 @@ dojo.declare('com.realitybuilder.Block', null, {
         this._coordinatesChangedAfterLastRendering = true;
     },
 
-    // Finds the index of - in sensor space - the leftmost and the rightmost
-    // vertex. This index is the same for the bottom and the top vertexes.
+    // Finds the indexes of the vertexes that correspond to the leftmost and
+    // rightmost edges, as displayed in sensor space.
+    //
+    // Note that these vertexes often, but not always, are identical to the
+    // leftmost and rightmost vertex of the top or bottom.
     _updateHorizontalExtentsInSensorSpace: function () {
         var
         bottomVertexesS = this._bottomVertexesS,
@@ -325,27 +332,36 @@ dojo.declare('com.realitybuilder.Block', null, {
         }
     },
 
-    // Subtracts the shape of the block from the drawing on the canvas with
-    // rendering context "context".
-    subtract: function (context) {
-        var
-        bottomVertexesS, topVertexesS,
-        len, vertexS, i, ilv, irv;
+    onlySubtractBottom: function () {
+        this._onlySubtractBottom = true;
+    },
 
-        this._updateCoordinates();
+    _subtractDrawBottomPath: function (context) {
+        var vertexesS, len, vertexS, i;
+
+        vertexesS = this._bottomVertexesS;
+
+        // counterclockwise (when viewed from top in block space):
+        vertexS = vertexesS[0];
+        context.moveTo(vertexS[0], vertexS[1]);
+        for (i = 1; i < vertexesS.length; i += 1) {
+            vertexS = vertexesS[i];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+    },
+
+    _subtractDrawPath: function (context) {
+        var bottomVertexesS, topVertexesS, len, vertexS, i, ilv, irv;
 
         bottomVertexesS = this._bottomVertexesS;
         topVertexesS = this._topVertexesS;
         len = topVertexesS.length; // same for top and bottom
+
         ilv = this._indexOfLeftmostVertex;
         irv = this._indexOfRightmostVertex;
 
-        context.globalCompositeOperation = "destination-out";
-        context.fillStyle = "black";
-
         // top, from rightmost to leftmost vertex, counterclockwise (when
         // viewed from top in block space):
-        context.beginPath();
         vertexS = topVertexesS[irv];
         context.moveTo(vertexS[0], vertexS[1]);
         for (i = irv + 1; i <= len + ilv; i += 1) {
@@ -367,8 +383,28 @@ dojo.declare('com.realitybuilder.Block', null, {
         // line from rightmost vertex on bottom to rightmost vertex on top:
         vertexS = bottomVertexesS[irv];
         context.lineTo(vertexS[0], vertexS[1]);
+    },
 
+    // Subtracts the shape of the block from the drawing on the canvas with
+    // rendering context "context".
+    subtract: function (context) {
+        var
+        bottomVertexesS, topVertexesS,
+        len, vertexS, i, ilv, irv;
+
+        this._updateCoordinates();
+
+        context.globalCompositeOperation = "destination-out";
+        context.fillStyle = "black";
+
+        context.beginPath();
+        if (this._onlySubtractBottom) {
+            this._subtractDrawBottomPath(context);
+        } else {
+            this._subtractDrawPath(context);
+        }
         context.closePath();
+
         context.fill();
 
         context.globalCompositeOperation = "source-over";

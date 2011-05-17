@@ -99,7 +99,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
                                                       this._blockProperties);
         this._newBlock = new com.realitybuilder.NewBlock(
             this._blockProperties,
-            this._camera, [-3, 1, 0] /*FIXME: [8, 0, 5]*/, 
+            this._camera, [10, 9, 1] /*FIXME: [8, 0, 5]*/, 
             this._constructionBlocks, 
             !this._showAdminControls);
         this._userControls = new com.realitybuilder.UserControls(this);
