@@ -128,6 +128,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this, this._onConstructionBlocksChanged);
         dojo.subscribe('com/realitybuilder/Camera/changed',
             this, this._onCameraChanged);
+        dojo.subscribe('com/realitybuilder/Image/changed',
+            this, this._onImageChanged);
         dojo.subscribe('com/realitybuilder/BlockProperties/changed',
             this, this._onBlockPropertiesChanged);
 

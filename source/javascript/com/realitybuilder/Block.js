@@ -283,7 +283,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     },
 
     // Finds the indexes of the vertexes that correspond to the leftmost and
-    // rightmost edges, as displayed in sensor space.
+    // rightmost edges, as displayed on the sensor.
     //
     // Note that these vertexes often, but not always, are identical to the
     // leftmost and rightmost vertex of the top or bottom.
