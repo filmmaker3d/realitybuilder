@@ -91,6 +91,10 @@ dojo.declare('com.realitybuilder.Block', null, {
     // happen.
     _projectedVertexesVXZ: null,
 
+    // The vertexes of the block projected to the view space x-z-plane, in
+    // sensor space.
+    _projectedVertexesVXZS: null,
+
     // Ids and data version numbers when last updating coordinates:
     _lastCameraId: null,
     _lastBlockPropertiesVersionOnServer: null,
@@ -98,9 +102,12 @@ dojo.declare('com.realitybuilder.Block', null, {
     // True, if the coordinates changed after the last rendering:
     _coordinatesChangedAfterLastRendering: false,
 
-    // Horizontal extents of the block in sensor space (same index for top and
-    // bottom). Note: depending on orientation of the block, the leftmost index
-    // may be bigger than the rightmost index!
+    // Horizontal extents of the block in sensor space: Indexes of the vertexes
+    // that correspond to the leftmost and rightmost edges, as displayed on the
+    // sensor.
+    //
+    // Note: depending on orientation of the block, the leftmost index may be
+    // bigger than the rightmost index!
     _indexOfLeftmostVertex: null,
     _indexOfRightmostVertex: null,
 
@@ -281,18 +288,25 @@ dojo.declare('com.realitybuilder.Block', null, {
     // Note that these vertexes often, but not always, are identical to the
     // leftmost and rightmost vertex of the top or bottom.
     _updateHorizontalExtentsInSensorSpace: function () {
-        var
-        bottomVertexesS = this._bottomVertexesS,
-        vertexS,
-        leftmostVertexS,
-        rightmostVertexS,
-        i, ilv, irv;
+        var vertexesS, vertexS, leftmostVertexS, rightmostVertexS, i, ilv, irv;
 
-        leftmostVertexS = rightmostVertexS = bottomVertexesS[0];
+        // Ideas behind the following algorithm, by example for the rightmost
+        // edge:
+        //
+        // * The rightmost edge doesn't change it the block is extended to a
+        //   prism with infinite vertical extents.
+        //
+        // * The rightmost edge goes through the rightmost (as displayed on the
+        //   sensor) intersection point between the prism and the view space
+        //   x-z-plane.
+
+        vertexesS = this._projectedVertexesVXZS;
+
+        leftmostVertexS = rightmostVertexS = vertexesS[0];
         ilv = irv = 0;
 
-        for (i = 1; i < bottomVertexesS.length; i += 1) {
-            vertexS = bottomVertexesS[i];
+        for (i = 1; i < vertexesS.length; i += 1) {
+            vertexS = vertexesS[i];
             if (vertexS[0] < leftmostVertexS[0]) {
                 leftmostVertexS = vertexS;
                 ilv = i;
@@ -307,6 +321,19 @@ dojo.declare('com.realitybuilder.Block', null, {
         this._indexOfRightmostVertex = irv;
     },
 
+    _updateProjectedVertexesVXZS: function () {
+        var cam = this._camera;
+
+        this._projectedVertexesVXZS = 
+            dojo.map(this._projectedVertexesVXZ,
+                     function (vertexVXZ) {
+                         var vertexV = [vertexVXZ[0],
+                                        0, // in view space x-z plane!
+                                        vertexVXZ[1]];
+                         return cam.viewToSensor(vertexV);
+                     });
+    },
+
     // Calculates the vertexes of the block in sensor space. The camera is
     // positioned in the center of the sensor.
     //
@@ -318,6 +345,7 @@ dojo.declare('com.realitybuilder.Block', null, {
                                          dojo.hitch(cam, cam.viewToSensor));
         this._topVertexesS = dojo.map(this._topVertexesV,
                                       dojo.hitch(cam, cam.viewToSensor));
+        this._updateProjectedVertexesVXZS();
         this._updateHorizontalExtentsInSensorSpace();
     },
 
@@ -326,8 +354,8 @@ dojo.declare('com.realitybuilder.Block', null, {
         if (this._coordinatesNeedToBeUpdated()) {
             this._updateWorldSpaceCoordinates();
             this._updateViewSpaceCoordinates();
-            this._updateSensorSpaceCoordinates();
             this._updateViewSpaceXZPlaneCoordinates();
+            this._updateSensorSpaceCoordinates();
             this._onCoordinatesUpdated();
         }
     },
