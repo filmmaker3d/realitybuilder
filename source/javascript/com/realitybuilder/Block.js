@@ -150,6 +150,8 @@ dojo.declare('com.realitybuilder.Block', null, {
     // with precision in calculations, the return value is false. This should
     // normally not happen.
     projectedVertexesVXZ: function () {
+        this._updateCoordinates();
+
         return (this._projectedVertexesVXZ === null) ? 
             false : this._projectedVertexesVXZ;
     },

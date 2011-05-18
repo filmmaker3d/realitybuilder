@@ -204,7 +204,7 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
             context.strokeStyle = color;
 
             context.beginPath();
-            context.arc(l / 2, l / 2, this._radiusS, 0, Math.PI * 2, true); 
+            context.arc(l / 2, l / 2, this._radiusS, 0, 2 * Math.PI, false);
             context.stroke();
 
             if (this._plus) {
