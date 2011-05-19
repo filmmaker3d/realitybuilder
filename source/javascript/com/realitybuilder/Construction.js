@@ -97,11 +97,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._constructionBlocks = 
             new com.realitybuilder.ConstructionBlocks(this, 
                                                       this._blockProperties);
-        this._newBlock = new com.realitybuilder.NewBlock(
-            this._blockProperties,
-            this._camera, [10, 9, 1] /*FIXME: [8, 0, 5]*/, 
-            this._constructionBlocks, 
-            !this._showAdminControls);
+        this._newBlock = 
+            new com.realitybuilder.NewBlock(this._blockProperties,
+                                            this._camera,
+                                            this._constructionBlocks);
         this._userControls = new com.realitybuilder.UserControls(this);
 
         if (this._showAdminControls) {
@@ -476,18 +475,15 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
         this._updateTimeout = 
             setTimeout(function () {
-                that._update(false);
+                that._update();
             }, this._UPDATE_INTERVAL);
     },
 
     // Triggers an update of the construction with the data stored on the
     // server. Only updates the blocks if there is a new version. Fails
     // silently on error.
-    //
-    // If "firstUpdate" is true, then this is the first time the update is
-    // performed.
-    _update: function (firstUpdate) {
-        var getDeletedBlocks, that = this;
+    _update: function () {
+        var getDeletedBlocks;
 
         // Without the admin controls being shown, deleted blocks are of no use
         // (pending blocks are needed to determine whether a request has been
@@ -506,9 +502,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
                 this._blockProperties.versionOnServer()
             },
             handleAs: "json",
-            load: function (data, ioargs) {
-                that._updateSucceeded(data, ioargs, firstUpdate);
-            }});
+            load: dojo.hitch(this, this._updateSucceeded)
+        });
     },
 
     // Unhides the content. Fades in the content, unless the browser is Internet

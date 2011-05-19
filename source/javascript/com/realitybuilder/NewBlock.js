@@ -31,6 +31,10 @@ dojo.require('com.realitybuilder.Block');
 dojo.require('com.realitybuilder.Shadow');
 
 dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
+    '-chains-': {
+        constructor: 'manual'
+    },
+
     // Points in block space, defining the rectangle which represents the space
     // in which blocks may be build.
     _BUILD_SPACE_1B: [-1, -1, 0],
@@ -59,17 +63,16 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Version of the construction blocks when the shadow was last rendered.
     _lastConstructionBlocksVersion: null,
 
-    // Creates the new block that the user may position. It is placed at the
-    // position "positionB" in block space. For collision detection and for
-    // calculating hidden lines, the block needs to know about the other blocks
-    // in the construction: "constructionBlocks" When the block is rendered, it
-    // is as seen by the sensor of the camera "camera".
+    // Creates the new block that the user may position. For collision
+    // detection and for calculating hidden lines, the block needs to know
+    // about the other blocks in the construction: "constructionBlocks" When
+    // the block is rendered, it is as seen by the sensor of the camera
+    // "camera".
     //
     // The block's properties, such as shape and size, are described by
     // "blockProperties".
-    constructor: function (blockProperties, camera, positionB, 
-                           constructionBlocks)
-    {
+    constructor: function (blockProperties, camera, constructionBlocks) {
+        this.inherited(arguments, [blockProperties, camera, [0, 0, 0]]);
         this._state = 1;
         this._constructionBlocks = constructionBlocks;
         this._shadow = new com.realitybuilder.Shadow(this, blockProperties, 
