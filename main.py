@@ -237,56 +237,6 @@ class Admin(webapp.RequestHandler):
             self.redirect(users.create_login_url("/admin"))
             return
 
-class About(webapp.RequestHandler):
-    def get(self):
-        template_values = {'debug': debug, 
-                           'up_url': '/', 'up_text': 'Home',
-                           'video_id': 'XiI6lOvQLRM'}
-        
-        path = os.path.join(os.path.dirname(__file__), 'about.html')
-        self.response.out.write(template.render(path, template_values))
-
-class Felix(webapp.RequestHandler):
-    def get(self):
-        template_values = {'debug': debug, 'up_url': '/about', 
-                           'up_text': 'Up'}
-        
-        path = os.path.join(os.path.dirname(__file__), 'felix.html')
-        self.response.out.write(template.render(path, template_values))
-
-class Webcam(webapp.RequestHandler):
-    def get(self):
-        template_values = {'debug': debug, 'up_url': '/about', 
-                           'up_text': 'Up'}
-        
-        path = os.path.join(os.path.dirname(__file__), 'webcam.html')
-        self.response.out.write(template.render(path, template_values))
-
-class Tests(webapp.RequestHandler):
-    def get(self):
-        tests = [
-            ['Chrome 5', 'WinXP/32', 'Yes', ''],
-            ['Firefox 1', 'WinXP/32', 'No', 'No Canvas'],
-            ['Firefox 3.6', 'WinXP/32', 'Yes', ''],
-            ['Firefox 3.6 w/o Flash', 'WinXP/32', 'Yes', ''],
-            ['Firefox 3.6 w/o JavaScript', 'WinXP/32', 'No', 
-             'No JavaScript'],
-            ['Internet Explorer 6', 'Win2K/32', 'Yes', ''],
-            ['Internet Explorer 7', 'WinXP/32', 'Yes', ''],
-            ['Internet Explorer 8', 'WinXP/32', 'Yes', ''],
-            ['Lynx 2.8', 'WinXP/32', 'No', 'No JavaScript'],
-            ['Netscape 4', 'Win2K/32', 'No', 'No Dojo Tookit'],
-            ['Opera 10.60', 'WinXP/32', 'Yes', ''],
-            ['Opera 10.60 w/o Images', 'WinXP/32', 'No', 
-             'No Images'],
-            ['Opera Mini 5.1', 'Symbian S60', 'Yes', ''],
-            ['Safari 5.0', 'WinXP/32', 'Yes', '']];
-        template_values = {'debug': debug, 'up_url': '/about', 
-                           'up_text': 'Up', 'tests': tests}
-        
-        path = os.path.join(os.path.dirname(__file__), 'tests.html')
-        self.response.out.write(template.render(path, template_values))
-
 # Data describing a construction, including building blocks.
 class RPCConstruction(webapp.RequestHandler):
     # Returns the blocks as an array of dictionaries. Only returns deleted
@@ -806,10 +756,6 @@ class Image(webapp.RequestHandler):
 application = webapp.WSGIApplication([
     ('/', Index), ('/admin', Admin), 
     ('/images/live.jpg', Image),
-    ('/about', About),
-    ('/felix', Felix),
-    ('/webcam', Webcam),
-    ('/tests', Tests),
     ('/admin/update', AdminUpdate),
     ('/admin/rpc/delete', RPCAdminDelete),
     ('/admin/rpc/make_real', RPCAdminMakeReal),

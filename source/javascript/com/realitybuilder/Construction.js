@@ -408,8 +408,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
             '</canvas>' +
             '</div>' +
             '<p id="status"></p>' +
-            this._requestRealButtonHtml() + 
-            '<a id="about" href="about">About</a>');
+            this._requestRealButtonHtml());
 
         // Initializes Explorer Canvas for elements that were added later to
         // the DOM.
