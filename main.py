@@ -346,7 +346,7 @@ class RPCConstruction(webapp.RequestHandler):
         query = BlockProperties.all().ancestor(construction)
         block_properties = query.get()
         if block_properties is None:
-            raise Exception('could not get block properties')
+            raise Exception('could not get block properties data')
 
         block_properties_data_version = block_properties.data_version
         block_properties_data_changed = \
@@ -371,6 +371,35 @@ class RPCConstruction(webapp.RequestHandler):
                                               attachment_offsets_b)})
         return data
 
+    # Returns JSON serializable data related to the new block
+    @staticmethod
+    def get_new_block_data(construction, 
+                           new_block_data_version_client):
+        query = NewBlock.all().ancestor(construction)
+        new_block = query.get()
+        if new_block is None:
+            raise Exception('could not get new block data')
+
+        new_block_data_version = new_block.data_version
+        new_block_data_changed = (new_block_data_version != 
+                                  new_block_data_version_client)
+        data = {
+            'version': new_block_data_version,
+            'changed': new_block_data_changed}
+        if new_block_data_changed:
+            # New block data version on server not the same as on client. =>
+            # Deliver all the data.
+            data.update({'initXB': new_block.init_x_b,
+                         'initYB': new_block.init_y_b,
+                         'initZB': new_block.init_z_b,
+                         'buildSpace1XB': new_block.build_space_1_x_b,
+                         'buildSpace1YB': new_block.build_space_1_y_b,
+                         'buildSpace1ZB': new_block.build_space_1_z_b,
+                         'buildSpace2XB': new_block.build_space_2_x_b,
+                         'buildSpace2YB': new_block.build_space_2_y_b,
+                         'buildSpace2ZB': new_block.build_space_2_z_b})
+        return data
+
     # A transaction may not be necessary, but it ensures data integrity for
     # example if there is a transaction missing somewhere else.
     @staticmethod
@@ -378,7 +407,8 @@ class RPCConstruction(webapp.RequestHandler):
                     get_deleted_blocks,
                     camera_data_version_client,
                     image_data_version_client,
-                    block_properties_data_version_client):
+                    block_properties_data_version_client,
+                    new_block_data_version_client):
         construction = Construction.get_main()
         data = {
             'blocksData': RPCConstruction.get_blocks_data(
@@ -389,7 +419,9 @@ class RPCConstruction(webapp.RequestHandler):
             'imageData': RPCConstruction.get_image_data(
                 construction, camera_data_version_client),
             'blockPropertiesData': RPCConstruction.get_block_properties_data(
-                construction, block_properties_data_version_client)
+                construction, block_properties_data_version_client),
+            'newBlockData': RPCConstruction.get_new_block_data(
+                construction, new_block_data_version_client)
         }
         return data
 
@@ -406,13 +438,16 @@ class RPCConstruction(webapp.RequestHandler):
             image_data_version_client = self.request.get('imageDataVersion')
             block_properties_data_version_client = \
                 self.request.get('blockPropertiesDataVersion')
+            new_block_data_version_client = \
+                self.request.get('newBlockDataVersion')
 
             data = db.run_in_transaction(RPCConstruction.transaction, 
                                          blocks_data_version_client, 
                                          get_deleted_blocks,
                                          camera_data_version_client,
                                          image_data_version_client,
-                                         block_properties_data_version_client)
+                                         block_properties_data_version_client,
+                                         new_block_data_version_client)
             dump_json(self, data)
         except Exception, e:
             logging.error('Could not retrieve data: ' + str(e))
@@ -712,6 +747,7 @@ class AdminInit(webapp.RequestHandler):
         newBlock.build_space_2_x_b = 11
         newBlock.build_space_2_y_b = 11
         newBlock.build_space_2_z_b = 6
+        newBlock.put()
 
         # Deletes all block entries:
         queries = [Block.all()]

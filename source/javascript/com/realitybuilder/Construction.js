@@ -117,8 +117,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
         dojo.subscribe('com/realitybuilder/ConstructionBlocks/changedOnServer', 
             this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('com/realitybuilder/NewBlock/positioned', 
-            this, this._onNewBlockPositioned);
+        dojo.subscribe('com/realitybuilder/NewBlock/positionInitialized', 
+            this, this._onNewBlockPositionInitialized);
+        dojo.subscribe('com/realitybuilder/NewBlock/buildSpaceChanged', 
+            this, this._onBuildSpaceChanged);
         dojo.subscribe('com/realitybuilder/NewBlock/stopped', 
             this, this._onNewBlockStopped);
         dojo.subscribe('com/realitybuilder/NewBlock/madeMovable', 
@@ -291,7 +293,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // been initialized, which is relevant only in the beginning.
     _renderCoordinateControlsIfFullyInitialized: function () {
         if (this._camera.isInitializedWithServerData() && 
-            this._blockProperties.isInitializedWithServerData()) {
+            this._blockProperties.isInitializedWithServerData() &&
+            this._newBlock.isInitializedWithServerData()) {
             this._userControls.renderCoordinateControls();
         }
     },
@@ -344,10 +347,20 @@ dojo.declare('com.realitybuilder.Construction', null, {
     },
 
     // Called after the new block's position has been initialized.
-    _onNewBlockPositioned: function () {
+    _onNewBlockPositionInitialized: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
         this._updateStatusMessageIfFullyInitialized();
+        this._renderCoordinateControlsIfFullyInitialized();
+    },
+
+    // Called after the dimensions of the space where the new block may be
+    // built have been changed.
+    _onBuildSpaceChanged: function () {
+        this._updateNewBlockStateIfFullyInitialized();
+        this._renderBlocksIfFullyInitialized();
+        this._updateStatusMessageIfFullyInitialized();
+        this._renderCoordinateControlsIfFullyInitialized();
     },
 
     // Called after the block properties have changed.

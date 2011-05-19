@@ -41,8 +41,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
     // Points in block space, defining the rectangle which represents the space
     // in which blocks may be built.
-    _build_space_1_b: null,
-    _build_space_2_b: null,
+    _buildSpace1B: null,
+    _buildSpace2B: null,
 
     // State of the block: 0 = stopped, 1 = movable
     _state: null,
@@ -98,18 +98,32 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Updates the block properties to the version on the server, which is
     // described by "serverData".
     updateWithServerData: function (serverData) {
-        var positionNotInitialized;
+        var positionNotInitialized, positionWasInitialized;
 
         positionNotInitialized = !this.isInitializedWithServerData();
 
+        if (positionNotInitialized) {
+            this._positionB = [serverData.initXB,
+                               serverData.initYB,
+                               serverData.initZB];
+            positionWasInitialized = true;
+        } else {
+            positionWasInitialized = false;
+        }
+
+        this._buildSpace1B = [serverData.buildSpace1XB,
+                              serverData.buildSpace1YB,
+                              serverData.buildSpace1ZB];
+        this._buildSpace2B = [serverData.buildSpace2XB,
+                              serverData.buildSpace2YB,
+                              serverData.buildSpace2ZB];
+
         this._versionOnServer = serverData.version;
 
-        if (positionNotInitialized) {
-            this._setInitPosition([serverData.initXB,
-                                   serverData.initYB,
-                                   serverData.initZB]);
-            dojo.publish('com/realitybuilder/NewBlock/positioned');
+        if (positionWasInitialized) {
+            dojo.publish('com/realitybuilder/NewBlock/positionInitialized');
         }
+        dojo.publish('com/realitybuilder/NewBlock/buildSpaceChanged');
     },
 
     // Returns true, iff the current block collides with any real block.
@@ -162,7 +176,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Maximum vertical position of the new block. Note that this position is
     // higher than the position in which blocks may be build, by 1.
     maxZB: function () {
-        return this._BUILD_SPACE_2B[2];
+        return this._buildSpace2B[2];
     },
 
     // Makes sure that this block does not intersect with any real block. If it
@@ -207,7 +221,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // ground and just as large as to allow a block to be moved anywhere
     // outside the boundary of the build space.
     _wouldBeInMoveSpace: function (testB) {
-        var b1B = this._BUILD_SPACE_1B, b2B = this._BUILD_SPACE_2B;
+        var b1B = this._buildSpace1B, b2B = this._buildSpace2B;
         return (
             testB[0] >= b1B[0] - 2 && testB[0] <= b2B[0] &&
             testB[1] >= b1B[1] - 2 && testB[1] <= b2B[1] &&
@@ -219,7 +233,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         var xB = this._positionB[0],
             yB = this._positionB[1],
             zB = this._positionB[2],
-            b1B = this._BUILD_SPACE_1B, b2B = this._BUILD_SPACE_2B;
+            b1B = this._buildSpace1B, b2B = this._buildSpace2B;
         return (
             xB >= b1B[0] && xB <= b2B[0] - 2 &&
             yB >= b1B[1] && yB <= b2B[1] - 2 &&
