@@ -117,6 +117,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
         dojo.subscribe('com/realitybuilder/ConstructionBlocks/changedOnServer', 
             this, this._update); // Speeds up responsiveness.
+        dojo.subscribe('com/realitybuilder/NewBlock/positioned', 
+            this, this._onNewBlockPositioned);
         dojo.subscribe('com/realitybuilder/NewBlock/stopped', 
             this, this._onNewBlockStopped);
         dojo.subscribe('com/realitybuilder/NewBlock/madeMovable', 
@@ -275,6 +277,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // initialized, which is relevant only in the beginning.
     _renderBlocksIfFullyInitialized: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
+            this._newBlock.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData()) {
             if (this._showAdminControls) {
@@ -298,6 +301,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // in the beginning.
     _updateNewBlockStateIfFullyInitialized: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
+            this._newBlock.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData()) {
             this._updateNewBlockPositionAndState();
             this._userControls.updateRequestRealButton();
@@ -310,6 +314,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // been initialized, which is relevant only in the beginning.
     _updateStatusMessageIfFullyInitialized: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
+            this._newBlock.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData()) {
             this._userControls.
                 updateStatusMessage(this._responseToLastRequest);
@@ -336,6 +341,13 @@ dojo.declare('com.realitybuilder.Construction', null, {
         // Updates the renderings, which depend on the camera position:
         this._renderCoordinateControlsIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
+    },
+
+    // Called after the new block's position has been initialized.
+    _onNewBlockPositioned: function () {
+        this._updateNewBlockStateIfFullyInitialized();
+        this._renderBlocksIfFullyInitialized();
+        this._updateStatusMessageIfFullyInitialized();
     },
 
     // Called after the block properties have changed.
@@ -466,6 +478,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
                 updateWithServerData(data.blockPropertiesData);
         }
 
+        if (data.newBlockData.changed) {
+            this._newBlock.updateWithServerData(data.newBlockData);
+        }
+
         if (this._updateTimeout) {
             // Clears the last timeout. May be necessary if the call to the
             // function has not been triggered by that timeout. Without
@@ -499,7 +515,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
                 "cameraDataVersion": this._camera.versionOnServer(),
                 "imageDataVersion": this._image.versionOnServer(),
                 "blockPropertiesDataVersion": 
-                this._blockProperties.versionOnServer()
+                this._blockProperties.versionOnServer(),
+                "newBlockDataVersion": this._newBlock.versionOnServer()
             },
             handleAs: "json",
             load: dojo.hitch(this, this._updateSucceeded)

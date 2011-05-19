@@ -18,7 +18,7 @@ Getting started
 
 2. Initialize sample data, by visting (relative to the root URL):
 
-    /admin/update
+    /admin/init
 
 3. Visit the user interface:
 

@@ -35,10 +35,14 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         constructor: 'manual'
     },
 
+    // Version of data last retrieved from the server, or "-1" initially. Is a
+    // string in order to be able to contain very large integers.
+    _versionOnServer: '-1',
+
     // Points in block space, defining the rectangle which represents the space
-    // in which blocks may be build.
-    _BUILD_SPACE_1B: [-1, -1, 0],
-    _BUILD_SPACE_2B: [13, 13, 4],
+    // in which blocks may be built.
+    _build_space_1_b: null,
+    _build_space_2_b: null,
 
     // State of the block: 0 = stopped, 1 = movable
     _state: null,
@@ -79,6 +83,33 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                                                      camera, 
                                                      constructionBlocks);
         this._camera = camera;
+    },
+
+    versionOnServer: function () {
+        return this._versionOnServer;
+    },
+
+    // Returns false when the object is new and has not yet been updated with
+    // server data.
+    isInitializedWithServerData: function () {
+        return this._versionOnServer !== '-1';
+    },
+
+    // Updates the block properties to the version on the server, which is
+    // described by "serverData".
+    updateWithServerData: function (serverData) {
+        var positionNotInitialized;
+
+        positionNotInitialized = !this.isInitializedWithServerData();
+
+        this._versionOnServer = serverData.version;
+
+        if (positionNotInitialized) {
+            this._setInitPosition([serverData.initXB,
+                                   serverData.initYB,
+                                   serverData.initZB]);
+            dojo.publish('com/realitybuilder/NewBlock/positioned');
+        }
     },
 
     // Returns true, iff the current block collides with any real block.

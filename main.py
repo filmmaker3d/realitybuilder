@@ -101,6 +101,26 @@ class Construction(db.Model):
         else:
             raise Exception('could not find construction')
 
+# Data specific to the new block
+class NewBlock(db.Model):
+    # The data version is increased every time the data is changed. The client
+    # uses this data to determine when to update the display.
+    data_version = db.StringProperty()
+
+    # Initial position of the new block, in block space:
+    init_x_b = db.IntegerProperty()
+    init_y_b = db.IntegerProperty()
+    init_z_b = db.IntegerProperty()
+
+    # Points in block space, defining the rectangle which represents the space
+    # in which blocks may be built.
+    build_space_1_x_b = db.IntegerProperty()
+    build_space_1_y_b = db.IntegerProperty()
+    build_space_1_z_b = db.IntegerProperty()
+    build_space_2_x_b = db.IntegerProperty()
+    build_space_2_y_b = db.IntegerProperty()
+    build_space_2_z_b = db.IntegerProperty()
+
 class Block(db.Model):
     x_b = db.IntegerProperty()
     y_b = db.IntegerProperty()
@@ -613,7 +633,7 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
             logging.error('Could not update camera and image data: ' + str(e))
 
 # Initializes part or all of the database. Use with caution.
-class AdminUpdate(webapp.RequestHandler):
+class AdminInit(webapp.RequestHandler):
     def get(self):
         if not debug:
             print 'Only available in debug mode.'
@@ -646,7 +666,7 @@ class AdminUpdate(webapp.RequestHandler):
         construction.image_update_interval_client = 5.
         construction.put()
 
-        # Deletes all block shape entries:
+        # Deletes all block properties entries:
         queries = [BlockProperties.all()]
         for query in queries:
             for result in query:
@@ -673,6 +693,25 @@ class AdminUpdate(webapp.RequestHandler):
              '[0, 1, 1], [-1, 1, 1], [-1, 0, 1], [-1, -1, 1], ' +
              '[0, -1, 1], [1, -1, 1], [1, 0, 1], [1, 1, 1]]')
         blockProperties.put()
+
+        # Deletes all new block entries:
+        queries = [NewBlock.all()]
+        for query in queries:
+            for result in query:
+                result.delete()
+
+        # Sets up the new block:
+        newBlock = NewBlock(parent=construction)
+        newBlock.data_version = '0'
+        newBlock.init_x_b = 8
+        newBlock.init_y_b = 0
+        newBlock.init_z_b = 7
+        newBlock.build_space_1_x_b = -1
+        newBlock.build_space_1_y_b = -1
+        newBlock.build_space_1_z_b = 0
+        newBlock.build_space_2_x_b = 11
+        newBlock.build_space_2_y_b = 11
+        newBlock.build_space_2_z_b = 6
 
         # Deletes all block entries:
         queries = [Block.all()]
@@ -756,7 +795,7 @@ class Image(webapp.RequestHandler):
 application = webapp.WSGIApplication([
     ('/', Index), ('/admin', Admin), 
     ('/images/live.jpg', Image),
-    ('/admin/update', AdminUpdate),
+    ('/admin/init', AdminInit),
     ('/admin/rpc/delete', RPCAdminDelete),
     ('/admin/rpc/make_real', RPCAdminMakeReal),
     ('/admin/rpc/make_pending', RPCAdminMakePending),
