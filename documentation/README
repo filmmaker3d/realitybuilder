@@ -105,9 +105,21 @@ Terminology
 
     The origin of the view space is in the pinhole.
 
+  - The coordinate specifiers ending in "VXZ" denote coordinates in the view
+    space x-z-plane. Points in this plane get mapped onto the horizontal line
+    in the middle of the sensor. Points are describe using x, z coordinate
+    tuples.
+
+    Units: mm
+
   - The coordinate specifiers ending in "S" denote coordinates in "sensor
     space", i.e. coordinates of projected points. The origin of the sensor is
     in one of its corners.
+
+    Units: px
+
+  - The coordinate specifiers ending in "VXZS" denote coordinates in the
+    horizontal line in sensor space that the view space x-z-plane is mapped to.
 
     Units: px
 
