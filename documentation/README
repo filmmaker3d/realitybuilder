@@ -209,7 +209,9 @@ Before releasing a new version:
 
 * Check that unit tests work.
 
-* Check that the code runs with debug mode disabled.
+* Disable debug mode.
+
+* Check that the Reality Builder works fine with the sample data (/admin/init).
 
 
 Miscellaneous
