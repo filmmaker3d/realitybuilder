@@ -78,7 +78,7 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         dojo.attr(this._helperCanvas, 'width', shadowCanvas.width);
         dojo.attr(this._helperCanvas, 'height', shadowCanvas.height);
 
-        if (com.realitybuilder.isFlashCanvasActive()) {
+        if (com.realitybuilder.util.isFlashCanvasActive()) {
             FlashCanvas.initElement(this._canvas);
             FlashCanvas.initElement(this._helperCanvas);
         }

@@ -436,7 +436,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
         // Initializes Explorer Canvas for elements that were added later to
         // the DOM.
-        if (com.realitybuilder.isFlashCanvasActive()) {
+        if (com.realitybuilder.util.isFlashCanvasActive()) {
             FlashCanvas.initElement(dojo.byId('sensorShadowCanvas'));
             FlashCanvas.initElement(dojo.byId('sensorRealBlocksCanvas'));
             FlashCanvas.initElement(dojo.byId('sensorPendingBlocksCanvas'));
@@ -573,9 +573,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // Updates the camera and live image settings on the server. Fails silently
     // on error.
     storeSettingsOnServer: function () {
-        var imageData = com.realitybuilder.addPrefix(
+        var imageData = com.realitybuilder.util.addPrefix(
                 'image.', this._adminControls.readImageControls()),
-            cameraData = com.realitybuilder.addPrefix(
+            cameraData = com.realitybuilder.util.addPrefix(
                 'camera.', this._adminControls.readCameraControls()),
             content = {};
         dojo.mixin(content, imageData, cameraData);

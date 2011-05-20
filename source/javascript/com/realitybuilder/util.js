@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global com, dojo, dojox, FlashCanvas, logoutUrl, swfobject */
 
 dojo.provide('com.realitybuilder.util');
 
@@ -273,7 +273,7 @@ com.realitybuilder.util.polarToCartesian = function (polarPS) {
 
 // Returns the object "object" with all keys converted to strings and being
 // prefixed by "prefix".
-com.realitybuilder.addPrefix = function (prefix, object) {
+com.realitybuilder.util.addPrefix = function (prefix, object) {
     var tmp = [], i;
     for (i in object) {
         if (object.hasOwnProperty(i)) {
@@ -285,40 +285,34 @@ com.realitybuilder.addPrefix = function (prefix, object) {
 
 // Returns true, iff FlashCanvas has loaded. FlashCanvas implements HTML canvas
 // support for Internet Explorer.
-com.realitybuilder.isFlashCanvasActive = function () {
+com.realitybuilder.util.isFlashCanvasActive = function () {
     return (typeof FlashCanvas !== 'undefined');
 };
 
-com.realitybuilder.isFlashReadyForFlashCanvas = function () {
+com.realitybuilder.util.isFlashReadyForFlashCanvas = function () {
     return swfobject.hasFlashPlayerVersion("9"); // incl. higher versions
 };
 
 // Returns true, iff the canvas functionality is somehow supported, either
 // natively by the browser, or via some emulation.
-com.realitybuilder.isCanvasSupported = function () {
+com.realitybuilder.util.isCanvasSupported = function () {
     return (document.createElement('canvas').getContext ||  // Native support
-            (com.realitybuilder.isFlashCanvasActive() &&
-             com.realitybuilder.isFlashReadyForFlashCanvas()));
+            (com.realitybuilder.util.isFlashCanvasActive() &&
+             com.realitybuilder.util.isFlashReadyForFlashCanvas()));
 };
 
-com.realitybuilder.aboutMessage = function () {
-    return '<p><a href="about">About the Reality Builder</a></p>';
-};
-
-com.realitybuilder.showNoCanvasErrorMessage = function () {
+com.realitybuilder.util.showNoCanvasErrorMessage = function () {
     dojo.attr('noCanvasErrorMessage', 'innerHTML', 
         '<p class="first">The Reality Builder does not work because your ' +
         'browser does not support the <a ' +
         'href="http://www.w3.org/TR/html5/the-canvas-element.html">Canvas ' +
-        'element</a>.</p>' +
-        com.realitybuilder.aboutMessage());
+        'element</a>.</p>');
 };
 
-com.realitybuilder.showNoImagesErrorMessage = function () {
+com.realitybuilder.util.showNoImagesErrorMessage = function () {
     dojo.attr('noImagesErrorMessage', 'innerHTML', 
         '<p class="first">The Reality Builder does not work because your ' +
-        'browser does not load images.</p>' +
-        com.realitybuilder.aboutMessage());
+        'browser does not load images.</p>');
 };
 
 // Clears the canvas "canvas".

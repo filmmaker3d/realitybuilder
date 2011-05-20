@@ -31,7 +31,7 @@ function realityBuilderIsDojoSupported() {
 // to the user.
 function realityBuilderOnImageStateDetected(disabled) {
     if (disabled) {
-        com.realitybuilder.showNoImagesErrorMessage();
+        com.realitybuilder.util.showNoImagesErrorMessage();
     } else {
         realityBuilderCreateConstruction();
     }
@@ -39,11 +39,11 @@ function realityBuilderOnImageStateDetected(disabled) {
 
 function realityBuilderInit() {
     dojo.addOnLoad(function () {
-        if (com.realitybuilder.isCanvasSupported()) {
+        if (com.realitybuilder.util.isCanvasSupported()) {
             DetectImageState.init('/images/placeholder.gif', 
                                   realityBuilderOnImageStateDetected);
         } else {
-            com.realitybuilder.showNoCanvasErrorMessage();
+            com.realitybuilder.util.showNoCanvasErrorMessage();
         }
     });
 }

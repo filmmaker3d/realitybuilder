@@ -678,7 +678,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                 color = this.isMovable() ? 'red' : 'white';
 
                 // Shadow does currently not work with FlashCanvas.
-                if (!com.realitybuilder.isFlashCanvasActive()) {
+                if (!com.realitybuilder.util.isFlashCanvasActive()) {
                     this._renderShadow();
                 }
 
