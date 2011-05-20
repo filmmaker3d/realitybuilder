@@ -58,6 +58,10 @@ dojo.declare('com.realitybuilder.Block', null, {
     // sensor space.
     _projectedVertexesVXZS: null,
 
+    // The sensor space bounding box of the block, i.e. the smallest rectangle,
+    // which encloses the block in sensor space.
+    _boundingBoxS: null,
+
     // Ids and data version numbers when last updating coordinates:
     _lastCameraId: null,
     _lastBlockPropertiesVersionOnServer: null,
@@ -107,6 +111,11 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     zB: function () {
         return this._positionB[2];
+    },
+
+    // Returns the block's vertexes in screen space.
+    _vertexesS: function () {
+        return this._bottomVertexesS.concat(this._topVertexesS);
     },
 
     // If not all vertexes could be determined, for example due to problems
@@ -299,6 +308,28 @@ dojo.declare('com.realitybuilder.Block', null, {
                      });
     },
 
+    // Updates the vertices (top left, lower right) defining the bounding box
+    // of the block in sensor space. Depends on the vertices of the block in
+    // sensor space.
+    _updateSensorSpaceBoundingBox: function () {
+        var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE,
+            maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE;
+        dojo.forEach(this._vertexesS(), function (vertexS) {
+            if (vertexS[0] < minX) {
+                minX = vertexS[0];
+            } else if (vertexS[0] > maxX) {
+                maxX = vertexS[0];
+            } if (vertexS[1] < minY) {
+                minY = vertexS[1];
+            } else if (vertexS[1] > maxY) {
+                maxY = vertexS[1];
+            }
+        });
+
+
+        this._boundingBoxS = [[minX, minY], [maxX, maxY]];
+    },
+
     // Calculates the vertexes of the block in sensor space. The camera is
     // positioned in the center of the sensor.
     //
@@ -312,6 +343,7 @@ dojo.declare('com.realitybuilder.Block', null, {
                                       dojo.hitch(cam, cam.viewToSensor));
         this._updateProjectedVertexesVXZS();
         this._updateHorizontalExtentsInSensorSpace();
+        this._updateSensorSpaceBoundingBox();
     },
 
     // Updates coordinates, but only if there have been changes.

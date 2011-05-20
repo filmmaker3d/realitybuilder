@@ -256,14 +256,10 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Returns true, iff the bounding box of the current block overlaps with
     // that of the block "block", in sensor space.
     _boundingBoxesOverlap: function (block) {
-        return true;
-
-        /* FIXME - reactivate: (
-            (this._boundingBoxS[1][0] >= block._boundingBoxS[0][0]) &&
-            (this._boundingBoxS[0][0] <= block._boundingBoxS[1][0]) &&
-            (this._boundingBoxS[1][1] >= block._boundingBoxS[0][1]) &&
-            (this._boundingBoxS[0][1] <= block._boundingBoxS[1][1]));
-            */
+        return (this._boundingBoxS[1][0] >= block._boundingBoxS[0][0]  &&
+                this._boundingBoxS[0][0] <= block._boundingBoxS[1][0] &&
+                this._boundingBoxS[1][1] >= block._boundingBoxS[0][1] &&
+                this._boundingBoxS[0][1] <= block._boundingBoxS[1][1]);
     },
 
     // If the new block (= the current block) and the block "block" are on the
