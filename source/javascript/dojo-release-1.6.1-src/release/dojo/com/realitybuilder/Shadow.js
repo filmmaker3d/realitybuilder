@@ -1,0 +1,8 @@
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
+
+
+if(!dojo._hasResource["com.realitybuilder.Shadow"]){dojo._hasResource["com.realitybuilder.Shadow"]=true;dojo.provide("com.realitybuilder.Shadow");dojo.require("com.realitybuilder.LayerShadow");dojo.require("com.realitybuilder.ShadowObscuringBlocks");dojo.declare("com.realitybuilder.Shadow",null,{_newBlock:null,_camera:null,_blockProperties:null,_constructionBlocks:null,_shadowObscuringBlocks:null,_layerShadow:null,constructor:function(_1,_2,_3,_4){this._newBlock=_1;this._blockProperties=_2;this._camera=_3;this._constructionBlocks=_4;this._shadowObscuringBlocks=new com.realitybuilder.ShadowObscuringBlocks(_1,_2,_3,_4);this._layerShadow=new com.realitybuilder.LayerShadow(_1,_2,_3,_4);},_renderLayerShadow:function(_5,_6,_7,_8,_9){this._layerShadow.render(_9);_5.globalAlpha=0.2;_5.drawImage(this._layerShadow.canvas(),0,0);_5.globalAlpha=1;},render:function(){var _a=this._camera.sensor().shadowCanvas(),_b,_c,_d=this._newBlock,_e=this._camera,_f=this._constructionBlocks;this._shadowObscuringBlocks.update();if(_a.getContext){_b=_a.getContext("2d");com.realitybuilder.util.clearCanvas(_a);for(_c=-1;_c<=_d.maxZB()-1;_c+=1){if(_c<_d.zB()){this._renderLayerShadow(_b,_d,_e,_f,_c);}this._shadowObscuringBlocks.subtract(_b,_c+1);}return;}},clear:function(){var _10=this._camera.sensor().shadowCanvas();com.realitybuilder.util.clearCanvas(_10);}});}

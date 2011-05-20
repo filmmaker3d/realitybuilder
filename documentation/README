@@ -38,8 +38,8 @@ Run unit tests by visiting (relative to the root URL) with debug mode enabled:
   /source/javascript/com/realitybuilder/tests/runTests.html
 
 
-Enable support for Internet Explorer versions less than 9
-=========================================================
+How to enable support for Internet Explorer versions less than 9
+================================================================
 
 To make the Reality Builder work with Internet Explorer versions less than 9,
 FlashCanvas Pro is required. For reasons of license, this library is not
@@ -53,6 +53,27 @@ included in the distribution of the Reality Builder. To install it:
 
   The directory "proprietary" is for proprietary software components that
   should not be redistributed as part of the Reality Builder source code.
+
+
+About blocks
+============
+
+Blocks must have the following shape:
+
+  Right prism with a convex outline.
+
+Blocks are solid, i.e. they never overlap.
+
+
+
+About the camera
+================
+
+The camera x-y position must be outside of the x-y area where blocks are to be
+built, and it must look down onto the blocks. All blocks, thus, are in front to
+the sensor.
+
+This limitation on camera placement allows for simpler and speedier code.
 
 
 Terminology
@@ -107,8 +128,8 @@ Terminology
 
   - The coordinate specifiers ending in "VXZ" denote coordinates in the view
     space x-z-plane. Points in this plane get mapped onto the horizontal line
-    in the middle of the sensor. Points are describe using x, z coordinate
-    tuples.
+    in the middle of the sensor: y = 0 Points are describe using x, z
+    coordinate tuples.
 
     Units: mm
 
@@ -229,17 +250,17 @@ Miscellaneous
   Dojo build. One reason for using a custom build are limitations on the number
   and size of files on Google App Engine, as of April 2010.
   
-  How I created the build:
+  How to create the build:
 
-  1. I ran the following command in the Dojo "buildscripts" directory, from the
+  1. Run the following command in the Dojo "buildscripts" directory, from the
     Windows XP command line:
 
     build.bat profile=realitybuilder action=clean,release optimize=shrinksafe
 
-  2. I copied dojo and dojox related files and directories to "/javascript":
+  2. Copy dojo and dojox related files and directories to "/javascript":
 
-    - dojo/realitybuilder.js: The so called layer, containing code written by
-      me, plus dojo code that it depends on, except for Dojo Base and some
+    - dojo/realitybuilder.js: The so called layer, containing Reality Builder
+      code, plus dojo code that it depends on, except for Dojo Base and some
       special resources.
 
     - dojo/dojo.js: The layer, containing the Dojo Base
@@ -248,20 +269,8 @@ Miscellaneous
 
     - dojo/nls: needed for at least "dojox.date.posix.strftime"
 
-    - dojox/gfx: provides interfaces to different graphics description
-      standards, such as SVG or Canvas.
-
     Source of the above resources, relative to the directory containing the
     Dojo SDK: release/dojo/
-
-    Including the following dependencies into the build profile seems to break
-    rendering. Perhaps it is simply not possible to merge more than one
-    renderer into a layer. 
-
-      dojox.gfx.canvas, dojox.gfx.svg, dojox.gfx.silverlight, dojox.gfx.vml
-
-* The application depends on having the construction oriented in a certain way,
-  relative to the camera.
 
 * Certain RPC calls require admin priveledges, namely those that are available
   only via the admin interface. This is necessary so that users cannot hack

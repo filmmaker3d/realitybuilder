@@ -1,0 +1,8 @@
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
+
+
+if(!dojo._hasResource["com.realitybuilder.UserControls"]){dojo._hasResource["com.realitybuilder.UserControls"]=true;dojo.provide("com.realitybuilder.UserControls");dojo.require("com.realitybuilder.CoordinateControls");dojo.declare("com.realitybuilder.UserControls",null,{_construction:null,_node:null,constructor:function(_1){this._construction=_1;this._coordinateControls=new com.realitybuilder.CoordinateControls(_1.newBlock(),_1.camera());this._node=dojo.byId("userControls");dojo.connect(dojo.byId("requestReal"),"onclick",_1,_1.requestReal);},updateCoordinateControls:function(_2){this._coordinateControls.update(_2);},renderCoordinateControls:function(){this._coordinateControls.render();},updateRequestRealButton:function(){var _3=dojo.byId("requestReal"),_4=this._construction.newBlock();if(_4.isMovable()&&_4.canBeMadeReal()){dojo.style(_3,"visibility","visible");}else{dojo.style(_3,"visibility","hidden");}},updateStatusMessage:function(_5){var _6="",_7=this._construction.newBlock();switch(_5){case 0:if(_7.canBeMadeReal()){_6="To request having the block built in its current "+"position, make it real.";}else{_6="Move the block to a position where you want it to be "+"built.";}break;case 1:_6="Your request is being processed. Be patient...";break;case 2:_6="Your block has been built. Continue...";break;case 3:_6="Your request has been denied. Continue...";break;}dojo.byId("status").innerHTML=_6;}});}
