@@ -117,8 +117,6 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     updateWithServerData: function (serverData) {
         this._versionOnServer = serverData.version;
 
-        var camera = this._construction.camera();
-        // FIXME: dojo.hitch superfluous?
         this._blocks = dojo.map(serverData.blocks, 
                                 dojo.hitch(this,
                                            this._createBlockFromServerData));

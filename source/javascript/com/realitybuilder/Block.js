@@ -22,25 +22,6 @@
 dojo.provide('com.realitybuilder.Block');
 
 dojo.declare('com.realitybuilder.Block', null, {
-    // Initial edges of the block, defined using indices of the array
-    // "this._vertexesB". Only edges, that are visible when the construction is
-    // oriented a certain way, are included. The third value is an index used
-    // for identifying the edge (important if the position of the edge is
-    // changed). The fourth value specifies whether the edge is a background
-    // edge which, if the block was solid, would not be visible. The edges are
-    // initial since the actual edges, while based on them, may be cut, e.g. by
-    // a hidden lines algorithm.
-    _INITIAL_EDGES: [
-        // bottom
-        [0, 1, 0, true], [1, 2, 1, true], [2, 3, 2, false], [3, 0, 3, false],
-
-        // top
-        [4, 5, 4, false], [5, 6, 5, false], [6, 7, 6, false], [7, 4, 7, false],
-
-        // vertical
-        [0, 4, 8, false], [1, 5, 9, true], 
-        [2, 6, 10, false], [3, 7, 11, false]],
-
     // Position of the block in block space. From the position the block
     // extends in positive direction along the x-, y-, and z-axis.
     _positionB: null,
@@ -51,24 +32,6 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
-
-    // Edges of the block, defined using indices of the array
-    // "this._vertexesB". Only edges, that are visible when the construction is
-    // oriented a certain way, are included. The third number is an index used
-    // for identifying the edge (important if the position of the edge is
-    // changed).
-    _edges: null,
-
-    // Edges that - in sensor space - define the border (outline) of any block,
-    // when it is oriented in a certain way.
-    _BORDER_EDGES: [
-        [2, 3, 2], [3, 0, 3], [0, 4, 8], 
-        [4, 5, 4], [5, 6, 5], [2, 6, 10]],
-
-    // Indexes of the vertexes, describing the border of any block, when it is
-    // oriented in a certain way. Sorted so that following the vertexes creates
-    // the outline.
-    _BORDER_VERTEX_INDEXES: [2, 3, 0, 4, 5, 6],
 
     // Coordinates of the vertexes in world space, view space, and sensor
     // space.
@@ -438,31 +401,6 @@ dojo.declare('com.realitybuilder.Block', null, {
         context.fill();
 
         context.globalCompositeOperation = "source-over";
-    },
-
-    // Subtracts the shapes of the real blocks in front of the block from the
-    // drawing on the canvas with rendering context "context".
-    _subtractRealBlocks: function (context) {
-        var realBlocksSorted = this._constructionBlocks.realBlocksSorted(),
-            i, realBlock;
-
-        // Idea behind the following loop: the shadow may be covered by blocks
-        // in a layer above or in the same layer.
-        for (i = 0; i < realBlocksSorted.length; i += 1) {
-            realBlock = realBlocksSorted[i];
-
-            if (realBlock.zB() < this._zB) {
-                break;
-            }
-
-            // Only blocks in front of the shadow are allowed to cut it.
-            if (this._isCuttingBlock(realBlock)) {
-                if (this._boundingBoxesOverlap(realBlock) && 
-                    this._anyVertexInBoundingBox(realBlock)) {
-                    realBlock.subtract(context);
-                }
-            }
-        }
     },
 
     // Renders the foreground of the block, i.e. the part of that block that
