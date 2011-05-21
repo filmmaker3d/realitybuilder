@@ -97,7 +97,8 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         yB = this._newBlock.yB(),
         zB = layerZB + 1,
         vs = [],
-        blockOutlineB = this._blockProperties.outlineB(),
+        blockOutlineB = 
+            this._blockProperties.rotatedOutlineB(this._newBlock.a()),
         that = this;
 
         // counterclockwise:

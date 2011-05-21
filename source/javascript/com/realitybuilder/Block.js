@@ -26,6 +26,9 @@ dojo.declare('com.realitybuilder.Block', null, {
     // extends in positive direction along the x-, y-, and z-axis.
     _positionB: null,
 
+    // Rotation angle, about center of rotation:
+    _a: null, // mulitples of 90°, CCW when viewed from above
+
     // Camera object, used for calculating the projection of the block on the
     // camera sensor.
     _camera: null,
@@ -33,11 +36,13 @@ dojo.declare('com.realitybuilder.Block', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
-    // Coordinates of the vertexes in world space, view space, and sensor
-    // space.
+    // Coordinates of the vertexes in block space, world space, view space, and
+    // sensor space.
+    _bottomVertexesB: null,
     _bottomVertexes: null,
     _bottomVertexesV: null,
     _bottomVertexesS: null,
+    _topVertexesB: null,
     _topVertexes: null,
     _topVertexesV: null,
     _topVertexesS: null,
@@ -83,12 +88,13 @@ dojo.declare('com.realitybuilder.Block', null, {
     _onlySubtractBottom: false,
 
     // Creates a block at the position in block space ("xB", "yB", "zB") =
-    // "positionB". When the block is rendered, it is as seen by the sensor of
-    // the camera "camera".
+    // "positionB", and rotated about its center of rotation by "a" (° CCW,
+    // when viewed from above). When the block is rendered, it is as seen by
+    // the sensor of the camera "camera".
     //
     // The block's properties, such as shape and size, are described by
     // "blockProperties".
-    constructor: function (blockProperties, camera, positionB) {
+    constructor: function (blockProperties, camera, positionB, a) {
         this._positionB = positionB;
         this._blockProperties = blockProperties;
         this._camera = camera;
@@ -111,6 +117,10 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     zB: function () {
         return this._positionB[2];
+    },
+
+    a: function () {
+        return this._a;
     },
 
     // Returns the block's vertexes in screen space.
@@ -196,32 +206,40 @@ dojo.declare('com.realitybuilder.Block', null, {
         return false;
     },
 
-    // Updates the vertexes of the block in world space.
-    _updateWorldSpaceCoordinates: function () {
+    // Updates the vertexes of the block in block space.
+    _updateBlockSpaceCoordinates: function () {
         var 
         xB = this.positionB()[0],
         yB = this.positionB()[1],
         zB = this.positionB()[2],
-        vsBottom = [], vsTop = [],
-        blockOutlineB = this._blockProperties.outlineB(),
+        blockOutlineB = this._blockProperties.rotatedOutlineB(this.a()),
         that = this;
+
+        this._bottomVertexesB = [];
+        this._topVertexesB = [];
 
         // top, counterclockwise (when viewed from top in block space):
         dojo.forEach(blockOutlineB, function (vertexXYB) {
-            vsBottom.push(com.realitybuilder.util.blockToWorld(
-                [xB + vertexXYB[0], 
-                 yB + vertexXYB[1], 
-                 zB],
-                that._blockProperties));
-            vsTop.push(com.realitybuilder.
-                       util.blockToWorld([xB + vertexXYB[0], 
-                                          yB + vertexXYB[1], 
-                                          zB + 1],
-                                         that._blockProperties));
+            that._bottomVertexesB.push([xB + vertexXYB[0], 
+                                        yB + vertexXYB[1], 
+                                        zB]);
+            that._topVertexesB.push([xB + vertexXYB[0], 
+                                     yB + vertexXYB[1], 
+                                     zB + 1]);
         });
+    },
 
-        this._bottomVertexes = vsBottom;
-        this._topVertexes = vsTop;
+    _blockToWorld: function (pB) {
+        return com.realitybuilder.util.blockToWorld(pB,
+                                                    this._blockProperties);
+    },
+
+    // Updates the vertexes of the block in world space.
+    _updateWorldSpaceCoordinates: function () {
+        this._bottomVertexes = dojo.map(this._bottomVertexesB, 
+                                        dojo.hitch(this, this._blockToWorld));
+        this._topVertexes = dojo.map(this._topVertexesB, 
+                                     dojo.hitch(this, this._blockToWorld));
     },
 
     // Calculates the vertexes of the block in view space.
@@ -349,6 +367,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     // Updates coordinates, but only if there have been changes.
     _updateCoordinates: function () {
         if (this._coordinatesNeedToBeUpdated()) {
+            this._updateBlockSpaceCoordinates();
             this._updateWorldSpaceCoordinates();
             this._updateViewSpaceCoordinates();
             this._updateViewSpaceXZPlaneCoordinates();
@@ -444,7 +463,8 @@ dojo.declare('com.realitybuilder.Block', null, {
         len = topVertexesS.length, // same for top and bottom
         vertexS, firstVertexS, i, 
         ilv = this._indexOfLeftmostVertex,
-        irv = this._indexOfRightmostVertex;
+        irv = this._indexOfRightmostVertex,
+        imax;
 
         context.globalAlpha = 1;
 
@@ -452,8 +472,9 @@ dojo.declare('com.realitybuilder.Block', null, {
         context.beginPath();
         firstVertexS = bottomVertexesS[ilv];
         context.moveTo(firstVertexS[0], firstVertexS[1]);
-        for (i = ilv + 1; i <= irv; i += 1) {
-            vertexS = bottomVertexesS[i];
+        imax = (ilv + 1 <= irv) ? irv : irv + len;
+        for (i = ilv + 1; i <= imax; i += 1) {
+            vertexS = bottomVertexesS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
         }
         context.stroke();
@@ -462,7 +483,7 @@ dojo.declare('com.realitybuilder.Block', null, {
         context.beginPath();
         firstVertexS = topVertexesS[0];
         context.moveTo(firstVertexS[0], firstVertexS[1]);
-        for (i = 1; i <= topVertexesS.length; i += 1) {
+        for (i = 1; i <= len; i += 1) {
             vertexS = topVertexesS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
         }
@@ -470,7 +491,8 @@ dojo.declare('com.realitybuilder.Block', null, {
         context.stroke();
 
         // vertical lines:
-        for (i = ilv; i <= irv; i += 1) {
+        imax = (ilv <= irv) ? irv : irv + len;
+        for (i = ilv; i <= imax; i += 1) {
             context.beginPath();
             vertexS = bottomVertexesS[i % len];
             context.moveTo(vertexS[0], vertexS[1]);
@@ -489,7 +511,8 @@ dojo.declare('com.realitybuilder.Block', null, {
         len = topVertexesS.length, // same for top and bottom
         vertexS, i, 
         ilv = this._indexOfLeftmostVertex,
-        irv = this._indexOfRightmostVertex;
+        irv = this._indexOfRightmostVertex,
+        imax;
 
         context.globalAlpha = 0.2;
 
@@ -497,14 +520,16 @@ dojo.declare('com.realitybuilder.Block', null, {
         context.beginPath();
         vertexS = bottomVertexesS[irv];
         context.moveTo(vertexS[0], vertexS[1]);
-        for (i = irv + 1; i <= len + ilv; i += 1) {
+        imax = (irv + 1 <= ilv) ? ilv : ilv + len;
+        for (i = irv + 1; i <= ilv; i += 1) {
             vertexS = bottomVertexesS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
         }
         context.stroke();
 
         // vertical lines:
-        for (i = irv + 1; i <= len + ilv - 1; i += 1) {
+        imax = (irv + 1 <= ilv - 1) ? ilv - 1 : ilv - 1 + len;
+        for (i = irv + 1; i <= imax; i += 1) {
             context.beginPath();
             vertexS = bottomVertexesS[i % len];
             context.moveTo(vertexS[0], vertexS[1]);

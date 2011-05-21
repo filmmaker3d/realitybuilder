@@ -76,7 +76,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // The block's properties, such as shape and size, are described by
     // "blockProperties".
     constructor: function (blockProperties, camera, constructionBlocks) {
-        this.inherited(arguments, [blockProperties, camera, [0, 0, 0]]);
+        this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
         this._state = 1;
         this._constructionBlocks = constructionBlocks;
         this._shadow = new com.realitybuilder.Shadow(this, blockProperties, 
@@ -98,17 +98,16 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Updates the block properties to the version on the server, which is
     // described by "serverData".
     updateWithServerData: function (serverData) {
-        var positionNotInitialized, positionWasInitialized;
+        var positionAngleWereInitialized;
 
-        positionNotInitialized = !this.isInitializedWithServerData();
-
-        if (positionNotInitialized) {
+        if (!this.isInitializedWithServerData()) {
             this._positionB = [serverData.initXB,
                                serverData.initYB,
                                serverData.initZB];
-            positionWasInitialized = true;
+            this._a = serverData.initA;
+            positionAngleWereInitialized = true;
         } else {
-            positionWasInitialized = false;
+            positionAngleWereInitialized = false;
         }
 
         this._buildSpace1B = [serverData.buildSpace1XB,
@@ -120,8 +119,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
         this._versionOnServer = serverData.version;
 
-        if (positionWasInitialized) {
-            dojo.publish('com/realitybuilder/NewBlock/positionInitialized');
+        if (positionAngleWereInitialized) {
+            dojo.publish('com/realitybuilder/NewBlock/' + 
+                         'positionAngleInitialized');
         }
         dojo.publish('com/realitybuilder/NewBlock/buildSpaceChanged');
     },

@@ -45,7 +45,7 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     //
     // The block's properties, such as shape and size, are described by
     // "blockProperties".
-    constructor: function (blockProperties, camera, positionB, state, 
+    constructor: function (blockProperties, camera, positionB, rotAngle, state,
                            timeStamp)
     {
         this._state = state;

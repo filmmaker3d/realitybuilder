@@ -117,24 +117,25 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
         dojo.subscribe('com/realitybuilder/ConstructionBlocks/changedOnServer', 
             this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('com/realitybuilder/NewBlock/positionInitialized', 
-            this, this._onNewBlockPositionInitialized);
+        dojo.subscribe('com/realitybuilder/NewBlock/' + 
+                       'positionAngleInitialized', 
+                       this, this._onNewBlockPositionAngleInitialized);
         dojo.subscribe('com/realitybuilder/NewBlock/buildSpaceChanged', 
-            this, this._onBuildSpaceChanged);
+                       this, this._onBuildSpaceChanged);
         dojo.subscribe('com/realitybuilder/NewBlock/stopped', 
-            this, this._onNewBlockStopped);
+                       this, this._onNewBlockStopped);
         dojo.subscribe('com/realitybuilder/NewBlock/madeMovable', 
-            this, this._onNewBlockMadeMovable);
+                       this, this._onNewBlockMadeMovable);
         dojo.subscribe('com/realitybuilder/NewBlock/moved', 
-            this, this._onNewBlockMoved);
+                       this, this._onNewBlockMoved);
         dojo.subscribe('com/realitybuilder/ConstructionBlocks/changed',
-            this, this._onConstructionBlocksChanged);
+                       this, this._onConstructionBlocksChanged);
         dojo.subscribe('com/realitybuilder/Camera/changed',
-            this, this._onCameraChanged);
+                       this, this._onCameraChanged);
         dojo.subscribe('com/realitybuilder/Image/changed',
-            this, this._onImageChanged);
+                       this, this._onImageChanged);
         dojo.subscribe('com/realitybuilder/BlockProperties/changed',
-            this, this._onBlockPropertiesChanged);
+                       this, this._onBlockPropertiesChanged);
 
         this._setupDemoFunctionality();
 
@@ -180,7 +181,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
         if (this._newBlock.isMovable()) {
             this._newBlock.stop();
             this._constructionBlocks.createPendingOnServer(
-                this._newBlock.positionB());
+                this._newBlock.positionB(), this._newBlock.a());
             this._responseToLastRequest = 1;
         }
         this._userControls.updateRequestRealButton();
@@ -346,8 +347,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._renderBlocksIfFullyInitialized();
     },
 
-    // Called after the new block's position has been initialized.
-    _onNewBlockPositionInitialized: function () {
+    // Called after the new block's position, rotation angle have been
+    // initialized.
+    _onNewBlockPositionAngleInitialized: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
         this._updateStatusMessageIfFullyInitialized();

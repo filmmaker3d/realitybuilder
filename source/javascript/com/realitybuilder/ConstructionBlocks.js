@@ -105,10 +105,9 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         var camera = this._construction.camera();
         return new com.realitybuilder.ConstructionBlock(this._blockProperties,
                                                         camera, 
-                                                        [bd.xB,
-                                                         bd.yB, 
-                                                         bd.zB], 
-                                                        bd.state, 
+                                                        [bd.xB, bd.yB, bd.zB],
+                                                        bd.rotAngle,
+                                                        bd.state,
                                                         bd.timeStamp);
     },
 
@@ -208,10 +207,11 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
             ('com/realitybuilder/ConstructionBlocks/changeOnServerFailed');
     },
 
-    // Triggers setting the state of the block at the position "positionB" to
-    // pending: on the client and on the server. Once the server has completed
-    // the request, the list of blocks is updated. Difference to the function
-    // "createPendingOnServer": If the block does not exist, it is not created.
+    // Triggers setting the state of the block at the position "positionB" and
+    // with rotation angle "a" to pending: on the client and on the server.
+    // Once the server has completed the request, the list of blocks is
+    // updated. Difference to the function "createPendingOnServer": If the
+    // block does not exist, it is not created.
     makePendingOnServer: function (positionB) {
         dojo.xhrPost({
             url: "/admin/rpc/make_pending",
@@ -238,15 +238,16 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
             ('com/realitybuilder/ConstructionBlocks/changeOnServerFailed');
     },
 
-    // Adds a block at the block space position "positionB" to the list of
-    // blocks on the server, with state pending.
-    createPendingOnServer: function (positionB) {
+    // Adds a block at the block space position "positionB" and rotation angle
+    // "a" to the list of blocks on the server, with state pending.
+    createPendingOnServer: function (positionB, a) {
         dojo.xhrPost({
             url: "/rpc/create_pending",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
-                "zB": positionB[2]
+                "zB": positionB[2],
+                "a": a
             },
             load: dojo.hitch(this, this._createPendingOnServerSucceeded),
             error: dojo.hitch(this, this._createPendingOnServerFailed)

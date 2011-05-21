@@ -32,7 +32,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSON response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -98,7 +98,7 @@ class Construction(db.Model):
         if construction:
             return construction
         else:
-            raise Exception('could not find construction')
+            raise Exception('Could not find construction')
 
 # Data specific to the new block
 class NewBlock(db.Model):
@@ -106,10 +106,14 @@ class NewBlock(db.Model):
     # uses this data to determine when to update the display.
     data_version = db.StringProperty()
 
-    # Initial position of the new block, in block space:
+    # Initial position, in block space:
     init_x_b = db.IntegerProperty()
     init_y_b = db.IntegerProperty()
     init_z_b = db.IntegerProperty()
+
+    # Initial rotation angle:
+    init_a = db.IntegerProperty() # multiples of 90°, CCW when viewed from
+                                  # above
 
     # Points in block space, defining the rectangle which represents the space
     # in which blocks may be built.
@@ -121,9 +125,13 @@ class NewBlock(db.Model):
     build_space_2_z_b = db.IntegerProperty()
 
 class Block(db.Model):
+    # Position, in block space:
     x_b = db.IntegerProperty()
     y_b = db.IntegerProperty()
     z_b = db.IntegerProperty()
+
+    # Rotation angle:
+    a = db.IntegerProperty() # ° CCW when viewed from above
 
     # 0 = deleted, 1 = pending, 2 = real
     state = db.IntegerProperty(default=0)
@@ -146,13 +154,14 @@ class Block(db.Model):
             Block.build_key_name(x_b, y_b, z_b), parent=construction)
 
     # Inserts a block at the block space position "x_b", "y_b", "z_b" in the
-    # construction "construction", with the initial state deleted. Raises an
-    # exception on failure. Returns the block.
+    # construction "construction", with the initial state deleted. The block is
+    # rotated by "a", CCW when viewed from above. Raises an exception
+    # on failure. Returns the block.
     @staticmethod
-    def insert_at_positionB(construction, x_b, y_b, z_b):
+    def insert_at_positionB(construction, x_b, y_b, z_b, a):
         return Block(parent=construction, 
                      key_name=Block.build_key_name(x_b, y_b, z_b),
-                     x_b=x_b, y_b=y_b, z_b=z_b, 
+                     x_b=x_b, y_b=y_b, z_b=z_b, a=a,
                      time_stamp=long(time.time()))
 
     # If there is a block at "x_b", "y_b", "z_b" in the state "state" in the
@@ -234,6 +243,11 @@ class BlockProperties(db.Model):
     # A block is defined to be attachable to another block, if it is in any of
     # the following positions relative to the other block, in block space:
     attachment_offsets_b = db.StringProperty() # JSON array
+
+    # Center of rotation, with coordinates in block space, relative to the
+    # lower left corner of the unrotated block, when viewed from above:
+    rot_center_x_b = db.FloatProperty()
+    rot_center_y_b = db.FloatProperty()
 
 class Index(webapp.RequestHandler):
     def get(self):
@@ -345,7 +359,7 @@ class RPCConstruction(webapp.RequestHandler):
         query = BlockProperties.all().ancestor(construction)
         block_properties = query.get()
         if block_properties is None:
-            raise Exception('could not get block properties data')
+            raise Exception('Could not get block properties data')
 
         block_properties_data_version = block_properties.data_version
         block_properties_data_changed = \
@@ -367,7 +381,9 @@ class RPCConstruction(webapp.RequestHandler):
                          simplejson.loads(block_properties.collision_offsets_b),
                          'attachmentOffsetsB':
                              simplejson.loads(block_properties.
-                                              attachment_offsets_b)})
+                                              attachment_offsets_b),
+                         'rotCenterXB': block_properties.rot_center_x_b,
+                         'rotCenterYB': block_properties.rot_center_y_b})
         return data
 
     # Returns JSON serializable data related to the new block
@@ -377,7 +393,7 @@ class RPCConstruction(webapp.RequestHandler):
         query = NewBlock.all().ancestor(construction)
         new_block = query.get()
         if new_block is None:
-            raise Exception('could not get new block data')
+            raise Exception('Could not get new block data')
 
         new_block_data_version = new_block.data_version
         new_block_data_changed = (new_block_data_version != 
@@ -391,6 +407,7 @@ class RPCConstruction(webapp.RequestHandler):
             data.update({'initXB': new_block.init_x_b,
                          'initYB': new_block.init_y_b,
                          'initZB': new_block.init_z_b,
+                         'initA': new_block.init_a,
                          'buildSpace1XB': new_block.build_space_1_x_b,
                          'buildSpace1YB': new_block.build_space_1_y_b,
                          'buildSpace1ZB': new_block.build_space_1_z_b,
@@ -531,15 +548,16 @@ class RPCAdminDelete(webapp.RequestHandler):
 class RPCCreatePending(webapp.RequestHandler):
     # Tries to send an email, informing that a pending block has been created,
     # or the state of an existing block has been changed to pending. The
-    # position of the block: "x_b", "y_b", "z_b"
+    # position of the block: "x_b", "y_b", "z_b" Its rotation angle: "a"
     @staticmethod
-    def send_info_email(x_b, y_b, z_b):
+    def send_info_email(x_b, y_b, z_b, a):
         sender_address = "Reality Builder <felixedgarklee@googlemail.com>"
         recipient_address = "new.pending.blocks@realitybuilder.com"
         subject = "New Pending Block"
         body = """
 Position: %d, %d, %d
-""" % (x_b, y_b, z_b)
+Angle: %d
+""" % (x_b, y_b, z_b, a)
 
         try:
             mail.send_mail(sender_address, recipient_address, subject, body)
@@ -549,16 +567,16 @@ Position: %d, %d, %d
         return True
 
     # Tries to create a pending block at the block position "x_b", "y_b",
-    # "z_b".
+    # "z_b", and rotated about its center of rotation by "a".
     @staticmethod
-    def transaction(x_b, y_b, z_b):
+    def transaction(x_b, y_b, z_b, a):
         construction = Construction.get_main()
 
         block = Block.get_by_positionB(construction, x_b, y_b, z_b)
         if not block:
             # Block has to be created, with initial state deleted. It is left
             # in that state, if it intersects with a real block - see below.
-            block = Block.insert_at_positionB(construction, x_b, y_b, z_b)
+            block = Block.insert_at_positionB(construction, x_b, y_b, z_b, a)
 
         if block.state == 2 or block.state == 1:
             # Block is real or block is already pending.
@@ -571,14 +589,16 @@ Position: %d, %d, %d
             return
 
         block.store_state_and_increase_blocks_data_version(1) # Set to pending.
-        RPCCreatePending.send_info_email(x_b, y_b, z_b)
+        RPCCreatePending.send_info_email(x_b, y_b, z_b, a)
 
     def post(self):
         try:
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
-            db.run_in_transaction(RPCCreatePending.transaction, x_b, y_b, z_b)
+            a = int(self.request.get('a'))
+            db.run_in_transaction(RPCCreatePending.transaction, 
+                                  x_b, y_b, z_b, a)
         except Exception, e:
             logging.error('Could not add pending block or set existing ' + 
                           'block to pending: ' + str(e))
@@ -597,7 +617,7 @@ class RPCAdminMakePending(webapp.RequestHandler):
     def transaction(x_b, y_b, z_b):
         construction = Construction.get_main()
 
-        block = Block.get_by_positionB(construction, x_b, y_b, z_b)
+        block = Block.get_by_positionB(construction, x_b, y_b, z_b, a)
         if not block or block.state == 1:
             # No block found, or block is already pending, or block intersects
             # with real block. => Nothing is done.
@@ -616,8 +636,9 @@ class RPCAdminMakePending(webapp.RequestHandler):
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
+            a = float(self.request.get('a'))
             db.run_in_transaction(RPCAdminMakePending.transaction, 
-                                  x_b, y_b, z_b)
+                                  x_b, y_b, z_b, a)
         except Exception, e:
             logging.error('Could not make block pending: ' + str(e))
 
@@ -726,6 +747,8 @@ class AdminInit(webapp.RequestHandler):
              '[0, 0, 1], ' +
              '[0, 1, 1], [-1, 1, 1], [-1, 0, 1], [-1, -1, 1], ' +
              '[0, -1, 1], [1, -1, 1], [1, 0, 1], [1, 1, 1]]')
+        blockProperties.rot_center_x_b = 1.
+        blockProperties.rot_center_y_b = 1.
         blockProperties.put()
 
         # Deletes all new block entries:
@@ -740,6 +763,7 @@ class AdminInit(webapp.RequestHandler):
         newBlock.init_x_b = 8
         newBlock.init_y_b = 0
         newBlock.init_z_b = 7
+        newBlock.init_a = 0
         newBlock.build_space_1_x_b = -1
         newBlock.build_space_1_y_b = -1
         newBlock.build_space_1_z_b = 0
@@ -765,7 +789,7 @@ class AdminInit(webapp.RequestHandler):
             y_b = c[1]
             z_b = c[2]
             state = c[3]
-            block = Block.insert_at_positionB(construction, x_b, y_b, z_b)
+            block = Block.insert_at_positionB(construction, x_b, y_b, z_b, 0)
             block.state = state
             block.put()
 
