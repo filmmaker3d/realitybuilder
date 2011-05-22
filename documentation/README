@@ -217,6 +217,16 @@ Before releasing a new version:
 Miscellaneous
 =============
 
+* In the datastore, blocks are allowed to occupy the same position, given that
+  they have different rotation. This is enforced by giving the keys of the
+  blocks the format: x, y, z, a. An example block outline that, when rotated
+  about its center (by 180°) does not collide with the unrotated block:
+
+    .
+    |\
+    | \
+    +--+
+
 * Canvas seems to have automatic "double buffering", i.e. Gecko and WebKit
   browsers don't draw to screen while executing code.
 

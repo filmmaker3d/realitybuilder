@@ -119,7 +119,8 @@ dojo.declare('com.realitybuilder.ShadowObscuringBlocks', null, {
 
             dstPositionB = [srcBlock.xB(), srcBlock.yB(), dstZB];
             dstBlock = new com.realitybuilder.Block(that._blockProperties,
-                                                    camera, dstPositionB);
+                                                    camera, dstPositionB,
+                                                    srcBlock.a());
             dstBlock.onlySubtractBottom();
             blocks.push(dstBlock);
         });

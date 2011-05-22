@@ -86,7 +86,7 @@ dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
             return [cXB - tmpYB, cYB + tmpXB];
         } else if (a % 4 === 2) {
             return [cXB - tmpXB, cYB - tmpYB];
-        } else if (a % 4 === 2) {
+        } else if (a % 4 === 3) {
             return [cXB + tmpYB, cYB - tmpXB];
         }
     },
@@ -139,7 +139,7 @@ dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
     // Returns the outline, rotated by angle "a", in multiples of 90° CCW when
     // viewed from above.
     rotatedOutlineB: function (a) {
-        return this._rotatedOutlinesB[a];
+        return this._rotatedOutlinesB[a % 4];
     },
 
     collisionOffsetsB: function () {

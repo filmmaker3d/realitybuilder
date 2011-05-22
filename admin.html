@@ -34,10 +34,11 @@
 
 {%block bottomBar%}
   <div id="bottomBar">
-    <div id="coordinateDisplay">
-      x&nbsp;=&nbsp;<span id="newBlockX">0</span>,
-      y&nbsp;=&nbsp;<span id="newBlockY">0</span>,
-      z&nbsp;=&nbsp;<span id="newBlockZ">0</span>
+    <div id="positionAndAngleDisplay">
+      x&nbsp;=&nbsp;<span id="newBlockXB">0</span>,
+      y&nbsp;=&nbsp;<span id="newBlockYB">0</span>,
+      z&nbsp;=&nbsp;<span id="newBlockZB">0</span>,
+      a&nbsp;=&nbsp;<span id="newBlockA">0</span>
     </div>
     <button type="button" id="toggleRealButton"></button>
     <button type="button" id="togglePendingButton"></button>
@@ -116,6 +117,7 @@
             <th class="number">x</th>
             <th class="number">y</th>
             <th class="number">z</th>
+            <th class="number">a</th>
             <th>Created</th>
             <th>State</th>
             <th></th>

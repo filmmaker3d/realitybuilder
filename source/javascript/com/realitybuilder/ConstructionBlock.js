@@ -36,16 +36,16 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // change.
     _timeStamp: null,
 
-    // Creates a 2x2x1 building block at the position in block space ("xB",
-    // "yB", "zB") = "positionB". A blocks extents are defined by two corners:
-    // ("xB", "yB", "zB"), ("xB" + 2, "yB" + 2, "zB" + 1). A time stamp - in
-    // seconds since the epoch - of the date-time when the bocks status was
-    // last changed is "timeStamp". When the block is rendered, it is as seen
-    // by the sensor of the camera "camera".
+    // Creates a block at the position in block space ("xB", "yB", "zB") =
+    // "positionB", and rotated about its center of rotation by "a" (° CCW,
+    // when viewed from above). When the block is rendered, it is as seen by
+    // the sensor of the camera "camera". A time stamp - in seconds since the
+    // epoch - of the date-time when the bocks status was last changed is
+    // "timeStamp".
     //
     // The block's properties, such as shape and size, are described by
     // "blockProperties".
-    constructor: function (blockProperties, camera, positionB, rotAngle, state,
+    constructor: function (blockProperties, camera, positionB, a, state,
                            timeStamp)
     {
         this._state = state;

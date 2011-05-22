@@ -44,8 +44,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _buildSpace1B: null,
     _buildSpace2B: null,
 
-    // State of the block: 0 = stopped, 1 = movable
-    _state: null,
+    // Iff true, then the block is stopped, which means that it can neither be
+    // moved nor be rotated.
+    _isStopped: null,
 
     // Permament blocks in the construction, including real and pending blocks.
     // Needed for hidden lines removal and collision detection.
@@ -61,8 +62,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // coordinates.
     _lastPositionB: null,
 
-    // State of the block when it was last rendered.
-    _lastState: null,
+    // Whether the block was stopped or not when it was last rendered.
+    _lastIsStopped: null,
 
     // Version of the construction blocks when the shadow was last rendered.
     _lastConstructionBlocksVersion: null,
@@ -77,7 +78,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // "blockProperties".
     constructor: function (blockProperties, camera, constructionBlocks) {
         this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
-        this._state = 1;
+        this._isStopped = false;
         this._constructionBlocks = constructionBlocks;
         this._shadow = new com.realitybuilder.Shadow(this, blockProperties, 
                                                      camera, 
@@ -155,21 +156,31 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         dojo.publish('com/realitybuilder/NewBlock/moved');
     },
 
+    // Rotates the block by 90°, CCW when viewed from above.
+    rotate90: function () {
+        this._a = (this._a + 1) % 4; // multiples of 90°
+        dojo.publish('com/realitybuilder/NewBlock/moved'); // FIXME: rename to rotated or something
+    },
+
+    isRotatable: function () {
+        return !this._isStopped;
+    },
+
     isMovable: function () {
-        return this._state === 1;
+        return !this._isStopped;
     },
 
     isStopped: function () {
-        return this._state === 0;
+        return this._isStopped;
     },
 
     stop: function () {
-        this._state = 0;
+        this._isStopped = true;
         dojo.publish('com/realitybuilder/NewBlock/stopped');
     },
 
     makeMovable: function () {
-        this._state = 1;
+        this._isStopped = false;
         dojo.publish('com/realitybuilder/NewBlock/madeMovable');
     },
 
@@ -256,10 +267,24 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Returns true, iff the bounding box of the current block overlaps with
     // that of the block "block", in sensor space.
     _boundingBoxesOverlap: function (block) {
-        return (this._boundingBoxS[1][0] >= block._boundingBoxS[0][0]  &&
-                this._boundingBoxS[0][0] <= block._boundingBoxS[1][0] &&
-                this._boundingBoxS[1][1] >= block._boundingBoxS[0][1] &&
-                this._boundingBoxS[0][1] <= block._boundingBoxS[1][1]);
+        // l = left, r = right, b = bottom, t = top
+        var 
+        l, r, b, t, blockL, blockR, blockB, blockT, 
+        horizontalOverlap, verticalOverlap;
+
+        l = this._boundingBoxS[0][0];
+        r = this._boundingBoxS[1][0];
+        b = this._boundingBoxS[0][1];
+        t = this._boundingBoxS[1][1];
+        blockL = block._boundingBoxS[0][0];
+        blockR = block._boundingBoxS[1][0];
+        blockB = block._boundingBoxS[0][1];
+        blockT = block._boundingBoxS[1][1];
+
+        horizontalOverlap = (r >= blockL && l <= blockR);
+        verticalOverlap = (t >= blockB && b <= blockT);
+
+        return horizontalOverlap && verticalOverlap;
     },
 
     // If the new block (= the current block) and the block "block" are on the
@@ -369,7 +394,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _needsToBeRendered: function () {
         var 
         coordinatesHaveChanged, constructionBlocksHaveChanged, 
-        stateHasChanged;
+        isStoppedStateHasChanged;
 
         coordinatesHaveChanged = this._coordinatesChangedAfterLastRendering;
 
@@ -380,15 +405,16 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             (this._lastConstructionBlocksVersion !==
              this._constructionBlocks.versionOnServer());
 
-        stateHasChanged = (this._lastState !== this._state);
+        isStoppedStateHasChanged = 
+            (this._lastIsStopped !== this._lastIsStopped);
 
         return coordinatesHaveChanged || constructionBlocksHaveChanged ||
-            stateHasChanged;
+            isStoppedStateHasChanged;
     },
 
     _onRendered: function () {
         this._coordinatesChangedAfterLastRendering = false;
-        this._lastState = this._state;
+        this._lastIsStopped = this._isStopped;
         this._lastConstructionBlocksVersion =
             this._constructionBlocks.versionOnServer();
     },

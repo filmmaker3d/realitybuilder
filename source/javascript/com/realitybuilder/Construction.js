@@ -137,7 +137,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
         dojo.subscribe('com/realitybuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
 
-        this._setupDemoFunctionality();
+        dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
 
         this._update();
         this._checkIfHasLoaded();
@@ -202,22 +202,27 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._adminControls.updateTogglePendingButton();
     },
 
-    // Handles keys events for demoing the application.
-    _onDemoKeyPress: function (event) {
+    // Handles keys events.
+    _onKeyPress: function (event) {
+        var constructionBlocks, newBlock;
+
+        constructionBlocks = this._constructionBlocks;
+        newBlock = this._newBlock;
+
         if (event.shiftKey && event.keyCode === dojo.keys.F12) {
+            // For demoing the Reality Builder:
+            //
             // Makes the block at the position of the new block real on the
             // server. This only works if there is a block at that position in
             // the list of construction blocks, and if the user is logged in as
             // administrator.
-            this._constructionBlocks.setBlockStateOnServer(
-                this._newBlock.positionB(), 2);
+            constructionBlocks.setBlockStateOnServer(newBlock.positionB(), 
+                                                     newBlock.a(), 2);
+        } else if (event.keyCode === 114) { // r
+            if (newBlock.isRotatable()) {
+                newBlock.rotate90();
+            }
         }
-    },
-
-    // Sets up (hidden) functionality for demoing the application.
-    _setupDemoFunctionality: function () {
-        dojo.connect(null, "onkeypress", 
-            dojo.hitch(this, this._onDemoKeyPress));
     },
 
     // Called when the new block has been moved. Lets it redraw and updates

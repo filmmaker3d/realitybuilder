@@ -106,7 +106,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         return new com.realitybuilder.ConstructionBlock(this._blockProperties,
                                                         camera, 
                                                         [bd.xB, bd.yB, bd.zB],
-                                                        bd.rotAngle,
+                                                        bd.a,
                                                         bd.state,
                                                         bd.timeStamp);
     },
@@ -203,8 +203,8 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Called if making the block pending on the server failed.
     _makePendingOnServerFailed: function () {
-        dojo.publish
-            ('com/realitybuilder/ConstructionBlocks/changeOnServerFailed');
+        dojo.publish('com/realitybuilder/ConstructionBlocks/' + 
+                     'changeOnServerFailed');
     },
 
     // Triggers setting the state of the block at the position "positionB" and
@@ -212,13 +212,14 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     // Once the server has completed the request, the list of blocks is
     // updated. Difference to the function "createPendingOnServer": If the
     // block does not exist, it is not created.
-    makePendingOnServer: function (positionB) {
+    makePendingOnServer: function (positionB, a) {
         dojo.xhrPost({
             url: "/admin/rpc/make_pending",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
-                "zB": positionB[2]
+                "zB": positionB[2],
+                "a": a
             },
             load: dojo.hitch(this, this._makePendingOnServerSucceeded),
             error: dojo.hitch(this, this._makePendingOnServerFailed)
@@ -234,8 +235,8 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     // Called if storing the block failed. In this case, the state is reverted
     // to virtual.
     _createPendingOnServerFailed: function () {
-        dojo.publish
-            ('com/realitybuilder/ConstructionBlocks/changeOnServerFailed');
+        dojo.publish('com/realitybuilder/ConstructionBlocks/' + 
+                     'changeOnServerFailed');
     },
 
     // Adds a block at the block space position "positionB" and rotation angle
@@ -261,19 +262,20 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Called if deleting the block on the server failed.
     _deleteOnServerFailed: function () {
-        dojo.publish
-            ('com/realitybuilder/ConstructionBlocks/changeOnServerFailed');
+        dojo.publish('com/realitybuilder/ConstructionBlocks/' + 
+                     'changeOnServerFailed');
     },
 
-    // Deletes the block positioned at the block space position "positionB", on
-    // the client and on the server.
-    deleteOnServer: function (positionB) {
+    // Deletes the block positioned at the block space position "positionB" and
+    // rotated by the angle "a", on the client and on the server.
+    deleteOnServer: function (positionB, a) {
         dojo.xhrPost({
             url: "/admin/rpc/delete",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
-                "zB": positionB[2]
+                "zB": positionB[2],
+                "a": a
             },
             load: dojo.hitch(this, this._deleteOnServerSucceeded),
             error: dojo.hitch(this, this._deleteOnServerFailed)
@@ -287,19 +289,21 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Called if making the block real on the server failed.
     _makeRealOnServerFailed: function () {
-        dojo.publish
-            ('com/realitybuilder/ConstructionBlocks/changeOnServerFailed');
+        dojo.publish('com/realitybuilder/ConstructionBlocks/' +
+                     'changeOnServerFailed');
     },
 
     // Triggers setting the state of the block at the block space position
-    // "positionB" to real: on the client and on the server.
-    makeRealOnServer: function (positionB) {
+    // "positionB" and rotated by the angle "a" to real: on the client and on
+    // the server.
+    makeRealOnServer: function (positionB, a) {
         dojo.xhrPost({
             url: "/admin/rpc/make_real",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
-                "zB": positionB[2]
+                "zB": positionB[2],
+                "a": a
             },
             load: dojo.hitch(this, this._makeRealOnServerSucceeded),
             error: dojo.hitch(this, this._makeRealOnServerFailed)
@@ -307,17 +311,18 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     },
 
     // Triggers setting of the state of the block at the block space position
-    // "positionB" to "state" on the server.
-    setBlockStateOnServer: function (positionB, state) {
+    // "positionB" and rotated by the angle "a" to the state "state" on the
+    // server.
+    setBlockStateOnServer: function (positionB, a, state) {
         switch (state) {
         case 0:
-            this.deleteOnServer(positionB);
+            this.deleteOnServer(positionB, a);
             break;
         case 1:
-            this.makePendingOnServer(positionB);
+            this.makePendingOnServer(positionB, a);
             break;
         case 2:
-            this.makeRealOnServer(positionB);
+            this.makeRealOnServer(positionB, a);
             break;
         }
     },
@@ -338,8 +343,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
             if (bZB + 1 <= zBMax && 
                 xB >= bXB && xB <= bXB + 1 &&
                 yB >= bYB && yB <= bYB + 1 &&
-                bZB + 1 > zBOfUpperSide)
-            {
+                bZB + 1 > zBOfUpperSide) {
                 zBOfUpperSide = bZB + 1;
             }
         });

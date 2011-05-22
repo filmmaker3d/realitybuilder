@@ -145,9 +145,9 @@ table#blocksTable td select {
     float: left;
 }
 
-#coordinateDisplay {
+#positionAndAngleDisplay {
     display: inline-block;
-    width: 11em; /* needs to accomodate up to: "x = 11, y = 11, z = 0" */
+    width: 13em;
     height: 17px;
     border: 1px solid gray; 
     margin-right: 10px;

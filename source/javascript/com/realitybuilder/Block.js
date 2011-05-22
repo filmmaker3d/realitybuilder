@@ -67,9 +67,12 @@ dojo.declare('com.realitybuilder.Block', null, {
     // which encloses the block in sensor space.
     _boundingBoxS: null,
 
-    // Ids and data version numbers when last updating coordinates:
+    // Ids, data version numbers and block position and angle when last
+    // updating coordinates:
     _lastCameraId: null,
     _lastBlockPropertiesVersionOnServer: null,
+    _lastPositionB: null,
+    _lastA: null,
 
     // True, if the coordinates changed after the last rendering:
     _coordinatesChangedAfterLastRendering: false,
@@ -96,6 +99,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     // "blockProperties".
     constructor: function (blockProperties, camera, positionB, a) {
         this._positionB = positionB;
+        this._a = a;
         this._blockProperties = blockProperties;
         this._camera = camera;
         this._edges = this._INITIAL_EDGES;
@@ -256,14 +260,22 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     // Returns true, iff coordinates need to be updated.
     _coordinatesNeedToBeUpdated: function () {
-        var cameraHasChanged, blockPropertiesHaveChanged;
+        var 
+        cameraHasChanged, blockPropertiesHaveChanged, positionBHasChanged,
+        aHasChanged;
 
-        cameraHasChanged = this._lastCameraIdS !== this._camera.id();
+        cameraHasChanged = this._lastCameraId !== this._camera.id();
         blockPropertiesHaveChanged = 
             this._lastBlockPropertiesVersionOnServer !== 
             this._blockProperties.versionOnServer();
+        positionBHasChanged = 
+            this._lastPositionB === null ||
+            !com.realitybuilder.util.pointsIdenticalB(this._lastPositionB,
+                                                      this._positionB);
+        aHasChanged = this._lastA !== this._a;
 
-        return cameraHasChanged || blockPropertiesHaveChanged;
+        return cameraHasChanged || blockPropertiesHaveChanged ||
+            positionBHasChanged || aHasChanged;
     },
 
     // Called after the coordinates have been updated.
@@ -271,6 +283,10 @@ dojo.declare('com.realitybuilder.Block', null, {
         this._lastBlockPropertiesVersionOnServer = 
             this._blockProperties.versionOnServer();
         this._lastCameraId = this._camera.id();
+        this._lastPositionB = [this._positionB[0],
+                               this._positionB[1],
+                               this._positionB[2]]; // deep copy necessary
+        this._lastA = this._a;
         this._coordinatesChangedAfterLastRendering = true;
     },
 
@@ -330,20 +346,28 @@ dojo.declare('com.realitybuilder.Block', null, {
     // of the block in sensor space. Depends on the vertices of the block in
     // sensor space.
     _updateSensorSpaceBoundingBox: function () {
-        var minX = Number.MAX_VALUE, minY = Number.MAX_VALUE,
-            maxX = Number.MIN_VALUE, maxY = Number.MIN_VALUE;
-        dojo.forEach(this._vertexesS(), function (vertexS) {
-            if (vertexS[0] < minX) {
-                minX = vertexS[0];
-            } else if (vertexS[0] > maxX) {
-                maxX = vertexS[0];
-            } if (vertexS[1] < minY) {
-                minY = vertexS[1];
-            } else if (vertexS[1] > maxY) {
-                maxY = vertexS[1];
-            }
-        });
+        var minX, minY, maxX, maxY, vertexesS, vertexS, i;
 
+        vertexesS = this._vertexesS();
+
+        if (vertexesS.length > 0) {
+            vertexS = vertexesS[0];
+            minX = maxX = vertexS[0];
+            minY = maxY = vertexS[1];
+            for (i = 1; i < vertexesS.length; i += 1) {
+                vertexS = vertexesS[i];
+                if (vertexS[0] < minX) {
+                    minX = vertexS[0];
+                } else if (vertexS[0] > maxX) {
+                    maxX = vertexS[0];
+                }
+                if (vertexS[1] < minY) {
+                    minY = vertexS[1];
+                } else if (vertexS[1] > maxY) {
+                    maxY = vertexS[1];
+                }
+            }
+        }
 
         this._boundingBoxS = [[minX, minY], [maxX, maxY]];
     },

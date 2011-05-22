@@ -122,10 +122,15 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     },
 
     updateCoordinateDisplays: function () {
-        var positionB = this._construction.newBlock().positionB();
-        dojo.byId('newBlockX').innerHTML = positionB[0].toString();
-        dojo.byId('newBlockY').innerHTML = positionB[1].toString();
-        dojo.byId('newBlockZ').innerHTML = positionB[2].toString();
+        var positionB, a;
+
+        positionB = this._construction.newBlock().positionB();
+        a = this._construction.newBlock().a();
+
+        dojo.byId('newBlockXB').innerHTML = positionB[0].toString();
+        dojo.byId('newBlockYB').innerHTML = positionB[1].toString();
+        dojo.byId('newBlockZB').innerHTML = positionB[2].toString();
+        dojo.byId('newBlockA').innerHTML = a.toString();
     },
 
     // Sorting function for sorting blocks for display in the table.
@@ -167,8 +172,8 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     // "block" and triggers setting of the state.
     _applyStateFromStateSelector: function (select, block) {
         this._construction.constructionBlocks().
-            setBlockStateOnServer(block.positionB(), 
-                parseInt(select.value, 10));
+            setBlockStateOnServer(block.positionB(), block.a(),
+                                  parseInt(select.value, 10));
     },
 
     // Returns a node representing a select button for the state of the block
@@ -199,27 +204,30 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     // Adds a row for the block "block" to the table body "tableBody"
     // displaying the list of blocks.
     _appendBlocksTableRow: function (block, tableBody) {
-        var positionB = block.positionB(),
-            row = document.createElement('tr'),
-            date = new Date(block.timeStamp() * 1000),
-            dateTimeFormatted = 
-                dojox.date.posix.strftime(date, '%Y-%m-%d %H:%M:%S'),
-            rowValues = [
-                positionB[0], positionB[1], positionB[2], dateTimeFormatted,
-                this._stateSelector(block)],
-            cell;
+        var positionB, row, date, dateTimeFormatted, rowValues, cell;
+
+        positionB = block.positionB();
+        row = document.createElement('tr');
+        date = new Date(block.timeStamp() * 1000);
+        dateTimeFormatted = 
+            dojox.date.posix.strftime(date, '%Y-%m-%d %H:%M:%S');
+        rowValues = [
+            positionB[0], positionB[1], positionB[2], block.a(), 
+            dateTimeFormatted, this._stateSelector(block)];
+
         dojo.forEach(rowValues, function (rowValue, i) {
             cell = document.createElement('td');
-            if (i < 4) {
+            if (i < 5) {
                 cell.innerHTML = rowValue;
             } else {
                 cell.appendChild(rowValue);
             }
-            if (i < 3) {
+            if (i < 4) {
                 dojo.addClass(cell, 'number');
             }
             row.appendChild(cell);
         });
+
         tableBody.appendChild(row);
     },
 
