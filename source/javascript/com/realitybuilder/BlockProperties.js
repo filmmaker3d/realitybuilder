@@ -75,19 +75,21 @@ dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
     _rotateOutlinePointBXY: function (pBXY, a) {
         var tmpXB, tmpYB, cXB, cYB;
 
-        cXB = this._rotCenterXB;
-        cYB = this._rotCenterYB;
-        tmpXB = pBXY[0] - cXB;
-        tmpYB = pBXY[1] - cYB;
-
         if (a % 4 === 0) {
             return pBXY;
-        } else if (a % 4 === 1) {
-            return [cXB - tmpYB, cYB + tmpXB];
-        } else if (a % 4 === 2) {
-            return [cXB - tmpXB, cYB - tmpYB];
-        } else if (a % 4 === 3) {
-            return [cXB + tmpYB, cYB - tmpXB];
+        } else {
+            cXB = this._rotCenterXB;
+            cYB = this._rotCenterYB;
+            tmpXB = pBXY[0] - cXB;
+            tmpYB = pBXY[1] - cYB;
+
+            if (a % 4 === 1) {
+                return [Math.round(cXB - tmpYB), Math.round(cYB + tmpXB)];
+            } else if (a % 4 === 2) {
+                return [Math.round(cXB - tmpXB), Math.round(cYB - tmpYB)];
+            } else { // a % 4 === 3
+                return [Math.round(cXB + tmpYB), Math.round(cYB - tmpXB)];
+            }
         }
     },
 

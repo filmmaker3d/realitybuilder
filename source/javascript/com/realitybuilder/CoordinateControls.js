@@ -74,9 +74,9 @@ dojo.declare('com.realitybuilder.CoordinateControls', null, {
             var context = this._canvas.getContext('2d');
             context.clearRect(0, 0, this._canvas.width, this._canvas.height);
         }
-        this._renderButtonPair(0, [3, -1.5, 0], [7, -1.5, 0]);
-        this._renderButtonPair(1, [11.5, 3, 0], [11.5, 7, 0]);
-        this._renderButtonPair(2, [0, -1.5, 1], [0, -1.5, 4]);
+        this._renderButtonPair(0, [2.5, -1.5, 0], [4.5, -1.5, 0]);
+        this._renderButtonPair(1, [7.5, 2, 0], [7.5, 5, 0]);
+        this._renderButtonPair(2, [0, -1, 1], [0, -1, 4]);
     },
 
     // Draws a line connecting the buttons "button1" and "button2".

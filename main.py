@@ -237,17 +237,29 @@ class BlockProperties(db.Model):
     position_spacing_xy = db.FloatProperty() # mm
     position_spacing_z = db.FloatProperty() # mm
 
-    # Outline of the block in the xy plane, with coordinates in block space,
-    # counterclockwise:
+    # Outline of a block in the xy plane, with coordinates in block space,
+    # counterclockwise, when not rotated:
     outline_b = db.StringProperty() # JSON array
 
-    # Two blocks are defined to collide, iff one block is offset against the
-    # other in the x-y-plane by:
-    collision_offsets_b = db.StringProperty() # JSON array
+    # Two blocks A and B are defined to collide, iff block B is offset against
+    # block A in the block space x-y-plane by any of the following values. The
+    # rotation angles below are those of block B, after rotating both blocks so
+    # that block A is horizontal. The offsets are stored as JSON arrays.
+    collision_offsets_b = db.StringProperty() # FIXME: remove
+    collision_offsets_0_b = db.StringProperty() # 0°
+    collision_offsets_1_b = db.StringProperty() # 90°
+    collision_offsets_2_b = db.StringProperty() # 180°
+    collision_offsets_3_b = db.StringProperty() # 270°
 
-    # A block is defined to be attachable to another block, if it is in any of
-    # the following positions relative to the other block, in block space:
-    attachment_offsets_b = db.StringProperty() # JSON array
+    # A block B is defined to be attachable to a block A, if it is offset
+    # against block A by any of the following values, in block space. The
+    # rotation angles below are those of block B, after rotating both blocks so
+    # that block A is horizontal. The offsets are stored as JSON arrays.
+    attachment_offsets_b = db.StringProperty() # FIXME: remove
+    attachment_offsets_0_b = db.StringProperty() # 0°
+    attachment_offsets_1_b = db.StringProperty() # 90°
+    attachment_offsets_2_b = db.StringProperty() # 180°
+    attachment_offsets_3_b = db.StringProperty() # 270°
 
     # Center of rotation, with coordinates in block space, relative to the
     # lower left corner of the unrotated block, when viewed from above:
@@ -717,17 +729,17 @@ class AdminInit(webapp.RequestHandler):
         construction = Construction(key_name = 'main')
         construction.blocks_data_version = '0'
         construction.camera_data_version = '0'
-        construction.camera_x = 122.05
-        construction.camera_y = -88.81
-        construction.camera_z = 122.37
-        construction.camera_a_x = 2.3363
-        construction.camera_a_y = -0.50827
-        construction.camera_a_z = 0.438
-        construction.camera_fl = 40.1
-        construction.camera_sensor_resolution = 18.2857
+        construction.camera_x = 189.57
+        construction.camera_y = -159.16
+        construction.camera_z = 140.11
+        construction.camera_a_x = 2.1589
+        construction.camera_a_y = -0.46583
+        construction.camera_a_z = 0.29
+        construction.camera_fl = 40.
+        construction.camera_sensor_resolution = 19.9
         construction.image_data_version = '0'
         construction.image_url = \
-            'http://sites.inka.de/W1787/realitybuilder/live.jpg';
+            'http://127.0.0.1/documentation/sample_scenes/prism/live.jpg';
         construction.image_update_interval_server = 5.
         construction.image_update_interval_client = 5.
         construction.put()
@@ -743,9 +755,9 @@ class AdminInit(webapp.RequestHandler):
         # which is necessary when doing transactions):
         blockProperties = BlockProperties(parent=construction)
         blockProperties.data_version = '0'
-        blockProperties.position_spacing_xy = 8.
-        blockProperties.position_spacing_z = 9.6
-        blockProperties.outline_b = '[[0, 0], [2, 0], [2, 2], [0, 2]]'
+        blockProperties.position_spacing_xy = 20.
+        blockProperties.position_spacing_z = 10.
+        blockProperties.outline_b = '[[0, 0], [1, 0], [2, 1], [0, 1]]'
         blockProperties.collision_offsets_b = ('[[0, 0], ' +
                                                '[-1, 0], ' +
                                                '[-1, 1], [0, 1], [1, 1], ' +
@@ -771,9 +783,9 @@ class AdminInit(webapp.RequestHandler):
         # Sets up the new block:
         newBlock = NewBlock(parent=construction)
         newBlock.data_version = '0'
-        newBlock.init_x_b = 8
+        newBlock.init_x_b = 4
         newBlock.init_y_b = 0
-        newBlock.init_z_b = 7
+        newBlock.init_z_b = 5
         newBlock.init_a = 0
         newBlock.build_space_1_x_b = -1
         newBlock.build_space_1_y_b = -1
@@ -791,16 +803,16 @@ class AdminInit(webapp.RequestHandler):
 
         # Creates block entries:
         cs = [
-            [0, 0, 0, 2], [2, 0, 0, 2], [6, 0, 0, 2], [8, 0, 0, 2],
-            [8, 2, 0, 2], [8, 4, 0, 2], [6, 8, 0, 2],
-            [2, 0, 1, 2], [6, 0, 1, 2],
-            [3, 0, 2, 2], [5, 0, 2, 2]]
+            [4, 4, 1, 2, 2], [4, 4, 0, 2, 2], [4, 4, 0, 0, 2], [0, 4, 3, 1, 2],
+            [1, 4, 2, 0, 2], [1, 3, 1, 3, 2], [0, 3, 0, 2, 2], [0, 0, 0, 3, 2],
+            [2, -1, 0, 2, 2], [4, 0, 0, 0, 2], [1, 0, 0, 0, 2]]
         for c in cs:
             x_b = c[0]
             y_b = c[1]
             z_b = c[2]
-            state = c[3]
-            block = Block.insert_at(construction, x_b, y_b, z_b, 0)
+            a = c[3]
+            state = c[4]
+            block = Block.insert_at(construction, x_b, y_b, z_b, a)
             block.state = state
             block.put()
 
