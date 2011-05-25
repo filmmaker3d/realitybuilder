@@ -102,7 +102,6 @@ dojo.declare('com.realitybuilder.Block', null, {
         this._a = a;
         this._blockProperties = blockProperties;
         this._camera = camera;
-        this._edges = this._INITIAL_EDGES;
     },
 
     // Returns the block's position in block space. From the position the block
@@ -168,11 +167,10 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     // Returns true, iff the current block collides with the block "block".
     collidesWith: function (block) {
-        var 
-        testPositionB,
-        collisionOffsetsB = this._blockProperties.collisionOffsetsB(),
-        collisionOffsetB,
-        i;
+        var testPositionB, collisionOffsetsB, collisionOffsetB, i;
+
+        collisionOffsetsB = 
+            this._blockProperties.rotatedCollisionOffsetsB(this, block);
 
         for (i = 0; i < collisionOffsetsB.length; i += 1) {
             collisionOffsetB = collisionOffsetsB[i];

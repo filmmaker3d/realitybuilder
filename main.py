@@ -241,25 +241,17 @@ class BlockProperties(db.Model):
     # counterclockwise, when not rotated:
     outline_b = db.StringProperty() # JSON array
 
-    # Two blocks A and B are defined to collide, iff block B is offset against
-    # block A in the block space x-y-plane by any of the following values. The
-    # rotation angles below are those of block B, after rotating both blocks so
-    # that block A is horizontal. The offsets are stored as JSON arrays.
-    collision_offsets_b = db.StringProperty() # FIXME: remove
-    collision_offsets_0_b = db.StringProperty() # 0°
-    collision_offsets_1_b = db.StringProperty() # 90°
-    collision_offsets_2_b = db.StringProperty() # 180°
-    collision_offsets_3_b = db.StringProperty() # 270°
+    # Two blocks 1 and 2 are defined to collide, iff block 2 is offset against
+    # block 1 in the block space x-y-plane by any of the following values. The
+    # rotation angles below are those of block 2, after rotating both blocks so
+    # that block 1 is horizontal. The offsets are stored as JSON arrays.
+    collision_offsets_list_b = db.StringListProperty() # 0°, 90°, 180°, 270°
 
-    # A block B is defined to be attachable to a block A, if it is offset
-    # against block A by any of the following values, in block space. The
-    # rotation angles below are those of block B, after rotating both blocks so
-    # that block A is horizontal. The offsets are stored as JSON arrays.
-    attachment_offsets_b = db.StringProperty() # FIXME: remove
-    attachment_offsets_0_b = db.StringProperty() # 0°
-    attachment_offsets_1_b = db.StringProperty() # 90°
-    attachment_offsets_2_b = db.StringProperty() # 180°
-    attachment_offsets_3_b = db.StringProperty() # 270°
+    # A block 2 is defined to be attachable to a block 1, if it is offset
+    # against block 1 by any of the following values, in block space. The
+    # rotation angles below are those of block 2, after rotating both blocks so
+    # that block 1 is horizontal. The offsets are stored as JSON arrays.
+    attachment_offsets_b = db.StringListProperty() # 0°, 90°, 180°, 270°
 
     # Center of rotation, with coordinates in block space, relative to the
     # lower left corner of the unrotated block, when viewed from above:
@@ -370,6 +362,10 @@ class RPCConstruction(webapp.RequestHandler):
                         construction.image_update_interval_client})
         return data
 
+    @staticmethod
+    def json_decode_list(l):
+        return map(simplejson.loads, l)
+
     # Returns JSON serializable data related to the block properties.
     @staticmethod
     def get_block_properties_data(construction, 
@@ -395,11 +391,12 @@ class RPCConstruction(webapp.RequestHandler):
                          block_properties.position_spacing_z,
                          'outlineB': 
                          simplejson.loads(block_properties.outline_b),
-                         'collisionOffsetsB':
-                         simplejson.loads(block_properties.collision_offsets_b),
-                         'attachmentOffsetsB':
-                             simplejson.loads(block_properties.
-                                              attachment_offsets_b),
+                         'collisionOffsetsListB': \
+                             RPCConstruction.json_decode_list \
+                             (block_properties.collision_offsets_list_b),
+                         'attachmentOffsetsB': \
+                             RPCConstruction.json_decode_list \
+                             (block_properties.attachment_offsets_b),
                          'rotCenterXB': block_properties.rot_center_x_b,
                          'rotCenterYB': block_properties.rot_center_y_b})
         return data
@@ -710,7 +707,8 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
         except Exception, e:
             logging.error('Could not update camera and image data: ' + str(e))
 
-# Initializes part or all of the database. Use with caution.
+# Initializes the datastore with sample data. Works only in debug mode. Use
+# with caution.
 class AdminInit(webapp.RequestHandler):
     def get(self):
         if not debug:
@@ -722,6 +720,15 @@ class AdminInit(webapp.RequestHandler):
         for query in queries:
             for result in query:
                 result.delete()
+
+        # An external image is used because "dev_appserver.py" can only server
+        # one requests at a time, as of May 2011. Therefore, according to
+        # official documentation: "If your application makes URL fetch requests
+        # to itself while processing a request, these requests will fail when
+        # using the development web server." See: <url:http://code.google.com/a
+        # ppengine/docs/python/tools/devserver.html#Using_URL_Fetch>
+        image_url = ('http://realitybuilder.googlecode.com/hg/documentation/' +
+                     'sample_scenes/prism/live.jpg')
 
         # Creates the construction configuration. An image URL is not set to an
         # image on the same App Engine instance, since urlfetch doesn't seem to
@@ -738,8 +745,7 @@ class AdminInit(webapp.RequestHandler):
         construction.camera_fl = 40.
         construction.camera_sensor_resolution = 19.9
         construction.image_data_version = '0'
-        construction.image_url = \
-            'http://127.0.0.1/documentation/sample_scenes/prism/live.jpg';
+        construction.image_url = image_url
         construction.image_update_interval_server = 5.
         construction.image_update_interval_client = 5.
         construction.put()
@@ -758,20 +764,21 @@ class AdminInit(webapp.RequestHandler):
         blockProperties.position_spacing_xy = 20.
         blockProperties.position_spacing_z = 10.
         blockProperties.outline_b = '[[0, 0], [1, 0], [2, 1], [0, 1]]'
-        blockProperties.collision_offsets_b = ('[[0, 0], ' +
-                                               '[-1, 0], ' +
-                                               '[-1, 1], [0, 1], [1, 1], ' +
-                                               '[1, 0], ' +
-                                               '[1, -1], [0, -1], [-1, -1]]')
+        blockProperties.collision_offsets_list_b = \
+            ['[[-1, 0], [0, 0], [1, 0]]',
+             '[[0, 0], [1, 0], [0, -1], [1, -1]]',
+             '[[0, 0], [1, 0]]',
+             '[[0, 1], [1, 1], [0, 0], [1, 0]]']
         blockProperties.attachment_offsets_b = \
-            ('[[0, 0, -1], ' +
+            ['[[0, 0, -1], ' +
              '[0, 1, -1], [-1, 1, -1], [-1, 0, -1], [-1, -1, -1], ' +
              '[0, -1, -1], [1, -1, -1], [1, 0, -1], [1, 1, -1], ' +
              '[0, 0, 1], ' +
              '[0, 1, 1], [-1, 1, 1], [-1, 0, 1], [-1, -1, 1], ' +
-             '[0, -1, 1], [1, -1, 1], [1, 0, 1], [1, 1, 1]]')
-        blockProperties.rot_center_x_b = 1.
-        blockProperties.rot_center_y_b = 1.
+             '[0, -1, 1], [1, -1, 1], [1, 0, 1], [1, 1, 1]]',
+             '[]', '[]', '[]']
+        blockProperties.rot_center_x_b = 0.5
+        blockProperties.rot_center_y_b = 0.5
         blockProperties.put()
 
         # Deletes all new block entries:
@@ -803,17 +810,16 @@ class AdminInit(webapp.RequestHandler):
 
         # Creates block entries:
         cs = [
-            [4, 4, 1, 2, 2], [4, 4, 0, 2, 2], [4, 4, 0, 0, 2], [0, 4, 3, 1, 2],
-            [1, 4, 2, 0, 2], [1, 3, 1, 3, 2], [0, 3, 0, 2, 2], [0, 0, 0, 3, 2],
-            [2, -1, 0, 2, 2], [4, 0, 0, 0, 2], [1, 0, 0, 0, 2]]
+            [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
+            [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
+            [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0]]
         for c in cs:
             x_b = c[0]
             y_b = c[1]
             z_b = c[2]
             a = c[3]
-            state = c[4]
             block = Block.insert_at(construction, x_b, y_b, z_b, a)
-            block.state = state
+            block.state = 2
             block.put()
 
         print 'Done.'

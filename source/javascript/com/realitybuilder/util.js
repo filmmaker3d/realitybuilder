@@ -251,9 +251,18 @@ com.realitybuilder.util.withDuplicatesRemoved = function (ps) {
 // Returns the polar coordinates of the sensor space point "pS".
 com.realitybuilder.util.cartesianToPolar = function (pS) {
     var x = pS[0], y = pS[1],
-        angle = Math.atan2(y, x),
-        distance = Math.sqrt(x * x + y * y);
+    angle = Math.atan2(y, x),
+    distance = Math.sqrt(x * x + y * y);
     return [angle, distance];
+};
+
+// Returns the cartesian coordinates of the sensor space point "polarPS", which
+// is in polar coordinates.
+com.realitybuilder.util.polarToCartesian = function (polarPS) {
+    var angle = polarPS[0], distance = polarPS[1],
+    x = distance * Math.cos(angle),
+    y = distance * Math.sin(angle);
+    return [x, y];
 };
 
 // Returns a new point, whose coordinates are the sum of the coordinates of the
@@ -262,13 +271,28 @@ com.realitybuilder.util.addS = function (p1S, p2S) {
     return [p1S[0] + p2S[0], p1S[1] + p2S[1]];
 };
 
-// Returns the cartesian coordinates of the sensor space point "polarPS", which
-// is in polar coordinates.
-com.realitybuilder.util.polarToCartesian = function (polarPS) {
-    var angle = polarPS[0], distance = polarPS[1],
-        x = distance * Math.cos(angle),
-        y = distance * Math.sin(angle);
-    return [x, y];
+// Returns the point "pBXY" in the block space x-z-plane, rotated about the
+// center "cBXY" by the angle "a", CCW when viewed from above. The angle is in
+// multiples of 90°.
+com.realitybuilder.util.rotatePointBXY = function (pBXY, cBXY, a) {
+    var tmpXB, tmpYB, cXB, cYB;
+
+    if (a % 4 === 0) {
+        return pBXY;
+    } else {
+        cXB = cBXY[0];
+        cYB = cBXY[1];
+        tmpXB = pBXY[0] - cXB;
+        tmpYB = pBXY[1] - cYB;
+        
+        if (a % 4 === 1) {
+            return [Math.round(cXB - tmpYB), Math.round(cYB + tmpXB)];
+        } else if (a % 4 === 2) {
+            return [Math.round(cXB - tmpXB), Math.round(cYB - tmpYB)];
+        } else { // a % 4 === 3
+            return [Math.round(cXB + tmpYB), Math.round(cYB - tmpXB)];
+        }
+    }
 };
 
 // Returns the object "object" with all keys converted to strings and being

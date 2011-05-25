@@ -3,6 +3,10 @@ Introduction
 
 A scene with a prism as a building block.
 
+As the center of rotation is not in the middle of the block, the behavior of
+the block may sometimes appear unintuitive. However, the scene is good for
+testing, as it displays various border cases.
+
 
 Legal
 =====

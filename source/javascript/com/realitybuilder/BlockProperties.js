@@ -45,18 +45,24 @@ dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
     // cneter of rotation, in block space:
     _rotatedOutlinesB: [null, null, null, null],
 
-    // Two blocks are defined to collide, iff one block is offset against the
-    // other in the x-y-plane by:
-    _collisionOffsetsB: null,
+    // Two blocks 1 and 2 are defined to collide, iff block 2 is offset against
+    // block 1 in the block space x-y-plane by any of the following values. The
+    // rotation angles below are those of block 2, after rotating both blocks
+    // so that block 1 is horizontal. The offsets are stored as JSON arrays.
+    _collisionOffsetsListB: null, // 0°, 90°, 180°, 270°
+
+    // Array with the list of collision offsets rotated by 0°, 90°, 180°, and
+    // 270° CCW (when viewed from above) around the center of rotation of block
+    // 1, in block space:
+    _rotatedCollisionOffsetsListsB: [null, null, null, null],
 
     // A block is defined to be attachable to another block, if it is in any of
     // the following positions relative to the other block, in block space:
     _attachmentOffsetsB: null,
 
-    // Center of rotation, with coordinates in block space, relative to the
-    // lower left corner of the unrotated block, when viewed from above:
-    _rotCenterXB: null,
-    _rotCenterYB: null,
+    // Center of rotation, in the block space x-y-plane, with coordinates
+    // relative to the origin of the unrotated block.
+    _rotCenterBXY: null,
 
     versionOnServer: function () {
         return this._versionOnServer;
@@ -68,36 +74,13 @@ dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
         return this._versionOnServer !== '-1';
     },
 
-    // Rotates the outline point "pBXY" by the angle "a", which is measured in
-    // multiples of 90°, CCW when viewed from above. The center of rotation is
-    // the center of rotation of the block. Rounds the resulting coordinates to
-    // integers.
-    _rotateOutlinePointBXY: function (pBXY, a) {
-        var tmpXB, tmpYB, cXB, cYB;
-
-        if (a % 4 === 0) {
-            return pBXY;
-        } else {
-            cXB = this._rotCenterXB;
-            cYB = this._rotCenterYB;
-            tmpXB = pBXY[0] - cXB;
-            tmpYB = pBXY[1] - cYB;
-
-            if (a % 4 === 1) {
-                return [Math.round(cXB - tmpYB), Math.round(cYB + tmpXB)];
-            } else if (a % 4 === 2) {
-                return [Math.round(cXB - tmpXB), Math.round(cYB - tmpYB)];
-            } else { // a % 4 === 3
-                return [Math.round(cXB + tmpYB), Math.round(cYB - tmpXB)];
-            }
-        }
-    },
-
     _rotateOutlineBXY: function (a) {
         var that = this;
 
         return dojo.map(this._outlineB, function (pBXY) {
-            return that._rotateOutlinePointBXY(pBXY, a);
+            return com.realitybuilder.util.rotatePointBXY(pBXY, 
+                                                          that._rotCenterBXY,
+                                                          a);
         });
     },
 
@@ -109,6 +92,36 @@ dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
         }
     },
 
+    _rotateCollisionOffsetsBXY: function (collisionOffsetsB, a) {
+        var that = this;
+
+        return dojo.map(collisionOffsetsB, function (pBXY) {
+            return com.realitybuilder.util.rotatePointBXY(pBXY, 
+                                                          [0, 0],
+                                                          a);
+        });
+    },
+
+    _rotateCollisionOffsetsListBXY: function (a1) {
+        var a2, collisionOffsetsB, tmp = [null, null, null, null];
+
+        for (a2 = 0; a2 < 4; a2 += 1) {
+            collisionOffsetsB = this._collisionOffsetsListB[a2];
+            tmp[a2] = this._rotateCollisionOffsetsBXY(collisionOffsetsB, a1);
+        }
+
+        return tmp;
+    },
+
+    _updateRotatedCollisionOffsetsListsBXY: function () {
+        var a1;
+
+        for (a1 = 0; a1 < 4; a1 += 1) { 
+            this._rotatedCollisionOffsetsListsB[a1] = 
+                this._rotateCollisionOffsetsListBXY(a1);
+        }
+    },
+
     // Updates the block properties to the version on the server, which is
     // described by "serverData".
     updateWithServerData: function (serverData) {
@@ -116,12 +129,12 @@ dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
         this._positionSpacingXY = serverData.positionSpacingXY;
         this._positionSpacingZ = serverData.positionSpacingZ;
         this._outlineB = serverData.outlineB;
-        this._collisionOffsetsB = serverData.collisionOffsetsB;
-        this._attachmentOffsetsB = serverData.attachmentOffsetsB;
-        this._rotCenterXB = serverData.rotCenterXB;
-        this._rotCenterYB = serverData.rotCenterYB;
+        this._collisionOffsetsListB = serverData.collisionOffsetsListB;
+        this._attachmentOffsetsB = serverData.attachmentOffsetsB[0];
+        this._rotCenterBXY = [serverData.rotCenterXB, serverData.rotCenterYB];
 
         this._updateRotatedOutlinesB();
+        this._updateRotatedCollisionOffsetsListsBXY();
 
         dojo.publish('com/realitybuilder/BlockProperties/changed');
     },
@@ -144,8 +157,16 @@ dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
         return this._rotatedOutlinesB[a % 4];
     },
 
-    collisionOffsetsB: function () {
-        return this._collisionOffsetsB;
+    // Returns the list of collision offsets, of block 2 relative to block 1.
+    rotatedCollisionOffsetsB: function (block1, block2) {
+        var collisionOffsetsListB, relative_a;
+
+        collisionOffsetsListB = 
+            this._rotatedCollisionOffsetsListsB[block1.a() % 4];
+
+        relative_a = (4 + block2.a() - block1.a()) % 4;
+
+        return collisionOffsetsListB[relative_a];
     },
 
     attachmentOffsetsB: function () {

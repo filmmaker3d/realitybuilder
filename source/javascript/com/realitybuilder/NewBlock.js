@@ -219,9 +219,11 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         var testPositionB, testBlock, cbs = this._constructionBlocks;
 
         testPositionB = 
-            com.realitybuilder.util.addVectorsB(this._positionB, deltaB);
+            com.realitybuilder.util.addVectorsB(this.positionB(), deltaB);
         testBlock = new com.realitybuilder.Block(this._blockProperties,
-                                                 this._camera, testPositionB);
+                                                 this._camera, 
+                                                 testPositionB,
+                                                 this.a());
 
         return (cbs.realBlocksCollideWith(testBlock) ||
                 !this._wouldBeInMoveSpace(testPositionB));
