@@ -289,6 +289,30 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         return horizontalOverlap && verticalOverlap;
     },
 
+    // Compares the vertexes "vertexes1VXZ" with the edges defined by
+    // "vertexes2VXZ".
+    _relationVertexesEdges: function (vertexes1VXZ, vertexes2VXZ) {
+        var util, len, i, j, relation, vertexVXZ, vertex1VXZ, edge2VXZ;
+
+        util = com.realitybuilder.util;
+
+        len = vertexes2VXZ.length; // same for all blocks
+        for (i = 0; i < len; i += 1) { // iterates edges of this block
+            edge2VXZ = [vertexes2VXZ[i], vertexes2VXZ[(i + 1) % len]];
+            for (j = 0; j < len; j += 1) { // iterates vertexes of "block"
+                vertex1VXZ = vertexes1VXZ[j];
+                relation = util.relationPointSegmentVXZ(vertex1VXZ,
+                                                        edge2VXZ);
+
+                if (relation < 0 || relation > 0) {
+                    return relation;
+                } // else continue since no decision can be made yet
+            }
+        }
+
+        return 0; // undecided
+    },
+
     // If the new block (= the current block) and the block "block" are on the
     // same layer (SL) and they overlap (O) in sensor space, then this has one
     // of the following return values:
@@ -299,11 +323,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     //
     // False: The new block obscures the block "block" visually.
     _isObscuredBySLO: function (block) {
-        var 
-        i, j, relation, vertexesVXZ, blockVertexesVXZ, len, vertexVXZ,
-        blockVertexVXZ, edgeVXZ, util;
-
-        util = com.realitybuilder.util;
+        var relation, vertexesVXZ, blockVertexesVXZ;
 
         // What follows is a comparison of the projection of the blocks on the
         // view space x-z-plane, from the point of view of the camera. The
@@ -320,28 +340,30 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             return false;
         }
 
-        len = vertexesVXZ.length; // same for all blocks
-        for (i = 0; i < len; i += 1) { // iter. all edges of this block
-            edgeVXZ = [vertexesVXZ[i], vertexesVXZ[(i + 1) % len]];
-            for (j = 0; j < len; j += 1) { // iter. vertexes of "block"
-                blockVertexVXZ = blockVertexesVXZ[j];
-                relation = util.relationPointSegmentVXZ(blockVertexVXZ,
-                                                        edgeVXZ);
-
-                if (relation < 0) {
-                    // Vertex of "block" is in front of edge of this block. =>
-                    // "block" is in front of this block, as both are convex
-                    // prisms in the same layer.
-                    return true;
-                } else if (relation > 0) {
-                    // Vertex of "block" is behind edge of this block.
-                    return false;
-                } // else continue since no decision can be made yet
-            }
+        relation = this._relationVertexesEdges(blockVertexesVXZ, vertexesVXZ);
+        if (relation === 0) {
+            // Still undecided => swap around blocks. May be necessary if this
+            // block is very narrow from the perspective of the camera. In that
+            // case, the straight lines going through the vertexes of "block"
+            // never cut the edges of this block.
+            relation = 
+                this._relationVertexesEdges(vertexesVXZ, blockVertexesVXZ);
+            relation = -relation;
         }
 
-        return false; // blocks don't overlap in screen space, and so return
-                      // value is irrelevant (see description of function)
+        if (relation < 0) {
+            // Vertex of "block" is in front of edge of this block. =>
+            // "block" is in front of this block, as both are convex
+            // prisms in the same layer.
+            return true;
+        } else if (relation > 0) {
+            // Vertex of "block" is behind edge of this block.
+            return false;
+        } else {
+            return false; // blocks don't overlap in screen space, and so
+                          // return value is irrelevant (see description of
+                          // function)
+        }
     },
 
     // Subtracts the shape of the the real block "realblock" from the canvas
