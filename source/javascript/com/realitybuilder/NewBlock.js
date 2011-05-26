@@ -204,7 +204,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                 testZB += 1;
                 testBlock = new com.realitybuilder.Block(this._blockProperties,
                                                          this._camera,
-                                                         [xB, yB, testZB]);
+                                                         [xB, yB, testZB],
+                                                         this.a());
             } while (cbs.realBlocksCollideWith(testBlock));
             this._positionB[2] = testZB;
         }
