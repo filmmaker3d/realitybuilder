@@ -236,8 +236,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _wouldBeInMoveSpace: function (testB) {
         var b1B = this._buildSpace1B, b2B = this._buildSpace2B;
         return (
-            testB[0] >= b1B[0] - 2 && testB[0] <= b2B[0] &&
-            testB[1] >= b1B[1] - 2 && testB[1] <= b2B[1] &&
+            testB[0] >= b1B[0] - 1 && testB[0] <= b2B[0] + 1 &&
+            testB[1] >= b1B[1] - 1 && testB[1] <= b2B[1] + 1 &&
             testB[2] >= 0 && testB[2] <= b2B[2] + 1);
     },
 
@@ -247,10 +247,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             yB = this._positionB[1],
             zB = this._positionB[2],
             b1B = this._buildSpace1B, b2B = this._buildSpace2B;
-        return (
-            xB >= b1B[0] && xB <= b2B[0] - 2 &&
-            yB >= b1B[1] && yB <= b2B[1] - 2 &&
-            zB >= b1B[2] && zB <= b2B[2]);
+        return (xB >= b1B[0] && xB <= b2B[0] &&
+                yB >= b1B[1] && yB <= b2B[1] &&
+                zB >= b1B[2] && zB <= b2B[2]);
     },
 
     // Returns true, iff this block is attachable to another block or to the

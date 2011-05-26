@@ -243,15 +243,15 @@ class BlockProperties(db.Model):
 
     # Two blocks 1 and 2 are defined to collide, iff block 2 is offset against
     # block 1 in the block space x-y-plane by any of the following values. The
-    # rotation angles below are those of block 2, after rotating both blocks so
-    # that block 1 is horizontal. The offsets are stored as JSON arrays.
+    # rotation angles below are those of block 2 relative to block 1. The
+    # offsets are stored as JSON arrays.
     collision_offsets_list_b = db.StringListProperty() # 0°, 90°, 180°, 270°
 
     # A block 2 is defined to be attachable to a block 1, if it is offset
     # against block 1 by any of the following values, in block space. The
-    # rotation angles below are those of block 2, after rotating both blocks so
-    # that block 1 is horizontal. The offsets are stored as JSON arrays.
-    attachment_offsets_b = db.StringListProperty() # 0°, 90°, 180°, 270°
+    # rotation angles below are those of block 2 relative to block 1. The
+    # offsets are stored as JSON arrays.
+    attachment_offsets_list_b = db.StringListProperty() # 0°, 90°, 180°, 270°
 
     # Center of rotation, with coordinates in block space, relative to the
     # lower left corner of the unrotated block, when viewed from above:
@@ -394,9 +394,9 @@ class RPCConstruction(webapp.RequestHandler):
                          'collisionOffsetsListB': \
                              RPCConstruction.json_decode_list \
                              (block_properties.collision_offsets_list_b),
-                         'attachmentOffsetsB': \
+                         'attachmentOffsetsListB': \
                              RPCConstruction.json_decode_list \
-                             (block_properties.attachment_offsets_b),
+                             (block_properties.attachment_offsets_list_b),
                          'rotCenterXB': block_properties.rot_center_x_b,
                          'rotCenterYB': block_properties.rot_center_y_b})
         return data
@@ -769,14 +769,11 @@ class AdminInit(webapp.RequestHandler):
              '[[0, 0], [1, 0], [0, -1], [1, -1]]',
              '[[0, 0], [1, 0]]',
              '[[0, 1], [1, 1], [0, 0], [1, 0]]']
-        blockProperties.attachment_offsets_b = \
-            ['[[0, 0, -1], ' +
-             '[0, 1, -1], [-1, 1, -1], [-1, 0, -1], [-1, -1, -1], ' +
-             '[0, -1, -1], [1, -1, -1], [1, 0, -1], [1, 1, -1], ' +
-             '[0, 0, 1], ' +
-             '[0, 1, 1], [-1, 1, 1], [-1, 0, 1], [-1, -1, 1], ' +
-             '[0, -1, 1], [1, -1, 1], [1, 0, 1], [1, 1, 1]]',
-             '[]', '[]', '[]']
+        blockProperties.attachment_offsets_list_b = \
+            ['[[0, 0, -1], [0, 0, 1]]',
+             '[[0, 0, -1], [0, 0, 1]]',
+             '[[0, 0, -1], [0, 0, 1], [1, 0, -1], [1, 0, 1]]',
+             '[[0, 0, -1], [0, 0, 1]]']
         blockProperties.rot_center_x_b = 0.5
         blockProperties.rot_center_y_b = 0.5
         blockProperties.put()
@@ -794,12 +791,12 @@ class AdminInit(webapp.RequestHandler):
         newBlock.init_y_b = 0
         newBlock.init_z_b = 5
         newBlock.init_a = 0
-        newBlock.build_space_1_x_b = -1
-        newBlock.build_space_1_y_b = -1
+        newBlock.build_space_1_x_b = 0
+        newBlock.build_space_1_y_b = 0
         newBlock.build_space_1_z_b = 0
-        newBlock.build_space_2_x_b = 11
-        newBlock.build_space_2_y_b = 11
-        newBlock.build_space_2_z_b = 6
+        newBlock.build_space_2_x_b = 5
+        newBlock.build_space_2_y_b = 5
+        newBlock.build_space_2_z_b = 4
         newBlock.put()
 
         # Deletes all block entries:

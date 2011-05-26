@@ -188,11 +188,10 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     // Returns true, iff the current block is attachable to the block "block".
     attachableTo: function (block) {
-        var
-        testPositionB,
-        attachmentOffsetsB = this._blockProperties.attachmentOffsetsB(),
-        attachmentOffsetB,
-        i;
+        var testPositionB, attachmentOffsetsB, attachmentOffsetB, i;
+
+        attachmentOffsetsB = 
+            this._blockProperties.rotatedAttachmentOffsetsB(this, block);
 
         for (i = 0; i < attachmentOffsetsB.length; i += 1) {
             attachmentOffsetB = attachmentOffsetsB[i];
