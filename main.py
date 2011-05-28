@@ -52,9 +52,7 @@ class Construction(db.Model):
     # version is the version of the data below. It is increased every time the
     # data is changed. See also the description of the blocks version.
     camera_data_version = db.StringProperty()
-    camera_x = db.FloatProperty(default=1.) # x position
-    camera_y = db.FloatProperty(default=1.) # y position
-    camera_z = db.FloatProperty(default=1.) # z position
+    camera_position = db.ListProperty(float) # position in world space
     camera_a_x = db.FloatProperty(default=0.) # angle of rotation about x
     camera_a_y = db.FloatProperty(default=0.) # angle of rotation about y
     camera_a_z = db.FloatProperty(default=0.) # angle of rotation about z
@@ -107,9 +105,7 @@ class NewBlock(db.Model):
     data_version = db.StringProperty()
 
     # Initial position, in block space:
-    init_x_b = db.IntegerProperty()
-    init_y_b = db.IntegerProperty()
-    init_z_b = db.IntegerProperty()
+    init_position_b = db.ListProperty(int)
 
     # Initial rotation angle:
     init_a = db.IntegerProperty() # multiples of 90°, CCW when viewed from
@@ -117,18 +113,12 @@ class NewBlock(db.Model):
 
     # Points in block space, defining the rectangle which represents the space
     # in which blocks may be built.
-    build_space_1_x_b = db.IntegerProperty()
-    build_space_1_y_b = db.IntegerProperty()
-    build_space_1_z_b = db.IntegerProperty()
-    build_space_2_x_b = db.IntegerProperty()
-    build_space_2_y_b = db.IntegerProperty()
-    build_space_2_z_b = db.IntegerProperty()
+    build_space_1_b = db.ListProperty(int)
+    build_space_2_b = db.ListProperty(int)
 
 class Block(db.Model):
     # Position, in block space:
-    x_b = db.IntegerProperty()
-    y_b = db.IntegerProperty()
-    z_b = db.IntegerProperty()
+    position_b = db.ListProperty(int)
 
     # Rotation angle:
     a = db.IntegerProperty() # ° CCW when viewed from above
@@ -143,34 +133,37 @@ class Block(db.Model):
     # Returns the datastore key name of a block at "x_b", "y_b", "z_b", rotated
     # by "a".
     @staticmethod
-    def build_key_name(x_b, y_b, z_b, a):
+    def build_key_name(position_b, a):
+        x_b = position_b[0]
+        y_b = position_b[1]
+        z_b = position_b[2]
         return str(x_b) + ',' + str(y_b) + ',' + str(z_b) + ',' + str(a)
 
-    # Returns the block at the block space position "x_b", "y_b", "z_b",
-    # rotated by the angle "a", in the construction "construction", or "None",
-    # if the block cannot be found. Also returns blocks in state deleted.
+    # Returns the block at the block space position "position_b", rotated by
+    # the angle "a", in the construction "construction", or "None", if the
+    # block cannot be found. Also returns blocks in state deleted.
     @staticmethod
-    def get_at(construction, x_b, y_b, z_b, a):
-        return Block.get_by_key_name(
-            Block.build_key_name(x_b, y_b, z_b, a), parent=construction)
+    def get_at(construction, position_b, a):
+        return Block.get_by_key_name(Block.build_key_name(position_b, a), 
+                                     parent=construction)
 
-    # Inserts a block at the block space position "x_b", "y_b", "z_b" in the
+    # Inserts a block at the block space position "position_b" in the
     # construction "construction", with the initial state deleted. The block is
     # rotated by "a", CCW when viewed from above. Raises an exception on
     # failure. Returns the block.
     @staticmethod
-    def insert_at(construction, x_b, y_b, z_b, a):
+    def insert_at(construction, position_b, a):
         return Block(parent=construction, 
-                     key_name=Block.build_key_name(x_b, y_b, z_b, a),
-                     x_b=x_b, y_b=y_b, z_b=z_b, a=a,
+                     key_name=Block.build_key_name(position_b, a),
+                     position_b=position_b, a=a,
                      time_stamp=long(time.time()))
 
-    # If there is a block at "x_b", "y_b", "z_b", rotated by "a", in the state
-    # "state" in the construction "construction", returns that block. Otherwise
-    # returns "None".
+    # If there is a block at "position_b", rotated by "a", in the state "state"
+    # in the construction "construction", returns that block. Otherwise returns
+    # "None".
     @staticmethod
-    def get_at_with_state(construction, x_b, y_b, z_b, a, state):
-        block = Block.get_at(construction, x_b, y_b, z_b, a)
+    def get_at_with_state(construction, position_b, a, state):
+        block = Block.get_at(construction, position_b, a)
         if block and block.state == state:
             return block
         else:
@@ -185,17 +178,26 @@ class Block(db.Model):
         (1, 0),
         (1, -1), (0, -1), (-1, -1)]
 
+    def x_b(self):
+        return self.position_b[0]
+
+    def y_b(self):
+        return self.position_b[1]
+
+    def z_b(self):
+        return self.position_b[2]
+
     # Returns True, iff the block "block" intersects with any real block. Self
     # intersection does not count as intersection.
     def is_intersecting_with_real(self):
         for relative_xy_positionB in self.intersecting_relative_xy_positionsB:
-            testXB = self.x_b + relative_xy_positionB[0]
-            testYB = self.y_b + relative_xy_positionB[1]
-            testZB = self.z_b
+            testXB = self.x_b() + relative_xy_positionB[0]
+            testYB = self.y_b() + relative_xy_positionB[1]
+            testZB = self.z_b()
             testA = self.a
             testBlock = Block.get_at_with_state(self.parent(), 
-                                                testXB, testYB, testZB, testA, 
-                                                2)
+                                                [testXB, testYB, testZB], 
+                                                testA, 2)
             if testBlock:
                 # Intersecting real block exists.
                 return True
@@ -206,13 +208,13 @@ class Block(db.Model):
     @staticmethod
     def delete_intersecting_pending_blocks(block):
         for relative_xy_positionB in Block.intersecting_relative_xy_positionsB:
-            testXB = block.x_b + relative_xy_positionB[0]
-            testYB = block.y_b + relative_xy_positionB[1]
-            testZB = block.z_b
+            testXB = block.x_b() + relative_xy_positionB[0]
+            testYB = block.y_b() + relative_xy_positionB[1]
+            testZB = block.z_b()
             testA = block.a
             testBlock = Block.get_at_with_state(block.parent(), 
-                                                testXB, testYB, testZB, testA, 
-                                                1)
+                                                [testXB, testYB, testZB], 
+                                                testA, 1)
             if testBlock:
                 # Intersecting pending block exists. => It is deleted:
                 testBlock.state = 0
@@ -291,9 +293,7 @@ class RPCConstruction(webapp.RequestHandler):
         blocks = []
         for block in query:
             blocks.append({
-                    'xB': block.x_b, 
-                    'yB': block.y_b, 
-                    'zB': block.z_b,
+                    'positionB': block.position_b, 
                     'a': block.a,
                     'state': block.state,
                     'timeStamp': block.time_stamp})
@@ -332,9 +332,7 @@ class RPCConstruction(webapp.RequestHandler):
             # Camera version on server not the same as on client. =>
             # Deliver all the data.
             data.update({
-                    'x': construction.camera_x,
-                    'y': construction.camera_y,
-                    'z': construction.camera_z,
+                    'position': construction.camera_position,
                     'aX': construction.camera_a_x,
                     'aY': construction.camera_a_y,
                     'aZ': construction.camera_a_z,
@@ -419,16 +417,10 @@ class RPCConstruction(webapp.RequestHandler):
         if new_block_data_changed:
             # New block data version on server not the same as on client. =>
             # Deliver all the data.
-            data.update({'initXB': new_block.init_x_b,
-                         'initYB': new_block.init_y_b,
-                         'initZB': new_block.init_z_b,
+            data.update({'initPositionB': new_block.init_position_b,
                          'initA': new_block.init_a,
-                         'buildSpace1XB': new_block.build_space_1_x_b,
-                         'buildSpace1YB': new_block.build_space_1_y_b,
-                         'buildSpace1ZB': new_block.build_space_1_z_b,
-                         'buildSpace2XB': new_block.build_space_2_x_b,
-                         'buildSpace2YB': new_block.build_space_2_y_b,
-                         'buildSpace2ZB': new_block.build_space_2_z_b})
+                         'buildSpace1B': new_block.build_space_1_b,
+                         'buildSpace2B': new_block.build_space_2_b})
         return data
 
     # A transaction may not be necessary, but it ensures data integrity for
@@ -497,7 +489,7 @@ class RPCAdminMakeReal(webapp.RequestHandler):
     def transaction(x_b, y_b, z_b, a):
         construction = Construction.get_main()
         
-        block = Block.get_at(construction, x_b, y_b, z_b, a)
+        block = Block.get_at(construction, [x_b, y_b, z_b], a)
         if not block or block.state == 2:
             return # No block to update or already real.
         
@@ -534,7 +526,7 @@ class RPCAdminDelete(webapp.RequestHandler):
     def transaction(x_b, y_b, z_b, a):
         construction = Construction.get_main()
 
-        block = Block.get_at(construction, x_b, y_b, z_b, a)
+        block = Block.get_at(construction, [x_b, y_b, z_b], a)
         if block:
             # block found to be set to state deleted
             block.store_state_and_increase_blocks_data_version(0)
@@ -592,11 +584,11 @@ Angle: %d
     def transaction(x_b, y_b, z_b, a):
         construction = Construction.get_main()
 
-        block = Block.get_at(construction, x_b, y_b, z_b, a)
+        block = Block.get_at(construction, [x_b, y_b, z_b], a)
         if not block:
             # Block has to be created, with initial state deleted. It is left
             # in that state, if it intersects with a real block - see below.
-            block = Block.insert_at(construction, x_b, y_b, z_b, a)
+            block = Block.insert_at(construction, [x_b, y_b, z_b], a)
 
         if block.state == 2 or block.state == 1:
             # Block is real or block is already pending.
@@ -637,7 +629,7 @@ class RPCAdminMakePending(webapp.RequestHandler):
     def transaction(x_b, y_b, z_b, a):
         construction = Construction.get_main()
 
-        block = Block.get_at(construction, x_b, y_b, z_b, a)
+        block = Block.get_at(construction, [x_b, y_b, z_b], a)
         if not block or block.state == 1:
             # No block found, or block is already pending, or block intersects
             # with real block. => Nothing is done.
@@ -688,9 +680,9 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
     def post(self):
         try:
             data = {
-                'camera_x': float(self.request.get('camera.x')),
-                'camera_y': float(self.request.get('camera.y')),
-                'camera_z': float(self.request.get('camera.z')),
+                'camera_position': [float(self.request.get('camera.x')),
+                                    float(self.request.get('camera.y')),
+                                    float(self.request.get('camera.z'))],
                 'camera_a_x': float(self.request.get('camera.aX')),
                 'camera_a_y': float(self.request.get('camera.aY')),
                 'camera_a_z': float(self.request.get('camera.aZ')),
@@ -736,9 +728,7 @@ class AdminInit(webapp.RequestHandler):
         construction = Construction(key_name = 'main')
         construction.blocks_data_version = '0'
         construction.camera_data_version = '0'
-        construction.camera_x = 189.57
-        construction.camera_y = -159.16
-        construction.camera_z = 140.11
+        construction.camera_position = [189.57, -159.16, 140.11]
         construction.camera_a_x = 2.1589
         construction.camera_a_y = -0.46583
         construction.camera_a_z = 0.29
@@ -787,16 +777,10 @@ class AdminInit(webapp.RequestHandler):
         # Sets up the new block:
         newBlock = NewBlock(parent=construction)
         newBlock.data_version = '0'
-        newBlock.init_x_b = 4
-        newBlock.init_y_b = 0
-        newBlock.init_z_b = 5
+        newBlock.init_position_b = [4, 0, 5]
         newBlock.init_a = 0
-        newBlock.build_space_1_x_b = 0
-        newBlock.build_space_1_y_b = 0
-        newBlock.build_space_1_z_b = 0
-        newBlock.build_space_2_x_b = 5
-        newBlock.build_space_2_y_b = 5
-        newBlock.build_space_2_z_b = 4
+        newBlock.build_space_1_b = [0, 0, 0]
+        newBlock.build_space_2_b = [5, 5, 4]
         newBlock.put()
 
         # Deletes all block entries:
@@ -815,7 +799,7 @@ class AdminInit(webapp.RequestHandler):
             y_b = c[1]
             z_b = c[2]
             a = c[3]
-            block = Block.insert_at(construction, x_b, y_b, z_b, a)
+            block = Block.insert_at(construction, [x_b, y_b, z_b], a)
             block.state = 2
             block.put()
 

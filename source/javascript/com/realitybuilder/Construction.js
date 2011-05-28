@@ -580,11 +580,19 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // Updates the camera and live image settings on the server. Fails silently
     // on error.
     storeSettingsOnServer: function () {
-        var imageData = com.realitybuilder.util.addPrefix(
-                'image.', this._adminControls.readImageControls()),
-            cameraData = com.realitybuilder.util.addPrefix(
-                'camera.', this._adminControls.readCameraControls()),
-            content = {};
+        var imageData, cameraData, content, util;
+
+        util = com.realitybuilder.util;
+
+        imageData = util.addPrefix('image.', 
+                                   this._adminControls.readImageControls());
+        cameraData = util.addPrefix('camera.', 
+                                    this._adminControls.readCameraControls());
+        cameraData['camera.x'] = cameraData['camera.position'][0];
+        cameraData['camera.y'] = cameraData['camera.position'][1];
+        cameraData['camera.z'] = cameraData['camera.position'][2];
+        content = {};
+
         dojo.mixin(content, imageData, cameraData);
         dojo.xhrPost({
             url: "/admin/rpc/update_settings",

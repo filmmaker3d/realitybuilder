@@ -105,8 +105,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         var camera = this._construction.camera();
         return new com.realitybuilder.ConstructionBlock(this._blockProperties,
                                                         camera, 
-                                                        [bd.xB, bd.yB, bd.zB],
-                                                        bd.a,
+                                                        bd.positionB, bd.a,
                                                         bd.state,
                                                         bd.timeStamp);
     },

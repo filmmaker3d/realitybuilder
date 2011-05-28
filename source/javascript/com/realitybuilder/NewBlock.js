@@ -102,21 +102,15 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         var positionAngleWereInitialized;
 
         if (!this.isInitializedWithServerData()) {
-            this._positionB = [serverData.initXB,
-                               serverData.initYB,
-                               serverData.initZB];
+            this._positionB = serverData.initPositionB;
             this._a = serverData.initA;
             positionAngleWereInitialized = true;
         } else {
             positionAngleWereInitialized = false;
         }
 
-        this._buildSpace1B = [serverData.buildSpace1XB,
-                              serverData.buildSpace1YB,
-                              serverData.buildSpace1ZB];
-        this._buildSpace2B = [serverData.buildSpace2XB,
-                              serverData.buildSpace2YB,
-                              serverData.buildSpace2ZB];
+        this._buildSpace1B = serverData.buildSpace1B;
+        this._buildSpace2B = serverData.buildSpace2B;
 
         this._versionOnServer = serverData.version;
 

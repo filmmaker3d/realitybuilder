@@ -135,7 +135,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
     // Updates the settings of the camera using the "data" which is a subset of
     // the data that also the server delivers.
     update: function (data) {
-        this._position = [data.x, data.y, data.z];
+        this._position = data.position;
         this._aX = data.aX;
         this._aY = data.aY;
         this._aZ = data.aZ;

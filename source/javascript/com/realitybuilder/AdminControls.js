@@ -104,9 +104,9 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     // of that used for exchanging camera data with the server.
     readCameraControls: function () {
         var data = {
-            "x": parseFloat(dojo.byId('cameraX').value) || 0,
-            "y": parseFloat(dojo.byId('cameraY').value) || 0,
-            "z": parseFloat(dojo.byId('cameraZ').value) || 0,
+            "position": [parseFloat(dojo.byId('cameraX').value) || 0,
+                         parseFloat(dojo.byId('cameraY').value) || 0,
+                         parseFloat(dojo.byId('cameraZ').value) || 0],
             "aX": parseFloat(dojo.byId('cameraAX').value) || 0,
             "aY": parseFloat(dojo.byId('cameraAY').value) || 0,
             "aZ": parseFloat(dojo.byId('cameraAZ').value) || 0,
