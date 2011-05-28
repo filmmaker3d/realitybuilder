@@ -257,8 +257,7 @@ class BlockProperties(db.Model):
 
     # Center of rotation, with coordinates in block space, relative to the
     # lower left corner of the unrotated block, when viewed from above:
-    rot_center_x_b = db.FloatProperty()
-    rot_center_y_b = db.FloatProperty()
+    rot_center_bxy = db.ListProperty(float)
 
 class Index(webapp.RequestHandler):
     def get(self):
@@ -395,8 +394,7 @@ class RPCConstruction(webapp.RequestHandler):
                          'attachmentOffsetsListB': \
                              RPCConstruction.json_decode_list \
                              (block_properties.attachment_offsets_list_b),
-                         'rotCenterXB': block_properties.rot_center_x_b,
-                         'rotCenterYB': block_properties.rot_center_y_b})
+                         'rotCenterBXY': block_properties.rot_center_bxy})
         return data
 
     # Returns JSON serializable data related to the new block
@@ -764,8 +762,7 @@ class AdminInit(webapp.RequestHandler):
              '[[0, 0, -1], [0, 0, 1]]',
              '[[0, 0, -1], [0, 0, 1], [1, 0, -1], [1, 0, 1]]',
              '[[0, 0, -1], [0, 0, 1]]']
-        blockProperties.rot_center_x_b = 0.5
-        blockProperties.rot_center_y_b = 0.5
+        blockProperties.rot_center_bxy = [0.5, 0.5]
         blockProperties.put()
 
         # Deletes all new block entries:

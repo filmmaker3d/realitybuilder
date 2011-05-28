@@ -100,17 +100,16 @@ Terminology
 
 * Specifiers for coordinates (see also "perspective.xar"):
 
-  - The coordinate specifiers ending in "B", e.g. "xB", denote block positions:
+  - The coordinate specifiers ending in "B", e.g. "xB", denote positions in the
+    grid where blocks may be placed. The space comprised by those coordinates
+    is called "block position space", or short: "block space"
 
-      xB, yB, zB: Position of the left ("xB"), front ("yB"), bottom ("zB")
-        corner of a block's bounding box.
-
-    Units: none
+    Units: none (multiples of distances between positions)
 
     Value: integer
 
-    The space comprised by those coordinates is called "block position space",
-    or short: "block space"
+  - The coordinate specifiers ending in "BXY", denote block positions in the
+    block space x-y plane.
 
   - The coordinate specifiers ending in "V" denote coordinates in "view space",
     i.e. the space relative to the lens, approximated as a pinhole, of the

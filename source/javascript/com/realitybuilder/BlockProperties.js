@@ -175,7 +175,7 @@ dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
         this._outlineB = serverData.outlineB;
         this._collisionOffsetsListB = serverData.collisionOffsetsListB;
         this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
-        this._rotCenterBXY = [serverData.rotCenterXB, serverData.rotCenterYB];
+        this._rotCenterBXY = serverData.rotCenterBXY;
 
         this._updateRotatedOutlinesB();
         this._updateRotatedCollisionOffsetsListsBXY();
