@@ -206,16 +206,16 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _onKeyPress: function (event) {
         var constructionBlocks, newBlock;
 
-        constructionBlocks = this._constructionBlocks;
         newBlock = this._newBlock;
 
-        if (event.shiftKey && event.keyCode === dojo.keys.F12) {
+        if (event.keyCode === 109) { // m
             // For demoing the Reality Builder:
             //
             // Makes the block at the position of the new block real on the
             // server. This only works if there is a block at that position in
             // the list of construction blocks, and if the user is logged in as
             // administrator.
+            constructionBlocks = this._constructionBlocks;
             constructionBlocks.setBlockStateOnServer(newBlock.positionB(), 
                                                      newBlock.a(), 2);
         } else if (event.keyCode === 114) { // r

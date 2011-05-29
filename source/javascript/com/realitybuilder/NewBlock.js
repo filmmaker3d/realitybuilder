@@ -150,16 +150,19 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Moves the block in block space, by "delta", unless the move would make
     // it go out of range.
     move: function (deltaB) {
-        if (!this.wouldGoOutOfRange(deltaB)) {
+        if (!this.wouldGoOutOfRange(deltaB, 0)) {
             this._positionB = com.realitybuilder.util.addVectorsB(
                 this._positionB, deltaB);
         }
         dojo.publish('com/realitybuilder/NewBlock/moved');
     },
 
-    // Rotates the block by 90°, CCW when viewed from above.
+    // Rotates the block by 90°, CCW when viewed from above, unless the
+    // rotation would make it go out of range.
     rotate90: function () {
-        this._a = (this._a + 1) % 4; // multiples of 90°
+        if (!this.wouldGoOutOfRange([0, 0, 0], 1)) {
+            this._a = (this._a + 1) % 4; // multiples of 90°
+        }
         dojo.publish('com/realitybuilder/NewBlock/moved'); // FIXME: rename to rotated or something
     },
 
@@ -212,22 +215,25 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         }
     },
 
-    // Returns true, if this block would intersect with any real block if it
-    // was moved in block space by the vector "deltaB", or if it would be
-    // outside of the space where it is allowed to be moved. This space may be
-    // larger than the building space, allowing movement of the block alongside
-    // the exterior of the construction, for positioning.
-    wouldGoOutOfRange: function (deltaB) {
-        var testPositionB, testBlock, cbs = this._constructionBlocks;
+    // Returns true, if this block would intersect with any real block if:
+    //
+    // * it was moved in block space by the vector "deltaB", and/or 
+    //
+    // * rotated CCW (when viewd from above) by the angle "deltaA" (in
+    //   multiples of 90°), or 
+    //
+    // * if it would be outside of the space where it is allowed to be moved.
+    wouldGoOutOfRange: function (deltaB, deltaA) {
+        var testPositionB, testBlock, testA;
 
-        testPositionB = 
-            com.realitybuilder.util.addVectorsB(this.positionB(), deltaB);
+        testPositionB = com.realitybuilder.util.addVectorsB(this.positionB(), 
+                                                            deltaB);
+        testA = (this.a() + deltaA) % 4;
         testBlock = new com.realitybuilder.Block(this._blockProperties,
                                                  this._camera, 
-                                                 testPositionB,
-                                                 this.a());
+                                                 testPositionB, testA);
 
-        return (cbs.realBlocksCollideWith(testBlock) ||
+        return (this._constructionBlocks.realBlocksCollideWith(testBlock) ||
                 !this._wouldBeInMoveSpace(testPositionB));
     },
 

@@ -110,7 +110,7 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
             for (i = 0; i < 3; i += 1) {
                 deltaB[i] = (i === this._coordinate) ? this._delta() : 0;
             }
-            if (this._newBlock.wouldGoOutOfRange(deltaB)) {
+            if (this._newBlock.wouldGoOutOfRange(deltaB, 0)) {
                 this._disable();
             } else {
                 this._enable();
