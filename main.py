@@ -195,18 +195,7 @@ class Block(db.Model):
     # Returns True, iff the block "block" intersects with any real block. Self
     # intersection does not count as intersection.
     def is_intersecting_with_real(self):
-        for relative_xy_positionB in self.intersecting_relative_xy_positionsB:
-            testXB = self.x_b() + relative_xy_positionB[0]
-            testYB = self.y_b() + relative_xy_positionB[1]
-            testZB = self.z_b()
-            testA = self.a
-            testBlock = Block.get_at_with_state(self.parent(), 
-                                                [testXB, testYB, testZB], 
-                                                testA, 2)
-            if testBlock:
-                # Intersecting real block exists.
-                return True
-        return False
+        return False # currently not implemented
 
     # Deletes any pending blocks intersecting with the block "block", aside
     # from the block itself.
