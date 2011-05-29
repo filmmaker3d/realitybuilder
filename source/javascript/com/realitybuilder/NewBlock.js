@@ -1,10 +1,4 @@
 // The new block in the construction. It may be positioned by the user.
-// Published topics:
-//
-// - When the block has been stopped: com/realitybuilder/NewBlock/stopped
-// 
-// - When the block has been made movable: 
-//   com/realitybuilder/NewBlock/madeMovable
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
@@ -154,7 +148,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             this._positionB = com.realitybuilder.util.addVectorsB(
                 this._positionB, deltaB);
         }
-        dojo.publish('com/realitybuilder/NewBlock/moved');
+        dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
     },
 
     // Rotates the block by 90°, CCW when viewed from above, unless the
@@ -163,7 +157,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         if (!this.wouldGoOutOfRange([0, 0, 0], 1)) {
             this._a = (this._a + 1) % 4; // multiples of 90°
         }
-        dojo.publish('com/realitybuilder/NewBlock/moved'); // FIXME: rename to rotated or something
+        dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
     },
 
     isRotatable: function () {

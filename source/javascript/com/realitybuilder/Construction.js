@@ -126,8 +126,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
                        this, this._onNewBlockStopped);
         dojo.subscribe('com/realitybuilder/NewBlock/madeMovable', 
                        this, this._onNewBlockMadeMovable);
-        dojo.subscribe('com/realitybuilder/NewBlock/moved', 
-                       this, this._onNewBlockMoved);
+        dojo.subscribe('com/realitybuilder/NewBlock/movedOrRotated',
+                       this, this._onNewBlockMovedOrRotated);
         dojo.subscribe('com/realitybuilder/ConstructionBlocks/changed',
                        this, this._onConstructionBlocksChanged);
         dojo.subscribe('com/realitybuilder/Camera/changed',
@@ -225,9 +225,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
     },
 
-    // Called when the new block has been moved. Lets it redraw and updates
-    // controls.
-    _onNewBlockMoved: function () {
+    // Called when the new block has been moved or rotated. Lets it redraw and
+    // updates controls.
+    _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
         this._userControls.updateRequestRealButton();
         this._userControls.updateStatusMessage(this._responseToLastRequest);
