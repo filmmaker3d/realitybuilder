@@ -253,6 +253,11 @@ class BlockProperties(db.Model):
     # lower left corner of the unrotated block, when viewed from above:
     rot_center_bxy = db.ListProperty(float)
 
+# Information concerning sending info emails about pending blocks.
+class PendingBlockEmail(db.Model):
+    sender_address = db.EmailProperty()
+    recipient_address = db.EmailProperty()
+
 class Index(webapp.RequestHandler):
     def get(self):
         template_values = {'debug': debug}
@@ -554,16 +559,21 @@ class RPCAdminDelete(webapp.RequestHandler):
 class RPCCreatePending(webapp.RequestHandler):
     # Tries to send an email, informing that a pending block has been created,
     # or the state of an existing block has been changed to pending. The
-    # position of the block: "x_b", "y_b", "z_b" Its rotation angle: "a"
+    # position of the block: "position_b" Its rotation angle: "a"
     @staticmethod
-    def send_info_email(x_b, y_b, z_b, a):
-        sender_address = "Reality Builder <felixedgarklee@googlemail.com>"
-        recipient_address = "new.pending.blocks@realitybuilder.com"
+    def send_info_email(construction, position_b, a):
+        query = PendingBlockEmail.all().ancestor(construction)
+        pending_block_email = query.get()
+        if pending_block_email is None:
+            raise Exception('Could not get pending block email data')
+
+        sender_address = pending_block_email.sender_address
+        recipient_address = pending_block_email.recipient_address
         subject = "New Pending Block"
         body = """
 Position: %d, %d, %d
 Angle: %d
-""" % (x_b, y_b, z_b, a)
+""" % (position_b[0], position_b[1], position_b[2], a)
 
         try:
             mail.send_mail(sender_address, recipient_address, subject, body)
@@ -595,7 +605,7 @@ Angle: %d
             return
 
         block.store_state_and_increase_blocks_data_version(1) # Set to pending.
-        RPCCreatePending.send_info_email(x_b, y_b, z_b, a)
+        RPCCreatePending.send_info_email(construction, [x_b, y_b, z_b], a)
 
     def post(self):
         try:
@@ -797,6 +807,19 @@ class AdminInit(webapp.RequestHandler):
             block = Block.insert_at(construction, [x_b, y_b, z_b], a)
             block.state = 2
             block.put()
+
+        # Deletes all pending block email entries:
+        queries = [PendingBlockEmail.all()]
+        for query in queries:
+            for result in query:
+                result.delete()
+
+        # Creates pending block email entries:
+        pendingBlockEmail = PendingBlockEmail(parent=construction)
+        pendingBlockEmail.sender_address = 'Admin <admin@example.com>'
+        pendingBlockEmail.recipient_address = \
+            'Block Builders <block.builders@example.com>'
+        pendingBlockEmail.put()
 
         print 'Done.'
 
