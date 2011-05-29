@@ -40,9 +40,14 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _versionOnServer: '-1',
 
     // Points in block space, defining the rectangle which represents the space
-    // in which blocks may be built.
+    // in which the block may be built.
     _buildSpace1B: null,
     _buildSpace2B: null,
+
+    // Points in move space, defining the rectangle which represents the space
+    // in which the block may be moved around.
+    _moveSpace1B: null,
+    _moveSpace2B: null,
 
     // Iff true, then the block is stopped, which means that it can neither be
     // moved nor be rotated.
@@ -225,15 +230,13 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // Returns true, if this block would be outside the move space, if it was
-    // in block space at the position "testB". The move space is above the
-    // ground and just as large as to allow a block to be moved anywhere
-    // outside the boundary of the build space.
+    // at the position "testB" (block space coordinates). The move space is the
+    // space in which the block is allowed to be moved around.
     _wouldBeInMoveSpace: function (testB) {
-        var b1B = this._buildSpace1B, b2B = this._buildSpace2B;
-        return (
-            testB[0] >= b1B[0] - 1 && testB[0] <= b2B[0] + 1 &&
-            testB[1] >= b1B[1] - 1 && testB[1] <= b2B[1] + 1 &&
-            testB[2] >= 0 && testB[2] <= b2B[2] + 1);
+        var m1B = this._moveSpace1B, m2B = this._moveSpace2B;
+        return (testB[0] >= m1B[0] && testB[0] <= m2B[0] &&
+                testB[1] >= m1B[1] && testB[1] <= m2B[1] &&
+                testB[2] >= 0 && testB[2] <= m2B[2]);
     },
 
     // Returns true, iff this block is in the space where blocks may be build.

@@ -112,7 +112,12 @@ class NewBlock(db.Model):
                                   # above
 
     # Points in block space, defining the rectangle which represents the space
-    # in which blocks may be built.
+    # in which the block may be moved around.
+    move_space_1_b = db.ListProperty(int)
+    move_space_2_b = db.ListProperty(int)
+
+    # Points in block space, defining the rectangle which represents the space
+    # in which the block may be built.
     build_space_1_b = db.ListProperty(int)
     build_space_2_b = db.ListProperty(int)
 
@@ -417,6 +422,8 @@ class RPCConstruction(webapp.RequestHandler):
             # Deliver all the data.
             data.update({'initPositionB': new_block.init_position_b,
                          'initA': new_block.init_a,
+                         'moveSpace1B': new_block.move_space_1_b,
+                         'moveSpace2B': new_block.move_space_2_b,
                          'buildSpace1B': new_block.build_space_1_b,
                          'buildSpace2B': new_block.build_space_2_b})
         return data
@@ -776,6 +783,8 @@ class AdminInit(webapp.RequestHandler):
         newBlock.data_version = '0'
         newBlock.init_position_b = [4, 0, 5]
         newBlock.init_a = 0
+        newBlock.move_space_1_b = [-1, -1, 0]
+        newBlock.move_space_2_b = [6, 6, 5]
         newBlock.build_space_1_b = [0, 0, 0]
         newBlock.build_space_2_b = [5, 5, 4]
         newBlock.put()
