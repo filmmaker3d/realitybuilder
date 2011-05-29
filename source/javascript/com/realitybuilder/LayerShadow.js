@@ -97,15 +97,15 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         yB = this._newBlock.yB(),
         zB = layerZB + 1,
         vs = [],
-        blockOutlineB = 
-            this._blockProperties.rotatedOutlineB(this._newBlock.a()),
+        blockOutlineBXY = 
+            this._blockProperties.rotatedOutlineBXY(this._newBlock.a()),
         that = this;
 
         // counterclockwise:
-        dojo.forEach(blockOutlineB, function (vertexXYB) {
+        dojo.forEach(blockOutlineBXY, function (vertexBXY) {
             vs.push(com.realitybuilder.util.
-                    blockToWorld([xB + vertexXYB[0], 
-                                  yB + vertexXYB[1], 
+                    blockToWorld([xB + vertexBXY[0], 
+                                  yB + vertexBXY[1], 
                                   zB],
                                  that._blockProperties));
         });

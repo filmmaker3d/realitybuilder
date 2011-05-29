@@ -246,13 +246,13 @@ class BlockProperties(db.Model):
 
     # Outline of a block in the xy plane, with coordinates in block space,
     # counterclockwise, when not rotated:
-    outline_b = db.StringProperty() # JSON array
+    outline_bxy = db.StringProperty() # JSON array
 
     # Two blocks 1 and 2 are defined to collide, iff block 2 is offset against
     # block 1 in the block space x-y-plane by any of the following values. The
     # rotation angles below are those of block 2 relative to block 1. The
     # offsets are stored as JSON arrays.
-    collision_offsets_list_b = db.StringListProperty() # 0°, 90°, 180°, 270°
+    collision_offsets_list_bxy = db.StringListProperty() # 0°, 90°, 180°, 270°
 
     # A block 2 is defined to be attachable to a block 1, if it is offset
     # against block 1 by any of the following values, in block space. The
@@ -391,11 +391,11 @@ class RPCConstruction(webapp.RequestHandler):
                          block_properties.position_spacing_xy,
                          'positionSpacingZ': 
                          block_properties.position_spacing_z,
-                         'outlineB': 
-                         simplejson.loads(block_properties.outline_b),
-                         'collisionOffsetsListB': \
+                         'outlineBXY': 
+                         simplejson.loads(block_properties.outline_bxy),
+                         'collisionOffsetsListBXY': \
                              RPCConstruction.json_decode_list \
-                             (block_properties.collision_offsets_list_b),
+                             (block_properties.collision_offsets_list_bxy),
                          'attachmentOffsetsListB': \
                              RPCConstruction.json_decode_list \
                              (block_properties.attachment_offsets_list_b),
@@ -758,8 +758,8 @@ class AdminInit(webapp.RequestHandler):
         blockProperties.data_version = '0'
         blockProperties.position_spacing_xy = 20.
         blockProperties.position_spacing_z = 10.
-        blockProperties.outline_b = '[[0, 0], [1, 0], [2, 1], [0, 1]]'
-        blockProperties.collision_offsets_list_b = \
+        blockProperties.outline_bxy = '[[0, 0], [1, 0], [2, 1], [0, 1]]'
+        blockProperties.collision_offsets_list_bxy = \
             ['[[-1, 0], [0, 0], [1, 0]]',
              '[[0, 0], [1, 0], [0, -1], [1, -1]]',
              '[[0, 0], [1, 0]]',

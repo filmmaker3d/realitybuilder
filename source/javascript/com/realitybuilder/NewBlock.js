@@ -39,15 +39,15 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
 
-    // Points in block space, defining the rectangle which represents the space
-    // in which the block may be built.
-    _buildSpace1B: null,
-    _buildSpace2B: null,
-
     // Points in move space, defining the rectangle which represents the space
     // in which the block may be moved around.
     _moveSpace1B: null,
     _moveSpace2B: null,
+
+    // Points in block space, defining the rectangle which represents the space
+    // in which the block may be built.
+    _buildSpace1B: null,
+    _buildSpace2B: null,
 
     // Iff true, then the block is stopped, which means that it can neither be
     // moved nor be rotated.
@@ -114,6 +114,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             positionAngleWereInitialized = false;
         }
 
+        this._moveSpace1B = serverData.moveSpace1B;
+        this._moveSpace2B = serverData.moveSpace2B;
         this._buildSpace1B = serverData.buildSpace1B;
         this._buildSpace2B = serverData.buildSpace2B;
 

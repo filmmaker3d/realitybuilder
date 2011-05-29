@@ -167,15 +167,15 @@ dojo.declare('com.realitybuilder.Block', null, {
 
     // Returns true, iff the current block collides with the block "block".
     collidesWith: function (block) {
-        var testPositionB, collisionOffsetsB, collisionOffsetB, i;
+        var testPositionB, collisionOffsetsBXY, collisionOffsetBXY, i;
 
-        collisionOffsetsB = 
-            this._blockProperties.rotatedCollisionOffsetsB(this, block);
+        collisionOffsetsBXY = 
+            this._blockProperties.rotatedCollisionOffsetsBXY(this, block);
 
-        for (i = 0; i < collisionOffsetsB.length; i += 1) {
-            collisionOffsetB = collisionOffsetsB[i];
-            testPositionB = [this.xB() + collisionOffsetB[0],
-                             this.yB() + collisionOffsetB[1],
+        for (i = 0; i < collisionOffsetsBXY.length; i += 1) {
+            collisionOffsetBXY = collisionOffsetsBXY[i];
+            testPositionB = [this.xB() + collisionOffsetBXY[0],
+                             this.yB() + collisionOffsetBXY[1],
                              this.zB()];
             if (com.realitybuilder.util.pointsIdenticalB(block.positionB(),
                                                          testPositionB)) {
@@ -213,19 +213,19 @@ dojo.declare('com.realitybuilder.Block', null, {
         xB = this.positionB()[0],
         yB = this.positionB()[1],
         zB = this.positionB()[2],
-        blockOutlineB = this._blockProperties.rotatedOutlineB(this.a()),
+        blockOutlineBXY = this._blockProperties.rotatedOutlineBXY(this.a()),
         that = this;
 
         this._bottomVertexesB = [];
         this._topVertexesB = [];
 
         // top, counterclockwise (when viewed from top in block space):
-        dojo.forEach(blockOutlineB, function (vertexXYB) {
-            that._bottomVertexesB.push([xB + vertexXYB[0], 
-                                        yB + vertexXYB[1], 
+        dojo.forEach(blockOutlineBXY, function (vertexBXY) {
+            that._bottomVertexesB.push([xB + vertexBXY[0], 
+                                        yB + vertexBXY[1], 
                                         zB]);
-            that._topVertexesB.push([xB + vertexXYB[0], 
-                                     yB + vertexXYB[1], 
+            that._topVertexesB.push([xB + vertexBXY[0], 
+                                     yB + vertexBXY[1], 
                                      zB + 1]);
         });
     },
