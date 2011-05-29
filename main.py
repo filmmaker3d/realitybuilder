@@ -32,7 +32,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = True
+debug = False
 
 # Dumps the data "data" as JSON response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -724,7 +724,7 @@ class AdminInit(webapp.RequestHandler):
         # using the development web server." See: <url:http://code.google.com/a
         # ppengine/docs/python/tools/devserver.html#Using_URL_Fetch>
         image_url = ('http://realitybuilder.googlecode.com/hg/documentation/' +
-                     'sample_scenes/prism/live.jpg')
+                     'sample_scene/live.jpg')
 
         # Creates the construction configuration. An image URL is not set to an
         # image on the same App Engine instance, since urlfetch doesn't seem to

@@ -120,8 +120,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
         dojo.subscribe('com/realitybuilder/NewBlock/' + 
                        'positionAngleInitialized', 
                        this, this._onNewBlockPositionAngleInitialized);
-        dojo.subscribe('com/realitybuilder/NewBlock/buildSpaceChanged', 
-                       this, this._onBuildSpaceChanged);
+        dojo.subscribe('com/realitybuilder/NewBlock/buildOrMoveSpaceChanged', 
+                       this, this._onMoveOrBuildSpaceChanged);
         dojo.subscribe('com/realitybuilder/NewBlock/stopped', 
                        this, this._onNewBlockStopped);
         dojo.subscribe('com/realitybuilder/NewBlock/madeMovable', 
@@ -362,8 +362,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
     },
 
     // Called after the dimensions of the space where the new block may be
-    // built have been changed.
-    _onBuildSpaceChanged: function () {
+    // moved or built have been changed.
+    _onMoveOrBuildSpaceChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
         this._updateStatusMessageIfFullyInitialized();

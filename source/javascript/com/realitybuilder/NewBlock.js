@@ -119,7 +119,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             dojo.publish('com/realitybuilder/NewBlock/' + 
                          'positionAngleInitialized');
         }
-        dojo.publish('com/realitybuilder/NewBlock/buildSpaceChanged');
+        dojo.publish('com/realitybuilder/NewBlock/moveOrBuildSpaceChanged');
     },
 
     // Returns true, iff the current block collides with any real block.
