@@ -130,6 +130,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
                        this, this._onNewBlockMadeMovable);
         dojo.subscribe('com/realitybuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
+        dojo.subscribe('com/realitybuilder/NewBlock/' + 
+                       'onNewBlockMakeRealRequested',
+                       this, this._onNewBlockMakeRealRequested);
         dojo.subscribe('com/realitybuilder/ConstructionBlocks/changed',
                        this, this._onConstructionBlocksChanged);
         dojo.subscribe('com/realitybuilder/Camera/changed',
@@ -179,16 +182,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._userControls.updateCoordinateControls(false);
     },
 
-    // Toggles the state of a block from virtual to pending. Also updates the
-    // last-request-state.
-    requestReal: function () {
-        if (this._newBlock.isMovable()) {
-            this._newBlock.stop();
-            this._constructionBlocks.createPendingOnServer(
-                this._newBlock.positionB(), this._newBlock.a());
-            this._responseToLastRequest = 1;
-        }
-        this._userControls.updateRequestRealButton();
+    // Called when the block was requested to be made real.
+    _onNewBlockMakeRealRequested: function () {
+        this._responseToLastRequest = 1;
+        this._controlPanel.update();
         this._userControls.updateStatusMessage(this._responseToLastRequest);
     },
 
@@ -222,10 +219,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
             constructionBlocks = this._constructionBlocks;
             constructionBlocks.setBlockStateOnServer(newBlock.positionB(), 
                                                      newBlock.a(), 2);
-        } else if (event.keyCode === 114) { // r
-            if (newBlock.isRotatable()) {
-                newBlock.rotate90();
-            }
         }
     },
 

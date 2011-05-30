@@ -40,12 +40,18 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
         nb = newBlock;
 
         buttons = [];
-        buttons.push(this._newCoordinateButton('incZButton', [0, 0, 1]));
-        buttons.push(this._newCoordinateButton('decZButton', [0, 0, -1]));
+        buttons.push(this._createCoordinateButton('incX', [1, 0, 0]));
+        buttons.push(this._createCoordinateButton('decX', [-1, 0, 0]));
+        buttons.push(this._createCoordinateButton('incY', [0, 1, 0]));
+        buttons.push(this._createCoordinateButton('decY', [0, -1, 0]));
+        buttons.push(this._createCoordinateButton('incZ', [0, 0, 1]));
+        buttons.push(this._createCoordinateButton('decZ', [0, 0, -1]));
+        buttons.push(this._createRotate90Button());
+        buttons.push(this._createRequestRealButton());
         this._buttons = buttons;
     },
 
-    _newCoordinateButton: function (id, deltaB) {
+    _createCoordinateButton: function (type, deltaB) {
         var newBlock, onClicked, shouldBeEnabled;
 
         newBlock = this._newBlock;
@@ -59,7 +65,44 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
                     newBlock.isMovable());
         };
 
-        return new com.realitybuilder.ControlButton(id, 
+        return new com.realitybuilder.ControlButton(type + 'Button', 
+                                                    onClicked, 
+                                                    shouldBeEnabled);
+    },
+
+    _createRotate90Button: function () {
+        var newBlock, onClicked, shouldBeEnabled;
+
+        newBlock = this._newBlock;
+
+        onClicked = function () {
+            newBlock.rotate90();
+        };
+
+        shouldBeEnabled = function () {
+            return (!newBlock.wouldGoOutOfRange([0, 0, 0], 1) &&
+                    newBlock.isRotatable());
+        };
+
+        return new com.realitybuilder.ControlButton('rotate90Button', 
+                                                    onClicked, 
+                                                    shouldBeEnabled);
+    },
+
+    _createRequestRealButton: function () {
+        var newBlock, onClicked, shouldBeEnabled;
+
+        newBlock = this._newBlock;
+
+        onClicked = function () {
+            newBlock.requestReal();
+        };
+
+        shouldBeEnabled = function () {
+            return newBlock.canBeMadeReal();
+        };
+
+        return new com.realitybuilder.ControlButton('requestRealButton', 
                                                     onClicked, 
                                                     shouldBeEnabled);
     },

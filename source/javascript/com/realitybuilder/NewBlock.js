@@ -127,28 +127,14 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         return this._constructionBlocks.realBlocksCollideWith(this);
     },
 
-    // See same function in super class.
-    _viewSpaceNeedsToBeUpdated: function () {
-        return (this._lastPositionB === null ||
-                !com.realitybuilder.util.pointsIdenticalB(
-                    this._lastPositionB, this._positionB) ||
-                this.inherited(arguments));
-    },
-
-    // See same function in super class.
-    _onViewSpaceUpdated: function () {
-        this._lastPositionB = dojo.clone(this._positionB);
-        this.inherited(arguments);
-    },
-
     // Moves the block in block space, by "delta", unless the move would make
     // it go out of range.
     move: function (deltaB) {
         if (!this.wouldGoOutOfRange(deltaB, 0)) {
             this._positionB = com.realitybuilder.util.addVectorsB(
                 this._positionB, deltaB);
+            dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
         }
-        dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
     },
 
     // Rotates the block by 90°, CCW when viewed from above, unless the
@@ -156,8 +142,18 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     rotate90: function () {
         if (!this.wouldGoOutOfRange([0, 0, 0], 1)) {
             this._a = (this._a + 1) % 4; // multiples of 90°
+            dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
         }
-        dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
+    },
+
+    // Requests that the block be made pending, thereby requesting to
+    // eventually have it made real.
+    requestMakeReal: function () {
+        if (this.canBeMadeReal()) {
+            this._newBlock.stop();
+            this._constructionBlocks.createPendingOnServer(this);
+            dojo.publish('com/realitybuilder/NewBlock/makeRealRequested');
+        }
     },
 
     isRotatable: function () {

@@ -71,6 +71,9 @@ dojo.declare('com.realitybuilder.ControlButton', null, {
         if (!this._isEnabled) {
             this._onMouseOut(); // necessary if mouse cursor is still over
                                 // button
+            dojo.addClass(this._node, 'disabled');
+        } else {
+            dojo.removeClass(this._node, 'disabled');
         }
     }
 });

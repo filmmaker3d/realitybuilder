@@ -238,16 +238,16 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
                      'changeOnServerFailed');
     },
 
-    // Adds a block at the block space position "positionB" and rotation angle
-    // "a" to the list of blocks on the server, with state pending.
-    createPendingOnServer: function (positionB, a) {
+    // Adds the block "block" to the list of blocks on the server, with state
+    // pending.
+    createPendingOnServer: function (block) {
         dojo.xhrPost({
             url: "/rpc/create_pending",
             content: {
-                "xB": positionB[0],
-                "yB": positionB[1],
-                "zB": positionB[2],
-                "a": a
+                "xB": block.x(),
+                "yB": block.y(),
+                "zB": block.z(),
+                "a": block.a()
             },
             load: dojo.hitch(this, this._createPendingOnServerSucceeded),
             error: dojo.hitch(this, this._createPendingOnServerFailed)

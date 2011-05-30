@@ -121,37 +121,141 @@ table#contentContainer td {
     text-align: left;
 }
 
-#controlPanel {
+#controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 
+#incZButton, #decZButton, #rotate90Button, #requestRealButton {
     position: absolute;
+    background-image: url(/images/control_panel.png);
+}
+
+#controlPanel {
     bottom: 10px;
     left: 145px;
     width: 350px;
     height: 110px;
-    background: url(/images/control_panel.png) 0 0;
+}
+
+#incXButton, #decXButton, #incYButton, #decYButton {
+    width: 50px;
+    height: 29px;
+}
+
+#incXButton {
+    top: 57px;
+    left: 174px;
+    background-position: -170px -170px;
+}
+
+#incXButton.hover {
+    background-position: -170px -270px;
+}
+
+#incXButton.disabled {
+    background-position: -170px -370px;
+}
+
+#decXButton {
+    top: 24px;
+    left: 77px;
+    background-position: -50px -120px;
+}
+
+#decXButton.hover {
+    background-position: -50px -220px;
+}
+
+#decXButton.disabled {
+    background-position: -50px -320px;
+}
+
+#incYButton {
+    top: 12px;
+    left: 154px;
+    background-position: -170px -120px;
+}
+
+#incYButton.hover {
+    background-position: -170px -220px;
+}
+
+#incYButton.disabled {
+    background-position: -170px -320px;
+}
+
+#decYButton {
+    top: 68px;
+    left: 96px;
+    background-position: -50px -170px;
+}
+
+#decYButton.hover {
+    background-position: -50px -270px;
+}
+
+#decYButton.disabled {
+    background-position: -50px -370px;
+}
+
+#incZButton, #decZButton {
+    width: 40px;
+    height: 40px;
 }
 
 #incZButton {
-    position: absolute;
     top: 10px;
     left: 10px;
-    width: 40px;
-    height: 40px;
-    background: url(/images/control_panel.png) 0 -120px;
+    background-position: 0 -120px;
 }
 
 #incZButton.hover {
     background-position: 0 -220px;
 }
 
+#incZButton.disabled {
+    background-position: 0 -320px;
+}
+
 #decZButton {
-    position: absolute;
     top: 60px;
     left: 10px;
-    width: 40px;
-    height: 40px;
-    background: url(/images/control_panel.png) 0 -170px;
+    background-position: 0 -170px;
 }
 
 #decZButton.hover {
     background-position: 0 -270px;
+}
+
+#decZButton.disabled {
+    background-position: 0 -370px;
+}
+
+#rotate90Button {
+    top: 40px;
+    left: 125px;
+    width: 49px;
+    height: 36px;
+    background-position: -110px -120px;
+}
+
+#rotate90Button.hover {
+    background-position: -110px -220px;
+}
+
+#rotate90Button.disabled {
+    background-position: -110px -320px;
+}
+
+#requestRealButton {
+    top: 10px;
+    left: 250px;
+    width: 90px;
+    height: 90px;
+    background-position: -230px -120px;
+}
+
+#requestRealButton.hover {
+    background-position: -230px -220px;
+}
+
+#requestRealButton.disabled {
+    background-position: -230px -320px;
 }
