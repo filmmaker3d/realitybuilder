@@ -28,9 +28,10 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
 
     // Side length of the squared surface that the button is drawn on and that
     // is clickable.
-    _sideLengthS: 37,
+    _sideLengthS: 36,
 
-    _radiusS: 17.5, // Radius of the circle displayed, in sensor space.
+    // FIXME: remove Math.round
+    _radiusS: 16, // Radius of the circle displayed, in sensor space.
 
     // Point where the button is centered in sensor space.
     centerS: null,
@@ -204,7 +205,8 @@ dojo.declare('com.realitybuilder.CoordinateButton', null, {
             context.strokeStyle = color;
 
             context.beginPath();
-            context.arc(l / 2, l / 2, this._radiusS, 0, 2 * Math.PI, false);
+            // FIXME: remove Math.round
+            context.arc(Math.round(l / 2), Math.round(l / 2), this._radiusS, 0, 2 * Math.PI, false);
             context.stroke();
 
             if (this._plus) {

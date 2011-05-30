@@ -1,4 +1,4 @@
-// User controls. These controls allow, for example, moving a block.
+// User controls. These controls allow moving a block, making it real, etc.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //

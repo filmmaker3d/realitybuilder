@@ -32,7 +32,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSON response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -780,7 +780,7 @@ class AdminInit(webapp.RequestHandler):
         # Sets up the new block:
         newBlock = NewBlock(parent=construction)
         newBlock.data_version = '0'
-        newBlock.init_position_b = [4, 0, 5]
+        newBlock.init_position_b = [4, 0, 4]
         newBlock.init_a = 0
         newBlock.move_space_1_b = [-1, -1, 0]
         newBlock.move_space_2_b = [6, 6, 5]

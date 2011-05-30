@@ -1,6 +1,6 @@
 {%comment%}
   Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
-
+  
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy of
   the License at
@@ -18,7 +18,7 @@
 
 {%block head%}
   <meta name="description" 
-    content="A tool for remote construction.">
+        content="A tool for remote construction.">
   {# media="all" hides style sheets from Netscape 4 #}
   <link rel="stylesheet" href="/stylesheets/index.css" media="all">
   <!--[if IE 6]>
@@ -92,7 +92,29 @@
           </div>
         </div>
         <div id="content">
-          <div id="view"></div>
+          <div id="view">
+            <img id="live" src="/images/placeholder.gif" alt="Live Image">
+            <div id="sensor">
+              <canvas id="sensorShadowCanvas" 
+                      width="1" height="1"></canvas>
+              <canvas id="sensorRealBlocksCanvas" 
+                      width="1" height="1"></canvas>
+              <canvas id="sensorPendingBlocksCanvas" 
+                      width="1" height="1"></canvas>
+              <canvas id="sensorNewBlockCanvas" 
+                      width="1" height="1"></canvas>
+            </div>
+            <div id="coordinateControls">
+              <canvas id="coordinateControlsCanvas" 
+                      width="1" height="1"></canvas>
+            </div>
+            <p id="status"></p>
+            <div id="requestReal">Make Real</div>
+            <div id="controlPanel">
+              <div id="incZButton"></div>
+              <div id="decZButton"></div>
+            </div>
+          </div>
 
           {# For admin mode. #}
           {%block sideBar%}{%endblock%}

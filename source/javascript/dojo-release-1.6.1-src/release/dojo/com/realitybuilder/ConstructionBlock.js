@@ -1,8 +1,109 @@
-/*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
-	Available via Academic Free License >= 2.1 OR the modified BSD license.
-	see: http://dojotoolkit.org/license for details
-*/
+if(!dojo._hasResource['com.realitybuilder.ConstructionBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['com.realitybuilder.ConstructionBlock'] = true;
+// A block that is permanently part of the construction, though it may be
+// marked as deleted or pending.
 
+// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
 
-if(!dojo._hasResource["com.realitybuilder.ConstructionBlock"]){dojo._hasResource["com.realitybuilder.ConstructionBlock"]=true;dojo.provide("com.realitybuilder.ConstructionBlock");dojo.require("com.realitybuilder.Block");dojo.declare("com.realitybuilder.ConstructionBlock",com.realitybuilder.Block,{_state:null,_timeStamp:null,constructor:function(_1,_2,_3,a,_4,_5){this._state=_4;this._timeStamp=_5;},timeStamp:function(){return this._timeStamp;},isDeleted:function(){return this._state===0;},isPending:function(){return this._state===1;},isReal:function(){return this._state===2;},state:function(){return this._state;},render:function(_6){if(!this.isDeleted()){var _7=this.isReal()?"green":"white";this.inherited(arguments,[arguments[0],_7]);}},renderSolidTop:function(_8){var _9,_a,i;this._updateCoordinates();_9=this._topVertexesS;_a=_9[0];_8.beginPath();_8.moveTo(_a[0],_a[1]);for(i=1;i<_9.length;i+=1){_a=_9[i];_8.lineTo(_a[0],_a[1]);}_8.closePath();_8.fill();}});}
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+
+dojo.provide('com.realitybuilder.ConstructionBlock');
+
+dojo.require('com.realitybuilder.Block');
+
+dojo.declare('com.realitybuilder.ConstructionBlock', 
+    com.realitybuilder.Block,
+{
+    // State of the block: 0 = deleted, 1 = pending (= requested to be build),
+    // 2 = real
+    _state: null,
+
+    // Time stamp - in seconds since the epoch - of the date-time when the
+    // bocks status was last changed. Block creation also counts as status
+    // change.
+    _timeStamp: null,
+
+    // Creates a block at the position in block space ("xB", "yB", "zB") =
+    // "positionB", and rotated about its center of rotation by "a" (° CCW,
+    // when viewed from above). When the block is rendered, it is as seen by
+    // the sensor of the camera "camera". A time stamp - in seconds since the
+    // epoch - of the date-time when the bocks status was last changed is
+    // "timeStamp".
+    //
+    // The block's properties, such as shape and size, are described by
+    // "blockProperties".
+    constructor: function (blockProperties, camera, positionB, a, state,
+                           timeStamp)
+    {
+        this._state = state;
+        this._timeStamp = timeStamp;
+    },
+
+    timeStamp: function () {
+        return this._timeStamp;
+    },
+
+    isDeleted: function () {
+        return this._state === 0;
+    },
+
+    isPending: function () {
+        return this._state === 1;
+    },
+
+    isReal: function () {
+        return this._state === 2;
+    },
+
+    state: function () {
+        return this._state;
+    },
+
+    // If not deleted, draws the block as seen by the sensor on the canvas with
+    // rendering context "context". Depends on the vertexes in view
+    // coordinates.
+    render: function (context) {
+        if (!this.isDeleted()) {
+            var color = this.isReal() ? "green" : "white";
+            this.inherited(arguments, [arguments[0], color]);
+        }
+    },
+
+    // Draws the top of the block solidly filled, onto the canvas with
+    // rendering context "context".
+    renderSolidTop: function (context) {
+        var topVertexesS, vertexS, i;
+
+        this._updateCoordinates();
+
+        topVertexesS = this._topVertexesS;
+
+        // counterclockwise:
+        vertexS = topVertexesS[0];
+        context.beginPath();
+        context.moveTo(vertexS[0], vertexS[1]);
+        for (i = 1; i < topVertexesS.length; i += 1) {
+            vertexS = topVertexesS[i];
+            context.lineTo(vertexS[0], vertexS[1]);
+        }
+        context.closePath();
+        context.fill();
+    }
+});
+
+}

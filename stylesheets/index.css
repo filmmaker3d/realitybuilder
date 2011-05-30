@@ -120,3 +120,38 @@ table#contentContainer td {
     margin: 0 auto;
     text-align: left;
 }
+
+#controlPanel {
+    position: absolute;
+    bottom: 10px;
+    left: 145px;
+    width: 350px;
+    height: 110px;
+    background: url(/images/control_panel.png) 0 0;
+}
+
+#incZButton {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    background: url(/images/control_panel.png) 0 -120px;
+}
+
+#incZButton.hover {
+    background-position: 0 -220px;
+}
+
+#decZButton {
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    background: url(/images/control_panel.png) 0 -170px;
+}
+
+#decZButton.hover {
+    background-position: 0 -270px;
+}

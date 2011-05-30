@@ -1,8 +1,118 @@
-/*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
-	Available via Academic Free License >= 2.1 OR the modified BSD license.
-	see: http://dojotoolkit.org/license for details
-*/
+if(!dojo._hasResource['com.realitybuilder.Shadow']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['com.realitybuilder.Shadow'] = true;
+// The shadow under the new block. It is used to indicate where the block is
+// hovering.
 
+// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
 
-if(!dojo._hasResource["com.realitybuilder.Shadow"]){dojo._hasResource["com.realitybuilder.Shadow"]=true;dojo.provide("com.realitybuilder.Shadow");dojo.require("com.realitybuilder.LayerShadow");dojo.require("com.realitybuilder.ShadowObscuringBlocks");dojo.declare("com.realitybuilder.Shadow",null,{_newBlock:null,_camera:null,_blockProperties:null,_constructionBlocks:null,_shadowObscuringBlocks:null,_layerShadow:null,constructor:function(_1,_2,_3,_4){this._newBlock=_1;this._blockProperties=_2;this._camera=_3;this._constructionBlocks=_4;this._shadowObscuringBlocks=new com.realitybuilder.ShadowObscuringBlocks(_1,_2,_3,_4);this._layerShadow=new com.realitybuilder.LayerShadow(_1,_2,_3,_4);},_renderLayerShadow:function(_5,_6,_7,_8,_9){this._layerShadow.render(_9);_5.globalAlpha=0.2;_5.drawImage(this._layerShadow.canvas(),0,0);_5.globalAlpha=1;},render:function(){var _a=this._camera.sensor().shadowCanvas(),_b,_c,_d=this._newBlock,_e=this._camera,_f=this._constructionBlocks;this._shadowObscuringBlocks.update();if(_a.getContext){_b=_a.getContext("2d");com.realitybuilder.util.clearCanvas(_a);for(_c=-1;_c<=_d.maxZB()-1;_c+=1){if(_c<_d.zB()){this._renderLayerShadow(_b,_d,_e,_f,_c);}this._shadowObscuringBlocks.subtract(_b,_c+1);}return;}},clear:function(){var _10=this._camera.sensor().shadowCanvas();com.realitybuilder.util.clearCanvas(_10);}});}
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+
+dojo.provide('com.realitybuilder.Shadow');
+
+dojo.require('com.realitybuilder.LayerShadow');
+dojo.require('com.realitybuilder.ShadowObscuringBlocks');
+
+dojo.declare('com.realitybuilder.Shadow', null, {
+    // New block that the shadow is associated with.
+    _newBlock: null,
+
+    // Camera object, used for calculating the projection on the camera sensor.
+    _camera: null,
+
+    // Properties (shape, dimensions, etc.) of a block:
+    _blockProperties: null,
+
+    // Permament blocks in the construction, including real and pending blocks.
+    // Needed for hidden lines removal and collision detection.
+    _constructionBlocks: null,
+
+    // Blocks that are used for graphically removing that parts of a shadow
+    // that are not actually visible.
+    _shadowObscuringBlocks: null,
+
+    // Only one instance of LayerShadow is used, to avoid memory leaks. See the
+    // documentation of LayerShadow for more information.
+    _layerShadow: null,
+
+    // Creates the shadow of the block "newBlock". When the shadow is rendered,
+    // it is as seen by the sensor of the camera "camera". For finding which
+    // parts of the shadow have to be obscured, the list of non-new blocks in
+    // the construction is used: "constructionBlocks"
+    constructor: function (newBlock, blockProperties, camera, 
+                           constructionBlocks)
+    {
+        this._newBlock = newBlock;
+        this._blockProperties = blockProperties;
+        this._camera = camera;
+        this._constructionBlocks = constructionBlocks;
+
+        this._shadowObscuringBlocks =
+            new com.realitybuilder.ShadowObscuringBlocks(newBlock, 
+                                                         blockProperties,
+                                                         camera,
+                                                         constructionBlocks);
+
+        this._layerShadow = 
+            new com.realitybuilder.LayerShadow(newBlock, blockProperties,
+                                               camera, constructionBlocks);
+    },
+
+    _renderLayerShadow: function (context, newBlock, camera, 
+                                  constructionBlocks, layerZB)
+    {
+        this._layerShadow.render(layerZB);
+        context.globalAlpha = 0.2;
+        context.drawImage(this._layerShadow.canvas(), 0, 0);
+        context.globalAlpha = 1;
+    },
+
+    // Draws the shadow of the new block as seen by the sensor of the camera.
+    render: function () {
+        var 
+        canvas = this._camera.sensor().shadowCanvas(), context, 
+        layerZB,
+        newBlock = this._newBlock, camera = this._camera,
+        constructionBlocks = this._constructionBlocks;
+
+        this._shadowObscuringBlocks.update();
+
+        if (canvas.getContext) {
+            context = canvas.getContext('2d');
+            com.realitybuilder.util.clearCanvas(canvas);
+
+            // draws shadow from bottom up, in each step removing parts that
+            // are obscured by blocks in the layer above:
+            for (layerZB = -1; layerZB <= newBlock.maxZB() - 1; layerZB += 1) {
+                if (layerZB < newBlock.zB()) {
+                    this._renderLayerShadow(context, newBlock, camera, 
+                                            constructionBlocks, layerZB);
+                }
+                this._shadowObscuringBlocks.subtract(context, layerZB + 1);
+            }
+            return;
+        }
+    },
+
+    // Makes sure that the shadow is not shown on the sensor.
+    clear: function () {
+        var canvas = this._camera.sensor().shadowCanvas();
+        com.realitybuilder.util.clearCanvas(canvas);
+    }
+});
+
+}

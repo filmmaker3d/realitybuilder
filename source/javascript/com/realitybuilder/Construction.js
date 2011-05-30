@@ -29,6 +29,7 @@ dojo.require('com.realitybuilder.Image');
 dojo.require('com.realitybuilder.Camera');
 dojo.require('com.realitybuilder.UserControls');
 dojo.require('com.realitybuilder.AdminControls');
+dojo.require('com.realitybuilder.ControlPanel');
 dojo.require('com.realitybuilder.util');
 
 dojo.declare('com.realitybuilder.Construction', null, {
@@ -83,7 +84,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // blocks.
     constructor: function (showAdminControls) {
         this._insertLoadIndicator();
-        this._insertView();
 
         this._showAdminControls = showAdminControls;
         this._responseToLastRequest = 0;
@@ -102,6 +102,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
                                             this._camera,
                                             this._constructionBlocks);
         this._userControls = new com.realitybuilder.UserControls(this);
+        this._controlPanel = 
+            new com.realitybuilder.ControlPanel(this._newBlock);
 
         if (this._showAdminControls) {
             this._adminControls = new com.realitybuilder.AdminControls(this);
@@ -166,12 +168,14 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // Called when the new block is stopped.
     _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
+        this._controlPanel.update();
         this._userControls.updateCoordinateControls(true);
     },
 
     // Called when the new block is made movable.
     _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
+        this._controlPanel.update();
         this._userControls.updateCoordinateControls(false);
     },
 
@@ -231,6 +235,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._newBlock.render();
         this._userControls.updateRequestRealButton();
         this._userControls.updateStatusMessage(this._responseToLastRequest);
+        this._controlPanel.update();
         this._userControls.updateCoordinateControls();
         if (this._showAdminControls) {
             this._adminControls.updateCoordinateDisplays();
@@ -314,8 +319,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this._blockProperties.isInitializedWithServerData()) {
             this._updateNewBlockPositionAndState();
             this._userControls.updateRequestRealButton();
-            this._userControls.updateCoordinateControls(
-                !this._newBlock.isMovable());
+            this._controlPanel.update();
         }
     },
 
@@ -401,55 +405,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
     _insertLoadIndicator: function () {
         dojo.attr('loadIndicator', 'innerHTML', 'Loading...');
-    },
-
-    // Returns HTML code for the request real button. For IE6 the button is a
-    // link instead of a div. Otherwise CSS for hovering doesn't get triggered.
-    _requestRealButtonHtml: function () {
-        var tmp1, tmp2;
-        if (dojo.isIE && dojo.isIE === 6) {
-            tmp1 = 'a href="javascript:void(0)"';
-            tmp2 = 'a';
-        } else {
-            tmp1 = tmp2 = 'div';
-        }
-        return '<' + tmp1 + ' id="requestReal" >Make Real</' + tmp2 + '>';
-    },
-
-    // Inserts the base HTML code for the "view". It is initially hidden.
-    _insertView: function () {
-        // Instead of using a CSS background image, an image tag is used.
-        // Reason: In Firefox 3.5/Win32, replacing the background image caused
-        // flickering, even when making sure that the replacement image has
-        // been preloaded.
-        dojo.attr('view', 'innerHTML',
-            '<img id="live" src="/images/placeholder.gif" alt="Live Image">' +
-            '<div id="sensor">' +
-            '<canvas id="sensorShadowCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '<canvas id="sensorRealBlocksCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '<canvas id="sensorPendingBlocksCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '<canvas id="sensorNewBlockCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '</div>' +
-            '<div id="coordinateControls">' +
-            '<canvas id="coordinateControlsCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '</div>' +
-            '<p id="status"></p>' +
-            this._requestRealButtonHtml());
-
-        // Initializes Explorer Canvas for elements that were added later to
-        // the DOM.
-        if (com.realitybuilder.util.isFlashCanvasActive()) {
-            FlashCanvas.initElement(dojo.byId('sensorShadowCanvas'));
-            FlashCanvas.initElement(dojo.byId('sensorRealBlocksCanvas'));
-            FlashCanvas.initElement(dojo.byId('sensorPendingBlocksCanvas'));
-            FlashCanvas.initElement(dojo.byId('sensorNewBlockCanvas'));
-            FlashCanvas.initElement(dojo.byId('coordinateControlsCanvas'));
-        }
     },
 
     // Regularly checks if the construction has been loaded, so that the

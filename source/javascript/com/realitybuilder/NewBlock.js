@@ -428,8 +428,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             (this._lastConstructionBlocksVersion !==
              this._constructionBlocks.versionOnServer());
 
-        isStoppedStateHasChanged = 
-            (this._lastIsStopped !== this._lastIsStopped);
+        isStoppedStateHasChanged = (this._lastIsStopped !== this._isStopped);
 
         return coordinatesHaveChanged || constructionBlocksHaveChanged ||
             isStoppedStateHasChanged;
