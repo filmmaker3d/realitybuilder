@@ -81,6 +81,10 @@ table#contentContainer td {
     vertical-align: middle;
 }
 
+table#contentContainer tr {
+    height: 100%;
+}
+
 #view {
     position: relative;
     margin: 0 auto;
