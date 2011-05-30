@@ -150,7 +150,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // eventually have it made real.
     requestMakeReal: function () {
         if (this.canBeMadeReal()) {
-            this._newBlock.stop();
+            this._stop();
             this._constructionBlocks.createPendingOnServer(this);
             dojo.publish('com/realitybuilder/NewBlock/makeRealRequested');
         }
@@ -168,7 +168,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         return this._isStopped;
     },
 
-    stop: function () {
+    _stop: function () {
         this._isStopped = true;
         dojo.publish('com/realitybuilder/NewBlock/stopped');
     },

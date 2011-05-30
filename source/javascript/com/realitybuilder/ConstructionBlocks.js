@@ -244,9 +244,9 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         dojo.xhrPost({
             url: "/rpc/create_pending",
             content: {
-                "xB": block.x(),
-                "yB": block.y(),
-                "zB": block.z(),
+                "xB": block.xB(),
+                "yB": block.yB(),
+                "zB": block.zB(),
                 "a": block.a()
             },
             load: dojo.hitch(this, this._createPendingOnServerSucceeded),

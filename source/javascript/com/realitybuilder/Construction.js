@@ -27,7 +27,6 @@ dojo.require('com.realitybuilder.ConstructionBlock');
 dojo.require('com.realitybuilder.NewBlock');
 dojo.require('com.realitybuilder.Image');
 dojo.require('com.realitybuilder.Camera');
-dojo.require('com.realitybuilder.UserControls');
 dojo.require('com.realitybuilder.AdminControls');
 dojo.require('com.realitybuilder.ControlPanel');
 dojo.require('com.realitybuilder.util');
@@ -39,10 +38,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // All blocks, permanently in the construction, including real and pending
     // blocks:
     _constructionBlocks: null,
-
-    // Response to the last request to build a block. 0: no last request. 1:
-    // not yet processed. 2: accepted. 3: denied.
-    _responseToLastRequest: null,
 
     // Interval in between requests to the server for the new construction
     // data.
@@ -71,8 +66,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // The live image.
     _image: null,
 
+    // The control panel for moving around the block and requesting it to be
+    // made real:
+    _controlPanel: null,
+
     // Controls for changing and inspecting settings and the construction.
-    _userControls: null,
     _adminControls: null,
 
     // Handle for the timeout between requests to the server for new
@@ -86,7 +84,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._insertLoadIndicator();
 
         this._showAdminControls = showAdminControls;
-        this._responseToLastRequest = 0;
         this._showReal = showAdminControls;
         this._showPending = showAdminControls;
 
@@ -101,7 +98,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
             new com.realitybuilder.NewBlock(this._blockProperties,
                                             this._camera,
                                             this._constructionBlocks);
-        this._userControls = new com.realitybuilder.UserControls(this);
         this._controlPanel = 
             new com.realitybuilder.ControlPanel(this._newBlock);
 
@@ -168,25 +164,21 @@ dojo.declare('com.realitybuilder.Construction', null, {
         return this._constructionBlocks;
     },
 
-    // Called when the new block is stopped.
+    // Called after the new block has been stopped.
     _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
         this._controlPanel.update();
-        this._userControls.updateCoordinateControls(true);
     },
 
-    // Called when the new block is made movable.
+    // Called after the new block has been made movable.
     _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
         this._controlPanel.update();
-        this._userControls.updateCoordinateControls(false);
     },
 
-    // Called when the block was requested to be made real.
+    // Called after the block was requested to be made real.
     _onNewBlockMakeRealRequested: function () {
-        this._responseToLastRequest = 1;
         this._controlPanel.update();
-        this._userControls.updateStatusMessage(this._responseToLastRequest);
     },
 
     // Toggles display of real blocks.
@@ -222,29 +214,20 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
     },
 
-    // Called when the new block has been moved or rotated. Lets it redraw and
+    // Called after the new block has been moved or rotated. Lets it redraw and
     // updates controls.
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
-        this._userControls.updateRequestRealButton();
-        this._userControls.updateStatusMessage(this._responseToLastRequest);
         this._controlPanel.update();
-        this._userControls.updateCoordinateControls();
         if (this._showAdminControls) {
             this._adminControls.updateCoordinateDisplays();
         }
     },
 
     // Updates the position and state of the block to reflect changes in the
-    // construction. Also sets the status text. Depends on up to date lists of
-    // blocks and real blocks.
+    // construction. Depends on up to date lists of blocks and real blocks.
     _updateNewBlockPositionAndState: function () {
-        var positionB = this._newBlock.positionB(), tmp, state;
-
-        // Discovers the correct status text and updates the new block state:
-        if (this._newBlock.isStopped()) {
-            tmp = this._constructionBlocks.blockAt(positionB);
-        }
+        var positionB = this._newBlock.positionB(), state;
 
         // Updates the position of the new block so that it doesn't conflict
         // with any real block.
@@ -253,29 +236,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
         if (this._showAdminControls) {
             // Necessary after updating the block position:
             this._adminControls.updateCoordinateDisplays();
-        }
-
-        // Finds the correct status message, and updates whether the block is
-        // movable or fixed.
-        if (this._newBlock.isStopped()) {
-            if (tmp && !tmp.isDeleted()) {
-                // Non-new block ground in the position of the new block.
-                state = tmp.state(); // State of block in same pos. as new
-                                     // block was.
-                if (state === 2) {
-                    // Real block in the same position as the new block.
-                    this._responseToLastRequest = 2; // request accepted
-                    this._newBlock.makeMovable(); // so that the user can
-                                                  // continue
-                } else {
-                    // request not yet processed
-                    this._responseToLastRequest = 1;
-                }
-            } else {
-                // No non-new block found in the position of the new block.
-                this._responseToLastRequest = 3; // request denied
-                this._newBlock.makeMovable(); // so that the user can continue
-            }
         }
     },
 
@@ -299,7 +259,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
         if (this._camera.isInitializedWithServerData() && 
             this._blockProperties.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData()) {
-            this._userControls.renderCoordinateControls();
         }
     },
 
@@ -311,19 +270,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this._newBlock.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData()) {
             this._updateNewBlockPositionAndState();
-            this._userControls.updateRequestRealButton();
             this._controlPanel.update();
-        }
-    },
-
-    // Updates the status message, but only if all necessary components have
-    // been initialized, which is relevant only in the beginning.
-    _updateStatusMessageIfFullyInitialized: function () {
-        if (this._constructionBlocks.isInitializedWithServerData() &&
-            this._newBlock.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData()) {
-            this._userControls.
-                updateStatusMessage(this._responseToLastRequest);
         }
     },
 
@@ -333,7 +280,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this._adminControls.updateBlocksTable();
         }
 
-        this._updateStatusMessageIfFullyInitialized();
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
     },
@@ -354,7 +300,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _onNewBlockPositionAngleInitialized: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
-        this._updateStatusMessageIfFullyInitialized();
         this._renderCoordinateControlsIfFullyInitialized();
     },
 
@@ -363,16 +308,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _onMoveOrBuildSpaceChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
-        this._updateStatusMessageIfFullyInitialized();
         this._renderCoordinateControlsIfFullyInitialized();
     },
 
     // Called after the block properties have changed.
     _onBlockPropertiesChanged: function () {
-        // Updates the rendering of the coordinate controls, which depend on
-        // some of the block properties:
-        this._userControls.renderCoordinateControls();
-
         // Updates the renderings, which depend on block properties:
         this._renderCoordinateControlsIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
@@ -380,11 +320,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
         // Updates the state (and related controls) of the new block, because
         // they depend on block properties such as collision settings:
         this._updateNewBlockStateIfFullyInitialized();
-
-        // Updates the status message because it depends on the block
-        // properties concerning attachment conditions (attachment of the new
-        // to a real block):
-        this._updateStatusMessageIfFullyInitialized();
 
         this._renderBlocksIfFullyInitialized();
     },

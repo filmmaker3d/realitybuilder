@@ -12,9 +12,7 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
-body, html, #view, #sensor, #coordinateControlsCanvas, #live, #status, #info,
-#requestReal
-{
+body, html, #view, #sensor, #coordinateControlsCanvas, #live, #status, #info {
     -moz-user-select: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -62,7 +60,7 @@ body {
 }
 
 #sensorRealBlocksCanvas, #sensorPendingBlocksCanvas, #sensorShadowCanvas, 
-#sensorNewBlockCanvas, #coordinateControlsCanvas {
+#sensorNewBlockCanvas {
     position: absolute;
     left: 0;
     top: 0;
@@ -73,38 +71,6 @@ body {
     left: 0;
     top: 0;
     background-color: #808080;
-}
-
-#status, #requestReal {
-    font-size: 12px;
-    color: white;
-}
-
-#status, #requestReal {
-    cursor: default;
-}
-
-#status {
-    position: absolute;
-    left: 12px;
-    top: 10px;
-    width: 150px;
-}
-
-#requestReal {
-    display: block;
-    position: absolute;
-    right: 35px;
-    top: 22px;
-    font-size: 14px;
-    padding: 5px;
-    color: white;
-    border: 1px solid white;
-}
-
-#requestReal:hover, #requestReal:active, #requestReal:focus {
-    color: red;
-    border: 1px solid red;
 }
 
 table#contentContainer {
@@ -134,6 +100,10 @@ table#contentContainer td {
     height: 110px;
 }
 
+#controlPanel.disabled {
+    background-position: 0px -120px;
+}
+
 #incXButton, #decXButton, #incYButton, #decYButton {
     width: 50px;
     height: 29px;
@@ -142,57 +112,57 @@ table#contentContainer td {
 #incXButton {
     top: 57px;
     left: 174px;
-    background-position: -170px -170px;
+    background-position: -170px -290px;
 }
 
 #incXButton.hover {
-    background-position: -170px -270px;
+    background-position: -170px -390px;
 }
 
 #incXButton.disabled {
-    background-position: -170px -370px;
+    background-position: -170px -490px;
 }
 
 #decXButton {
     top: 24px;
     left: 77px;
-    background-position: -50px -120px;
+    background-position: -50px -240px;
 }
 
 #decXButton.hover {
-    background-position: -50px -220px;
+    background-position: -50px -340px;
 }
 
 #decXButton.disabled {
-    background-position: -50px -320px;
+    background-position: -50px -440px;
 }
 
 #incYButton {
     top: 12px;
     left: 154px;
-    background-position: -170px -120px;
+    background-position: -170px -240px;
 }
 
 #incYButton.hover {
-    background-position: -170px -220px;
+    background-position: -170px -340px;
 }
 
 #incYButton.disabled {
-    background-position: -170px -320px;
+    background-position: -170px -440px;
 }
 
 #decYButton {
     top: 68px;
     left: 96px;
-    background-position: -50px -170px;
+    background-position: -50px -290px;
 }
 
 #decYButton.hover {
-    background-position: -50px -270px;
+    background-position: -50px -390px;
 }
 
 #decYButton.disabled {
-    background-position: -50px -370px;
+    background-position: -50px -490px;
 }
 
 #incZButton, #decZButton {
@@ -203,29 +173,29 @@ table#contentContainer td {
 #incZButton {
     top: 10px;
     left: 10px;
-    background-position: 0 -120px;
+    background-position: 0 -240px;
 }
 
 #incZButton.hover {
-    background-position: 0 -220px;
+    background-position: 0 -340px;
 }
 
 #incZButton.disabled {
-    background-position: 0 -320px;
+    background-position: 0 -440px;
 }
 
 #decZButton {
     top: 60px;
     left: 10px;
-    background-position: 0 -170px;
+    background-position: 0 -290px;
 }
 
 #decZButton.hover {
-    background-position: 0 -270px;
+    background-position: 0 -390px;
 }
 
 #decZButton.disabled {
-    background-position: 0 -370px;
+    background-position: 0 -490px;
 }
 
 #rotate90Button {
@@ -233,15 +203,15 @@ table#contentContainer td {
     left: 125px;
     width: 49px;
     height: 36px;
-    background-position: -110px -120px;
+    background-position: -110px -240px;
 }
 
 #rotate90Button.hover {
-    background-position: -110px -220px;
+    background-position: -110px -340px;
 }
 
 #rotate90Button.disabled {
-    background-position: -110px -320px;
+    background-position: -110px -440px;
 }
 
 #requestRealButton {
@@ -249,13 +219,13 @@ table#contentContainer td {
     left: 250px;
     width: 90px;
     height: 90px;
-    background-position: -230px -120px;
+    background-position: -230px -240px;
 }
 
 #requestRealButton.hover {
-    background-position: -230px -220px;
+    background-position: -230px -340px;
 }
 
 #requestRealButton.disabled {
-    background-position: -230px -320px;
+    background-position: -230px -440px;
 }

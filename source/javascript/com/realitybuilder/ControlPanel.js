@@ -30,11 +30,16 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
     // Buttons:
     _buttons: null,
 
+    // Node object representing the panel.
+    _node: null,
+
     // Creates control panel for the block "newBlock".
     constructor: function (newBlock) { 
         var rb, nb, buttons;
 
         this._newBlock = newBlock;
+
+        this._node = dojo.byId('controlPanel');
 
         rb = com.realitybuilder;
         nb = newBlock;
@@ -95,11 +100,11 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
         newBlock = this._newBlock;
 
         onClicked = function () {
-            newBlock.requestReal();
+            newBlock.requestMakeReal();
         };
 
         shouldBeEnabled = function () {
-            return newBlock.canBeMadeReal();
+            return newBlock.canBeMadeReal() && !newBlock.isStopped();
         };
 
         return new com.realitybuilder.ControlButton('requestRealButton', 
@@ -107,10 +112,16 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
                                                     shouldBeEnabled);
     },
 
-    // Updates the status of the buttons.
+    // Updates the status of the buttons and that of the panel itself:
     update: function () {
         dojo.forEach(this._buttons, function (button) {
             button.update();
         });
+
+        if (this._newBlock.isStopped()) {
+            dojo.addClass(this._node, 'disabled');
+        } else {
+            dojo.removeClass(this._node, 'disabled');
+        }
     }
 });
