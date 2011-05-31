@@ -49,8 +49,7 @@ realitybuilder.js:
 ./../../release/dojo/com/realitybuilder/Image.js
 ./../../release/dojo/com/realitybuilder/Sensor.js
 ./../../release/dojo/com/realitybuilder/Camera.js
-./../../release/dojo/com/realitybuilder/CoordinateButton.js
-./../../release/dojo/com/realitybuilder/CoordinateControls.js
-./../../release/dojo/com/realitybuilder/UserControls.js
 ./../../release/dojo/com/realitybuilder/AdminControls.js
+./../../release/dojo/com/realitybuilder/ControlButton.js
+./../../release/dojo/com/realitybuilder/ControlPanel.js
 ./../../release/dojo/com/realitybuilder/Construction.js

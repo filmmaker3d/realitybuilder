@@ -5359,6 +5359,16 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         return this._realBlocksSorted;
     },
 
+    // Returns block space z coordinate of the highest real blocks, or -1 if
+    // there are no real blocks.
+    highestRealBlocksZB: function () {
+        if (this._realBlocksSorted.length > 0) {
+            return this._realBlocksSorted[0].zB();
+        } else {
+            return -1;
+        }
+    },
+
     // Returns all blocks positioned at z coordinate "zB", in block space.
     realBlocksInLayer: function (zB) {
         var blocks = [], i, realBlocksSorted = this._realBlocksSorted, block;
@@ -5522,16 +5532,16 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
                      'changeOnServerFailed');
     },
 
-    // Adds a block at the block space position "positionB" and rotation angle
-    // "a" to the list of blocks on the server, with state pending.
-    createPendingOnServer: function (positionB, a) {
+    // Adds the block "block" to the list of blocks on the server, with state
+    // pending.
+    createPendingOnServer: function (block) {
         dojo.xhrPost({
             url: "/rpc/create_pending",
             content: {
-                "xB": positionB[0],
-                "yB": positionB[1],
-                "zB": positionB[2],
-                "a": a
+                "xB": block.xB(),
+                "yB": block.yB(),
+                "zB": block.zB(),
+                "a": block.a()
             },
             load: dojo.hitch(this, this._createPendingOnServerSucceeded),
             error: dojo.hitch(this, this._createPendingOnServerFailed)
@@ -6022,7 +6032,7 @@ dojo.declare('com.realitybuilder.ShadowObscuringBlocks', null, {
         blocks = [],
         blocksInLayer, blocksInPrevLayer = [], copiedBlocks;
 
-        for (zB = newBlock.maxZB() - 1; zB >= 0; zB -= 1) {
+        for (zB = cbs.highestRealBlocksZB(); zB >= 0; zB -= 1) {
             // Collects shadow obscuring blocks for current layer:
             blocksInLayer = cbs.realBlocksInLayer(zB);
 
@@ -6160,7 +6170,8 @@ dojo.declare('com.realitybuilder.Shadow', null, {
         canvas = this._camera.sensor().shadowCanvas(), context, 
         layerZB,
         newBlock = this._newBlock, camera = this._camera,
-        constructionBlocks = this._constructionBlocks;
+        constructionBlocks = this._constructionBlocks,
+        maxLayerZB = constructionBlocks.highestRealBlocksZB();
 
         this._shadowObscuringBlocks.update();
 
@@ -6170,7 +6181,7 @@ dojo.declare('com.realitybuilder.Shadow', null, {
 
             // draws shadow from bottom up, in each step removing parts that
             // are obscured by blocks in the layer above:
-            for (layerZB = -1; layerZB <= newBlock.maxZB() - 1; layerZB += 1) {
+            for (layerZB = -1; layerZB <= maxLayerZB; layerZB += 1) {
                 if (layerZB < newBlock.zB()) {
                     this._renderLayerShadow(context, newBlock, camera, 
                                             constructionBlocks, layerZB);
@@ -6317,22 +6328,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // Returns true, iff the current block collides with any real block.
-    collidesWithRealBlock: function () {
+    _collidesWithRealBlock: function () {
         return this._constructionBlocks.realBlocksCollideWith(this);
-    },
-
-    // See same function in super class.
-    _viewSpaceNeedsToBeUpdated: function () {
-        return (this._lastPositionB === null ||
-                !com.realitybuilder.util.pointsIdenticalB(
-                    this._lastPositionB, this._positionB) ||
-                this.inherited(arguments));
-    },
-
-    // See same function in super class.
-    _onViewSpaceUpdated: function () {
-        this._lastPositionB = dojo.clone(this._positionB);
-        this.inherited(arguments);
     },
 
     // Moves the block in block space, by "delta", unless the move would make
@@ -6341,8 +6338,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         if (!this.wouldGoOutOfRange(deltaB, 0)) {
             this._positionB = com.realitybuilder.util.addVectorsB(
                 this._positionB, deltaB);
+            dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
         }
-        dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
     },
 
     // Rotates the block by 90°, CCW when viewed from above, unless the
@@ -6350,8 +6347,18 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     rotate90: function () {
         if (!this.wouldGoOutOfRange([0, 0, 0], 1)) {
             this._a = (this._a + 1) % 4; // multiples of 90°
+            dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
         }
-        dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
+    },
+
+    // Requests that the block be made pending, thereby requesting to
+    // eventually have it made real.
+    requestMakeReal: function () {
+        if (this.canBeMadeReal()) {
+            this._stop();
+            this._constructionBlocks.createPendingOnServer(this);
+            dojo.publish('com/realitybuilder/NewBlock/makeRealRequested');
+        }
     },
 
     isRotatable: function () {
@@ -6366,31 +6373,52 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         return this._isStopped;
     },
 
-    stop: function () {
+    _stop: function () {
         this._isStopped = true;
         dojo.publish('com/realitybuilder/NewBlock/stopped');
     },
 
-    makeMovable: function () {
+    _makeMovable: function () {
         this._isStopped = false;
         dojo.publish('com/realitybuilder/NewBlock/madeMovable');
     },
 
-    // Maximum vertical position of the new block. Note that this position is
-    // higher than the position in which blocks may be build, by 1.
-    maxZB: function () {
-        return this._buildSpace2B[2];
+    // Updates the position and state of this block to reflect changes in the
+    // construction. Depends on up to date lists of blocks and real blocks.
+    updatePositionAndMovability: function () {
+        var positionB, state, constructionBlock;
+
+        // Makes the block movable again if certain conditions are met:
+        if (this.isStopped()) {
+            constructionBlock = 
+                this._constructionBlocks.blockAt(this.positionB());
+            if (constructionBlock) {
+                // Construction block in same position as new block.
+
+                if (constructionBlock.isDeleted() ||  
+                    constructionBlock.isReal()) {
+                    // construction block real = make-real-request accepted,
+                    // construction block deleted = request denied
+
+                    this._makeMovable(); // so that user can continue
+                } // else: pending or no data from the server
+            }
+        }
+
+        // Updates the position of the new block so that it doesn't conflict
+        // with any real block.
+        this._updatePositionB();
     },
 
     // Makes sure that this block does not intersect with any real block. If it
     // does, it is elevated step by step until it sits on top of another block.
     // Only updates the position of the block in block space. Does not update
     // any of the other coordinates.
-    updatePositionB: function () {
+    _updatePositionB: function () {
         var 
         testBlock, cbs = this._constructionBlocks, 
         xB = this.xB(), yB = this.yB(), testZB;
-        if (this.collidesWithRealBlock()) {
+        if (this._collidesWithRealBlock()) {
             testZB = this.zB();
             do {
                 testZB += 1;
@@ -6467,10 +6495,12 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         l, r, b, t, blockL, blockR, blockB, blockT, 
         horizontalOverlap, verticalOverlap;
 
+        this._updateCoordinates();
         l = this._boundingBoxS[0][0];
         r = this._boundingBoxS[1][0];
         b = this._boundingBoxS[0][1];
         t = this._boundingBoxS[1][1];
+        block._updateCoordinates();
         blockL = block._boundingBoxS[0][0];
         blockR = block._boundingBoxS[1][0];
         blockB = block._boundingBoxS[0][1];
@@ -6622,8 +6652,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             (this._lastConstructionBlocksVersion !==
              this._constructionBlocks.versionOnServer());
 
-        isStoppedStateHasChanged = 
-            (this._lastIsStopped !== this._lastIsStopped);
+        isStoppedStateHasChanged = (this._lastIsStopped !== this._isStopped);
 
         return coordinatesHaveChanged || constructionBlocksHaveChanged ||
             isStoppedStateHasChanged;
@@ -7129,479 +7158,6 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.CoordinateButton']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.CoordinateButton'] = true;
-// A button for changing the value of a coordinate of the new block.
-
-// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy
-// of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
-
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
-
-dojo.provide('com.realitybuilder.CoordinateButton');
-
-dojo.declare('com.realitybuilder.CoordinateButton', null, {
-    // Color of button in highlighted state, and in standard state:
-    _highlightColor: 'red',
-    _standardColor: 'white',
-
-    // Side length of the squared surface that the button is drawn on and that
-    // is clickable.
-    _sideLengthS: 37,
-
-    _radiusS: 17.5, // Radius of the circle displayed, in sensor space.
-
-    // Point where the button is centered in sensor space.
-    centerS: null,
-
-    // Node object representing the entire button.
-    _canvas: null,
-
-    // Group of the graphics objects rendered on the surface.
-    _group: null,
-
-    // True, iff the button is a button for increasing the coordinate.
-    _plus: null,
-
-    // The block whose coordinates may be changed with the button.
-    _newBlock: null,
-
-    // The coordinate (0, 1, or 3 for x, y, or z).
-    _coordinate: null,
-
-    // True, iff the button is disabled.
-    _disabled: true,
-
-    // Handle of the onclick event connection.
-    _onclickHandle: null,
-
-    // Vector in block space indicating the direction in that the block should
-    // be moved.
-    _deltaB: null,
-    
-    // Creates a button for changing the value of the coordinate "coordinate"
-    // (0, 1, or 3 for x, y, or z) of the new block "newBlock". Centers the
-    // button at the sensor space point "centerS". When the button is clicked,
-    // then the block is moved. Iff "plus" is true, then the button is a
-    // plus-button, meaning that clicking on it increases the coordinate.
-    // Otherwise it is a minus-button. Initially the button is in disabled
-    // state. It is rendered on the canvas "canvas".
-    constructor: function (newBlock, centerS, coordinate, plus, canvas) {
-        this.centerS = centerS;
-        this._plus = plus;
-        this._newBlock = newBlock;
-        this._coordinate = coordinate;
-        this._computeDeltaB();
-        this._createNode();
-    },
-
-    highlight: function () {
-        if (!this._disabled) {
-            this._render(this._highlightColor);
-        }
-    },
-
-    unhighlight: function () {
-        this._render(this._standardColor);
-    },
-
-    radiusS: function () {
-        return this._radiusS;
-    },
-
-    // Moves the center of the button to the sensor space point "centerS".
-    move: function (centerS) {
-        var l = this._sideLengthS;
-        this._canvas.style.left = (centerS[0] - l / 2) + 'px';
-        this._canvas.style.top = (centerS[1] - l / 2) + 'px';
-        this.centerS = centerS;
-    },
-
-    // Disables the button, if "alwaysDisable" is true. Otherwise, enables the
-    // button iff moving the block "newBlock" in the associated direction is
-    // possible.
-    update: function (alwaysDisable) {
-        var deltaB, i;
-        if (alwaysDisable) {
-            this._disable();
-        } else {
-            deltaB = [];
-            for (i = 0; i < 3; i += 1) {
-                deltaB[i] = (i === this._coordinate) ? this._delta() : 0;
-            }
-            if (this._newBlock.wouldGoOutOfRange(deltaB, 0)) {
-                this._disable();
-            } else {
-                this._enable();
-            }
-        }
-    },
-
-    // Triggers moving of the new block, i.e. changing its coordinate.
-    moveNewBlock: function () {
-        this._newBlock.move(this._deltaB);
-    },
-
-    _computeDeltaB: function () {
-        var i;
-        this._deltaB = [];
-        for (i = 0; i < 3; i += 1) {
-            this._deltaB[i] = (i === this._coordinate) ? this._delta() : 0;
-        }
-    },
-
-    // Direction for moving the block (-1 or +1).
-    _direction: function () {
-        return (this._plus ? 1 : -1);
-    },
-
-    // Delta by which to change the coordinate of the block.
-    _delta: function () {
-        return this._direction();
-    },
-
-    // Disables the button.
-    _disable: function () {
-        if (!this._disabled) {
-            dojo.disconnect(this._onclickHandle);
-
-            // necessary e.g. if mouse currently hovers
-            this._render(this._standardColor);
-
-            this._disabled = true;
-        }
-    },
-
-    // Enables the button.
-    _enable: function () {
-        if (this._disabled) {
-            this._onclickHandle = 
-                dojo.connect(this._canvas, 'onclick', this, this.moveNewBlock);
-            this._disabled = false;
-        }
-    },
-
-    // Draws a transparent rectangle over the entire area of the button, i.e.
-    // over the area of the surface "surface". This is a necessary for IE8
-    // which seems to need something to be drawn in every place where the
-    // button should receive mouse events.
-    _drawRectangle: function (surface) {
-        surface.createRect({x1: 0, y1: 0, 
-            x2: surface.width, y2: surface.height}).setFill([0, 0, 0, 0]);
-    },
-
-    // Creates the DOM node with the button drawn on it.
-    _createNode: function () {
-        var l = this._sideLengthS;
-        this._canvas = dojo.create('canvas', 
-            {
-                width: l, 
-                height: l, 
-                style: {
-                    position: 'absolute', 
-                    left: (this.centerS[0] - l / 2) + 'px',
-                    top: (this.centerS[1] - l / 2) + 'px'}}, 
-            'coordinateControls');
-        if (com.realitybuilder.util.isFlashCanvasActive()) {
-            FlashCanvas.initElement(this._canvas);
-        }
-        dojo.connect(this._canvas, 'onmouseover', this, this.highlight);
-        dojo.connect(this._canvas, 'onmouseout', this, this.unhighlight);
-
-        this._render(this._standardColor);
-    },
-
-    // Renders the button in the color "color" (CSS format).
-    _render: function (color) {
-        var canvas = this._canvas,
-            l = this._sideLengthS,
-            context;
-        if (canvas.getContext) {
-            context = canvas.getContext("2d");
-            com.realitybuilder.util.clearCanvas(canvas);
-
-            context.strokeStyle = color;
-
-            context.beginPath();
-            context.arc(l / 2, l / 2, this._radiusS, 0, 2 * Math.PI, false);
-            context.stroke();
-
-            if (this._plus) {
-                context.moveTo(l / 2, 4);
-                context.lineTo(l / 2, l - 4);
-                context.stroke();
-            }
-
-            context.moveTo(4, l / 2);
-            context.lineTo(l - 4, l / 2);
-            context.stroke();
-        }
-    }
-});
-
-}
-
-if(!dojo._hasResource['com.realitybuilder.CoordinateControls']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.CoordinateControls'] = true;
-// The coordinate controls that control the movement of the new block in the
-// construction.
-
-// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy
-// of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
-
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
-
-dojo.provide('com.realitybuilder.CoordinateControls');
-
-
-
-dojo.declare('com.realitybuilder.CoordinateControls', null, {
-    // List of all coordinate buttons, with index: 2 * coordinate + (plus ? 1 :
-    // 0)
-    _coordinateButtons: null,
-
-    // Block that is controlled.
-    _newBlock: null,
-
-    // Canvas on which the line connecting the buttons is drawn.
-    _canvas: null,
-
-    // Camera that is used for calculating perspecive projection.
-    _camera: null,
-
-    // Creates the coordinate controls that control the movement of the new
-    // block "newBlock" in the construction. For calculating perspective
-    // projection, the camera "camera" is used.
-    constructor: function (newBlock, camera) {
-        this._newBlock = newBlock;
-        this._camera = camera;
-        this._coordinateButtons = [];
-        this._canvas = dojo.byId('coordinateControlsCanvas');
-        this._setCanvasDimensions();
-    },
-
-    _setCanvasDimensions: function () {
-        var sensor = this._camera.sensor(),
-            width = sensor.width(), height = sensor.height();
-        dojo.attr(this._canvas, 'width', width);
-        dojo.attr(this._canvas, 'height', height);
-        dojo.style(this._canvas, 'width', width + 'px');
-        dojo.style(this._canvas, 'height', height + 'px');
-    },
-
-    // Updates the coordinate buttons, setting their enabled/disabled state. If
-    // "disableAll" is true, then the coordinate buttons are disabled in any
-    // case.
-    update: function (disableAll) {
-        var cbs = this._coordinateButtons;
-        dojo.forEach(cbs, function (cb) {
-            cb.update(disableAll);
-        });
-    },
-
-    // Draws the controls.
-    render: function () {
-        if (this._canvas.getContext) {
-            var context = this._canvas.getContext('2d');
-            context.clearRect(0, 0, this._canvas.width, this._canvas.height);
-        }
-        this._renderButtonPair(0, [2.5, -1.5, 0], [4.5, -1.5, 0]);
-        this._renderButtonPair(1, [7.5, 2, 0], [7.5, 5, 0]);
-        this._renderButtonPair(2, [0, -1, 1], [0, -1, 4]);
-    },
-
-    // Draws a line connecting the buttons "button1" and "button2".
-    _renderLine: function (button1, button2) {
-        var center1S, center2S, radiusS, connectionS, polarConnectionS,
-            angle, distance, offset1S, offset2S, point1S, point2S, context;
-
-        center1S = button1.centerS;
-        center2S = button2.centerS;
-        radiusS = button1.radiusS(); // same for both buttons
-
-        // Connection between the two center points:
-        connectionS = [
-            center2S[0] - center1S[0], center2S[1] - center1S[1]];
-        polarConnectionS = 
-            com.realitybuilder.util.cartesianToPolar(connectionS);
-        angle = polarConnectionS[0];
-        distance = polarConnectionS[1];
-
-        // Line end points:
-        offset1S = com.realitybuilder.util.polarToCartesian(
-            [angle, radiusS + 0.5]);
-        offset2S = com.realitybuilder.util.polarToCartesian(
-            [angle, distance - radiusS - 0.5]);
-        point1S = com.realitybuilder.util.addS(center1S, offset1S);
-        point2S = com.realitybuilder.util.addS(center1S, offset2S);
-
-        if (this._canvas.getContext) {
-            context = this._canvas.getContext('2d');
-            context.strokeStyle = 'white';
-            context.beginPath();
-            context.moveTo(point1S[0], point1S[1]);
-            context.lineTo(point2S[0], point2S[1]);
-            context.stroke();
-        }
-    },
-
-    // Makes sure that the button for controling the coordinate "coordinate"
-    // exists and is centered at the block space point "pointB". If the button
-    // has not been drawn before, it is created. Otherwise the position of the
-    // existing button is updated. Whether the button is a plus button is
-    // determined by the value of "plus". Returns the button.
-    _renderButton: function (coordinate, plus, pointB) {
-        var pointS = this._camera.blockToSensor(pointB),
-            i = 2 * coordinate + (plus ? 1 : 0),
-            button;
-        if (this._coordinateButtons[i]) {
-            button = this._coordinateButtons[i];
-            button.move(pointS);
-        } else {
-            button = new com.realitybuilder.CoordinateButton(
-                this._newBlock, pointS, coordinate, plus);
-            this._coordinateButtons[i] = button;
-        }
-        return button;
-    },
-
-    // Renders a button pair, with the minus-button at the point in block space
-    // "point1B" and the plus button at "point2B". The buttons are connected by
-    // a line. The coordinate that these buttons control is "coordinate" (0, 1,
-    // or 2 for x, y, or z). If the buttons already exist, then they are moved.
-    _renderButtonPair: function (coordinate, point1B, point2B) {
-        var button1 = this._renderButton(coordinate, false, point1B),
-            button2 = this._renderButton(coordinate, true, point2B);
-        this._renderLine(button1, button2);
-    }
-});
-
-}
-
-if(!dojo._hasResource['com.realitybuilder.UserControls']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.UserControls'] = true;
-// User controls. These controls allow, for example, moving a block.
-
-// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy
-// of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
-
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
-
-dojo.provide('com.realitybuilder.UserControls');
-
-
-
-dojo.declare('com.realitybuilder.UserControls', null, {
-    // The construction that the user controls are associated with.
-    _construction: null,
-
-    // The div containing the coordinate controls.
-    _node: null,
-
-    // Creates user controls for the construction "construction".
-    constructor: function (construction) { 
-        this._construction = construction;
-        this._coordinateControls = 
-            new com.realitybuilder.CoordinateControls(
-                construction.newBlock(), construction.camera());
-        this._node = dojo.byId('userControls');
-        dojo.connect(dojo.byId('requestReal'), 'onclick', 
-            construction, construction.requestReal);
-    },
-
-    updateCoordinateControls: function (disableAll) {
-        this._coordinateControls.update(disableAll);
-    },
-
-    renderCoordinateControls: function () {
-        this._coordinateControls.render();
-    },
-
-    // Updates the button which allows making the current block real.
-    updateRequestRealButton: function () {
-        var buttonNode = dojo.byId('requestReal'),
-            newBlock = this._construction.newBlock();
-        if (newBlock.isMovable() && newBlock.canBeMadeReal()) {
-            dojo.style(buttonNode, 'visibility', 'visible');
-        } else {
-            // real or pending, or too high => button is disabled
-            dojo.style(buttonNode, 'visibility', 'hidden');
-        }
-    },
-
-    // Updates the status message to reflect the response to the last request
-    // "responseToLastRequest".
-    updateStatusMessage: function (responseToLastRequest) {
-        var html = "",
-            newBlock = this._construction.newBlock();
-        switch (responseToLastRequest) {
-        case 0:
-            if (newBlock.canBeMadeReal()) {
-                html = "To request having the block built in its current " + 
-                    "position, make it real.";
-            } else {
-                html = "Move the block to a position where you want it to be " +
-                    "built.";
-            }
-            break;
-        case 1:
-            html = "Your request is being processed. Be patient...";
-            break;
-        case 2:
-            html = "Your block has been built. Continue...";
-            break;
-        case 3:
-            html = "Your request has been denied. Continue...";
-            break;
-        }
-        dojo.byId('status').innerHTML = html;
-    }
-});
-
-}
-
 if(!dojo._hasResource['com.realitybuilder.AdminControls']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource['com.realitybuilder.AdminControls'] = true;
 // Admin interface.
@@ -7852,6 +7408,222 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
 
 }
 
+if(!dojo._hasResource['com.realitybuilder.ControlButton']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['com.realitybuilder.ControlButton'] = true;
+// Button in the control panel for moving and positioning the new block.
+
+// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
+
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+
+dojo.provide('com.realitybuilder.ControlButton');
+
+dojo.declare('com.realitybuilder.ControlButton', null, {
+    // Function that's called when button is clicked:
+    _onClicked: null,
+
+    // Function that's called to check whether button should be enabled:
+    _shouldBeEnabled: null,
+
+    // Status of the button:
+    _isEnabled: false,
+
+    // Node object representing the button.
+    _node: null,
+
+    // Creates a control button associated with the ID "id". When the button is
+    // clicked, then calls the function "onClicked". To decide whether the
+    // button should be enabled, executes the function "shouldBeEnabled".
+    constructor: function (id, onClicked, shouldBeEnabled) { 
+        this._onClicked = onClicked;
+        this._shouldBeEnabled = shouldBeEnabled;
+
+        this._node = dojo.byId(id);
+
+        dojo.connect(this._node, 'onclick', this, this._onClicked2);
+        dojo.connect(this._node, 'onmouseover', this, this._onMouseOver);
+        dojo.connect(this._node, 'onmouseout', this, this._onMouseOut);
+    },
+
+    _onMouseOver: function () {
+        if (this._isEnabled) {
+            dojo.addClass(this._node, 'hover');
+        }
+    },
+
+    _onMouseOut: function () {
+        dojo.removeClass(this._node, 'hover');
+    },
+
+    _onClicked2: function () {
+        if (this._isEnabled) {
+            this._onClicked();
+        }
+    },
+
+    // Updates the enabled status of the button.
+    update: function () {
+        this._isEnabled = this._shouldBeEnabled();
+
+        if (!this._isEnabled) {
+            this._onMouseOut(); // necessary if mouse cursor is still over
+                                // button
+            dojo.addClass(this._node, 'disabled');
+        } else {
+            dojo.removeClass(this._node, 'disabled');
+        }
+    }
+});
+
+}
+
+if(!dojo._hasResource['com.realitybuilder.ControlPanel']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['com.realitybuilder.ControlPanel'] = true;
+// Control panel for moving and positioning the new block.
+
+// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
+
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+
+dojo.provide('com.realitybuilder.ControlPanel');
+
+
+
+dojo.declare('com.realitybuilder.ControlPanel', null, {
+    // New block that the control panel is associated with.
+    _newBlock: null,
+
+    // Buttons:
+    _buttons: null,
+
+    // Node object representing the panel.
+    _node: null,
+
+    // Creates control panel for the block "newBlock".
+    constructor: function (newBlock) { 
+        var rb, nb, buttons;
+
+        this._newBlock = newBlock;
+
+        this._node = dojo.byId('controlPanel');
+
+        rb = com.realitybuilder;
+        nb = newBlock;
+
+        buttons = [];
+        buttons.push(this._createCoordinateButton('incX', [1, 0, 0]));
+        buttons.push(this._createCoordinateButton('decX', [-1, 0, 0]));
+        buttons.push(this._createCoordinateButton('incY', [0, 1, 0]));
+        buttons.push(this._createCoordinateButton('decY', [0, -1, 0]));
+        buttons.push(this._createCoordinateButton('incZ', [0, 0, 1]));
+        buttons.push(this._createCoordinateButton('decZ', [0, 0, -1]));
+        buttons.push(this._createRotate90Button());
+        buttons.push(this._createRequestRealButton());
+        this._buttons = buttons;
+    },
+
+    _createCoordinateButton: function (type, deltaB) {
+        var newBlock, onClicked, shouldBeEnabled;
+
+        newBlock = this._newBlock;
+
+        onClicked = function () {
+            newBlock.move(deltaB);
+        };
+
+        shouldBeEnabled = function () {
+            return (!newBlock.wouldGoOutOfRange(deltaB, 0) &&
+                    newBlock.isMovable());
+        };
+
+        return new com.realitybuilder.ControlButton(type + 'Button', 
+                                                    onClicked, 
+                                                    shouldBeEnabled);
+    },
+
+    _createRotate90Button: function () {
+        var newBlock, onClicked, shouldBeEnabled;
+
+        newBlock = this._newBlock;
+
+        onClicked = function () {
+            newBlock.rotate90();
+        };
+
+        shouldBeEnabled = function () {
+            return (!newBlock.wouldGoOutOfRange([0, 0, 0], 1) &&
+                    newBlock.isRotatable());
+        };
+
+        return new com.realitybuilder.ControlButton('rotate90Button', 
+                                                    onClicked, 
+                                                    shouldBeEnabled);
+    },
+
+    _createRequestRealButton: function () {
+        var newBlock, onClicked, shouldBeEnabled;
+
+        newBlock = this._newBlock;
+
+        onClicked = function () {
+            newBlock.requestMakeReal();
+        };
+
+        shouldBeEnabled = function () {
+            return newBlock.canBeMadeReal() && !newBlock.isStopped();
+        };
+
+        return new com.realitybuilder.ControlButton('requestRealButton', 
+                                                    onClicked, 
+                                                    shouldBeEnabled);
+    },
+
+    // Updates the status of the buttons and that of the panel itself:
+    update: function () {
+        dojo.forEach(this._buttons, function (button) {
+            button.update();
+        });
+
+        if (this._newBlock.isStopped()) {
+            dojo.addClass(this._node, 'disabled');
+        } else {
+            dojo.removeClass(this._node, 'disabled');
+        }
+    }
+});
+
+}
+
 if(!dojo._hasResource['com.realitybuilder.Construction']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource['com.realitybuilder.Construction'] = true;
 // The construction and the controls.
@@ -7895,10 +7667,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // blocks:
     _constructionBlocks: null,
 
-    // Response to the last request to build a block. 0: no last request. 1:
-    // not yet processed. 2: accepted. 3: denied.
-    _responseToLastRequest: null,
-
     // Interval in between requests to the server for the new construction
     // data.
     _UPDATE_INTERVAL: 2000, // ms
@@ -7926,8 +7694,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // The live image.
     _image: null,
 
+    // The control panel for moving around the block and requesting it to be
+    // made real:
+    _controlPanel: null,
+
     // Controls for changing and inspecting settings and the construction.
-    _userControls: null,
     _adminControls: null,
 
     // Handle for the timeout between requests to the server for new
@@ -7939,10 +7710,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // blocks.
     constructor: function (showAdminControls) {
         this._insertLoadIndicator();
-        this._insertView();
 
         this._showAdminControls = showAdminControls;
-        this._responseToLastRequest = 0;
         this._showReal = showAdminControls;
         this._showPending = showAdminControls;
 
@@ -7957,7 +7726,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
             new com.realitybuilder.NewBlock(this._blockProperties,
                                             this._camera,
                                             this._constructionBlocks);
-        this._userControls = new com.realitybuilder.UserControls(this);
+        this._controlPanel = 
+            new com.realitybuilder.ControlPanel(this._newBlock);
 
         if (this._showAdminControls) {
             this._adminControls = new com.realitybuilder.AdminControls(this);
@@ -7984,6 +7754,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
                        this, this._onNewBlockMadeMovable);
         dojo.subscribe('com/realitybuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
+        dojo.subscribe('com/realitybuilder/NewBlock/' + 
+                       'onNewBlockMakeRealRequested',
+                       this, this._onNewBlockMakeRealRequested);
         dojo.subscribe('com/realitybuilder/ConstructionBlocks/changed',
                        this, this._onConstructionBlocksChanged);
         dojo.subscribe('com/realitybuilder/Camera/changed',
@@ -8019,29 +7792,21 @@ dojo.declare('com.realitybuilder.Construction', null, {
         return this._constructionBlocks;
     },
 
-    // Called when the new block is stopped.
+    // Called after the new block has been stopped.
     _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
-        this._userControls.updateCoordinateControls(true);
+        this._controlPanel.update();
     },
 
-    // Called when the new block is made movable.
+    // Called after the new block has been made movable.
     _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
-        this._userControls.updateCoordinateControls(false);
+        this._controlPanel.update();
     },
 
-    // Toggles the state of a block from virtual to pending. Also updates the
-    // last-request-state.
-    requestReal: function () {
-        if (this._newBlock.isMovable()) {
-            this._newBlock.stop();
-            this._constructionBlocks.createPendingOnServer(
-                this._newBlock.positionB(), this._newBlock.a());
-            this._responseToLastRequest = 1;
-        }
-        this._userControls.updateRequestRealButton();
-        this._userControls.updateStatusMessage(this._responseToLastRequest);
+    // Called after the block was requested to be made real.
+    _onNewBlockMakeRealRequested: function () {
+        this._controlPanel.update();
     },
 
     // Toggles display of real blocks.
@@ -8074,66 +7839,16 @@ dojo.declare('com.realitybuilder.Construction', null, {
             constructionBlocks = this._constructionBlocks;
             constructionBlocks.setBlockStateOnServer(newBlock.positionB(), 
                                                      newBlock.a(), 2);
-        } else if (event.keyCode === 114) { // r
-            if (newBlock.isRotatable()) {
-                newBlock.rotate90();
-            }
         }
     },
 
-    // Called when the new block has been moved or rotated. Lets it redraw and
+    // Called after the new block has been moved or rotated. Lets it redraw and
     // updates controls.
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
-        this._userControls.updateRequestRealButton();
-        this._userControls.updateStatusMessage(this._responseToLastRequest);
-        this._userControls.updateCoordinateControls();
+        this._controlPanel.update();
         if (this._showAdminControls) {
             this._adminControls.updateCoordinateDisplays();
-        }
-    },
-
-    // Updates the position and state of the block to reflect changes in the
-    // construction. Also sets the status text. Depends on up to date lists of
-    // blocks and real blocks.
-    _updateNewBlockPositionAndState: function () {
-        var positionB = this._newBlock.positionB(), tmp, state;
-
-        // Discovers the correct status text and updates the new block state:
-        if (this._newBlock.isStopped()) {
-            tmp = this._constructionBlocks.blockAt(positionB);
-        }
-
-        // Updates the position of the new block so that it doesn't conflict
-        // with any real block.
-        this._newBlock.updatePositionB();
-
-        if (this._showAdminControls) {
-            // Necessary after updating the block position:
-            this._adminControls.updateCoordinateDisplays();
-        }
-
-        // Finds the correct status message, and updates whether the block is
-        // movable or fixed.
-        if (this._newBlock.isStopped()) {
-            if (tmp && !tmp.isDeleted()) {
-                // Non-new block ground in the position of the new block.
-                state = tmp.state(); // State of block in same pos. as new
-                                     // block was.
-                if (state === 2) {
-                    // Real block in the same position as the new block.
-                    this._responseToLastRequest = 2; // request accepted
-                    this._newBlock.makeMovable(); // so that the user can
-                                                  // continue
-                } else {
-                    // request not yet processed
-                    this._responseToLastRequest = 1;
-                }
-            } else {
-                // No non-new block found in the position of the new block.
-                this._responseToLastRequest = 3; // request denied
-                this._newBlock.makeMovable(); // so that the user can continue
-            }
         }
     },
 
@@ -8151,38 +7866,20 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
     },
 
-    // (Re-)renders user controls, but only if all necessary components have
-    // been initialized, which is relevant only in the beginning.
-    _renderCoordinateControlsIfFullyInitialized: function () {
-        if (this._camera.isInitializedWithServerData() && 
-            this._blockProperties.isInitializedWithServerData() &&
-            this._newBlock.isInitializedWithServerData()) {
-            this._userControls.renderCoordinateControls();
-        }
-    },
-
-    // Updates the state of the new block (and related controls), but only if
-    // all necessary components have been initialized, which is relevant only
-    // in the beginning.
+    // Updates the state (including position) of the new block (and related
+    // controls), but only if all necessary components have been initialized,
+    // which is relevant only in the beginning.
     _updateNewBlockStateIfFullyInitialized: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData()) {
-            this._updateNewBlockPositionAndState();
-            this._userControls.updateRequestRealButton();
-            this._userControls.updateCoordinateControls(
-                !this._newBlock.isMovable());
-        }
-    },
+            this._newBlock.updatePositionAndMovability();
+            this._controlPanel.update();
 
-    // Updates the status message, but only if all necessary components have
-    // been initialized, which is relevant only in the beginning.
-    _updateStatusMessageIfFullyInitialized: function () {
-        if (this._constructionBlocks.isInitializedWithServerData() &&
-            this._newBlock.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData()) {
-            this._userControls.
-                updateStatusMessage(this._responseToLastRequest);
+            if (this._showAdminControls) {
+                // Necessary after updating the block position:
+                this._adminControls.updateCoordinateDisplays();
+            }
         }
     },
 
@@ -8192,7 +7889,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this._adminControls.updateBlocksTable();
         }
 
-        this._updateStatusMessageIfFullyInitialized();
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
     },
@@ -8203,8 +7899,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this._adminControls.updateCameraControls(this._camera);
         }
 
-        // Updates the renderings, which depend on the camera position:
-        this._renderCoordinateControlsIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
     },
 
@@ -8213,8 +7907,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _onNewBlockPositionAngleInitialized: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
-        this._updateStatusMessageIfFullyInitialized();
-        this._renderCoordinateControlsIfFullyInitialized();
     },
 
     // Called after the dimensions of the space where the new block may be
@@ -8222,28 +7914,15 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _onMoveOrBuildSpaceChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
-        this._updateStatusMessageIfFullyInitialized();
-        this._renderCoordinateControlsIfFullyInitialized();
     },
 
     // Called after the block properties have changed.
     _onBlockPropertiesChanged: function () {
-        // Updates the rendering of the coordinate controls, which depend on
-        // some of the block properties:
-        this._userControls.renderCoordinateControls();
-
-        // Updates the renderings, which depend on block properties:
-        this._renderCoordinateControlsIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
 
         // Updates the state (and related controls) of the new block, because
         // they depend on block properties such as collision settings:
         this._updateNewBlockStateIfFullyInitialized();
-
-        // Updates the status message because it depends on the block
-        // properties concerning attachment conditions (attachment of the new
-        // to a real block):
-        this._updateStatusMessageIfFullyInitialized();
 
         this._renderBlocksIfFullyInitialized();
     },
@@ -8257,55 +7936,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
     _insertLoadIndicator: function () {
         dojo.attr('loadIndicator', 'innerHTML', 'Loading...');
-    },
-
-    // Returns HTML code for the request real button. For IE6 the button is a
-    // link instead of a div. Otherwise CSS for hovering doesn't get triggered.
-    _requestRealButtonHtml: function () {
-        var tmp1, tmp2;
-        if (dojo.isIE && dojo.isIE === 6) {
-            tmp1 = 'a href="javascript:void(0)"';
-            tmp2 = 'a';
-        } else {
-            tmp1 = tmp2 = 'div';
-        }
-        return '<' + tmp1 + ' id="requestReal" >Make Real</' + tmp2 + '>';
-    },
-
-    // Inserts the base HTML code for the "view". It is initially hidden.
-    _insertView: function () {
-        // Instead of using a CSS background image, an image tag is used.
-        // Reason: In Firefox 3.5/Win32, replacing the background image caused
-        // flickering, even when making sure that the replacement image has
-        // been preloaded.
-        dojo.attr('view', 'innerHTML',
-            '<img id="live" src="/images/placeholder.gif" alt="Live Image">' +
-            '<div id="sensor">' +
-            '<canvas id="sensorShadowCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '<canvas id="sensorRealBlocksCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '<canvas id="sensorPendingBlocksCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '<canvas id="sensorNewBlockCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '</div>' +
-            '<div id="coordinateControls">' +
-            '<canvas id="coordinateControlsCanvas" width="1" height="1">' +
-            '</canvas>' +
-            '</div>' +
-            '<p id="status"></p>' +
-            this._requestRealButtonHtml());
-
-        // Initializes Explorer Canvas for elements that were added later to
-        // the DOM.
-        if (com.realitybuilder.util.isFlashCanvasActive()) {
-            FlashCanvas.initElement(dojo.byId('sensorShadowCanvas'));
-            FlashCanvas.initElement(dojo.byId('sensorRealBlocksCanvas'));
-            FlashCanvas.initElement(dojo.byId('sensorPendingBlocksCanvas'));
-            FlashCanvas.initElement(dojo.byId('sensorNewBlockCanvas'));
-            FlashCanvas.initElement(dojo.byId('coordinateControlsCanvas'));
-        }
     },
 
     // Regularly checks if the construction has been loaded, so that the
@@ -8375,19 +8005,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // server. Only updates the blocks if there is a new version. Fails
     // silently on error.
     _update: function () {
-        var getDeletedBlocks;
-
-        // Without the admin controls being shown, deleted blocks are of no use
-        // (pending blocks are needed to determine whether a request has been
-        // denied):
-        getDeletedBlocks = this._showAdminControls ? 'true' : 'false';
-
         dojo.xhrGet({
             url: "/rpc/construction",
             content: {
                 "blocksDataVersion": 
                 this._constructionBlocks.versionOnServer(),
-                "getDeletedBlocks": getDeletedBlocks,
                 "cameraDataVersion": this._camera.versionOnServer(),
                 "imageDataVersion": this._image.versionOnServer(),
                 "blockPropertiesDataVersion": 

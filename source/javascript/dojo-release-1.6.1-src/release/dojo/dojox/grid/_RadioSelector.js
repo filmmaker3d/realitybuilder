@@ -1,7 +1,8 @@
-if(!dojo._hasResource["dojox.grid._RadioSelector"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojox.grid._RadioSelector"] = true;
-dojo.provide("dojox.grid._RadioSelector");
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
 
-dojo.require("dojox.grid._Selector");
 
-}
+if(!dojo._hasResource["dojox.grid._RadioSelector"]){dojo._hasResource["dojox.grid._RadioSelector"]=true;dojo.provide("dojox.grid._RadioSelector");dojo.require("dojox.grid._Selector");}
