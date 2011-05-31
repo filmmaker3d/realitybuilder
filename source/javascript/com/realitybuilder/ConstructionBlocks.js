@@ -75,6 +75,16 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         return this._realBlocksSorted;
     },
 
+    // Returns block space z coordinate of the highest real blocks, or -1 if
+    // there are no real blocks.
+    highestRealBlocksZB: function () {
+        if (this._realBlocksSorted.length > 0) {
+            return this._realBlocksSorted[0].zB();
+        } else {
+            return -1;
+        }
+    },
+
     // Returns all blocks positioned at z coordinate "zB", in block space.
     realBlocksInLayer: function (zB) {
         var blocks = [], i, realBlocksSorted = this._realBlocksSorted, block;

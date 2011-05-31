@@ -281,13 +281,10 @@ class Admin(webapp.RequestHandler):
 
 # Data describing a construction, including building blocks.
 class RPCConstruction(webapp.RequestHandler):
-    # Returns the blocks as an array of dictionaries. Only returns deleted
-    # blocks, if "get_deleted_blocks" is true.
+    # Returns the blocks as an array of dictionaries.
     @staticmethod
-    def get_blocks_data_blocks(construction, get_deleted_blocks):
+    def get_blocks_data_blocks(construction):
         query = Block.all().ancestor(construction)
-        if not get_deleted_blocks:
-            query.filter('state !=', 0)
         blocks = []
         for block in query:
             blocks.append({
@@ -297,11 +294,9 @@ class RPCConstruction(webapp.RequestHandler):
                     'timeStamp': block.time_stamp})
         return blocks
 
-    # Returns JSON serializable data related to blocks. The data only contains
-    # deleted blocks, if "get_deleted_blocks" is true.
+    # Returns JSON serializable data related to blocks.
     @staticmethod
-    def get_blocks_data(construction, blocks_data_version_client, 
-                        get_deleted_blocks):
+    def get_blocks_data(construction, blocks_data_version_client):
         blocks_data_version = construction.blocks_data_version
         blocks_data_changed = \
             (blocks_data_version != blocks_data_version_client)
@@ -313,8 +308,7 @@ class RPCConstruction(webapp.RequestHandler):
             # all the data.
             data.update({
                     'blocks': 
-                    RPCConstruction.get_blocks_data_blocks(
-                        construction, get_deleted_blocks)})
+                    RPCConstruction.get_blocks_data_blocks(construction)})
         return data
 
     # Returns JSON serializable data related to the camera.
@@ -426,7 +420,6 @@ class RPCConstruction(webapp.RequestHandler):
     # example if there is a transaction missing somewhere else.
     @staticmethod
     def transaction(blocks_data_version_client, 
-                    get_deleted_blocks,
                     camera_data_version_client,
                     image_data_version_client,
                     block_properties_data_version_client,
@@ -434,8 +427,7 @@ class RPCConstruction(webapp.RequestHandler):
         construction = Construction.get_main()
         data = {
             'blocksData': RPCConstruction.get_blocks_data(
-                construction, blocks_data_version_client, 
-                get_deleted_blocks),
+                construction, blocks_data_version_client),
             'cameraData': RPCConstruction.get_camera_data(
                 construction, camera_data_version_client),
             'imageData': RPCConstruction.get_image_data(
@@ -451,10 +443,6 @@ class RPCConstruction(webapp.RequestHandler):
         try:
             blocks_data_version_client = \
                 self.request.get('blocksDataVersion')
-            if self.request.get('getDeletedBlocks') == 'true':
-                get_deleted_blocks = True
-            else:
-                get_deleted_blocks = False
             camera_data_version_client = \
                 self.request.get('cameraDataVersion')
             image_data_version_client = self.request.get('imageDataVersion')
@@ -465,7 +453,6 @@ class RPCConstruction(webapp.RequestHandler):
 
             data = db.run_in_transaction(RPCConstruction.transaction, 
                                          blocks_data_version_client, 
-                                         get_deleted_blocks,
                                          camera_data_version_client,
                                          image_data_version_client,
                                          block_properties_data_version_client,

@@ -138,7 +138,7 @@ dojo.declare('com.realitybuilder.ShadowObscuringBlocks', null, {
         blocks = [],
         blocksInLayer, blocksInPrevLayer = [], copiedBlocks;
 
-        for (zB = newBlock.maxZB() - 1; zB >= 0; zB -= 1) {
+        for (zB = cbs.highestRealBlocksZB(); zB >= 0; zB -= 1) {
             // Collects shadow obscuring blocks for current layer:
             blocksInLayer = cbs.realBlocksInLayer(zB);
 

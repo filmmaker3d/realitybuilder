@@ -85,7 +85,8 @@ dojo.declare('com.realitybuilder.Shadow', null, {
         canvas = this._camera.sensor().shadowCanvas(), context, 
         layerZB,
         newBlock = this._newBlock, camera = this._camera,
-        constructionBlocks = this._constructionBlocks;
+        constructionBlocks = this._constructionBlocks,
+        maxLayerZB = constructionBlocks.highestRealBlocksZB();
 
         this._shadowObscuringBlocks.update();
 
@@ -95,7 +96,7 @@ dojo.declare('com.realitybuilder.Shadow', null, {
 
             // draws shadow from bottom up, in each step removing parts that
             // are obscured by blocks in the layer above:
-            for (layerZB = -1; layerZB <= newBlock.maxZB() - 1; layerZB += 1) {
+            for (layerZB = -1; layerZB <= maxLayerZB; layerZB += 1) {
                 if (layerZB < newBlock.zB()) {
                     this._renderLayerShadow(context, newBlock, camera, 
                                             constructionBlocks, layerZB);

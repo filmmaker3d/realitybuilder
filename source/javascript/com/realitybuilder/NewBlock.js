@@ -123,7 +123,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     // Returns true, iff the current block collides with any real block.
-    collidesWithRealBlock: function () {
+    _collidesWithRealBlock: function () {
         return this._constructionBlocks.realBlocksCollideWith(this);
     },
 
@@ -173,26 +173,47 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         dojo.publish('com/realitybuilder/NewBlock/stopped');
     },
 
-    makeMovable: function () {
+    _makeMovable: function () {
         this._isStopped = false;
         dojo.publish('com/realitybuilder/NewBlock/madeMovable');
     },
 
-    // Maximum vertical position of the new block. Note that this position is
-    // higher than the position in which blocks may be build, by 1.
-    maxZB: function () {
-        return this._buildSpace2B[2];
+    // Updates the position and state of this block to reflect changes in the
+    // construction. Depends on up to date lists of blocks and real blocks.
+    updatePositionAndMovability: function () {
+        var positionB, state, constructionBlock;
+
+        // Makes the block movable again if certain conditions are met:
+        if (this.isStopped()) {
+            constructionBlock = 
+                this._constructionBlocks.blockAt(this.positionB());
+            if (constructionBlock) {
+                // Construction block in same position as new block.
+
+                if (constructionBlock.isDeleted() ||  
+                    constructionBlock.isReal()) {
+                    // construction block real = make-real-request accepted,
+                    // construction block deleted = request denied
+
+                    this._makeMovable(); // so that user can continue
+                } // else: pending or no data from the server
+            }
+        }
+
+        // Updates the position of the new block so that it doesn't conflict
+        // with any real block.
+        this._updatePositionB();
     },
 
     // Makes sure that this block does not intersect with any real block. If it
     // does, it is elevated step by step until it sits on top of another block.
     // Only updates the position of the block in block space. Does not update
     // any of the other coordinates.
-    updatePositionB: function () {
+    _updatePositionB: function () {
         var 
         testBlock, cbs = this._constructionBlocks, 
         xB = this.xB(), yB = this.yB(), testZB;
-        if (this.collidesWithRealBlock()) {
+        if (this._collidesWithRealBlock()) {
             testZB = this.zB();
             do {
                 testZB += 1;
@@ -269,10 +290,12 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         l, r, b, t, blockL, blockR, blockB, blockT, 
         horizontalOverlap, verticalOverlap;
 
+        this._updateCoordinates();
         l = this._boundingBoxS[0][0];
         r = this._boundingBoxS[1][0];
         b = this._boundingBoxS[0][1];
         t = this._boundingBoxS[1][1];
+        block._updateCoordinates();
         blockL = block._boundingBoxS[0][0];
         blockR = block._boundingBoxS[1][0];
         blockB = block._boundingBoxS[0][1];

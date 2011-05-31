@@ -224,21 +224,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
     },
 
-    // Updates the position and state of the block to reflect changes in the
-    // construction. Depends on up to date lists of blocks and real blocks.
-    _updateNewBlockPositionAndState: function () {
-        var positionB = this._newBlock.positionB(), state;
-
-        // Updates the position of the new block so that it doesn't conflict
-        // with any real block.
-        this._newBlock.updatePositionB();
-
-        if (this._showAdminControls) {
-            // Necessary after updating the block position:
-            this._adminControls.updateCoordinateDisplays();
-        }
-    },
-
     // (Re-)renders blocks, but only if all necessary components have been
     // initialized, which is relevant only in the beginning.
     _renderBlocksIfFullyInitialized: function () {
@@ -253,24 +238,20 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
     },
 
-    // (Re-)renders user controls, but only if all necessary components have
-    // been initialized, which is relevant only in the beginning.
-    _renderCoordinateControlsIfFullyInitialized: function () {
-        if (this._camera.isInitializedWithServerData() && 
-            this._blockProperties.isInitializedWithServerData() &&
-            this._newBlock.isInitializedWithServerData()) {
-        }
-    },
-
-    // Updates the state of the new block (and related controls), but only if
-    // all necessary components have been initialized, which is relevant only
-    // in the beginning.
+    // Updates the state (including position) of the new block (and related
+    // controls), but only if all necessary components have been initialized,
+    // which is relevant only in the beginning.
     _updateNewBlockStateIfFullyInitialized: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData()) {
-            this._updateNewBlockPositionAndState();
+            this._newBlock.updatePositionAndMovability();
             this._controlPanel.update();
+
+            if (this._showAdminControls) {
+                // Necessary after updating the block position:
+                this._adminControls.updateCoordinateDisplays();
+            }
         }
     },
 
@@ -290,8 +271,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
             this._adminControls.updateCameraControls(this._camera);
         }
 
-        // Updates the renderings, which depend on the camera position:
-        this._renderCoordinateControlsIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
     },
 
@@ -300,7 +279,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _onNewBlockPositionAngleInitialized: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
-        this._renderCoordinateControlsIfFullyInitialized();
     },
 
     // Called after the dimensions of the space where the new block may be
@@ -308,13 +286,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _onMoveOrBuildSpaceChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
-        this._renderCoordinateControlsIfFullyInitialized();
     },
 
     // Called after the block properties have changed.
     _onBlockPropertiesChanged: function () {
-        // Updates the renderings, which depend on block properties:
-        this._renderCoordinateControlsIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
 
         // Updates the state (and related controls) of the new block, because
@@ -402,19 +377,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // server. Only updates the blocks if there is a new version. Fails
     // silently on error.
     _update: function () {
-        var getDeletedBlocks;
-
-        // Without the admin controls being shown, deleted blocks are of no use
-        // (pending blocks are needed to determine whether a request has been
-        // denied):
-        getDeletedBlocks = this._showAdminControls ? 'true' : 'false';
-
         dojo.xhrGet({
             url: "/rpc/construction",
             content: {
                 "blocksDataVersion": 
                 this._constructionBlocks.versionOnServer(),
-                "getDeletedBlocks": getDeletedBlocks,
                 "cameraDataVersion": this._camera.versionOnServer(),
                 "imageDataVersion": this._image.versionOnServer(),
                 "blockPropertiesDataVersion": 
