@@ -95,9 +95,6 @@ dojo.declare('com.realitybuilder.Camera', null, {
         return this._versionOnServer;
     },
 
-    version: function () {
-    },
-
     // Returns false when the object is new and has not yet been updated with
     // server data.
     isInitializedWithServerData: function () {

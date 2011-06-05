@@ -32,7 +32,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSON response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -97,6 +97,25 @@ class Construction(db.Model):
             return construction
         else:
             raise Exception('Could not find construction')
+
+# Data specific to prerender-mode.
+class PrerenderMode(db.Model):
+    # The data version is increased every time the data is changed. The client
+    # uses this data to determine when to update the display.
+    data_version = db.StringProperty()
+
+    # With prerender-mode enabled, a block is automatically made real after
+    # "prerender_make_real_after" seconds, and if the total construction
+    # would afterwards match one of the block configurations in the list
+    # "prerender_block_configurations". Associated with each block
+    # configuration is an image, the URL of which is constructed using the
+    # template "prerender_image_url_template": %d is substituted with the
+    # block configuration number. This number is identical to the corresponding
+    # index in the array with the block configurations.
+    is_enabled = db.BooleanProperty()
+    make_real_after = db.FloatProperty() # s
+    block_configurations = db.StringListProperty()
+    image_url_template = db.StringProperty()
 
 # Data specific to the new block
 class NewBlock(db.Model):
@@ -392,8 +411,7 @@ class RPCConstruction(webapp.RequestHandler):
 
     # Returns JSON serializable data related to the new block
     @staticmethod
-    def get_new_block_data(construction, 
-                           new_block_data_version_client):
+    def get_new_block_data(construction, new_block_data_version_client):
         query = NewBlock.all().ancestor(construction)
         new_block = query.get()
         if new_block is None:
@@ -416,6 +434,33 @@ class RPCConstruction(webapp.RequestHandler):
                          'buildSpace2B': new_block.build_space_2_b})
         return data
 
+    # Returns JSON serializable data related to prerender-mode.
+    @staticmethod
+    def get_prerender_mode_data(construction, 
+                                prerender_mode_data_version_client):
+        query = PrerenderMode.all().ancestor(construction)
+        prerender_mode = query.get()
+        if prerender_mode is None:
+            raise Exception('Could not get prerender-mode data')
+
+        prerender_mode_data_version = prerender_mode.data_version
+        prerender_mode_data_changed = (prerender_mode_data_version != 
+                                       prerender_mode_data_version_client)
+        data = {
+            'version': prerender_mode_data_version,
+            'changed': prerender_mode_data_changed}
+        if prerender_mode_data_changed:
+            # Prerender-mode data version on server not the same as on client.
+            # => Deliver all the data.
+            data.update({'isEnabled': prerender_mode.is_enabled,
+                         'makeRealAfter': prerender_mode.make_real_after,
+                         'blockConfigurations': \
+                             RPCConstruction.json_decode_list \
+                             (prerender_mode.block_configurations),
+                         'imageUrlTemplate': 
+                         prerender_mode.image_url_template})
+        return data
+
     # A transaction may not be necessary, but it ensures data integrity for
     # example if there is a transaction missing somewhere else.
     @staticmethod
@@ -423,7 +468,8 @@ class RPCConstruction(webapp.RequestHandler):
                     camera_data_version_client,
                     image_data_version_client,
                     block_properties_data_version_client,
-                    new_block_data_version_client):
+                    new_block_data_version_client,
+                    prerender_mode_data_version_client):
         construction = Construction.get_main()
         data = {
             'blocksData': RPCConstruction.get_blocks_data(
@@ -435,7 +481,9 @@ class RPCConstruction(webapp.RequestHandler):
             'blockPropertiesData': RPCConstruction.get_block_properties_data(
                 construction, block_properties_data_version_client),
             'newBlockData': RPCConstruction.get_new_block_data(
-                construction, new_block_data_version_client)
+                construction, new_block_data_version_client),
+            'prerenderModeData': RPCConstruction.get_prerender_mode_data(
+                construction, prerender_mode_data_version_client)
         }
         return data
 
@@ -450,13 +498,16 @@ class RPCConstruction(webapp.RequestHandler):
                 self.request.get('blockPropertiesDataVersion')
             new_block_data_version_client = \
                 self.request.get('newBlockDataVersion')
+            prerender_mode_data_version_client = \
+                self.request.get('prerenderModeDataVersion')
 
             data = db.run_in_transaction(RPCConstruction.transaction, 
                                          blocks_data_version_client, 
                                          camera_data_version_client,
                                          image_data_version_client,
                                          block_properties_data_version_client,
-                                         new_block_data_version_client)
+                                         new_block_data_version_client,
+                                         prerender_mode_data_version_client)
             dump_json(self, data)
         except Exception, e:
             logging.error('Could not retrieve data: ' + str(e))
@@ -711,7 +762,7 @@ class AdminInit(webapp.RequestHandler):
         # using the development web server." See: <url:http://code.google.com/a
         # ppengine/docs/python/tools/devserver.html#Using_URL_Fetch>
         image_url = ('http://realitybuilder.googlecode.com/hg/documentation/' +
-                     'sample_scene/live.jpg')
+                     'sample_scene/prerendered_0.jpg')
 
         # Creates the construction configuration. An image URL is not set to an
         # image on the same App Engine instance, since urlfetch doesn't seem to
@@ -730,6 +781,29 @@ class AdminInit(webapp.RequestHandler):
         construction.image_update_interval_server = 5.
         construction.image_update_interval_client = 5.
         construction.put()
+
+        # Deletes all prerender-mode entries:
+        queries = [PrerenderMode.all()]
+        for query in queries:
+            for result in query:
+                result.delete()
+
+        # Sets up the prerender-mode:
+        prerenderMode = PrerenderMode(parent=construction)
+        prerenderMode.data_version = '0'
+        prerenderMode.is_enabled = True
+        prerenderMode.make_real_after = 2.
+        prerenderMode.block_configurations = \
+            ['[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
+             '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
+             '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0]]',
+             '[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
+             '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
+             '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0]]']
+        prerenderMode.image_url_template = \
+            'http://realitybuilder.googlecode.com/hg/documentation/' + \
+            'sample_scene/prerendered_%d.jpg'
+        prerenderMode.put()
 
         # Deletes all block properties entries:
         queries = [BlockProperties.all()]

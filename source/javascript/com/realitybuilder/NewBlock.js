@@ -67,6 +67,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Version of the construction blocks when the shadow was last rendered.
     _lastConstructionBlocksVersion: null,
 
+    // Prerender-mode (only relevant if enabled):
+    _prerenderMode: null,
+
     // Creates the new block that the user may position. For collision
     // detection and for calculating hidden lines, the block needs to know
     // about the other blocks in the construction: "constructionBlocks" When
@@ -75,7 +78,12 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     //
     // The block's properties, such as shape and size, are described by
     // "blockProperties".
-    constructor: function (blockProperties, camera, constructionBlocks) {
+    //
+    // Details of data for prerender-mode, if enabled, are contained in
+    // "prerenderMode".
+    constructor: function (blockProperties, camera, constructionBlocks,
+                           prerenderMode)
+    {
         this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
         this._isStopped = false;
         this._constructionBlocks = constructionBlocks;
@@ -83,6 +91,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                                                      camera, 
                                                      constructionBlocks);
         this._camera = camera;
+        this._prerenderMode = prerenderMode;
     },
 
     versionOnServer: function () {
@@ -276,10 +285,18 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                 this.zB() === 0);
     },
 
+    _isInPrerenderedBlockConfiguration: function () {
+        var rBlocks = this._constructionBlocks.realBlocksSorted();
+        return this._prerenderMode.onePrerenderedConfigurationMatches(rBlocks, 
+                                                                      this);
+    },
+
     // Returns true, iff the new block can be made real in its current
     // position.
     canBeMadeReal: function () {
-        return this._isInBuildSpace() && this._isAttachable();
+        return this._isInBuildSpace() && this._isAttachable() && 
+            (!this._prerenderMode.isEnabled() ||
+             this._isInPrerenderedBlockConfiguration());
     },
 
     // Returns true, iff the bounding box of the current block overlaps with

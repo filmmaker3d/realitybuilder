@@ -29,6 +29,7 @@ dojo.require('com.realitybuilder.Image');
 dojo.require('com.realitybuilder.Camera');
 dojo.require('com.realitybuilder.AdminControls');
 dojo.require('com.realitybuilder.ControlPanel');
+dojo.require('com.realitybuilder.PrerenderMode');
 dojo.require('com.realitybuilder.util');
 
 dojo.declare('com.realitybuilder.Construction', null, {
@@ -55,6 +56,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
+
+    // Prerender-mode:
+    _prerenderMode: null,
 
     // The new block that the user is supposed to position. Could move once the
     // real blocks are loaded, if there are any intersections.
@@ -94,10 +98,12 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._constructionBlocks = 
             new com.realitybuilder.ConstructionBlocks(this, 
                                                       this._blockProperties);
+        this._prerenderMode = new com.realitybuilder.PrerenderMode();
         this._newBlock = 
             new com.realitybuilder.NewBlock(this._blockProperties,
                                             this._camera,
-                                            this._constructionBlocks);
+                                            this._constructionBlocks,
+                                            this._prerenderMode);
         this._controlPanel = 
             new com.realitybuilder.ControlPanel(this._newBlock);
 
@@ -137,6 +143,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
                        this, this._onImageChanged);
         dojo.subscribe('com/realitybuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
+        dojo.subscribe('com/realitybuilder/PrerenderMode/changed',
+                       this, this._onPrerenderModeChanged);
 
         dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
 
@@ -244,7 +252,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _updateNewBlockStateIfFullyInitialized: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData()) {
+            this._blockProperties.isInitializedWithServerData() &&
+            this._prerenderMode.isInitializedWithServerData()) {
             this._newBlock.updatePositionAndMovability();
             this._controlPanel.update();
 
@@ -299,6 +308,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._renderBlocksIfFullyInitialized();
     },
 
+    _onPrerenderModeChanged: function () {
+        this._updateNewBlockStateIfFullyInitialized();
+    },
+
     // Called after settings describing the live image have changed.
     _onImageChanged: function () {
         if (this._showAdminControls) {
@@ -341,6 +354,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
         if (data.blocksData.changed) {
             this._constructionBlocks.updateWithServerData(data.blocksData, 
                                                           this._image);
+        }
+
+        if (data.prerenderModeData.changed) {
+            this._prerenderMode.updateWithServerData(data.prerenderModeData);
         }
 
         if (data.cameraData.changed) {
@@ -386,7 +403,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
                 "imageDataVersion": this._image.versionOnServer(),
                 "blockPropertiesDataVersion": 
                 this._blockProperties.versionOnServer(),
-                "newBlockDataVersion": this._newBlock.versionOnServer()
+                "newBlockDataVersion": this._newBlock.versionOnServer(),
+                "prerenderModeDataVersion": 
+                this._prerenderMode.versionOnServer()
             },
             handleAs: "json",
             load: dojo.hitch(this, this._updateSucceeded)
