@@ -216,11 +216,10 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
                      'changeOnServerFailed');
     },
 
-    // Triggers setting the state of the block at the position "positionB" and
-    // with rotation angle "a" to pending: on the client and on the server.
-    // Once the server has completed the request, the list of blocks is
-    // updated. Difference to the function "createPendingOnServer": If the
-    // block does not exist, it is not created.
+    // Triggers setting the state of the construction block at the position
+    // "positionB" and with rotation angle "a" to pending: on the client and on
+    // the server. Once the server has completed the request, the list of
+    // blocks is updated.
     makePendingOnServer: function (positionB, a) {
         dojo.xhrPost({
             url: "/admin/rpc/make_pending",
@@ -232,35 +231,6 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
             },
             load: dojo.hitch(this, this._makePendingOnServerSucceeded),
             error: dojo.hitch(this, this._makePendingOnServerFailed)
-        });
-    },
-
-
-    // Called if storing the block succeeded.
-    _createPendingOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
-    },
-
-    // Called if storing the block failed. In this case, the state is reverted
-    // to virtual.
-    _createPendingOnServerFailed: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/' + 
-                     'changeOnServerFailed');
-    },
-
-    // Adds the block "block" to the list of blocks on the server, with state
-    // pending.
-    createPendingOnServer: function (block) {
-        dojo.xhrPost({
-            url: "/rpc/create_pending",
-            content: {
-                "xB": block.xB(),
-                "yB": block.yB(),
-                "zB": block.zB(),
-                "a": block.a()
-            },
-            load: dojo.hitch(this, this._createPendingOnServerSucceeded),
-            error: dojo.hitch(this, this._createPendingOnServerFailed)
         });
     },
 

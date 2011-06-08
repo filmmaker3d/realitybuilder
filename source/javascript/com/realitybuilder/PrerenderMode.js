@@ -27,20 +27,17 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
     _versionOnServer: '-1',
 
     // With prerender-mode enabled, a block is automatically made real after
-    // "prerender_make_real_after" seconds, and if the total construction would
+    // "_makeRealAfter" milliseconds, and if the total construction would
     // afterwards match one of the block configurations in the list
-    // "prerender_block_configurations". Associated with each block
-    // configuration is an image, the URL of which is constructed using the
-    // template "prerender_image_url_template": %d is substituted with the
-    // block configuration number. This number is identical to the
-    // corresponding index in the array with the block configurations.
+    // "_blockConfigurations". Associated with each block configuration is an
+    // image, the URL of which is constructed using the template
+    // "imageUrlTemplate": %d is substituted with the block configuration
+    // number. This number is identical to the corresponding index in the array
+    // with the block configurations.
     _isEnabled: null,
-    makeRealAfter: null, // s
-    blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...
-    imageUrlTemplate: null,
-
-    constructor: function () {
-    },
+    _makeRealAfter: null, // ms
+    _blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...
+    _imageUrlTemplate: null,
 
     versionOnServer: function () {
         return this._versionOnServer;
@@ -66,6 +63,10 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
 
     isEnabled: function () {
         return this._isEnabled;
+    },
+
+    makeRealAfter: function () {
+        return this._makeRealAfter;
     },
 
     _blockConfigurationSetKey: function (block) {
@@ -123,19 +124,27 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
         return this._setIsEmpty(blockConfigurationSet);
     },
 
-    // Returns true, iff there is a prerendered block configuration that
-    // matches the block configuration described by the real blocks
-    // "realBlocks" and the new block "newBlock".
-    onePrerenderedConfigurationMatches: function (realBlocks, newBlock) {
+    // Iff there is a prerendered block configuration that matches the block
+    // configuration described by the real blocks "realBlocks" and the new
+    // block "newBlock", then returns the index of that configuration.
+    //
+    // Otherwise returns false.
+    matchingBlockConfiguration: function (realBlocks, newBlock) {
         var i, blockConfiguration;
 
         for (i = 0; i < this._blockConfigurations.length; i += 1) {
             blockConfiguration = this._blockConfigurations[i];
             if (this._blockConfigurationMatches(blockConfiguration, 
                                                 realBlocks, newBlock)) {
-                return true;
+                return i;
             }
         }
         return false; // no prerendered configuration matches
+    },
+
+    // Returns the image URL of the image for the block configuration with the
+    // index "i".
+    imageUrl: function (i) {
+        return this._imageUrlTemplate.replace('%d', i);
     }
 });

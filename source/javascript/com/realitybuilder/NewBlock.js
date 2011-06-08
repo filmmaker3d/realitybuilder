@@ -160,7 +160,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     requestMakeReal: function () {
         if (this.canBeMadeReal()) {
             this._stop();
-            this._constructionBlocks.createPendingOnServer(this);
+            this._createPendingOnServer();
             dojo.publish('com/realitybuilder/NewBlock/makeRealRequested');
         }
     },
@@ -286,9 +286,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     _isInPrerenderedBlockConfiguration: function () {
-        var rBlocks = this._constructionBlocks.realBlocksSorted();
-        return this._prerenderMode.onePrerenderedConfigurationMatches(rBlocks, 
-                                                                      this);
+        var realBlocks = this._constructionBlocks.realBlocksSorted();
+        return this._prerenderMode.matchingBlockConfiguration(realBlocks, 
+                                                              this) !== false;
     },
 
     // Returns true, iff the new block can be made real in its current
@@ -506,6 +506,72 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                 this._subtractRealBlocks(context);
             }
             this._onRendered();
+        }
+    },
+
+    // Called if storing the block as pending on the server succeeded.
+    _createPendingOnServerSucceeded: function () {
+        dojo.publish('com/realitybuilder/NewBlock/createdPendingOnServer');
+
+        if (this._prerenderMode.isEnabled()) {
+            // FIXME: make real after an interval
+            setTimeout(dojo.hitch(this, this._makeRealPrerenderedOnServer), 
+                       this._prerenderMode.makeRealAfter());
+        }
+    },
+
+    // Adds this block to the list of blocks on the server, with state pending.
+    _createPendingOnServer: function () {
+        dojo.xhrPost({
+            url: "/rpc/create_pending",
+            content: {
+                "xB": this.xB(),
+                "yB": this.yB(),
+                "zB": this.zB(),
+                "a": this.a()
+            },
+            load: dojo.hitch(this, this._createPendingOnServerSucceeded)
+        });
+    },
+
+    _makeRealPrerenderedOnServerSucceeded: function () {
+        // FIXME: OK? Maybe just use some general event indicating change on
+        // server.
+        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
+    },
+
+    // If this block together with the real blocks matches a prerendered block
+    // configuration, then:
+    //
+    // * makes it real,
+    //
+    // * sets the background image to the prerendered one.
+    //
+    // Otherwise, just makes the block movable again.
+    _makeRealPrerenderedOnServer: function () {
+        var i, imageUrl, realBlocks;
+
+        realBlocks = this._constructionBlocks.realBlocksSorted();
+        i = this._prerenderMode.matchingBlockConfiguration(realBlocks, this);
+
+        if (i !== false) {
+            imageUrl = this._prerenderMode.imageUrl(i);
+            dojo.xhrPost({
+                url: "/rpc/make_real_prerendered",
+                content: {
+                    "xB": this.xB(),
+                    "yB": this.yB(),
+                    "zB": this.zB(),
+                    "a": this.a(),
+                    "imageUrl": this._prerenderMode.imageUrl(i)
+                },
+                load: dojo.hitch(this, 
+                                 this._makeRealPrerenderedOnServerSucceeded)
+            });
+        } else {
+            // this block and the real block don't match a prerendered
+            // configuration
+            this._makeMovable();
         }
     }
 });

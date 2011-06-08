@@ -105,15 +105,15 @@ class PrerenderMode(db.Model):
     data_version = db.StringProperty()
 
     # With prerender-mode enabled, a block is automatically made real after
-    # "prerender_make_real_after" seconds, and if the total construction
-    # would afterwards match one of the block configurations in the list
-    # "prerender_block_configurations". Associated with each block
-    # configuration is an image, the URL of which is constructed using the
-    # template "prerender_image_url_template": %d is substituted with the
-    # block configuration number. This number is identical to the corresponding
-    # index in the array with the block configurations.
+    # "make_real_after" milliseconds, and if the total construction would
+    # afterwards match one of the block configurations in the list
+    # "block_configurations". Associated with each block configuration is an
+    # image, the URL of which is constructed using the template
+    # "image_url_template": %d is substituted with the block configuration
+    # number. This number is identical to the corresponding index in the array
+    # with the block configurations.
     is_enabled = db.BooleanProperty()
-    make_real_after = db.FloatProperty() # s
+    make_real_after = db.IntegerProperty() # ms
     block_configurations = db.StringListProperty()
     image_url_template = db.StringProperty()
 
@@ -525,7 +525,7 @@ class RPCAdminMakeReal(webapp.RequestHandler):
     @staticmethod
     def transaction(x_b, y_b, z_b, a):
         construction = Construction.get_main()
-        
+       
         block = Block.get_at(construction, [x_b, y_b, z_b], a)
         if not block or block.state == 2:
             return # No block to update or already real.
@@ -552,6 +552,72 @@ class RPCAdminMakeReal(webapp.RequestHandler):
                                   x_b, y_b, z_b, a)
         except Exception, e:
             logging.error('Could not make block real: ' + str(e))
+
+# FIXME: implement and update documentation
+#
+# Changes the status of the block at the provided position to real. If the
+# block isn't in the construction, then the operation fails. If the block
+# intersects with any real block, then it is deleted. If there are pending
+# blocks that intersect with the newly turned real block, then they are
+# deleted.
+# 
+# Silently fails on error.
+class RPCMakeRealPrerendered(webapp.RequestHandler):
+    # Tries to make the block at the block position "x_b", "y_b", "z_b", and
+    # rotated by the angle "a", real. If successful, then changes the URL of
+    # the background image to "image_url".
+    @staticmethod
+    def transaction(x_b, y_b, z_b, a, image_url):
+        # FIXME: check if prerender-mode is active
+
+        # FIXME: perhaps reuse code from other function
+ 
+        construction = Construction.get_main()
+
+        query = PrerenderMode.all().ancestor(construction)
+        prerender_mode = query.get()
+        if prerender_mode is None:
+            raise Exception('Could not get prerender-mode data')
+        
+        block = Block.get_at(construction, [x_b, y_b, z_b], a)
+        if not block or block.state == 2:
+            return # No block to update or already real.
+        
+        if block.is_intersecting_with_real():
+            # Block intersects with real block. => Should be
+            # deleted.
+            new_state = 0
+        else:
+            new_state = 2
+            
+        block.store_state_and_increase_blocks_data_version(new_state)
+
+        # Necessary since the current construction object still contains the
+        # old blocks data version. FIXME: somehow using another instance of
+        # "Construction" in "store_state..." and the "construction.put()" below
+        # causes trouble. Even using "Construction.get_main()" again doesn't
+        # solve the problem.
+        construction.increase_blocks_data_version() 
+            
+        if new_state != 0:
+            Block.delete_intersecting_pending_blocks(block)
+
+        construction.image_url = image_url
+        construction.put()
+        construction.increase_image_data_version()
+
+    def post(self):
+        try:
+            x_b = int(self.request.get('xB'))
+            y_b = int(self.request.get('yB'))
+            z_b = int(self.request.get('zB'))
+            a = int(self.request.get('a'))
+            image_url = self.request.get('imageUrl')
+            db.run_in_transaction(RPCMakeRealPrerendered.transaction, 
+                                  x_b, y_b, z_b, a, image_url)
+        except Exception, e:
+            logging.error('Could not make block real in prerender-mode: ' + 
+                          str(e))
 
 # Sets the state of the block at the provided position to deleted.
 #
@@ -792,7 +858,7 @@ class AdminInit(webapp.RequestHandler):
         prerenderMode = PrerenderMode(parent=construction)
         prerenderMode.data_version = '0'
         prerenderMode.is_enabled = True
-        prerenderMode.make_real_after = 2.
+        prerenderMode.make_real_after = 0
         prerenderMode.block_configurations = \
             ['[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
              '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
@@ -949,7 +1015,8 @@ application = webapp.WSGIApplication([
     ('/admin/rpc/make_pending', RPCAdminMakePending),
     ('/admin/rpc/update_settings', RPCAdminUpdateSettings),
     ('/rpc/construction', RPCConstruction),
-    ('/rpc/create_pending', RPCCreatePending)],
+    ('/rpc/create_pending', RPCCreatePending),
+    ('/rpc/make_real_prerendered', RPCMakeRealPrerendered)],
     debug = debug)
 
 def main():
