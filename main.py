@@ -477,7 +477,7 @@ class RPCConstruction(webapp.RequestHandler):
             'cameraData': RPCConstruction.get_camera_data(
                 construction, camera_data_version_client),
             'imageData': RPCConstruction.get_image_data(
-                construction, camera_data_version_client),
+                construction, image_data_version_client),
             'blockPropertiesData': RPCConstruction.get_block_properties_data(
                 construction, block_properties_data_version_client),
             'newBlockData': RPCConstruction.get_new_block_data(
