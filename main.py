@@ -603,6 +603,7 @@ class RPCMakeRealPrerendered(webapp.RequestHandler):
             Block.delete_intersecting_pending_blocks(block)
 
         construction.image_url = image_url
+        construction.image_last_update = 0. # since the image URL has changed
         construction.put()
         construction.increase_image_data_version()
 
@@ -778,6 +779,12 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
                 setattr(construction, key, value);
             except:
                 pass # nothing to be done
+
+        # In case the image URL has changed, then the image should be refreshed
+        # right away. And if the URL hasn't changed, then reloading the image
+        # should not be a problem, as this part of the code is usually not
+        # often called.
+        construction.image_last_update = 0.
 
         construction.put()
 
