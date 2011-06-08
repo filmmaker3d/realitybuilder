@@ -42,6 +42,9 @@ def dump_json(obj, data):
 
 # General information about the construction.
 class Construction(db.Model):
+    # How often the client should update server data.
+    update_interval_client = db.IntegerProperty() # ms
+
     # Version of the blocks configuration. Is the string representation of an
     # integer because the integer may become very large. The version is
     # incremented every time a change is made to the construction, for example
@@ -71,7 +74,6 @@ class Construction(db.Model):
     image_url = db.LinkProperty()
     image_last_update = db.FloatProperty(default=0.) # s
     image_update_interval_server = db.FloatProperty(default=5.) # s
-    image_update_interval_client = db.FloatProperty(default=5.) # s
 
     # Increases the blocks version number. Should be run in a transaction.
     def increase_blocks_data_version(self):
@@ -366,9 +368,7 @@ class RPCConstruction(webapp.RequestHandler):
             data.update({
                     'url': construction.image_url,
                     'updateIntervalServer': \
-                        construction.image_update_interval_server,
-                    'updateIntervalClient': \
-                        construction.image_update_interval_client})
+                        construction.image_update_interval_server})
         return data
 
     @staticmethod
@@ -472,6 +472,7 @@ class RPCConstruction(webapp.RequestHandler):
                     prerender_mode_data_version_client):
         construction = Construction.get_main()
         data = {
+            'updateIntervalClient': construction.update_interval_client,
             'blocksData': RPCConstruction.get_blocks_data(
                 construction, blocks_data_version_client),
             'cameraData': RPCConstruction.get_camera_data(
@@ -806,9 +807,7 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
                     float(self.request.get('camera.sensorResolution')),
                 'image_url': self.request.get('image.url'),
                 'image_update_interval_server':
-                    float(self.request.get('image.updateIntervalServer')),
-                'image_update_interval_client':
-                    float(self.request.get('image.updateIntervalClient'))}
+                    float(self.request.get('image.updateIntervalServer'))}
             db.run_in_transaction(RPCAdminUpdateSettings.transaction, 
                                   data)
         except Exception, e:
@@ -841,6 +840,7 @@ class AdminInit(webapp.RequestHandler):
         # image on the same App Engine instance, since urlfetch doesn't seem to
         # like that.
         construction = Construction(key_name = 'main')
+        construction.update_interval_client = 2000
         construction.blocks_data_version = '0'
         construction.camera_data_version = '0'
         construction.camera_position = [189.57, -159.16, 140.11]
@@ -852,7 +852,6 @@ class AdminInit(webapp.RequestHandler):
         construction.image_data_version = '0'
         construction.image_url = image_url
         construction.image_update_interval_server = 5.
-        construction.image_update_interval_client = 5.
         construction.put()
 
         # Deletes all prerender-mode entries:

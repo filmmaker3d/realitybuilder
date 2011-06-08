@@ -29,10 +29,6 @@ dojo.declare('com.realitybuilder.Image', null, {
     // The URL that the server retrieves the image from (it then caches it):
     _url: '',
 
-    // The duration of the intervals between the client retrieving a new image
-    // from the server:
-    _updateIntervalClient: 5, // s
-
     // The duration of the intervals between the server retrieving a new image
     // from the url:
     _updateIntervalServer: 5, // s
@@ -54,10 +50,8 @@ dojo.declare('com.realitybuilder.Image', null, {
         this._node.style.width = camera.sensor().width() + 'px';
         this._node.style.height = camera.sensor().height() + 'px';
 
-        this._onloadHandle = dojo.connect(
-            this._node, 'onload', this, this._onFirstImageLoad);
-
-        this._refresh();
+        this._onloadHandle = dojo.connect(this._node, 'onload', 
+                                          this, this._onFirstImageLoad);
     },
 
     imageLoaded: function () {
@@ -76,18 +70,12 @@ dojo.declare('com.realitybuilder.Image', null, {
         return this._updateIntervalServer;
     },
 
-    updateIntervalClient: function () {
-        return this._updateIntervalClient;
-    },
-
     // Updates the settings of the image to the version on the server, which is
     // described by "serverData".
     updateWithServerData: function (serverData) {
         this._versionOnServer = serverData.version;
-        this._updateIntervalClient = serverData.updateIntervalClient;
         this._updateIntervalServer = serverData.updateIntervalServer;
         this._url = serverData.url;
-        this._backgroundImageInterval = serverData.updateIntervalClient * 1000;
         dojo.publish('com/realitybuilder/Image/changed');
     },
 
@@ -98,12 +86,9 @@ dojo.declare('com.realitybuilder.Image', null, {
         dojo.disconnect(this._onloadHandle);
     },
 
-    // Updates the image and schedules the next update.
-    _refresh: function () {
+    // Updates the image.
+    update: function () {
         this._node.src = 
             '/images/live.jpg?nocache=' + Math.random().toString();
-        setTimeout(dojo.hitch(this, this._refresh), 
-            this._updateIntervalClient * 1000);
-        this._refreshed = true;
     }
 });

@@ -84,8 +84,6 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
         dojo.byId('imageURL').value = image.url();
         dojo.byId('imageUpdateIntervalServer').value = 
             image.updateIntervalServer();
-        dojo.byId('imageUpdateIntervalClient').value = 
-            image.updateIntervalClient();
     },
 
     // Returns data describing the image settings in a format that is a subset
@@ -94,9 +92,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
         var data = {
             'url': dojo.byId('imageURL').value || '',
             'updateIntervalServer': 
-                parseFloat(dojo.byId('imageUpdateIntervalServer').value) || 5,
-            'updateIntervalClient':
-                parseFloat(dojo.byId('imageUpdateIntervalClient').value) || 5};
+                parseFloat(dojo.byId('imageUpdateIntervalServer').value) || 5};
         return data;
     },
 

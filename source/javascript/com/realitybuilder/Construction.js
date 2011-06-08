@@ -40,10 +40,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // blocks:
     _constructionBlocks: null,
 
-    // Interval in between requests to the server for the new construction
-    // data.
-    _UPDATE_INTERVAL: 2000, // ms
-
     // The interval in between checks whether the web page has finished loading
     // can can be shown.
     _CHECK_IF_HAS_LOADED_INTERVAL: 500, // ms
@@ -389,12 +385,14 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._updateTimeout = 
             setTimeout(function () {
                 that._update();
-            }, this._UPDATE_INTERVAL);
+            }, data.updateIntervalClient);
     },
 
     // Triggers an update of the construction with the data stored on the
-    // server. Only updates the blocks if there is a new version. Fails
-    // silently on error.
+    // server. Only updates data where there is a new version. Fails silently
+    // on error.
+    //
+    // Also updates the background image.
     _update: function () {
         dojo.xhrGet({
             url: "/rpc/construction",
@@ -412,6 +410,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
             handleAs: "json",
             load: dojo.hitch(this, this._updateSucceeded)
         });
+
+        this._image.update();
     },
 
     // Unhides the content. Fades in the content, unless the browser is Internet
