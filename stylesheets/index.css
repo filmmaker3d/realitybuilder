@@ -25,6 +25,7 @@ html {
 
 body {
     background: black;
+    height: 100%;
 }
 
 #loadIndicator {
@@ -83,6 +84,10 @@ table#contentContainer td {
 
 table#contentContainer tr {
     height: 100%;
+}
+
+table#contentContainer tr.debug {
+    height: auto;
 }
 
 #view {
