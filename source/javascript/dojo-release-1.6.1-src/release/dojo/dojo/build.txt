@@ -37,8 +37,9 @@ realitybuilder.js:
 ./../../release/dojo/dojo/regexp.js
 ./../../release/dojo/dojo/date/locale.js
 ./../../release/dojo/dojox/date/posix.js
-./../../release/dojo/com/realitybuilder/Block.js
 ./../../release/dojo/com/realitybuilder/BlockProperties.js
+./../../release/dojo/com/realitybuilder/ConstructionBlockProperties.js
+./../../release/dojo/com/realitybuilder/Block.js
 ./../../release/dojo/com/realitybuilder/ConstructionBlock.js
 ./../../release/dojo/com/realitybuilder/util.js
 ./../../release/dojo/com/realitybuilder/ConstructionBlocks.js
@@ -52,4 +53,5 @@ realitybuilder.js:
 ./../../release/dojo/com/realitybuilder/AdminControls.js
 ./../../release/dojo/com/realitybuilder/ControlButton.js
 ./../../release/dojo/com/realitybuilder/ControlPanel.js
+./../../release/dojo/com/realitybuilder/PrerenderMode.js
 ./../../release/dojo/com/realitybuilder/Construction.js

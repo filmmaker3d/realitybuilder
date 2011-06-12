@@ -4000,6 +4000,302 @@ dojox.date.posix.getIsoWeeksInYear = function(/*Date*/dateObject) {
 
 }
 
+if(!dojo._hasResource['com.realitybuilder.BlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['com.realitybuilder.BlockProperties'] = true;
+// Describes the properties of a block, including shape and dimensions.
+
+// Sometimes the term "full shadow" is used, which refers to the shadow how it
+// would look if the all blocks in the layer would form an infinite plane
+// without holes.
+
+// Copyright 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
+
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+
+dojo.provide('com.realitybuilder.BlockProperties');
+
+dojo.declare('com.realitybuilder.BlockProperties', null, {
+    // Version of data last retrieved from the server, or "-1" initially. Is a
+    // string in order to be able to contain very large integers.
+    _versionOnServer: '-1',
+
+    // Block dimensions in world space. The side length of a block is
+    // approximately two times the grid spacing in the respective direction.
+    _blockPositionSpacingXY: null, // mm
+    _blockPositionSpacingZ: null, // mm
+
+    // Outline of the block in the xy plane, with coordinates in block space,
+    // counterclockwise:
+    _outlineBXY: null,
+
+    // Array with the outline rotated by 0°, 90°, 180°, and 270° around the
+    // cneter of rotation, in block space:
+    _rotatedOutlinesBXY: [null, null, null, null],
+
+    // Two blocks 1 and 2 are defined to collide, iff block 2 is offset against
+    // block 1 in the block space x-y-plane by any of the following values. The
+    // rotation angles below are those of block 2 relative to block 1. The
+    // offsets are stored as JSON arrays.
+    _collisionOffsetsListBXY: null, // 0°, 90°, 180°, 270°
+
+    // Array with the list of collision offsets rotated by 0°, 90°, 180°, and
+    // 270° CCW (when viewed from above) around the center of rotation of block
+    // 1, in block space:
+    _rotatedCollisionOffsetsListsBXY: [null, null, null, null],
+
+    // Two blocks 1 and 2 are defined to be attachable, iff block 2 is offset
+    // against block 1 in the block space by any of the following values. The
+    // rotation angles below are those of block 2 relative to block 1. The
+    // offsets are stored as JSON arrays.
+    _attachmentOffsetsListB: null, // 0°, 90°, 180°, 270°
+
+    // Array with the list of attachment offsets rotated by 0°, 90°, 180°, and
+    // 270° CCW (when viewed from above) around the center of rotation of block
+    // 1, in block space:
+    _rotatedAttachmentOffsetsListsB: [null, null, null, null],
+
+    // Center of rotation, in the block space x-y-plane, with coordinates
+    // relative to the origin of the unrotated block.
+    _rotCenterBXY: null,
+
+    versionOnServer: function () {
+        return this._versionOnServer;
+    },
+
+    // Returns false when the object is new and has not yet been updated with
+    // server data.
+    isInitializedWithServerData: function () {
+        return this._versionOnServer !== '-1';
+    },
+
+    _rotateOutlineBXY: function (a) {
+        var that = this;
+
+        return dojo.map(this._outlineBXY, function (pBXY) {
+            return com.realitybuilder.util.rotatePointBXY(pBXY, 
+                                                          that._rotCenterBXY,
+                                                          a);
+        });
+    },
+
+    _updateRotatedOutlinesBXY: function () {
+        var a;
+
+        for (a = 0; a < 4; a += 1) { 
+            this._rotatedOutlinesBXY[a] = this._rotateOutlineBXY(a);
+        }
+    },
+
+    _rotateCollisionOffsetsBXY: function (collisionOffsetsBXY, a) {
+        var util = com.realitybuilder.util;
+
+        return dojo.map(collisionOffsetsBXY, function (collisionOffsetBXY) {
+            return util.rotatePointBXY(collisionOffsetBXY, [0, 0], a);
+        });
+    },
+
+    _rotateCollisionOffsetsListBXY: function (a1) {
+        var a2, collisionOffsetsBXY, tmp = [null, null, null, null];
+
+        for (a2 = 0; a2 < 4; a2 += 1) {
+            collisionOffsetsBXY = this._collisionOffsetsListBXY[a2];
+            tmp[a2] = this._rotateCollisionOffsetsBXY(collisionOffsetsBXY, a1);
+        }
+
+        return tmp;
+    },
+
+    _updateRotatedCollisionOffsetsListsBXY: function () {
+        var a1;
+
+        for (a1 = 0; a1 < 4; a1 += 1) { 
+            this._rotatedCollisionOffsetsListsBXY[a1] = 
+                this._rotateCollisionOffsetsListBXY(a1);
+        }
+    },
+
+    _rotateAttachmentOffsetB: function (attachmentOffsetB, a) {
+        var pBXY, rotatedPBXY, rotatedPB, util;
+
+        util = com.realitybuilder.util;
+
+        // Rotates in the x-y plane, keeping z constant:
+        pBXY = [attachmentOffsetB[0], attachmentOffsetB[1]];
+        rotatedPBXY = util.rotatePointBXY(pBXY, [0, 0], a);
+        return [rotatedPBXY[0], rotatedPBXY[1], attachmentOffsetB[2]];
+    },
+
+    _rotateAttachmentOffsetsB: function (attachmentOffsetsB, a) {
+        var that = this;
+
+        return dojo.map(attachmentOffsetsB, function (attachmentOffsetB) {
+            return that._rotateAttachmentOffsetB(attachmentOffsetB, a);
+        });
+    },
+
+    _rotateAttachmentOffsetsListB: function (a1) {
+        var a2, attachmentOffsetsB, tmp = [null, null, null, null];
+
+        for (a2 = 0; a2 < 4; a2 += 1) {
+            attachmentOffsetsB = this._attachmentOffsetsListB[a2];
+            tmp[a2] = this._rotateAttachmentOffsetsB(attachmentOffsetsB, a1);
+        }
+
+        return tmp;
+    },
+
+    _updateRotatedAttachmentOffsetsListsB: function () {
+        var a1;
+
+        for (a1 = 0; a1 < 4; a1 += 1) { 
+            this._rotatedAttachmentOffsetsListsB[a1] = 
+                this._rotateAttachmentOffsetsListB(a1);
+        }
+    },
+
+    // Updates the block properties to the version on the server, which is
+    // described by "serverData".
+    updateWithServerData: function (serverData) {
+        this._versionOnServer = serverData.version;
+        this._positionSpacingXY = serverData.positionSpacingXY;
+        this._positionSpacingZ = serverData.positionSpacingZ;
+        this._outlineBXY = serverData.outlineBXY;
+        this._collisionOffsetsListBXY = serverData.collisionOffsetsListBXY;
+        this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
+        this._rotCenterBXY = serverData.rotCenterBXY;
+
+        this._updateRotatedOutlinesBXY();
+        this._updateRotatedCollisionOffsetsListsBXY();
+        this._updateRotatedAttachmentOffsetsListsB();
+
+        dojo.publish('com/realitybuilder/BlockProperties/changed');
+    },
+
+    positionSpacingXY: function () {
+        return this._positionSpacingXY;
+    },
+
+    positionSpacingZ: function () {
+        return this._positionSpacingZ;
+    },
+
+    // Returns the outline, rotated by angle "a", in multiples of 90° CCW when
+    // viewed from above.
+    rotatedOutlineBXY: function (a) {
+        return this._rotatedOutlinesBXY[a % 4];
+    },
+
+    // Returns the list of collision offsets, of block 2 relative to block 1.
+    rotatedCollisionOffsetsBXY: function (block1, block2) {
+        var collisionOffsetsListBXY, relative_a;
+
+        collisionOffsetsListBXY = 
+            this._rotatedCollisionOffsetsListsBXY[block1.a() % 4];
+
+        relative_a = (4 + block2.a() - block1.a()) % 4;
+
+        return collisionOffsetsListBXY[relative_a];
+    },
+
+    // Returns the list of attachment offsets, of block 2 relative to block 1.
+    rotatedAttachmentOffsetsB: function (block1, block2) {
+        var attachmentOffsetsListB, relative_a;
+
+        attachmentOffsetsListB = 
+            this._rotatedAttachmentOffsetsListsB[block1.a() % 4];
+
+        relative_a = (4 + block2.a() - block1.a()) % 4;
+
+        return attachmentOffsetsListB[relative_a];
+    }
+});
+
+}
+
+if(!dojo._hasResource['com.realitybuilder.ConstructionBlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['com.realitybuilder.ConstructionBlockProperties'] = true;
+// Describes the properties of a construction block.
+
+// Sometimes the term "full shadow" is used, which refers to the shadow how it
+// would look if the all blocks in the layer would form an infinite plane
+// without holes.
+
+// Copyright 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
+
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+
+dojo.provide('com.realitybuilder.ConstructionBlockProperties');
+
+dojo.declare('com.realitybuilder.ConstructionBlockProperties', null, {
+    // Version of data last retrieved from the server, or "-1" initially. Is a
+    // string in order to be able to contain very large integers.
+    _versionOnServer: '-1',
+
+    // Color (CSS format) of the block, if pending or real:
+    _pendingColor: null,
+    _realColor: null,
+
+    versionOnServer: function () {
+        return this._versionOnServer;
+    },
+
+    // Returns false when the object is new and has not yet been updated with
+    // server data.
+    isInitializedWithServerData: function () {
+        return this._versionOnServer !== '-1';
+    },
+
+    // Updates the block properties to the version on the server, which is
+    // described by "serverData".
+    updateWithServerData: function (serverData) {
+        this._versionOnServer = serverData.version;
+        this._pendingColor = serverData.pendingColor;
+        this._realColor = serverData.realColor;
+
+        dojo.publish('com/realitybuilder/ConstructionBlockProperties/changed');
+    },
+
+    pendingColor: function () {
+        return this._pendingColor;
+    },
+
+    realColor: function () {
+        return this._realColor;
+    }
+});
+
+}
+
 if(!dojo._hasResource['com.realitybuilder.Block']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource['com.realitybuilder.Block'] = true;
 // A building block.
@@ -4579,235 +4875,6 @@ dojo.declare('com.realitybuilder.Block', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.BlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.BlockProperties'] = true;
-// Describes the properties of a block, including shape and dimensions.
-
-// Sometimes the term "full shadow" is used, which refers to the shadow how it
-// would look if the all blocks in the layer would form an infinite plane
-// without holes.
-
-// Copyright 2011 Felix E. Klee <felix.klee@inka.de>
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy
-// of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
-
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
-
-dojo.provide('com.realitybuilder.BlockProperties');
-
-
-
-dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
-    // Version of data last retrieved from the server, or "-1" initially. Is a
-    // string in order to be able to contain very large integers.
-    _versionOnServer: '-1',
-
-    // Block dimensions in world space. The side length of a block is
-    // approximately two times the grid spacing in the respective direction.
-    _blockPositionSpacingXY: null, // mm
-    _blockPositionSpacingZ: null, // mm
-
-    // Outline of the block in the xy plane, with coordinates in block space,
-    // counterclockwise:
-    _outlineBXY: null,
-
-    // Array with the outline rotated by 0°, 90°, 180°, and 270° around the
-    // cneter of rotation, in block space:
-    _rotatedOutlinesBXY: [null, null, null, null],
-
-    // Two blocks 1 and 2 are defined to collide, iff block 2 is offset against
-    // block 1 in the block space x-y-plane by any of the following values. The
-    // rotation angles below are those of block 2 relative to block 1. The
-    // offsets are stored as JSON arrays.
-    _collisionOffsetsListBXY: null, // 0°, 90°, 180°, 270°
-
-    // Array with the list of collision offsets rotated by 0°, 90°, 180°, and
-    // 270° CCW (when viewed from above) around the center of rotation of block
-    // 1, in block space:
-    _rotatedCollisionOffsetsListsBXY: [null, null, null, null],
-
-    // Two blocks 1 and 2 are defined to be attachable, iff block 2 is offset
-    // against block 1 in the block space by any of the following values. The
-    // rotation angles below are those of block 2 relative to block 1. The
-    // offsets are stored as JSON arrays.
-    _attachmentOffsetsListB: null, // 0°, 90°, 180°, 270°
-
-    // Array with the list of attachment offsets rotated by 0°, 90°, 180°, and
-    // 270° CCW (when viewed from above) around the center of rotation of block
-    // 1, in block space:
-    _rotatedAttachmentOffsetsListsB: [null, null, null, null],
-
-    // Center of rotation, in the block space x-y-plane, with coordinates
-    // relative to the origin of the unrotated block.
-    _rotCenterBXY: null,
-
-    versionOnServer: function () {
-        return this._versionOnServer;
-    },
-
-    // Returns false when the object is new and has not yet been updated with
-    // server data.
-    isInitializedWithServerData: function () {
-        return this._versionOnServer !== '-1';
-    },
-
-    _rotateOutlineBXY: function (a) {
-        var that = this;
-
-        return dojo.map(this._outlineBXY, function (pBXY) {
-            return com.realitybuilder.util.rotatePointBXY(pBXY, 
-                                                          that._rotCenterBXY,
-                                                          a);
-        });
-    },
-
-    _updateRotatedOutlinesBXY: function () {
-        var a;
-
-        for (a = 0; a < 4; a += 1) { 
-            this._rotatedOutlinesBXY[a] = this._rotateOutlineBXY(a);
-        }
-    },
-
-    _rotateCollisionOffsetsBXY: function (collisionOffsetsBXY, a) {
-        var util = com.realitybuilder.util;
-
-        return dojo.map(collisionOffsetsBXY, function (collisionOffsetBXY) {
-            return util.rotatePointBXY(collisionOffsetBXY, [0, 0], a);
-        });
-    },
-
-    _rotateCollisionOffsetsListBXY: function (a1) {
-        var a2, collisionOffsetsBXY, tmp = [null, null, null, null];
-
-        for (a2 = 0; a2 < 4; a2 += 1) {
-            collisionOffsetsBXY = this._collisionOffsetsListBXY[a2];
-            tmp[a2] = this._rotateCollisionOffsetsBXY(collisionOffsetsBXY, a1);
-        }
-
-        return tmp;
-    },
-
-    _updateRotatedCollisionOffsetsListsBXY: function () {
-        var a1;
-
-        for (a1 = 0; a1 < 4; a1 += 1) { 
-            this._rotatedCollisionOffsetsListsBXY[a1] = 
-                this._rotateCollisionOffsetsListBXY(a1);
-        }
-    },
-
-    _rotateAttachmentOffsetB: function (attachmentOffsetB, a) {
-        var pBXY, rotatedPBXY, rotatedPB, util;
-
-        util = com.realitybuilder.util;
-
-        // Rotates in the x-y plane, keeping z constant:
-        pBXY = [attachmentOffsetB[0], attachmentOffsetB[1]];
-        rotatedPBXY = util.rotatePointBXY(pBXY, [0, 0], a);
-        return [rotatedPBXY[0], rotatedPBXY[1], attachmentOffsetB[2]];
-    },
-
-    _rotateAttachmentOffsetsB: function (attachmentOffsetsB, a) {
-        var that = this;
-
-        return dojo.map(attachmentOffsetsB, function (attachmentOffsetB) {
-            return that._rotateAttachmentOffsetB(attachmentOffsetB, a);
-        });
-    },
-
-    _rotateAttachmentOffsetsListB: function (a1) {
-        var a2, attachmentOffsetsB, tmp = [null, null, null, null];
-
-        for (a2 = 0; a2 < 4; a2 += 1) {
-            attachmentOffsetsB = this._attachmentOffsetsListB[a2];
-            tmp[a2] = this._rotateAttachmentOffsetsB(attachmentOffsetsB, a1);
-        }
-
-        return tmp;
-    },
-
-    _updateRotatedAttachmentOffsetsListsB: function () {
-        var a1;
-
-        for (a1 = 0; a1 < 4; a1 += 1) { 
-            this._rotatedAttachmentOffsetsListsB[a1] = 
-                this._rotateAttachmentOffsetsListB(a1);
-        }
-    },
-
-    // Updates the block properties to the version on the server, which is
-    // described by "serverData".
-    updateWithServerData: function (serverData) {
-        this._versionOnServer = serverData.version;
-        this._positionSpacingXY = serverData.positionSpacingXY;
-        this._positionSpacingZ = serverData.positionSpacingZ;
-        this._outlineBXY = serverData.outlineBXY;
-        this._collisionOffsetsListBXY = serverData.collisionOffsetsListBXY;
-        this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
-        this._rotCenterBXY = serverData.rotCenterBXY;
-
-        this._updateRotatedOutlinesBXY();
-        this._updateRotatedCollisionOffsetsListsBXY();
-        this._updateRotatedAttachmentOffsetsListsB();
-
-        dojo.publish('com/realitybuilder/BlockProperties/changed');
-    },
-
-    positionSpacingXY: function () {
-        return this._positionSpacingXY;
-    },
-
-    positionSpacingZ: function () {
-        return this._positionSpacingZ;
-    },
-
-    // Returns the outline, rotated by angle "a", in multiples of 90° CCW when
-    // viewed from above.
-    rotatedOutlineBXY: function (a) {
-        return this._rotatedOutlinesBXY[a % 4];
-    },
-
-    // Returns the list of collision offsets, of block 2 relative to block 1.
-    rotatedCollisionOffsetsBXY: function (block1, block2) {
-        var collisionOffsetsListBXY, relative_a;
-
-        collisionOffsetsListBXY = 
-            this._rotatedCollisionOffsetsListsBXY[block1.a() % 4];
-
-        relative_a = (4 + block2.a() - block1.a()) % 4;
-
-        return collisionOffsetsListBXY[relative_a];
-    },
-
-    // Returns the list of attachment offsets, of block 2 relative to block 1.
-    rotatedAttachmentOffsetsB: function (block1, block2) {
-        var attachmentOffsetsListB, relative_a;
-
-        attachmentOffsetsListB = 
-            this._rotatedAttachmentOffsetsListsB[block1.a() % 4];
-
-        relative_a = (4 + block2.a() - block1.a()) % 4;
-
-        return attachmentOffsetsListB[relative_a];
-    }
-});
-
-}
-
 if(!dojo._hasResource['com.realitybuilder.ConstructionBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource['com.realitybuilder.ConstructionBlock'] = true;
 // A block that is permanently part of the construction, though it may be
@@ -4837,7 +4904,7 @@ dojo.provide('com.realitybuilder.ConstructionBlock');
 
 
 dojo.declare('com.realitybuilder.ConstructionBlock', 
-    com.realitybuilder.Block,
+             com.realitybuilder.Block,
 {
     // State of the block: 0 = deleted, 1 = pending (= requested to be build),
     // 2 = real
@@ -4848,6 +4915,9 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // change.
     _timeStamp: null,
 
+    // Properties of a construction block:
+    _constructionBlockProperties: null,
+
     // Creates a block at the position in block space ("xB", "yB", "zB") =
     // "positionB", and rotated about its center of rotation by "a" (° CCW,
     // when viewed from above). When the block is rendered, it is as seen by
@@ -4856,10 +4926,11 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // "timeStamp".
     //
     // The block's properties, such as shape and size, are described by
-    // "blockProperties".
-    constructor: function (blockProperties, camera, positionB, a, state,
-                           timeStamp)
+    // "blockProperties" and "constructionBlockProperties".
+    constructor: function (blockProperties, camera, positionB, a, 
+                           constructionBlockProperties, state, timeStamp)
     {
+        this._constructionBlockProperties = constructionBlockProperties;
         this._state = state;
         this._timeStamp = timeStamp;
     },
@@ -4888,8 +4959,13 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // rendering context "context". Depends on the vertexes in view
     // coordinates.
     render: function (context) {
+        var color, properties;
+
         if (!this.isDeleted()) {
-            var color = this.isReal() ? "green" : "white";
+            properties = this._constructionBlockProperties;
+            color = this.isReal() ? 
+                properties.realColor() : 
+                properties.pendingColor();
             this.inherited(arguments, [arguments[0], color]);
         }
     },
@@ -5322,6 +5398,9 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
+    // Properties of a construction block:
+    _constructionBlockProperties: null,
+
     // The blocks.
     _blocks: null,
 
@@ -5337,8 +5416,10 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Creates a container for the blocks associated with the construction
     // "construction".
-    constructor: function (construction, blockProperties) {
+    constructor: function (construction, blockProperties, 
+                           constructionBlockProperties) {
         this._blockProperties = blockProperties;
+        this._constructionBlockProperties = constructionBlockProperties;
         this._blocks = [];
         this._realBlocksSorted = [];
         this._construction = construction;
@@ -5395,17 +5476,18 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         return this._versionOnServer !== '-1';
     },
 
-    _createBlockFromServerData: function (bd) {
-        var camera = this._construction.camera();
-        return new com.realitybuilder.ConstructionBlock(this._blockProperties,
-                                                        camera, 
-                                                        bd.positionB, bd.a,
-                                                        bd.state,
-                                                        bd.timeStamp);
+    _createBlockFromServerData: function (serverData) {
+        var camera = this._construction.camera(), rb = com.realitybuilder;
+        return new rb.ConstructionBlock(this._blockProperties,
+                                        camera, 
+                                        serverData.positionB, serverData.a,
+                                        this._constructionBlockProperties,
+                                        serverData.state,
+                                        serverData.timeStamp);
     },
 
-    // Sets the list of blocks to the version on the server, which is described
-    // by "serverData".
+    // Sets the data of construction blocks to the version on the server, which
+    // is described by "serverData".
     updateWithServerData: function (serverData) {
         this._versionOnServer = serverData.version;
 
@@ -5500,11 +5582,10 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
                      'changeOnServerFailed');
     },
 
-    // Triggers setting the state of the block at the position "positionB" and
-    // with rotation angle "a" to pending: on the client and on the server.
-    // Once the server has completed the request, the list of blocks is
-    // updated. Difference to the function "createPendingOnServer": If the
-    // block does not exist, it is not created.
+    // Triggers setting the state of the construction block at the position
+    // "positionB" and with rotation angle "a" to pending: on the client and on
+    // the server. Once the server has completed the request, the list of
+    // blocks is updated.
     makePendingOnServer: function (positionB, a) {
         dojo.xhrPost({
             url: "/admin/rpc/make_pending",
@@ -5516,35 +5597,6 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
             },
             load: dojo.hitch(this, this._makePendingOnServerSucceeded),
             error: dojo.hitch(this, this._makePendingOnServerFailed)
-        });
-    },
-
-
-    // Called if storing the block succeeded.
-    _createPendingOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
-    },
-
-    // Called if storing the block failed. In this case, the state is reverted
-    // to virtual.
-    _createPendingOnServerFailed: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/' + 
-                     'changeOnServerFailed');
-    },
-
-    // Adds the block "block" to the list of blocks on the server, with state
-    // pending.
-    createPendingOnServer: function (block) {
-        dojo.xhrPost({
-            url: "/rpc/create_pending",
-            content: {
-                "xB": block.xB(),
-                "yB": block.yB(),
-                "zB": block.zB(),
-                "a": block.a()
-            },
-            load: dojo.hitch(this, this._createPendingOnServerSucceeded),
-            error: dojo.hitch(this, this._createPendingOnServerFailed)
         });
     },
 
@@ -5819,15 +5871,16 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     },
 
     // Draws the full shadow, projected onto the layer of blocks of elevation
-    // "layerZB", on the canvas with rendering context "context".
-    _renderFull: function (layerZB, context) {
+    // "layerZB", on the canvas with rendering context "context". Uses the
+    // color "color" as the color of the shadow.
+    _renderFull: function (layerZB, context, color) {
         var fullVertexesS, vertexS, i;
 
         this._updateCoordinates(layerZB);
 
         fullVertexesS = this._fullVertexesS;
 
-        context.fillStyle = "red";
+        context.fillStyle = color;
 
         // counterclockwise:
         vertexS = fullVertexesS[0];
@@ -5847,7 +5900,9 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     //
     // "layerZB" is the elevation of the layer of blocks, on which the shadow
     // is projected (-1 is the ground plane):
-    render: function (layerZB) {
+    //
+    // Draws the shadow in the color "color".
+    render: function (layerZB, color) {
         var 
         canvas = this._canvas, helperCanvas = this._helperCanvas, 
         context, helperContext;
@@ -5876,10 +5931,10 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
             helperContext.globalCompositeOperation = "source-over";
             helperContext.drawImage(canvas, 0, 0);
             helperContext.globalCompositeOperation = "xor";
-            this._renderFull(layerZB, helperContext); // fast
+            this._renderFull(layerZB, helperContext, color); // fast
 
             // completes combination:
-            this._renderFull(layerZB, context); // fast
+            this._renderFull(layerZB, context, color); // fast
             
             // subtracts:
             context.globalCompositeOperation = "destination-out";
@@ -6156,16 +6211,18 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     },
 
     _renderLayerShadow: function (context, newBlock, camera, 
-                                  constructionBlocks, layerZB)
+                                  constructionBlocks, layerZB, color)
     {
-        this._layerShadow.render(layerZB);
+        this._layerShadow.render(layerZB, color);
         context.globalAlpha = 0.2;
         context.drawImage(this._layerShadow.canvas(), 0, 0);
         context.globalAlpha = 1;
     },
 
     // Draws the shadow of the new block as seen by the sensor of the camera.
-    render: function () {
+    //
+    // Draws the shadow in the color "color".
+    render: function (color) {
         var 
         canvas = this._camera.sensor().shadowCanvas(), context, 
         layerZB,
@@ -6184,7 +6241,7 @@ dojo.declare('com.realitybuilder.Shadow', null, {
             for (layerZB = -1; layerZB <= maxLayerZB; layerZB += 1) {
                 if (layerZB < newBlock.zB()) {
                     this._renderLayerShadow(context, newBlock, camera, 
-                                            constructionBlocks, layerZB);
+                                            constructionBlocks, layerZB, color);
                 }
                 this._shadowObscuringBlocks.subtract(context, layerZB + 1);
             }
@@ -6248,6 +6305,11 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _buildSpace1B: null,
     _buildSpace2B: null,
 
+    // Colors (CSS format) of the block and its shadow:
+    _color: null,
+    _stoppedColor: null, // when it is stopped
+    _shadowColor: null,
+
     // Iff true, then the block is stopped, which means that it can neither be
     // moved nor be rotated.
     _isStopped: null,
@@ -6272,6 +6334,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Version of the construction blocks when the shadow was last rendered.
     _lastConstructionBlocksVersion: null,
 
+    // Prerender-mode (only relevant if enabled):
+    _prerenderMode: null,
+
     // Creates the new block that the user may position. For collision
     // detection and for calculating hidden lines, the block needs to know
     // about the other blocks in the construction: "constructionBlocks" When
@@ -6280,7 +6345,12 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     //
     // The block's properties, such as shape and size, are described by
     // "blockProperties".
-    constructor: function (blockProperties, camera, constructionBlocks) {
+    //
+    // Details of data for prerender-mode, if enabled, are contained in
+    // "prerenderMode".
+    constructor: function (blockProperties, camera, constructionBlocks,
+                           prerenderMode)
+    {
         this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
         this._isStopped = false;
         this._constructionBlocks = constructionBlocks;
@@ -6288,6 +6358,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                                                      camera, 
                                                      constructionBlocks);
         this._camera = camera;
+        this._prerenderMode = prerenderMode;
     },
 
     versionOnServer: function () {
@@ -6317,6 +6388,10 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         this._moveSpace2B = serverData.moveSpace2B;
         this._buildSpace1B = serverData.buildSpace1B;
         this._buildSpace2B = serverData.buildSpace2B;
+
+        this._color = serverData.color;
+        this._stoppedColor = serverData.stoppedColor;
+        this._shadowColor = serverData.shadowColor;
 
         this._versionOnServer = serverData.version;
 
@@ -6356,7 +6431,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     requestMakeReal: function () {
         if (this.canBeMadeReal()) {
             this._stop();
-            this._constructionBlocks.createPendingOnServer(this);
+            this._createPendingOnServer();
             dojo.publish('com/realitybuilder/NewBlock/makeRealRequested');
         }
     },
@@ -6481,10 +6556,18 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                 this.zB() === 0);
     },
 
+    _isInPrerenderedBlockConfiguration: function () {
+        var realBlocks = this._constructionBlocks.realBlocksSorted();
+        return this._prerenderMode.matchingBlockConfiguration(realBlocks, 
+                                                              this) !== false;
+    },
+
     // Returns true, iff the new block can be made real in its current
     // position.
     canBeMadeReal: function () {
-        return this._isInBuildSpace() && this._isAttachable();
+        return this._isInBuildSpace() && this._isAttachable() && 
+            (!this._prerenderMode.isEnabled() ||
+             this._isInPrerenderedBlockConfiguration());
     },
 
     // Returns true, iff the bounding box of the current block overlaps with
@@ -6630,7 +6713,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Updates the shadow, i.e. (re-)draws it or removes it.
     _renderShadow: function () {
         if (this.isMovable()) {
-            this._shadow.render();
+            this._shadow.render(this._shadowColor);
         } else {
             this._shadow.clear();
         }
@@ -6680,7 +6763,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             canvas = this._camera.sensor().newBlockCanvas();
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
-                color = this.isMovable() ? 'red' : 'white';
+                color = this.isMovable() ? this._color : this._stoppedColor;
 
                 // Shadow does currently not work with FlashCanvas.
                 if (!com.realitybuilder.util.isFlashCanvasActive()) {
@@ -6694,6 +6777,72 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                 this._subtractRealBlocks(context);
             }
             this._onRendered();
+        }
+    },
+
+    // Called if storing the block as pending on the server succeeded.
+    _createPendingOnServerSucceeded: function () {
+        dojo.publish('com/realitybuilder/NewBlock/createdPendingOnServer');
+
+        if (this._prerenderMode.isEnabled()) {
+            // FIXME: make real after an interval
+            setTimeout(dojo.hitch(this, this._makeRealPrerenderedOnServer), 
+                       this._prerenderMode.makeRealAfter());
+        }
+    },
+
+    // Adds this block to the list of blocks on the server, with state pending.
+    _createPendingOnServer: function () {
+        dojo.xhrPost({
+            url: "/rpc/create_pending",
+            content: {
+                "xB": this.xB(),
+                "yB": this.yB(),
+                "zB": this.zB(),
+                "a": this.a()
+            },
+            load: dojo.hitch(this, this._createPendingOnServerSucceeded)
+        });
+    },
+
+    _makeRealPrerenderedOnServerSucceeded: function () {
+        // FIXME: OK? Maybe just use some general event indicating change on
+        // server.
+        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
+    },
+
+    // If this block together with the real blocks matches a prerendered block
+    // configuration, then:
+    //
+    // * makes it real,
+    //
+    // * sets the background image to the prerendered one.
+    //
+    // Otherwise, just makes the block movable again.
+    _makeRealPrerenderedOnServer: function () {
+        var i, imageUrl, realBlocks;
+
+        realBlocks = this._constructionBlocks.realBlocksSorted();
+        i = this._prerenderMode.matchingBlockConfiguration(realBlocks, this);
+
+        if (i !== false) {
+            imageUrl = this._prerenderMode.imageUrl(i);
+            dojo.xhrPost({
+                url: "/rpc/make_real_prerendered",
+                content: {
+                    "xB": this.xB(),
+                    "yB": this.yB(),
+                    "zB": this.zB(),
+                    "a": this.a(),
+                    "imageUrl": this._prerenderMode.imageUrl(i)
+                },
+                load: dojo.hitch(this, 
+                                 this._makeRealPrerenderedOnServerSucceeded)
+            });
+        } else {
+            // this block and the real block don't match a prerendered
+            // configuration
+            this._makeMovable();
         }
     }
 });
@@ -6733,10 +6882,6 @@ dojo.declare('com.realitybuilder.Image', null, {
     // The URL that the server retrieves the image from (it then caches it):
     _url: '',
 
-    // The duration of the intervals between the client retrieving a new image
-    // from the server:
-    _updateIntervalClient: 5, // s
-
     // The duration of the intervals between the server retrieving a new image
     // from the url:
     _updateIntervalServer: 5, // s
@@ -6758,10 +6903,8 @@ dojo.declare('com.realitybuilder.Image', null, {
         this._node.style.width = camera.sensor().width() + 'px';
         this._node.style.height = camera.sensor().height() + 'px';
 
-        this._onloadHandle = dojo.connect(
-            this._node, 'onload', this, this._onFirstImageLoad);
-
-        this._refresh();
+        this._onloadHandle = dojo.connect(this._node, 'onload', 
+                                          this, this._onFirstImageLoad);
     },
 
     imageLoaded: function () {
@@ -6780,18 +6923,12 @@ dojo.declare('com.realitybuilder.Image', null, {
         return this._updateIntervalServer;
     },
 
-    updateIntervalClient: function () {
-        return this._updateIntervalClient;
-    },
-
     // Updates the settings of the image to the version on the server, which is
     // described by "serverData".
     updateWithServerData: function (serverData) {
         this._versionOnServer = serverData.version;
-        this._updateIntervalClient = serverData.updateIntervalClient;
         this._updateIntervalServer = serverData.updateIntervalServer;
         this._url = serverData.url;
-        this._backgroundImageInterval = serverData.updateIntervalClient * 1000;
         dojo.publish('com/realitybuilder/Image/changed');
     },
 
@@ -6802,13 +6939,10 @@ dojo.declare('com.realitybuilder.Image', null, {
         dojo.disconnect(this._onloadHandle);
     },
 
-    // Updates the image and schedules the next update.
-    _refresh: function () {
+    // Updates the image.
+    update: function () {
         this._node.src = 
             '/images/live.jpg?nocache=' + Math.random().toString();
-        setTimeout(dojo.hitch(this, this._refresh), 
-            this._updateIntervalClient * 1000);
-        this._refreshed = true;
     }
 });
 
@@ -7027,9 +7161,6 @@ dojo.declare('com.realitybuilder.Camera', null, {
         return this._versionOnServer;
     },
 
-    version: function () {
-    },
-
     // Returns false when the object is new and has not yet been updated with
     // server data.
     isInitializedWithServerData: function () {
@@ -7246,8 +7377,6 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
         dojo.byId('imageURL').value = image.url();
         dojo.byId('imageUpdateIntervalServer').value = 
             image.updateIntervalServer();
-        dojo.byId('imageUpdateIntervalClient').value = 
-            image.updateIntervalClient();
     },
 
     // Returns data describing the image settings in a format that is a subset
@@ -7256,9 +7385,7 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
         var data = {
             'url': dojo.byId('imageURL').value || '',
             'updateIntervalServer': 
-                parseFloat(dojo.byId('imageUpdateIntervalServer').value) || 5,
-            'updateIntervalClient':
-                parseFloat(dojo.byId('imageUpdateIntervalClient').value) || 5};
+                parseFloat(dojo.byId('imageUpdateIntervalServer').value) || 5};
         return data;
     },
 
@@ -7624,6 +7751,161 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
 
 }
 
+if(!dojo._hasResource['com.realitybuilder.PrerenderMode']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['com.realitybuilder.PrerenderMode'] = true;
+// Configuration for prerender-mode, if enabled.
+
+// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
+
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+
+dojo.provide('com.realitybuilder.PrerenderMode');
+
+dojo.declare('com.realitybuilder.PrerenderMode', null, {
+    // Version of data last retrieved from the server, or "-1" initially. Is a
+    // string in order to be able to contain very large integers.
+    _versionOnServer: '-1',
+
+    // With prerender-mode enabled, a block is automatically made real after
+    // "_makeRealAfter" milliseconds, and if the total construction would
+    // afterwards match one of the block configurations in the list
+    // "_blockConfigurations". Associated with each block configuration is an
+    // image, the URL of which is constructed using the template
+    // "imageUrlTemplate": %d is substituted with the block configuration
+    // number. This number is identical to the corresponding index in the array
+    // with the block configurations.
+    _isEnabled: null,
+    _makeRealAfter: null, // ms
+    _blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...
+    _imageUrlTemplate: null,
+
+    versionOnServer: function () {
+        return this._versionOnServer;
+    },
+
+    // Returns false when the object is new and has not yet been updated with
+    // server data.
+    isInitializedWithServerData: function () {
+        return this._versionOnServer !== '-1';
+    },
+
+    // Updates the settings of the camera to the version on the server, which
+    // is described by "serverData".
+    updateWithServerData: function (serverData) {
+        this._versionOnServer = serverData.version;
+        this._isEnabled = serverData.isEnabled;
+        this._makeRealAfter = serverData.makeRealAfter;
+        this._blockConfigurations = serverData.blockConfigurations;
+        this._imageUrlTemplate = serverData.imageUrlTemplate;
+
+        dojo.publish('com/realitybuilder/PrerenderMode/changed');
+    },
+
+    isEnabled: function () {
+        return this._isEnabled;
+    },
+
+    makeRealAfter: function () {
+        return this._makeRealAfter;
+    },
+
+    _blockConfigurationSetKey: function (block) {
+        return block.xB() + ',' + block.yB() + ',' + block.zB() + ',' +
+            block.a();
+    },
+
+    // Returns a set describing the block configuration comprised of the real
+    // blocks "realBlocks" and the block "newBlock". The keys in the set have
+    // the format "xB,yB,zB,a".
+    _blockConfigurationSet: function (realBlocks, newBlock) {
+        var set = {}, setKey = this._blockConfigurationSetKey;
+
+        dojo.forEach(realBlocks, function (realBlock) {
+            set[setKey(realBlock)] = true;
+        });
+
+        set[setKey(newBlock)] = true;
+
+        return set;
+    },
+
+    _setIsEmpty: function (set) {
+        var key;
+
+        for (key in set) {
+            if (set.hasOwnProperty(key)) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+    // Returns true, iff the real blocks "realBlock" plus the block "newBlock"
+    // form the same block configuration as described in "blockConfigurations".
+    _blockConfigurationMatches: function (blockConfiguration, 
+                                          realBlocks, newBlock)
+    {
+        var blockConfigurationSet, i, item, key;
+
+        blockConfigurationSet = this._blockConfigurationSet(realBlocks, 
+                                                            newBlock);
+
+        for (i = 0; i < blockConfiguration.length; i += 1) {
+            item = blockConfiguration[i];
+            key = item[0] + ',' + item[1] + ',' + item[2] + ',' + item[3];
+            if (typeof blockConfigurationSet[key] === 'undefined') {
+                return false;
+            } else {
+                delete blockConfigurationSet[key];
+            }
+        }
+
+        return this._setIsEmpty(blockConfigurationSet);
+    },
+
+    // Iff there is a prerendered block configuration that matches the block
+    // configuration described by the real blocks "realBlocks" and the new
+    // block "newBlock", then returns the index of that configuration.
+    //
+    // Otherwise returns false.
+    matchingBlockConfiguration: function (realBlocks, newBlock) {
+        var i, blockConfiguration;
+
+        for (i = 0; i < this._blockConfigurations.length; i += 1) {
+            blockConfiguration = this._blockConfigurations[i];
+            if (this._blockConfigurationMatches(blockConfiguration, 
+                                                realBlocks, newBlock)) {
+                return i;
+            }
+        }
+        return false; // no prerendered configuration matches
+    },
+
+    // Returns the image URL of the image for the block configuration with the
+    // index "i".
+    imageUrl: function (i) {
+        return this._imageUrlTemplate.replace('%d', i);
+    }
+});
+
+}
+
 if(!dojo._hasResource['com.realitybuilder.Construction']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource['com.realitybuilder.Construction'] = true;
 // The construction and the controls.
@@ -7659,6 +7941,8 @@ dojo.provide('com.realitybuilder.Construction');
 
 
 
+
+
 dojo.declare('com.realitybuilder.Construction', null, {
     // True, iff admin controls should be shown:
     _showAdminControls: null,
@@ -7666,10 +7950,6 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // All blocks, permanently in the construction, including real and pending
     // blocks:
     _constructionBlocks: null,
-
-    // Interval in between requests to the server for the new construction
-    // data.
-    _UPDATE_INTERVAL: 2000, // ms
 
     // The interval in between checks whether the web page has finished loading
     // can can be shown.
@@ -7683,6 +7963,12 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
+
+    // Properties of a construction block:
+    _constructionBlockProperties: null,
+
+    // Prerender-mode:
+    _prerenderMode: null,
 
     // The new block that the user is supposed to position. Could move once the
     // real blocks are loaded, if there are any intersections.
@@ -7709,28 +7995,35 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // controls are shown, and - in the rendering - the real and pending
     // blocks.
     constructor: function (showAdminControls) {
+        var rb = com.realitybuilder;
+
         this._insertLoadIndicator();
 
         this._showAdminControls = showAdminControls;
         this._showReal = showAdminControls;
         this._showPending = showAdminControls;
 
-        this._blockProperties = new com.realitybuilder.BlockProperties();
-        this._camera = new com.realitybuilder.Camera(this._blockProperties, 
+        this._blockProperties = new rb.BlockProperties();
+        this._constructionBlockProperties = 
+            new rb.ConstructionBlockProperties();
+        this._camera = new rb.Camera(this._blockProperties, 
                                                      640, 480);
-        this._image = new com.realitybuilder.Image(this._camera);
+        this._image = new rb.Image(this._camera);
         this._constructionBlocks = 
-            new com.realitybuilder.ConstructionBlocks(this, 
-                                                      this._blockProperties);
+            new rb.ConstructionBlocks(this, 
+                                      this._blockProperties,
+                                      this._constructionBlockProperties);
+        this._prerenderMode = new rb.PrerenderMode();
         this._newBlock = 
-            new com.realitybuilder.NewBlock(this._blockProperties,
+            new rb.NewBlock(this._blockProperties,
                                             this._camera,
-                                            this._constructionBlocks);
+                                            this._constructionBlocks,
+                                            this._prerenderMode);
         this._controlPanel = 
-            new com.realitybuilder.ControlPanel(this._newBlock);
+            new rb.ControlPanel(this._newBlock);
 
         if (this._showAdminControls) {
-            this._adminControls = new com.realitybuilder.AdminControls(this);
+            this._adminControls = new rb.AdminControls(this);
 
             // When an attempt to change construction block data on the server
             // failed, then the relavant admin controls may have to be brought
@@ -7742,7 +8035,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
         }
 
         dojo.subscribe('com/realitybuilder/ConstructionBlocks/changedOnServer', 
-            this, this._update); // Speeds up responsiveness.
+                       this, this._update); // Speeds up responsiveness.
+        dojo.subscribe('com/realitybuilder/NewBlock/createdPendingOnServer', 
+                       this, this._update); // Speeds up responsiveness.
         dojo.subscribe('com/realitybuilder/NewBlock/' + 
                        'positionAngleInitialized', 
                        this, this._onNewBlockPositionAngleInitialized);
@@ -7765,6 +8060,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
                        this, this._onImageChanged);
         dojo.subscribe('com/realitybuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
+        dojo.subscribe('com/realitybuilder/ConstructionBlockProperties/changed',
+                       this, this._onConstructionBlockPropertiesChanged);
+        dojo.subscribe('com/realitybuilder/PrerenderMode/changed',
+                       this, this._onPrerenderModeChanged);
 
         dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
 
@@ -7858,7 +8157,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData()) {
+            this._blockProperties.isInitializedWithServerData() &&
+            this._constructionBlockProperties.isInitializedWithServerData()) {
             if (this._showAdminControls) {
                 this._constructionBlocks.render();
             }
@@ -7872,7 +8172,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _updateNewBlockStateIfFullyInitialized: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData()) {
+            this._blockProperties.isInitializedWithServerData() &&
+            this._prerenderMode.isInitializedWithServerData()) {
             this._newBlock.updatePositionAndMovability();
             this._controlPanel.update();
 
@@ -7918,13 +8219,20 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
     // Called after the block properties have changed.
     _onBlockPropertiesChanged: function () {
-        this._renderBlocksIfFullyInitialized();
-
         // Updates the state (and related controls) of the new block, because
         // they depend on block properties such as collision settings:
         this._updateNewBlockStateIfFullyInitialized();
 
         this._renderBlocksIfFullyInitialized();
+    },
+
+    // Called after the block properties have changed.
+    _onConstructionBlockPropertiesChanged: function () {
+        this._renderBlocksIfFullyInitialized();
+    },
+
+    _onPrerenderModeChanged: function () {
+        this._updateNewBlockStateIfFullyInitialized();
     },
 
     // Called after settings describing the live image have changed.
@@ -7944,6 +8252,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
+            this._constructionBlockProperties.isInitializedWithServerData() &&
             this._image.imageLoaded()) {
             // Shows the contents and removes the load indicator.
             dojo.destroy(dojo.byId('loadIndicator'));
@@ -7971,6 +8280,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
                                                           this._image);
         }
 
+        if (data.prerenderModeData.changed) {
+            this._prerenderMode.updateWithServerData(data.prerenderModeData);
+        }
+
         if (data.cameraData.changed) {
             this._camera.updateWithServerData(data.cameraData);
         }
@@ -7982,6 +8295,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
         if (data.blockPropertiesData.changed) {
             this._blockProperties.
                 updateWithServerData(data.blockPropertiesData);
+        }
+
+        if (data.constructionBlockPropertiesData.changed) {
+            this._constructionBlockProperties.
+                updateWithServerData(data.constructionBlockPropertiesData);
         }
 
         if (data.newBlockData.changed) {
@@ -7998,12 +8316,14 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._updateTimeout = 
             setTimeout(function () {
                 that._update();
-            }, this._UPDATE_INTERVAL);
+            }, data.updateIntervalClient);
     },
 
     // Triggers an update of the construction with the data stored on the
-    // server. Only updates the blocks if there is a new version. Fails
-    // silently on error.
+    // server. Only updates data where there is a new version. Fails silently
+    // on error.
+    //
+    // Also updates the background image.
     _update: function () {
         dojo.xhrGet({
             url: "/rpc/construction",
@@ -8014,11 +8334,17 @@ dojo.declare('com.realitybuilder.Construction', null, {
                 "imageDataVersion": this._image.versionOnServer(),
                 "blockPropertiesDataVersion": 
                 this._blockProperties.versionOnServer(),
-                "newBlockDataVersion": this._newBlock.versionOnServer()
+                "constructionBlockPropertiesDataVersion": 
+                this._constructionBlockProperties.versionOnServer(),
+                "newBlockDataVersion": this._newBlock.versionOnServer(),
+                "prerenderModeDataVersion": 
+                this._prerenderMode.versionOnServer()
             },
             handleAs: "json",
             load: dojo.hitch(this, this._updateSucceeded)
         });
+
+        this._image.update();
     },
 
     // Unhides the content. Fades in the content, unless the browser is Internet
