@@ -4073,6 +4073,9 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
     // relative to the origin of the unrotated block.
     _rotCenterBXY: null,
 
+    // Alpha transparency of the block's background:
+    _backgroundAlpha: null,
+
     versionOnServer: function () {
         return this._versionOnServer;
     },
@@ -4178,6 +4181,7 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
         this._collisionOffsetsListBXY = serverData.collisionOffsetsListBXY;
         this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
         this._rotCenterBXY = serverData.rotCenterBXY;
+        this._backgroundAlpha = serverData.backgroundAlpha;
 
         this._updateRotatedOutlinesBXY();
         this._updateRotatedCollisionOffsetsListsBXY();
@@ -4222,6 +4226,10 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
         relative_a = (4 + block2.a() - block1.a()) % 4;
 
         return attachmentOffsetsListB[relative_a];
+    },
+
+    backgroundAlpha: function () {
+        return this._backgroundAlpha;
     }
 });
 
@@ -4835,14 +4843,14 @@ dojo.declare('com.realitybuilder.Block', null, {
         irv = this._indexOfRightmostVertex,
         imax;
 
-        context.globalAlpha = 0.2;
+        context.globalAlpha = this._blockProperties.backgroundAlpha();
 
         // bottom:
         context.beginPath();
         vertexS = bottomVertexesS[irv];
         context.moveTo(vertexS[0], vertexS[1]);
         imax = (irv + 1 <= ilv) ? ilv : ilv + len;
-        for (i = irv + 1; i <= ilv; i += 1) {
+        for (i = irv + 1; i <= imax; i += 1) {
             vertexS = bottomVertexesS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
         }
@@ -6211,18 +6219,19 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     },
 
     _renderLayerShadow: function (context, newBlock, camera, 
-                                  constructionBlocks, layerZB, color)
+                                  constructionBlocks, layerZB, color, alpha)
     {
         this._layerShadow.render(layerZB, color);
-        context.globalAlpha = 0.2;
+        context.globalAlpha = alpha;
         context.drawImage(this._layerShadow.canvas(), 0, 0);
         context.globalAlpha = 1;
     },
 
     // Draws the shadow of the new block as seen by the sensor of the camera.
     //
-    // Draws the shadow in the color "color".
-    render: function (color) {
+    // Draws the shadow in the color "color" and with alpha transparency
+    // "alpha".
+    render: function (color, alpha) {
         var 
         canvas = this._camera.sensor().shadowCanvas(), context, 
         layerZB,
@@ -6241,7 +6250,8 @@ dojo.declare('com.realitybuilder.Shadow', null, {
             for (layerZB = -1; layerZB <= maxLayerZB; layerZB += 1) {
                 if (layerZB < newBlock.zB()) {
                     this._renderLayerShadow(context, newBlock, camera, 
-                                            constructionBlocks, layerZB, color);
+                                            constructionBlocks, layerZB, 
+                                            color, alpha);
                 }
                 this._shadowObscuringBlocks.subtract(context, layerZB + 1);
             }
@@ -6305,10 +6315,11 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _buildSpace1B: null,
     _buildSpace2B: null,
 
-    // Colors (CSS format) of the block and its shadow:
+    // Colors (CSS format) and transparency of the block and its shadow:
     _color: null,
     _stoppedColor: null, // when it is stopped
     _shadowColor: null,
+    _shadowAlpha: null,
 
     // Iff true, then the block is stopped, which means that it can neither be
     // moved nor be rotated.
@@ -6392,6 +6403,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         this._color = serverData.color;
         this._stoppedColor = serverData.stoppedColor;
         this._shadowColor = serverData.shadowColor;
+        this._shadowAlpha = serverData.shadowAlpha;
 
         this._versionOnServer = serverData.version;
 
@@ -6713,7 +6725,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Updates the shadow, i.e. (re-)draws it or removes it.
     _renderShadow: function () {
         if (this.isMovable()) {
-            this._shadow.render(this._shadowColor);
+            this._shadow.render(this._shadowColor, this._shadowAlpha);
         } else {
             this._shadow.clear();
         }
