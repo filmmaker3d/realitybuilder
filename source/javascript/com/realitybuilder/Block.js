@@ -542,7 +542,7 @@ dojo.declare('com.realitybuilder.Block', null, {
         vertexS = bottomVertexesS[irv];
         context.moveTo(vertexS[0], vertexS[1]);
         imax = (irv + 1 <= ilv) ? ilv : ilv + len;
-        for (i = irv + 1; i <= ilv; i += 1) {
+        for (i = irv + 1; i <= imax; i += 1) {
             vertexS = bottomVertexesS[i % len];
             context.lineTo(vertexS[0], vertexS[1]);
         }
