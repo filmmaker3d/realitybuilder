@@ -142,10 +142,11 @@ class NewBlock(db.Model):
     build_space_1_b = db.ListProperty(int)
     build_space_2_b = db.ListProperty(int)
 
-    # Colors (CSS format) of the block and its shadow:
+    # Colors (CSS format) and alpha transparency of the block and its shadow:
     color = db.StringProperty()
     stopped_color = db.StringProperty() # when it is stopped
     shadow_color = db.StringProperty()
+    shadow_alpha = db.FloatProperty()
 
 class Block(db.Model):
     # Position, in block space:
@@ -278,6 +279,9 @@ class BlockProperties(db.Model):
     # Center of rotation, with coordinates in block space, relative to the
     # lower left corner of the unrotated block, when viewed from above:
     rot_center_bxy = db.ListProperty(float)
+
+    # Alpha transparency of the block's background:
+    background_alpha = db.FloatProperty()
 
 # Data specific to a construction block.
 class ConstructionBlockProperties(db.Model):
@@ -421,7 +425,8 @@ class RPCConstruction(webapp.RequestHandler):
                          'attachmentOffsetsListB': \
                              RPCConstruction.json_decode_list \
                              (block_properties.attachment_offsets_list_b),
-                         'rotCenterBXY': block_properties.rot_center_bxy})
+                         'rotCenterBXY': block_properties.rot_center_bxy,
+                         'backgroundAlpha': block_properties.background_alpha})
         return data
 
     # Returns JSON serializable data related to the block properties.
@@ -476,7 +481,8 @@ class RPCConstruction(webapp.RequestHandler):
                          'buildSpace2B': new_block.build_space_2_b,
                          'color': new_block.color,
                          'stoppedColor': new_block.stopped_color,
-                         'shadowColor': new_block.shadow_color})
+                         'shadowColor': new_block.shadow_color,
+                         'shadowAlpha': new_block.shadow_alpha})
         return data
 
     # Returns JSON serializable data related to prerender-mode.
@@ -956,6 +962,7 @@ class AdminInit(webapp.RequestHandler):
              '[[0, 0, -1], [0, 0, 1], [1, 0, -1], [1, 0, 1]]',
              '[[0, 0, -1], [0, 0, 1]]']
         blockProperties.rot_center_bxy = [0.5, 0.5]
+        blockProperties.background_alpha = 0.2
         blockProperties.put()
 
         # Deletes all new block entries:
@@ -976,6 +983,7 @@ class AdminInit(webapp.RequestHandler):
         newBlock.color = 'red'
         newBlock.stopped_color = 'white'
         newBlock.shadow_color = 'red'
+        newBlock.shadow_alpha = 0.2
         newBlock.put()
 
         # Deletes all construction block properties entries:

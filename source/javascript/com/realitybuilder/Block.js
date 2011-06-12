@@ -535,7 +535,7 @@ dojo.declare('com.realitybuilder.Block', null, {
         irv = this._indexOfRightmostVertex,
         imax;
 
-        context.globalAlpha = 0.2;
+        context.globalAlpha = this._blockProperties.backgroundAlpha();
 
         // bottom:
         context.beginPath();

@@ -43,10 +43,11 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _buildSpace1B: null,
     _buildSpace2B: null,
 
-    // Colors (CSS format) of the block and its shadow:
+    // Colors (CSS format) and transparency of the block and its shadow:
     _color: null,
     _stoppedColor: null, // when it is stopped
     _shadowColor: null,
+    _shadowAlpha: null,
 
     // Iff true, then the block is stopped, which means that it can neither be
     // moved nor be rotated.
@@ -130,6 +131,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         this._color = serverData.color;
         this._stoppedColor = serverData.stoppedColor;
         this._shadowColor = serverData.shadowColor;
+        this._shadowAlpha = serverData.shadowAlpha;
 
         this._versionOnServer = serverData.version;
 
@@ -451,7 +453,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Updates the shadow, i.e. (re-)draws it or removes it.
     _renderShadow: function () {
         if (this.isMovable()) {
-            this._shadow.render(this._shadowColor);
+            this._shadow.render(this._shadowColor, this._shadowAlpha);
         } else {
             this._shadow.clear();
         }

@@ -69,6 +69,9 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
     // relative to the origin of the unrotated block.
     _rotCenterBXY: null,
 
+    // Alpha transparency of the block's background:
+    _backgroundAlpha: null,
+
     versionOnServer: function () {
         return this._versionOnServer;
     },
@@ -174,6 +177,7 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
         this._collisionOffsetsListBXY = serverData.collisionOffsetsListBXY;
         this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
         this._rotCenterBXY = serverData.rotCenterBXY;
+        this._backgroundAlpha = serverData.backgroundAlpha;
 
         this._updateRotatedOutlinesBXY();
         this._updateRotatedCollisionOffsetsListsBXY();
@@ -218,5 +222,9 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
         relative_a = (4 + block2.a() - block1.a()) % 4;
 
         return attachmentOffsetsListB[relative_a];
+    },
+
+    backgroundAlpha: function () {
+        return this._backgroundAlpha;
     }
 });
