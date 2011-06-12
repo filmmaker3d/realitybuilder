@@ -25,9 +25,7 @@
 
 dojo.provide('com.realitybuilder.BlockProperties');
 
-dojo.require('com.realitybuilder.Block');
-
-dojo.declare('com.realitybuilder.BlockProperties', com.realitybuilder.Block, {
+dojo.declare('com.realitybuilder.BlockProperties', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',

@@ -71,16 +71,18 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     },
 
     _renderLayerShadow: function (context, newBlock, camera, 
-                                  constructionBlocks, layerZB)
+                                  constructionBlocks, layerZB, color)
     {
-        this._layerShadow.render(layerZB);
+        this._layerShadow.render(layerZB, color);
         context.globalAlpha = 0.2;
         context.drawImage(this._layerShadow.canvas(), 0, 0);
         context.globalAlpha = 1;
     },
 
     // Draws the shadow of the new block as seen by the sensor of the camera.
-    render: function () {
+    //
+    // Draws the shadow in the color "color".
+    render: function (color) {
         var 
         canvas = this._camera.sensor().shadowCanvas(), context, 
         layerZB,
@@ -99,7 +101,7 @@ dojo.declare('com.realitybuilder.Shadow', null, {
             for (layerZB = -1; layerZB <= maxLayerZB; layerZB += 1) {
                 if (layerZB < newBlock.zB()) {
                     this._renderLayerShadow(context, newBlock, camera, 
-                                            constructionBlocks, layerZB);
+                                            constructionBlocks, layerZB, color);
                 }
                 this._shadowObscuringBlocks.subtract(context, layerZB + 1);
             }

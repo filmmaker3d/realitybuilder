@@ -22,6 +22,7 @@
 dojo.provide('com.realitybuilder.Construction');
 
 dojo.require('com.realitybuilder.BlockProperties');
+dojo.require('com.realitybuilder.ConstructionBlockProperties');
 dojo.require('com.realitybuilder.ConstructionBlocks');
 dojo.require('com.realitybuilder.ConstructionBlock');
 dojo.require('com.realitybuilder.NewBlock');
@@ -53,6 +54,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
+    // Properties of a construction block:
+    _constructionBlockProperties: null,
+
     // Prerender-mode:
     _prerenderMode: null,
 
@@ -81,30 +85,35 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // controls are shown, and - in the rendering - the real and pending
     // blocks.
     constructor: function (showAdminControls) {
+        var rb = com.realitybuilder;
+
         this._insertLoadIndicator();
 
         this._showAdminControls = showAdminControls;
         this._showReal = showAdminControls;
         this._showPending = showAdminControls;
 
-        this._blockProperties = new com.realitybuilder.BlockProperties();
-        this._camera = new com.realitybuilder.Camera(this._blockProperties, 
+        this._blockProperties = new rb.BlockProperties();
+        this._constructionBlockProperties = 
+            new rb.ConstructionBlockProperties();
+        this._camera = new rb.Camera(this._blockProperties, 
                                                      640, 480);
-        this._image = new com.realitybuilder.Image(this._camera);
+        this._image = new rb.Image(this._camera);
         this._constructionBlocks = 
-            new com.realitybuilder.ConstructionBlocks(this, 
-                                                      this._blockProperties);
-        this._prerenderMode = new com.realitybuilder.PrerenderMode();
+            new rb.ConstructionBlocks(this, 
+                                      this._blockProperties,
+                                      this._constructionBlockProperties);
+        this._prerenderMode = new rb.PrerenderMode();
         this._newBlock = 
-            new com.realitybuilder.NewBlock(this._blockProperties,
+            new rb.NewBlock(this._blockProperties,
                                             this._camera,
                                             this._constructionBlocks,
                                             this._prerenderMode);
         this._controlPanel = 
-            new com.realitybuilder.ControlPanel(this._newBlock);
+            new rb.ControlPanel(this._newBlock);
 
         if (this._showAdminControls) {
-            this._adminControls = new com.realitybuilder.AdminControls(this);
+            this._adminControls = new rb.AdminControls(this);
 
             // When an attempt to change construction block data on the server
             // failed, then the relavant admin controls may have to be brought
@@ -141,6 +150,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
                        this, this._onImageChanged);
         dojo.subscribe('com/realitybuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
+        dojo.subscribe('com/realitybuilder/ConstructionBlockProperties/changed',
+                       this, this._onConstructionBlockPropertiesChanged);
         dojo.subscribe('com/realitybuilder/PrerenderMode/changed',
                        this, this._onPrerenderModeChanged);
 
@@ -236,7 +247,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData()) {
+            this._blockProperties.isInitializedWithServerData() &&
+            this._constructionBlockProperties.isInitializedWithServerData()) {
             if (this._showAdminControls) {
                 this._constructionBlocks.render();
             }
@@ -297,12 +309,15 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
     // Called after the block properties have changed.
     _onBlockPropertiesChanged: function () {
-        this._renderBlocksIfFullyInitialized();
-
         // Updates the state (and related controls) of the new block, because
         // they depend on block properties such as collision settings:
         this._updateNewBlockStateIfFullyInitialized();
 
+        this._renderBlocksIfFullyInitialized();
+    },
+
+    // Called after the block properties have changed.
+    _onConstructionBlockPropertiesChanged: function () {
         this._renderBlocksIfFullyInitialized();
     },
 
@@ -327,6 +342,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
+            this._constructionBlockProperties.isInitializedWithServerData() &&
             this._image.imageLoaded()) {
             // Shows the contents and removes the load indicator.
             dojo.destroy(dojo.byId('loadIndicator'));
@@ -371,6 +387,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
                 updateWithServerData(data.blockPropertiesData);
         }
 
+        if (data.constructionBlockPropertiesData.changed) {
+            this._constructionBlockProperties.
+                updateWithServerData(data.constructionBlockPropertiesData);
+        }
+
         if (data.newBlockData.changed) {
             this._newBlock.updateWithServerData(data.newBlockData);
         }
@@ -403,6 +424,8 @@ dojo.declare('com.realitybuilder.Construction', null, {
                 "imageDataVersion": this._image.versionOnServer(),
                 "blockPropertiesDataVersion": 
                 this._blockProperties.versionOnServer(),
+                "constructionBlockPropertiesDataVersion": 
+                this._constructionBlockProperties.versionOnServer(),
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
                 "prerenderModeDataVersion": 
                 this._prerenderMode.versionOnServer()

@@ -38,6 +38,9 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
+    // Properties of a construction block:
+    _constructionBlockProperties: null,
+
     // The blocks.
     _blocks: null,
 
@@ -53,8 +56,10 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Creates a container for the blocks associated with the construction
     // "construction".
-    constructor: function (construction, blockProperties) {
+    constructor: function (construction, blockProperties, 
+                           constructionBlockProperties) {
         this._blockProperties = blockProperties;
+        this._constructionBlockProperties = constructionBlockProperties;
         this._blocks = [];
         this._realBlocksSorted = [];
         this._construction = construction;
@@ -111,17 +116,18 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         return this._versionOnServer !== '-1';
     },
 
-    _createBlockFromServerData: function (bd) {
-        var camera = this._construction.camera();
-        return new com.realitybuilder.ConstructionBlock(this._blockProperties,
-                                                        camera, 
-                                                        bd.positionB, bd.a,
-                                                        bd.state,
-                                                        bd.timeStamp);
+    _createBlockFromServerData: function (serverData) {
+        var camera = this._construction.camera(), rb = com.realitybuilder;
+        return new rb.ConstructionBlock(this._blockProperties,
+                                        camera, 
+                                        serverData.positionB, serverData.a,
+                                        this._constructionBlockProperties,
+                                        serverData.state,
+                                        serverData.timeStamp);
     },
 
-    // Sets the list of blocks to the version on the server, which is described
-    // by "serverData".
+    // Sets the data of construction blocks to the version on the server, which
+    // is described by "serverData".
     updateWithServerData: function (serverData) {
         this._versionOnServer = serverData.version;
 

@@ -152,15 +152,16 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     },
 
     // Draws the full shadow, projected onto the layer of blocks of elevation
-    // "layerZB", on the canvas with rendering context "context".
-    _renderFull: function (layerZB, context) {
+    // "layerZB", on the canvas with rendering context "context". Uses the
+    // color "color" as the color of the shadow.
+    _renderFull: function (layerZB, context, color) {
         var fullVertexesS, vertexS, i;
 
         this._updateCoordinates(layerZB);
 
         fullVertexesS = this._fullVertexesS;
 
-        context.fillStyle = "red";
+        context.fillStyle = color;
 
         // counterclockwise:
         vertexS = fullVertexesS[0];
@@ -180,7 +181,9 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
     //
     // "layerZB" is the elevation of the layer of blocks, on which the shadow
     // is projected (-1 is the ground plane):
-    render: function (layerZB) {
+    //
+    // Draws the shadow in the color "color".
+    render: function (layerZB, color) {
         var 
         canvas = this._canvas, helperCanvas = this._helperCanvas, 
         context, helperContext;
@@ -209,10 +212,10 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
             helperContext.globalCompositeOperation = "source-over";
             helperContext.drawImage(canvas, 0, 0);
             helperContext.globalCompositeOperation = "xor";
-            this._renderFull(layerZB, helperContext); // fast
+            this._renderFull(layerZB, helperContext, color); // fast
 
             // completes combination:
-            this._renderFull(layerZB, context); // fast
+            this._renderFull(layerZB, context, color); // fast
             
             // subtracts:
             context.globalCompositeOperation = "destination-out";

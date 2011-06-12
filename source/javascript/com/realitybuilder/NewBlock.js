@@ -43,6 +43,11 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _buildSpace1B: null,
     _buildSpace2B: null,
 
+    // Colors (CSS format) of the block and its shadow:
+    _color: null,
+    _stoppedColor: null, // when it is stopped
+    _shadowColor: null,
+
     // Iff true, then the block is stopped, which means that it can neither be
     // moved nor be rotated.
     _isStopped: null,
@@ -121,6 +126,10 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         this._moveSpace2B = serverData.moveSpace2B;
         this._buildSpace1B = serverData.buildSpace1B;
         this._buildSpace2B = serverData.buildSpace2B;
+
+        this._color = serverData.color;
+        this._stoppedColor = serverData.stoppedColor;
+        this._shadowColor = serverData.shadowColor;
 
         this._versionOnServer = serverData.version;
 
@@ -442,7 +451,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Updates the shadow, i.e. (re-)draws it or removes it.
     _renderShadow: function () {
         if (this.isMovable()) {
-            this._shadow.render();
+            this._shadow.render(this._shadowColor);
         } else {
             this._shadow.clear();
         }
@@ -492,7 +501,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             canvas = this._camera.sensor().newBlockCanvas();
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
-                color = this.isMovable() ? 'red' : 'white';
+                color = this.isMovable() ? this._color : this._stoppedColor;
 
                 // Shadow does currently not work with FlashCanvas.
                 if (!com.realitybuilder.util.isFlashCanvasActive()) {

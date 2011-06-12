@@ -119,7 +119,7 @@ class PrerenderMode(db.Model):
     block_configurations = db.StringListProperty()
     image_url_template = db.StringProperty()
 
-# Data specific to the new block
+# Data specific to the new block.
 class NewBlock(db.Model):
     # The data version is increased every time the data is changed. The client
     # uses this data to determine when to update the display.
@@ -141,6 +141,11 @@ class NewBlock(db.Model):
     # in which the block may be built.
     build_space_1_b = db.ListProperty(int)
     build_space_2_b = db.ListProperty(int)
+
+    # Colors (CSS format) of the block and its shadow:
+    color = db.StringProperty()
+    stopped_color = db.StringProperty() # when it is stopped
+    shadow_color = db.StringProperty()
 
 class Block(db.Model):
     # Position, in block space:
@@ -273,6 +278,16 @@ class BlockProperties(db.Model):
     # Center of rotation, with coordinates in block space, relative to the
     # lower left corner of the unrotated block, when viewed from above:
     rot_center_bxy = db.ListProperty(float)
+
+# Data specific to a construction block.
+class ConstructionBlockProperties(db.Model):
+    # The data version is increased every time the data is changed. The client
+    # uses this data to determine when to update the display.
+    data_version = db.StringProperty()
+
+    # Color (CSS format) of the block, if pending or real:
+    pending_color = db.StringProperty()
+    real_color = db.StringProperty()
 
 # Information concerning sending info emails about pending blocks.
 class PendingBlockEmail(db.Model):
@@ -409,6 +424,33 @@ class RPCConstruction(webapp.RequestHandler):
                          'rotCenterBXY': block_properties.rot_center_bxy})
         return data
 
+    # Returns JSON serializable data related to the block properties.
+    @staticmethod
+    def get_construction_block_properties_data \
+            (construction, 
+             construction_block_properties_data_version_client):
+        query = ConstructionBlockProperties.all().ancestor(construction)
+        construction_block_properties = query.get()
+        if construction_block_properties is None:
+            raise Exception('Could not get construction block properties data')
+
+        construction_block_properties_data_version = \
+            construction_block_properties.data_version
+        construction_block_properties_data_changed = \
+            (construction_block_properties_data_version != 
+             construction_block_properties_data_version_client)
+        data = {
+            'version': construction_block_properties_data_version,
+            'changed': construction_block_properties_data_changed}
+        if construction_block_properties_data_changed:
+            # Construction block properties data version on server not the same
+            # as on client. => Deliver all the data.
+            data.update({'pendingColor': 
+                         construction_block_properties.pending_color,
+                         'realColor': 
+                         construction_block_properties.real_color})
+        return data
+
     # Returns JSON serializable data related to the new block
     @staticmethod
     def get_new_block_data(construction, new_block_data_version_client):
@@ -431,7 +473,10 @@ class RPCConstruction(webapp.RequestHandler):
                          'moveSpace1B': new_block.move_space_1_b,
                          'moveSpace2B': new_block.move_space_2_b,
                          'buildSpace1B': new_block.build_space_1_b,
-                         'buildSpace2B': new_block.build_space_2_b})
+                         'buildSpace2B': new_block.build_space_2_b,
+                         'color': new_block.color,
+                         'stoppedColor': new_block.stopped_color,
+                         'shadowColor': new_block.shadow_color})
         return data
 
     # Returns JSON serializable data related to prerender-mode.
@@ -468,6 +513,7 @@ class RPCConstruction(webapp.RequestHandler):
                     camera_data_version_client,
                     image_data_version_client,
                     block_properties_data_version_client,
+                    construction_block_properties_data_version_client,
                     new_block_data_version_client,
                     prerender_mode_data_version_client):
         construction = Construction.get_main()
@@ -481,6 +527,10 @@ class RPCConstruction(webapp.RequestHandler):
                 construction, image_data_version_client),
             'blockPropertiesData': RPCConstruction.get_block_properties_data(
                 construction, block_properties_data_version_client),
+            'constructionBlockPropertiesData':
+                RPCConstruction.get_construction_block_properties_data(
+                construction, 
+                construction_block_properties_data_version_client),
             'newBlockData': RPCConstruction.get_new_block_data(
                 construction, new_block_data_version_client),
             'prerenderModeData': RPCConstruction.get_prerender_mode_data(
@@ -497,18 +547,22 @@ class RPCConstruction(webapp.RequestHandler):
             image_data_version_client = self.request.get('imageDataVersion')
             block_properties_data_version_client = \
                 self.request.get('blockPropertiesDataVersion')
+            construction_block_properties_data_version_client = \
+                self.request.get('constructionBlockPropertiesDataVersion')
             new_block_data_version_client = \
                 self.request.get('newBlockDataVersion')
             prerender_mode_data_version_client = \
                 self.request.get('prerenderModeDataVersion')
 
-            data = db.run_in_transaction(RPCConstruction.transaction, 
-                                         blocks_data_version_client, 
-                                         camera_data_version_client,
-                                         image_data_version_client,
-                                         block_properties_data_version_client,
-                                         new_block_data_version_client,
-                                         prerender_mode_data_version_client)
+            data = db.run_in_transaction \
+                (RPCConstruction.transaction, 
+                 blocks_data_version_client, 
+                 camera_data_version_client,
+                 image_data_version_client,
+                 block_properties_data_version_client,
+                 construction_block_properties_data_version_client,
+                 new_block_data_version_client,
+                 prerender_mode_data_version_client)
             dump_json(self, data)
         except Exception, e:
             logging.error('Could not retrieve data: ' + str(e))
@@ -919,7 +973,24 @@ class AdminInit(webapp.RequestHandler):
         newBlock.move_space_2_b = [6, 6, 5]
         newBlock.build_space_1_b = [0, 0, 0]
         newBlock.build_space_2_b = [5, 5, 4]
+        newBlock.color = 'red'
+        newBlock.stopped_color = 'white'
+        newBlock.shadow_color = 'red'
         newBlock.put()
+
+        # Deletes all construction block properties entries:
+        queries = [ConstructionBlockProperties.all()]
+        for query in queries:
+            for result in query:
+                result.delete()
+
+        # Sets up the construction block properties:
+        constructionBlockProperties = \
+            ConstructionBlockProperties(parent=construction)
+        constructionBlockProperties.data_version = '0'
+        constructionBlockProperties.pending_color = 'white'
+        constructionBlockProperties.real_color = 'green'
+        constructionBlockProperties.put()
 
         # Deletes all block entries:
         queries = [Block.all()]

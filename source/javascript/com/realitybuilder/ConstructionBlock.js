@@ -25,7 +25,7 @@ dojo.provide('com.realitybuilder.ConstructionBlock');
 dojo.require('com.realitybuilder.Block');
 
 dojo.declare('com.realitybuilder.ConstructionBlock', 
-    com.realitybuilder.Block,
+             com.realitybuilder.Block,
 {
     // State of the block: 0 = deleted, 1 = pending (= requested to be build),
     // 2 = real
@@ -36,6 +36,9 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // change.
     _timeStamp: null,
 
+    // Properties of a construction block:
+    _constructionBlockProperties: null,
+
     // Creates a block at the position in block space ("xB", "yB", "zB") =
     // "positionB", and rotated about its center of rotation by "a" (° CCW,
     // when viewed from above). When the block is rendered, it is as seen by
@@ -44,10 +47,11 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // "timeStamp".
     //
     // The block's properties, such as shape and size, are described by
-    // "blockProperties".
-    constructor: function (blockProperties, camera, positionB, a, state,
-                           timeStamp)
+    // "blockProperties" and "constructionBlockProperties".
+    constructor: function (blockProperties, camera, positionB, a, 
+                           constructionBlockProperties, state, timeStamp)
     {
+        this._constructionBlockProperties = constructionBlockProperties;
         this._state = state;
         this._timeStamp = timeStamp;
     },
@@ -76,8 +80,13 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
     // rendering context "context". Depends on the vertexes in view
     // coordinates.
     render: function (context) {
+        var color, properties;
+
         if (!this.isDeleted()) {
-            var color = this.isReal() ? "green" : "white";
+            properties = this._constructionBlockProperties;
+            color = this.isReal() ? 
+                properties.realColor() : 
+                properties.pendingColor();
             this.inherited(arguments, [arguments[0], color]);
         }
     },
