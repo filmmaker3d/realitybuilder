@@ -16,16 +16,16 @@ Getting started
 1. Start the Reality Builder on Google App Engine or on the development server
   included with the App Engine Python SDK.
 
-2. Initialize sample data, by visting (relative to the root URL):
+2. Initialize sample data. For instuctions read the documentation at the top
+  of:
 
-    /admin/init
+  /documentation/sample_scene/init.py
 
-3. Visit the user interface:
-
-    /
+3. Visit the user interface. It is the home page of the site to where you
+  deployed.
 
 4. Visit the admin interface, where you can change settings and manage state of
-  blocks:
+  blocks (path relative to user interface URL):
 
     /admin
 
