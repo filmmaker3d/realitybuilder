@@ -126,6 +126,9 @@ dojo.declare('com.realitybuilder.Construction', null, {
 
         dojo.subscribe('com/realitybuilder/ConstructionBlocks/changedOnServer', 
                        this, this._update); // Speeds up responsiveness.
+        dojo.subscribe('com/realitybuilder/NewBlock/' + 
+                       'madeRealPrerenderedOnServer', 
+                       this, this._update); // Speeds up responsiveness.
         dojo.subscribe('com/realitybuilder/NewBlock/createdPendingOnServer', 
                        this, this._update); // Speeds up responsiveness.
         dojo.subscribe('com/realitybuilder/NewBlock/' + 

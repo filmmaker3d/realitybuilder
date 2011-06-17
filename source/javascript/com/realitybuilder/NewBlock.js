@@ -525,7 +525,6 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         dojo.publish('com/realitybuilder/NewBlock/createdPendingOnServer');
 
         if (this._prerenderMode.isEnabled()) {
-            // FIXME: make real after an interval
             setTimeout(dojo.hitch(this, this._makeRealPrerenderedOnServer), 
                        this._prerenderMode.makeRealAfter());
         }
@@ -546,9 +545,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     },
 
     _makeRealPrerenderedOnServerSucceeded: function () {
-        // FIXME: OK? Maybe just use some general event indicating change on
-        // server.
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('com/realitybuilder/NewBlock/' + 
+                     'madeRealPrerenderedOnServer');
     },
 
     // If this block together with the real blocks matches a prerendered block
