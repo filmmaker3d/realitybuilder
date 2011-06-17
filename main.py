@@ -242,12 +242,34 @@ class Block(db.Model):
                 testBlock.put()
 
     # Sets the state of the block to "state", also updating the time stamp.
-    # Increases the blocks version number. Should be run in a transaction.
+    # Increases the blocks version number. Returns the new blocks data version.
+    #
+    # Should be run in a transaction.
     def store_state_and_increase_blocks_data_version(self, state):
         self.state = state
         self.time_stamp = long(time.time())
         self.put()
         self.parent().increase_blocks_data_version()
+        return self.parent().blocks_data_version
+
+    # Tries to make the block real. Increases construction blocks version
+    # number, if something has changed. May delete intersecting blocks.
+    #
+    # Returns true, iff the bock was made real or if it was already real.
+    #
+    # Should be run in a transaction.
+    def make_real(self):
+        if self.state != 2:
+            if self.is_intersecting_with_real():
+                # Block intersects with real block. => Should be deleted.
+                return False
+            else:
+                Block.delete_intersecting_pending_blocks(self)
+                self.store_state_and_increase_blocks_data_version(2)
+                return True
+        else:
+            # block already real
+            return True
 
 # Properties of the block: shape, size, how to attach blocks, etc.
 class BlockProperties(db.Model):
@@ -588,20 +610,10 @@ class RPCAdminMakeReal(webapp.RequestHandler):
         construction = Construction.get_main()
        
         block = Block.get_at(construction, [x_b, y_b, z_b], a)
-        if not block or block.state == 2:
-            return # No block to update or already real.
-        
-        if block.is_intersecting_with_real():
-            # Block intersects with real block. => Should be
-            # deleted.
-            new_state = 0
+        if not block:
+            return # no block
         else:
-            new_state = 2
-            
-        block.store_state_and_increase_blocks_data_version(new_state)
-            
-        if new_state != 0:
-            Block.delete_intersecting_pending_blocks(block)
+            block.make_real()
 
     def post(self):
         try:
@@ -614,60 +626,68 @@ class RPCAdminMakeReal(webapp.RequestHandler):
         except Exception, e:
             logging.error('Could not make block real: ' + str(e))
 
-# FIXME: implement and update documentation
-#
 # Changes the status of the block at the provided position to real. If the
 # block isn't in the construction, then the operation fails. If the block
 # intersects with any real block, then it is deleted. If there are pending
 # blocks that intersect with the newly turned real block, then they are
 # deleted.
+#
+# Once the block is successfully made real, then the background image is
+# replaced with that from the specified image URL.
 # 
 # Silently fails on error.
 class RPCMakeRealPrerendered(webapp.RequestHandler):
-    # Tries to make the block at the block position "x_b", "y_b", "z_b", and
-    # rotated by the angle "a", real. If successful, then changes the URL of
-    # the background image to "image_url".
+    # Tries to make the block real which is at the block position "position_b"
+    # and rotated by the angle "a". Returns true, iff successful.
     @staticmethod
-    def transaction(x_b, y_b, z_b, a, image_url):
-        # FIXME: check if prerender-mode is active
+    def transaction1(construction, position_b, a):
+        block = Block.get_at(construction, position_b, a)
+        if not block:
+            return False # no block
+        else:
+            return block.make_real()
 
-        # FIXME: perhaps reuse code from other function
- 
+    # Sets the background image to "image_url".
+    @staticmethod
+    def transaction2(construction, image_url):
+        construction.image_url = image_url
+        construction.image_last_update = 0. # since the image URL has changed
+        construction.put()
+        construction.increase_image_data_version()
+
+    def run_if_prerender_mode_enabled(self, position_b, a, image_url):
         construction = Construction.get_main()
 
         query = PrerenderMode.all().ancestor(construction)
         prerender_mode = query.get()
         if prerender_mode is None:
             raise Exception('Could not get prerender-mode data')
-        
-        block = Block.get_at(construction, [x_b, y_b, z_b], a)
-        if not block or block.state == 2:
-            return # No block to update or already real.
-        
-        if block.is_intersecting_with_real():
-            # Block intersects with real block. => Should be
-            # deleted.
-            new_state = 0
-        else:
-            new_state = 2
-            
-        block.store_state_and_increase_blocks_data_version(new_state)
 
-        # Necessary since the current construction object still contains the
-        # old blocks data version. FIXME: somehow using another instance of
-        # "Construction" in "store_state..." and the "construction.put()" below
-        # causes trouble. Even using "Construction.get_main()" again doesn't
-        # solve the problem.
-        construction.increase_blocks_data_version() 
-            
-        if new_state != 0:
-            Block.delete_intersecting_pending_blocks(block)
+        # Separate transactions are used, for two reasons:
+        # 
+        # * Making transactions smalled probably makes the server more
+        #   responsive.
+        #
+        # * The second transaction modifies construction data and writes it
+        #   back to the datastore. If that would happen in the first
+        #   transaction, then special care would have to be taken since the
+        #   construction data is also changed when the block is made real, but
+        #   with a different construction object. The problem: Although both
+        #   construction objects refer to the same datastore entity, one will
+        #   not get updated when that datastore entry is changed elsewhere.
+        #   This is due to the datastore's concepts of "Isolation and
+        #   Consistency": When reading values, they are always as of the
+        #   beginning of the transaction.
+        if prerender_mode.is_enabled:
+            made_real = \
+                db.run_in_transaction(RPCMakeRealPrerendered.transaction1, 
+                                      construction, position_b, a)
+            construction = Construction.get_main() # updates with latest data
+            if made_real:
+                db.run_in_transaction(RPCMakeRealPrerendered.transaction2, 
+                                      construction, image_url)
 
-        construction.image_url = image_url
-        construction.image_last_update = 0. # since the image URL has changed
-        construction.put()
-#FIXME: restore to update URL in admin interface:        construction.increase_image_data_version() (but somehow overwrites above reset to 0)
-
+    # Only runs if prerender-mode is enabled.
     def post(self):
         try:
             x_b = int(self.request.get('xB'))
@@ -675,8 +695,8 @@ class RPCMakeRealPrerendered(webapp.RequestHandler):
             z_b = int(self.request.get('zB'))
             a = int(self.request.get('a'))
             image_url = self.request.get('imageUrl')
-            db.run_in_transaction(RPCMakeRealPrerendered.transaction, 
-                                  x_b, y_b, z_b, a, image_url)
+
+            self.run_if_prerender_mode_enabled([x_b, y_b, z_b], a, image_url)
         except Exception, e:
             logging.error('Could not make block real in prerender-mode: ' + 
                           str(e))
