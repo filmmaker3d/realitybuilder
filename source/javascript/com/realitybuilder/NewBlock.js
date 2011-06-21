@@ -160,8 +160,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // Rotates the block by 90°, CCW when viewed from above, unless the
     // rotation would make it go out of range.
     rotate90: function () {
+        var congruentA = this._blockProperties.congruentA();
         if (!this.wouldGoOutOfRange([0, 0, 0], 1)) {
-            this._a = (this._a + 1) % 4; // multiples of 90°
+            this._a = (this._a + 1) % congruentA; // multiples of 90°
             dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
         }
     },
@@ -255,11 +256,13 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     //
     // * if it would be outside of the space where it is allowed to be moved.
     wouldGoOutOfRange: function (deltaB, deltaA) {
-        var testPositionB, testBlock, testA;
+        var testPositionB, testBlock, testA, congruentA;
+
+        congruentA = this._blockProperties.congruentA();
 
         testPositionB = com.realitybuilder.util.addVectorsB(this.positionB(), 
                                                             deltaB);
-        testA = (this.a() + deltaA) % 4;
+        testA = (this.a() + deltaA) % congruentA;
         testBlock = new com.realitybuilder.Block(this._blockProperties,
                                                  this._camera, 
                                                  testPositionB, testA);

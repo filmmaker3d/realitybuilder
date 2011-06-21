@@ -135,6 +135,7 @@ for query in queries:
 # which is necessary when doing transactions):
 blockProperties = BlockProperties(parent=construction)
 blockProperties.data_version = '0'
+blockProperties.congruent_a = 4
 blockProperties.position_spacing_xy = 20.
 blockProperties.position_spacing_z = 10.
 blockProperties.outline_bxy = '[[0, 0], [1, 0], [2, 1], [0, 1]]'

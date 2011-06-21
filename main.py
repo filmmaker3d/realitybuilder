@@ -32,7 +32,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSON response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -277,6 +277,10 @@ class BlockProperties(db.Model):
     # uses this data to determine when to update the display.
     data_version = db.StringProperty()
 
+    # If the block is rotated by that angle, then it is congruent with it not
+    # being rotated.
+    congruent_a = db.IntegerProperty() # 90°
+
     # Block dimensions in world space. The side length of a block is
     # approximately two times the grid spacing in the respective direction.
     position_spacing_xy = db.FloatProperty() # mm
@@ -290,13 +294,19 @@ class BlockProperties(db.Model):
     # block 1 in the block space x-y-plane by any of the following values. The
     # rotation angles below are those of block 2 relative to block 1. The
     # offsets are stored as JSON arrays.
-    collision_offsets_list_bxy = db.StringListProperty() # 0°, 90°, 180°, 270°
+    #
+    # The list has "congruent_a" number of entries, corresponding to rotation
+    # about 0°, 90°, ...
+    collision_offsets_list_bxy = db.StringListProperty()
 
     # A block 2 is defined to be attachable to a block 1, if it is offset
     # against block 1 by any of the following values, in block space. The
     # rotation angles below are those of block 2 relative to block 1. The
     # offsets are stored as JSON arrays.
-    attachment_offsets_list_b = db.StringListProperty() # 0°, 90°, 180°, 270°
+    #
+    # The list has "congruent_a" number of entries, corresponding to rotation
+    # about 0°, 90°, ...
+    attachment_offsets_list_b = db.StringListProperty()
 
     # Center of rotation, with coordinates in block space, relative to the
     # lower left corner of the unrotated block, when viewed from above:
@@ -435,7 +445,8 @@ class RPCConstruction(webapp.RequestHandler):
         if block_properties_data_changed:
             # Block properties data version on server not the same as on
             # client. => Deliver all the data.
-            data.update({'positionSpacingXY': 
+            data.update({'congruentA': block_properties.congruent_a,
+                         'positionSpacingXY': 
                          block_properties.position_spacing_xy,
                          'positionSpacingZ': 
                          block_properties.position_spacing_z,
