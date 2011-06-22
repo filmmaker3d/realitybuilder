@@ -96,8 +96,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
         this._blockProperties = new rb.BlockProperties();
         this._constructionBlockProperties = 
             new rb.ConstructionBlockProperties();
-        this._camera = new rb.Camera(this._blockProperties, 
-                                     1024, 690);
+        this._camera = new rb.Camera(this._blockProperties, 640, 480);
         this._image = new rb.Image(this._camera);
         this._constructionBlocks = 
             new rb.ConstructionBlocks(this, 

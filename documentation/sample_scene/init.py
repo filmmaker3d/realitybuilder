@@ -7,15 +7,16 @@
 # 
 # * GAE (production):
 # 
-#   a) Connect to the remote API shell. To do this, enter the directory of the
-#     Reality Builder, and then execute the corresponding shell command.
+#   a) Enter the directory of the Reality Builder
+#
+#   b) Connect to the remote API shell.
 # 
 #     On Windows XP's "cmd.exe" (substitute %-placeholders):
 #
 #       %PYTHON_PATH%\python.exe %GAE_PATH%\remote_api_shell.py -s ^
-#       %VERSION_NUMBER%.berlinity.appspot.com
+#       %VERSION_NUMBER%.realitybuilder.com
 #
-#   b) Paste the code. It will execute automatically.
+#   c) Paste the code. It will execute automatically.
 
 # Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 #
@@ -135,7 +136,7 @@ for query in queries:
 # which is necessary when doing transactions):
 blockProperties = BlockProperties(parent=construction)
 blockProperties.data_version = '0'
-blockProperties.congruent_a = 4
+blockProperties.congruency_a = 4
 blockProperties.position_spacing_xy = 20.
 blockProperties.position_spacing_z = 10.
 blockProperties.outline_bxy = '[[0, 0], [1, 0], [2, 1], [0, 1]]'

@@ -13,8 +13,8 @@ Less well-known file extensions used:
 Getting started
 ===============
 
-1. Start the Reality Builder on Google App Engine or on the development server
-  included with the App Engine Python SDK.
+1. Upload the Reality Builder to the Google App Engine or start it on the
+  development server included with the App Engine Python SDK.
 
 2. Initialize sample data. For instuctions read the documentation at the top
   of:
@@ -211,6 +211,38 @@ Before releasing a new version:
 * Disable debug mode.
 
 * Check that the Reality Builder works fine with the sample data (/admin/init).
+
+
+
+Versioning
+==========
+
+The version of a release is strucutred as follows:
+
+  major.minor.bugfix
+
+Example:
+
+  2.1.4
+
+Where:
+
+* major (major release number): A major release is a release where the major
+  release number has been increased. When that happens, then the minor release
+  number and the bugfix release number are set to 0. The major release number
+  is increased when - subjectively - there have been major changes as compared
+  to the previous minor release.
+
+* minor (minor release number): A minor release is a release where the minor
+  release number has been increased. When that happens, then the bugfix release
+  number is set to 0. The minor release number is increased when the changes as
+  compared to the previous minor release are not major and not a bugfix.
+
+* bugfix (bugfix release number): A bugfix release is a release where the
+  bugfix release number has been increased. The bugfix release number is
+  increased when a bug has been fixed in an already released version. In
+  general, new features are only introduced with new minor or major releases,
+  unless when absolutely necessary, and then these features are viewed as bugs.
 
 
 Miscellaneous

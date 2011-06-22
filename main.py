@@ -279,7 +279,7 @@ class BlockProperties(db.Model):
 
     # If the block is rotated by that angle, then it is congruent with it not
     # being rotated.
-    congruent_a = db.IntegerProperty() # 90°
+    congruency_a = db.IntegerProperty() # 90°
 
     # Block dimensions in world space. The side length of a block is
     # approximately two times the grid spacing in the respective direction.
@@ -295,7 +295,7 @@ class BlockProperties(db.Model):
     # rotation angles below are those of block 2 relative to block 1. The
     # offsets are stored as JSON arrays.
     #
-    # The list has "congruent_a" number of entries, corresponding to rotation
+    # The list has "congruency_a" number of entries, corresponding to rotation
     # about 0°, 90°, ...
     collision_offsets_list_bxy = db.StringListProperty()
 
@@ -304,7 +304,7 @@ class BlockProperties(db.Model):
     # rotation angles below are those of block 2 relative to block 1. The
     # offsets are stored as JSON arrays.
     #
-    # The list has "congruent_a" number of entries, corresponding to rotation
+    # The list has "congruency_a" number of entries, corresponding to rotation
     # about 0°, 90°, ...
     attachment_offsets_list_b = db.StringListProperty()
 
@@ -445,7 +445,7 @@ class RPCConstruction(webapp.RequestHandler):
         if block_properties_data_changed:
             # Block properties data version on server not the same as on
             # client. => Deliver all the data.
-            data.update({'congruentA': block_properties.congruent_a,
+            data.update({'congruencyA': block_properties.congruency_a,
                          'positionSpacingXY': 
                          block_properties.position_spacing_xy,
                          'positionSpacingZ': 
