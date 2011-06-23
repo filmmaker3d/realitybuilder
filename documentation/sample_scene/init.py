@@ -14,7 +14,7 @@
 #     On Windows XP's "cmd.exe" (substitute %-placeholders):
 #
 #       %PYTHON_PATH%\python.exe %GAE_PATH%\remote_api_shell.py -s ^
-#       %VERSION_NUMBER%.realitybuilder.com
+#       %VERSION%.%APPLICATION%.appspot.com
 #
 #   c) Paste the code. It will execute automatically.
 
