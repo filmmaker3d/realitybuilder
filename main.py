@@ -100,8 +100,8 @@ class Construction(db.Model):
 
     # Returns the main construction, which is the only construction. Raises an
     # exception, if the construction cannot be found.
-    @staticmethod
-    def get_main():
+    @classmethod
+    def get_main(cls):
         construction = Construction.get_by_key_name('main')
         if construction:
             return construction
@@ -172,8 +172,8 @@ class Block(db.Model):
 
     # Returns the datastore key name of a block at "x_b", "y_b", "z_b", rotated
     # by "a".
-    @staticmethod
-    def build_key_name(position_b, a):
+    @classmethod
+    def build_key_name(cls, position_b, a):
         x_b = position_b[0]
         y_b = position_b[1]
         z_b = position_b[2]
@@ -182,28 +182,28 @@ class Block(db.Model):
     # Returns the block at the block space position "position_b", rotated by
     # the angle "a", in the construction "construction", or "None", if the
     # block cannot be found. Also returns blocks in state deleted.
-    @staticmethod
-    def get_at(construction, position_b, a):
-        return Block.get_by_key_name(Block.build_key_name(position_b, a), 
-                                     parent=construction)
+    @classmethod
+    def get_at(cls, construction, position_b, a):
+        return cls.get_by_key_name(cls.build_key_name(position_b, a), 
+                                   parent=construction)
 
     # Inserts a block at the block space position "position_b" in the
     # construction "construction", with the initial state deleted. The block is
     # rotated by "a", CCW when viewed from above. Raises an exception on
     # failure. Returns the block.
-    @staticmethod
-    def insert_at(construction, position_b, a):
-        return Block(parent=construction, 
-                     key_name=Block.build_key_name(position_b, a),
-                     position_b=position_b, a=a,
-                     time_stamp=long(time.time()))
+    @classmethod
+    def insert_at(cls, construction, position_b, a):
+        return Block(parent = construction, 
+                     key_name = cls.build_key_name(position_b, a),
+                     position_b = position_b, a = a,
+                     time_stamp = long(time.time()))
 
     # If there is a block at "position_b", rotated by "a", in the state "state"
-    # in the construction "construction", returns that block. Otherwise returns
-    # "None".
-    @staticmethod
-    def get_at_with_state(construction, position_b, a, state):
-        block = Block.get_at(construction, position_b, a)
+    # in the construction associated with the current block, returns that
+    # block. Otherwise returns "None".
+    def get_at_with_state(self, position_b, a, state):
+        construction = self.parent()
+        block = self.get_at(construction, position_b, a)
         if block and block.state == state:
             return block
         else:
@@ -232,18 +232,16 @@ class Block(db.Model):
     def is_intersecting_with_real(self):
         return False # currently not implemented
 
-    # Deletes any pending blocks intersecting with the block "block", aside
+    # Deletes any pending blocks intersecting with the current block, aside
     # from the block itself.
-    @staticmethod
-    def delete_intersecting_pending_blocks(block):
-        for relative_xy_positionB in Block.intersecting_relative_xy_positionsB:
-            testXB = block.x_b() + relative_xy_positionB[0]
-            testYB = block.y_b() + relative_xy_positionB[1]
-            testZB = block.z_b()
-            testA = block.a
-            testBlock = Block.get_at_with_state(block.parent(), 
-                                                [testXB, testYB, testZB], 
-                                                testA, 1)
+    def delete_intersecting_pending_blocks(self):
+        for relative_xy_positionB in self.intersecting_relative_xy_positionsB:
+            testXB = self.x_b() + relative_xy_positionB[0]
+            testYB = self.y_b() + relative_xy_positionB[1]
+            testZB = self.z_b()
+            testA = self.a
+            testBlock = self.get_at_with_state([testXB, testYB, testZB], 
+                                               testA, 1)
             if testBlock:
                 # Intersecting pending block exists. => It is deleted:
                 testBlock.state = 0
@@ -272,7 +270,7 @@ class Block(db.Model):
                 # Block intersects with real block. => Should be deleted.
                 return False
             else:
-                Block.delete_intersecting_pending_blocks(self)
+                self.delete_intersecting_pending_blocks()
                 self.store_state_and_increase_blocks_data_version(2)
                 return True
         else:
@@ -362,8 +360,8 @@ class Admin(webapp.RequestHandler):
 # Data describing a construction, including building blocks.
 class RPCConstruction(webapp.RequestHandler):
     # Returns the blocks as an array of dictionaries.
-    @staticmethod
-    def get_blocks_data_blocks(construction):
+    @classmethod
+    def get_blocks_data_blocks(cls, construction):
         query = Block.all().ancestor(construction)
         blocks = []
         for block in query:
@@ -375,8 +373,8 @@ class RPCConstruction(webapp.RequestHandler):
         return blocks
 
     # Returns JSON serializable data related to blocks.
-    @staticmethod
-    def get_blocks_data(construction, blocks_data_version_client):
+    @classmethod
+    def get_blocks_data(cls, construction, blocks_data_version_client):
         blocks_data_version = construction.blocks_data_version
         blocks_data_changed = \
             (blocks_data_version != blocks_data_version_client)
@@ -387,13 +385,12 @@ class RPCConstruction(webapp.RequestHandler):
             # Blocks version on server not the same as on client. => Deliver
             # all the data.
             data.update({
-                    'blocks': 
-                    RPCConstruction.get_blocks_data_blocks(construction)})
+                    'blocks': cls.get_blocks_data_blocks(construction)})
         return data
 
     # Returns JSON serializable data related to the camera.
-    @staticmethod
-    def get_camera_data(construction, camera_data_version_client):
+    @classmethod
+    def get_camera_data(cls, construction, camera_data_version_client):
         camera_data_version = construction.camera_data_version
         camera_data_changed = \
             (camera_data_version != camera_data_version_client)
@@ -413,8 +410,8 @@ class RPCConstruction(webapp.RequestHandler):
         return data
 
     # Returns JSON serializable data related to the live image.
-    @staticmethod
-    def get_image_data(construction, image_data_version_client):
+    @classmethod
+    def get_image_data(cls, construction, image_data_version_client):
         image_data_version = construction.image_data_version
         image_data_changed = (image_data_version != 
                               image_data_version_client)
@@ -430,13 +427,13 @@ class RPCConstruction(webapp.RequestHandler):
                         construction.image_update_interval_server})
         return data
 
-    @staticmethod
-    def json_decode_list(l):
+    @classmethod
+    def json_decode_list(cls, l):
         return map(simplejson.loads, l)
 
     # Returns JSON serializable data related to the block properties.
-    @staticmethod
-    def get_block_properties_data(construction, 
+    @classmethod
+    def get_block_properties_data(cls, construction, 
                                   block_properties_data_version_client):
         query = BlockProperties.all().ancestor(construction)
         block_properties = query.get()
@@ -461,19 +458,19 @@ class RPCConstruction(webapp.RequestHandler):
                          'outlineBXY': 
                          simplejson.loads(block_properties.outline_bxy),
                          'collisionOffsetsListBXY': \
-                             RPCConstruction.json_decode_list \
+                             cls.json_decode_list \
                              (block_properties.collision_offsets_list_bxy),
                          'attachmentOffsetsListB': \
-                             RPCConstruction.json_decode_list \
+                             cls.json_decode_list \
                              (block_properties.attachment_offsets_list_b),
                          'rotCenterBXY': block_properties.rot_center_bxy,
                          'backgroundAlpha': block_properties.background_alpha})
         return data
 
     # Returns JSON serializable data related to the block properties.
-    @staticmethod
+    @classmethod
     def get_construction_block_properties_data \
-            (construction, 
+            (cls, construction, 
              construction_block_properties_data_version_client):
         query = ConstructionBlockProperties.all().ancestor(construction)
         construction_block_properties = query.get()
@@ -498,8 +495,8 @@ class RPCConstruction(webapp.RequestHandler):
         return data
 
     # Returns JSON serializable data related to the new block
-    @staticmethod
-    def get_new_block_data(construction, new_block_data_version_client):
+    @classmethod
+    def get_new_block_data(cls, construction, new_block_data_version_client):
         query = NewBlock.all().ancestor(construction)
         new_block = query.get()
         if new_block is None:
@@ -527,8 +524,8 @@ class RPCConstruction(webapp.RequestHandler):
         return data
 
     # Returns JSON serializable data related to prerender-mode.
-    @staticmethod
-    def get_prerender_mode_data(construction, 
+    @classmethod
+    def get_prerender_mode_data(cls, construction, 
                                 prerender_mode_data_version_client):
         query = PrerenderMode.all().ancestor(construction)
         prerender_mode = query.get()
@@ -547,7 +544,7 @@ class RPCConstruction(webapp.RequestHandler):
             data.update({'isEnabled': prerender_mode.is_enabled,
                          'makeRealAfter': prerender_mode.make_real_after,
                          'blockConfigurations': \
-                             RPCConstruction.json_decode_list \
+                             cls.json_decode_list \
                              (prerender_mode.block_configurations),
                          'imageUrlTemplate': 
                          prerender_mode.image_url_template})
@@ -555,8 +552,9 @@ class RPCConstruction(webapp.RequestHandler):
 
     # A transaction may not be necessary, but it ensures data integrity for
     # example if there is a transaction missing somewhere else.
-    @staticmethod
-    def transaction(blocks_data_version_client, 
+    @classmethod
+    def transaction(cls,
+                    blocks_data_version_client, 
                     camera_data_version_client,
                     image_data_version_client,
                     block_properties_data_version_client,
@@ -566,21 +564,22 @@ class RPCConstruction(webapp.RequestHandler):
         construction = Construction.get_main()
         data = {
             'updateIntervalClient': construction.update_interval_client,
-            'blocksData': RPCConstruction.get_blocks_data(
-                construction, blocks_data_version_client),
-            'cameraData': RPCConstruction.get_camera_data(
-                construction, camera_data_version_client),
-            'imageData': RPCConstruction.get_image_data(
-                construction, image_data_version_client),
-            'blockPropertiesData': RPCConstruction.get_block_properties_data(
+            'blocksData':
+                cls.get_blocks_data(construction, blocks_data_version_client),
+            'cameraData':
+                cls.get_camera_data(construction, camera_data_version_client),
+            'imageData':
+                cls.get_image_data(construction, image_data_version_client),
+            'blockPropertiesData':
+                cls.get_block_properties_data(
                 construction, block_properties_data_version_client),
             'constructionBlockPropertiesData':
-                RPCConstruction.get_construction_block_properties_data(
+                cls.get_construction_block_properties_data(
                 construction, 
                 construction_block_properties_data_version_client),
-            'newBlockData': RPCConstruction.get_new_block_data(
+            'newBlockData': cls.get_new_block_data(
                 construction, new_block_data_version_client),
-            'prerenderModeData': RPCConstruction.get_prerender_mode_data(
+            'prerenderModeData': cls.get_prerender_mode_data(
                 construction, prerender_mode_data_version_client)
         }
         return data
@@ -602,7 +601,7 @@ class RPCConstruction(webapp.RequestHandler):
                 self.request.get('prerenderModeDataVersion')
 
             data = db.run_in_transaction \
-                (RPCConstruction.transaction, 
+                (self.transaction, 
                  blocks_data_version_client, 
                  camera_data_version_client,
                  image_data_version_client,
@@ -624,8 +623,8 @@ class RPCConstruction(webapp.RequestHandler):
 class RPCAdminMakeReal(webapp.RequestHandler):
     # Tries to make the block at the block position "x_b", "y_b", "z_b", and
     # rotated by the angle "a", real.
-    @staticmethod
-    def transaction(x_b, y_b, z_b, a):
+    @classmethod
+    def transaction(cls, x_b, y_b, z_b, a):
         construction = Construction.get_main()
        
         block = Block.get_at(construction, [x_b, y_b, z_b], a)
@@ -717,8 +716,8 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
 class RPCAdminDelete(webapp.RequestHandler):
     # Tries to delete the block at position "x_b", "y_b", "z_b", and rotated by
     # the angle "a".
-    @staticmethod
-    def transaction(x_b, y_b, z_b, a):
+    @classmethod
+    def transaction(cls, x_b, y_b, z_b, a):
         construction = Construction.get_main()
 
         block = Block.get_at(construction, [x_b, y_b, z_b], a)
@@ -732,7 +731,7 @@ class RPCAdminDelete(webapp.RequestHandler):
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
             a = int(self.request.get('a'))
-            db.run_in_transaction(RPCAdminDelete.transaction, x_b, y_b, z_b, a)
+            db.run_in_transaction(self.transaction, x_b, y_b, z_b, a)
         except Exception, e:
             logging.error('Could not delete block: ' + str(e))
 
@@ -756,8 +755,8 @@ class RPCCreatePending(webapp.RequestHandler):
     # Tries to send an email, informing that a pending block has been created,
     # or the state of an existing block has been changed to pending. The
     # position of the block: "position_b" Its rotation angle: "a"
-    @staticmethod
-    def send_info_email(construction, position_b, a):
+    @classmethod
+    def send_info_email(cls, construction, position_b, a):
         query = PendingBlockEmail.all().ancestor(construction)
         pending_block_email = query.get()
         if pending_block_email is None:
@@ -780,8 +779,8 @@ Angle: %d
 
     # Tries to create a pending block at the block position "x_b", "y_b",
     # "z_b", and rotated about its center of rotation by "a".
-    @staticmethod
-    def transaction(x_b, y_b, z_b, a):
+    @classmethod
+    def transaction(cls, x_b, y_b, z_b, a):
         construction = Construction.get_main()
 
         block = Block.get_at(construction, [x_b, y_b, z_b], a)
@@ -801,7 +800,7 @@ Angle: %d
             return
 
         block.store_state_and_increase_blocks_data_version(1) # Set to pending.
-        RPCCreatePending.send_info_email(construction, [x_b, y_b, z_b], a)
+        cls.send_info_email(construction, [x_b, y_b, z_b], a)
 
     def post(self):
         try:
@@ -809,8 +808,7 @@ Angle: %d
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
             a = int(self.request.get('a'))
-            db.run_in_transaction(RPCCreatePending.transaction, 
-                                  x_b, y_b, z_b, a)
+            db.run_in_transaction(self.transaction, x_b, y_b, z_b, a)
         except Exception, e:
             logging.error('Could not add pending block or set existing ' + 
                           'block to pending: ' + str(e))
@@ -825,8 +823,8 @@ class RPCAdminMakePending(webapp.RequestHandler):
     # Tries to turn the block at the block position "x_b", "y_b", "z_b" and
     # rotated by the angle "a" into a pending block, or sets its state to
     # deleted, if it intersects with a real block.
-    @staticmethod
-    def transaction(x_b, y_b, z_b, a):
+    @classmethod
+    def transaction(cls, x_b, y_b, z_b, a):
         construction = Construction.get_main()
 
         block = Block.get_at(construction, [x_b, y_b, z_b], a)
@@ -849,8 +847,7 @@ class RPCAdminMakePending(webapp.RequestHandler):
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
             a = int(self.request.get('a'))
-            db.run_in_transaction(RPCAdminMakePending.transaction, 
-                                  x_b, y_b, z_b, a)
+            db.run_in_transaction(self.transaction, x_b, y_b, z_b, a)
         except Exception, e:
             logging.error('Could not make block pending: ' + str(e))
 
@@ -861,8 +858,8 @@ class RPCAdminMakePending(webapp.RequestHandler):
 class RPCAdminUpdateSettings(webapp.RequestHandler):
     # Tries to update the image and camera settings. Ignores values that cannot
     # be assigned.
-    @staticmethod
-    def transaction(data):
+    @classmethod
+    def transaction(cls, data):
         construction = Construction.get_main()
 
         for key, value in data.iteritems():
@@ -898,8 +895,7 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
                 'image_url': self.request.get('image.url'),
                 'image_update_interval_server':
                     float(self.request.get('image.updateIntervalServer'))}
-            db.run_in_transaction(RPCAdminUpdateSettings.transaction, 
-                                  data)
+            db.run_in_transaction(self.transaction, data)
         except Exception, e:
             logging.error('Could not update camera and image data: ' + str(e))
 
@@ -910,8 +906,8 @@ class Image(webapp.RequestHandler):
     # Retrieves a new image, stores it in the database for the entity
     # "construction", and returns the image. Returns the old image, if the
     # image retrieval fails.
-    @staticmethod
-    def update_image(construction):
+    @classmethod
+    def update_image(cls, construction):
         old_image = construction.image
         try:
             if not construction.image_url:
@@ -938,18 +934,18 @@ class Image(webapp.RequestHandler):
     # currently stored in the data store. Otherwise, retrieves an up to date
     # image, stores it in the data store and returns the result. If retrieving
     # does fail, returns the image currently in the data store.
-    @staticmethod
-    def transaction():
+    @classmethod
+    def transaction(cls):
         construction = Construction.get_main()
         if (time.time() > construction.image_last_update + \
                 construction.image_update_interval_server):
-            return Image.update_image(construction)
+            return cls.update_image(construction)
         else:
             return construction.image
 
     def get(self):
         try:
-            image = db.run_in_transaction(Image.transaction)
+            image = db.run_in_transaction(self.transaction)
             if image:
                 self.response.headers['Content-Type'] = 'image/jpeg'
                 self.response.out.write(image)
