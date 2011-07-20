@@ -95,6 +95,12 @@ table#contentContainer td {
     margin-right: 5px;
 }
 
+#prerenderedBlockConfigTextField {
+    width: 40px;
+    margin-bottom: 2px;
+    text-align: right;
+}
+
 #sideBar .scrollPane {
     overflow: auto;
     height: 195px;

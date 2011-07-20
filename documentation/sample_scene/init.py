@@ -123,6 +123,7 @@ prerenderMode.block_configurations = \
 prerenderMode.image_url_template = \
     'http://realitybuilder.googlecode.com/hg/documentation/' + \
     'sample_scene/prerendered_%d.jpg'
+prerenderMode.i = 0
 prerenderMode.put()
 
 # Deletes all block properties entries:

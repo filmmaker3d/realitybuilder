@@ -87,6 +87,16 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
             image.updateIntervalServer();
     },
 
+    updatePrerenderModeControls: function (prerenderMode) {
+        if (prerenderMode.isEnabled()) {
+            dojo.byId('prerenderedBlockConfigurationTextField').value =
+                prerenderMode.i();
+            dojo.style('prerenderedBlockConfigurations', 'display', 'block');
+        } else {
+            dojo.style('prerenderedBlockConfigurations', 'display', 'none');
+        }
+    },
+
     // Returns data describing the image settings in a format that is a subset
     // of that used for exchanging image data with the server.
     readImageControls: function () {

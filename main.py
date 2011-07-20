@@ -127,6 +127,14 @@ class PrerenderMode(db.Model):
     block_configurations = db.StringListProperty()
     image_url_template = db.StringProperty()
 
+    # Index of the currently loaded prerendered block configuration.
+    i = db.IntegerProperty()
+
+    # Increases the data version number. Should be run in a transaction.
+    def increase_data_version(self):
+        self.data_version = str(int(self.data_version) + 1)
+        self.put()
+
 # Data specific to the new block.
 class NewBlock(db.Model):
     # The data version is increased every time the data is changed. The client
@@ -547,7 +555,8 @@ class RPCConstruction(webapp.RequestHandler):
                              cls.json_decode_list \
                              (prerender_mode.block_configurations),
                          'imageUrlTemplate': 
-                         prerender_mode.image_url_template})
+                         prerender_mode.image_url_template,
+                         'i': prerender_mode.i})
         return data
 
     # A transaction may not be necessary, but it ensures data integrity for
@@ -671,9 +680,12 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
                 block.state = 2
                 block.put()
 
-            construction.increase_blocks_data_version();
+            construction.increase_blocks_data_version()
+
+            prerender_mode.i = i
+            prerender_mode.increase_data_version()
         else:
-            raise Exception('Could not get block configurations')
+            raise Exception('Index out of bounds')
 
     @classmethod
     def updateImage(cls, construction, prerender_mode, i):
@@ -864,7 +876,7 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
 
         for key, value in data.iteritems():
             try:
-                setattr(construction, key, value);
+                setattr(construction, key, value)
             except:
                 pass # nothing to be done
 

@@ -324,6 +324,11 @@ dojo.declare('com.realitybuilder.Construction', null, {
     },
 
     _onPrerenderModeChanged: function () {
+        if (this._showAdminControls) {
+            this._adminControls.
+                updatePrerenderModeControls(this._prerenderMode);
+        }
+
         this._updateNewBlockStateIfFullyInitialized();
     },
 
