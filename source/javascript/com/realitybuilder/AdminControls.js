@@ -70,19 +70,20 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     // Updates controls defining the camera "camera".
     updateCameraControls: function (camera) {
         var position = camera.position();
-        dojo.byId('cameraX').value = position[0];
-        dojo.byId('cameraY').value = position[1];
-        dojo.byId('cameraZ').value = position[2];
-        dojo.byId('cameraAX').value = camera.aX();
-        dojo.byId('cameraAY').value = camera.aY();
-        dojo.byId('cameraAZ').value = camera.aZ();
-        dojo.byId('cameraFl').value = camera.fl();
-        dojo.byId('cameraSensorResolution').value = camera.sensorResolution();
+        dojo.byId('cameraXTextField').value = position[0];
+        dojo.byId('cameraYTextField').value = position[1];
+        dojo.byId('cameraZTextField').value = position[2];
+        dojo.byId('cameraAXTextField').value = camera.aX();
+        dojo.byId('cameraAYTextField').value = camera.aY();
+        dojo.byId('cameraAZTextField').value = camera.aZ();
+        dojo.byId('cameraFlTextField').value = camera.fl();
+        dojo.byId('cameraSensorResolutionTextField').value = 
+            camera.sensorResolution();
     },
 
     updateImageControls: function (image) {
-        dojo.byId('imageURL').value = image.url();
-        dojo.byId('imageUpdateIntervalServer').value = 
+        dojo.byId('imageUrlTextField').value = image.url();
+        dojo.byId('imageUpdateIntervalServerTextField').value = 
             image.updateIntervalServer();
     },
 
@@ -90,9 +91,10 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     // of that used for exchanging image data with the server.
     readImageControls: function () {
         var data = {
-            'url': dojo.byId('imageURL').value || '',
+            'url': dojo.byId('imageUrlTextField').value || '',
             'updateIntervalServer': 
-                parseFloat(dojo.byId('imageUpdateIntervalServer').value) || 5};
+                parseFloat(dojo.byId('imageUpdateIntervalServerTextField').
+                           value) || 5};
         return data;
     },
 
@@ -100,15 +102,16 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
     // of that used for exchanging camera data with the server.
     readCameraControls: function () {
         var data = {
-            "position": [parseFloat(dojo.byId('cameraX').value) || 0,
-                         parseFloat(dojo.byId('cameraY').value) || 0,
-                         parseFloat(dojo.byId('cameraZ').value) || 0],
-            "aX": parseFloat(dojo.byId('cameraAX').value) || 0,
-            "aY": parseFloat(dojo.byId('cameraAY').value) || 0,
-            "aZ": parseFloat(dojo.byId('cameraAZ').value) || 0,
-            "fl": parseFloat(dojo.byId('cameraFl').value) || 1,
+            "position": [parseFloat(dojo.byId('cameraXTextField').value) || 0,
+                         parseFloat(dojo.byId('cameraYTextField').value) || 0,
+                         parseFloat(dojo.byId('cameraZTextField').value) || 0],
+            "aX": parseFloat(dojo.byId('cameraAXTextField').value) || 0,
+            "aY": parseFloat(dojo.byId('cameraAYTextField').value) || 0,
+            "aZ": parseFloat(dojo.byId('cameraAZTextField').value) || 0,
+            "fl": parseFloat(dojo.byId('cameraFlTextField').value) || 1,
             "sensorResolution": 
-                parseFloat(dojo.byId('cameraSensorResolution').value) || 100};
+                parseFloat(dojo.byId('cameraSensorResolutionTextField').value)
+                || 100};
         return data;
     },
 
