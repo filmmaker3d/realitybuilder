@@ -159,5 +159,21 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
             load: dojo.hitch(this, 
                              this._loadBlockConfigurationOnServerSucceeded)
         });
+    },
+
+    // Loads the previous prerendered block configuration, unless the current
+    // one is already the first.
+    loadPrevBlockConfigurationOnServer: function () {
+        if (this.i() > 0) {
+            this.loadBlockConfigurationOnServer(this.i() - 1);
+        }
+    },
+
+    // Loads the next prerendered block configuration, unless the current one
+    // is already the last.
+    loadNextBlockConfigurationOnServer: function () {
+        if (this.i() < this._blockConfigurations.length - 1) {
+            this.loadBlockConfigurationOnServer(this.i() + 1);
+        }
     }
 });

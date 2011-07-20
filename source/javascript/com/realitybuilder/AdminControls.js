@@ -49,6 +49,16 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
             this._construction, this._construction.togglePending);
 
         dojo.connect(dojo.byId('logoutButton'), 'onclick', this, this.logOut);
+
+        dojo.connect(dojo.byId('setPrerenderedBlockConfigurationButton'),
+                     'onclick', 
+                     this, this.setPrerenderedBlockConfiguration);
+        dojo.connect(dojo.byId('prevPrerenderedBlockConfigurationButton'),
+                     'onclick', 
+                     this, this.prevPrerenderedBlockConfiguration);
+        dojo.connect(dojo.byId('nextPrerenderedBlockConfigurationButton'),
+                     'onclick', 
+                     this, this.nextPrerenderedBlockConfiguration);
     },
 
     // Logs the administrator out, sending him back to the login screen.
@@ -87,7 +97,8 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
             image.updateIntervalServer();
     },
 
-    updatePrerenderModeControls: function (prerenderMode) {
+    updatePrerenderModeControls: function () {
+        var prerenderMode = this._construction.prerenderMode();
         if (prerenderMode.isEnabled()) {
             dojo.byId('prerenderedBlockConfigurationTextField').value =
                 prerenderMode.i();
@@ -95,6 +106,27 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
         } else {
             dojo.style('prerenderedBlockConfigurations', 'display', 'none');
         }
+    },
+
+    setPrerenderedBlockConfiguration: function () {
+        var prerenderMode, i;
+
+        prerenderMode = this._construction.prerenderMode();
+
+        i = parseInt(dojo.byId('prerenderedBlockConfigurationTextField').value,
+                     10);
+
+        prerenderMode.loadBlockConfigurationOnServer(i);
+    },
+
+    prevPrerenderedBlockConfiguration: function () {
+        var prerenderMode = this._construction.prerenderMode();
+        prerenderMode.loadPrevBlockConfigurationOnServer();
+    },
+
+    nextPrerenderedBlockConfiguration: function () {
+        var prerenderMode = this._construction.prerenderMode();
+        prerenderMode.loadNextBlockConfigurationOnServer();
     },
 
     // Returns data describing the image settings in a format that is a subset

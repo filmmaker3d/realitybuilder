@@ -171,6 +171,10 @@ dojo.declare('com.realitybuilder.Construction', null, {
         return this._camera;
     },
 
+    prerenderMode: function () {
+        return this._prerenderMode;
+    },
+
     showPending: function () {
         return this._showPending;
     },
@@ -326,7 +330,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     _onPrerenderModeChanged: function () {
         if (this._showAdminControls) {
             this._adminControls.
-                updatePrerenderModeControls(this._prerenderMode);
+                updatePrerenderModeControls();
         }
 
         this._updateNewBlockStateIfFullyInitialized();
