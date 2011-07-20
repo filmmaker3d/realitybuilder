@@ -75,6 +75,14 @@ class Construction(db.Model):
     image_last_update = db.FloatProperty(default=0.) # s
     image_update_interval_server = db.FloatProperty(default=5.) # s
 
+    def prerender_mode(self):
+        query = PrerenderMode.all().ancestor(self)
+        prerender_mode = query.get()
+        if prerender_mode is None:
+            raise Exception('Could not get prerender-mode data')
+        else:
+            return prerender_mode
+
     # Increases the blocks version number. Should be run in a transaction.
     def increase_blocks_data_version(self):
         self.blocks_data_version = str(int(self.blocks_data_version) + 1)
@@ -637,79 +645,70 @@ class RPCAdminMakeReal(webapp.RequestHandler):
         except Exception, e:
             logging.error('Could not make block real: ' + str(e))
 
-# Changes the status of the block at the provided position to real. If the
-# block isn't in the construction, then the operation fails. If the block
-# intersects with any real block, then it is deleted. If there are pending
-# blocks that intersect with the newly turned real block, then they are
-# deleted.
-#
-# Once the block is successfully made real, then the background image is
-# replaced with that from the specified image URL.
+# Loads the prerendered block configuration with the provided index and
+# replaces the background image appropriately.
 # 
 # Silently fails on error.
-class RPCMakeRealPrerendered(webapp.RequestHandler):
-    # Tries to make the block real which is at the block position "position_b"
-    # and rotated by the angle "a". Returns true, iff successful.
-    @staticmethod
-    def transaction1(construction, position_b, a):
-        block = Block.get_at(construction, position_b, a)
-        if not block:
-            return False # no block
-        else:
-            return block.make_real()
+class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
+    @classmethod
+    def updateBlocks(cls, construction, prerender_mode, i):
+        block_configurations = prerender_mode.block_configurations
 
-    # Sets the background image to "image_url".
-    @staticmethod
-    def transaction2(construction, image_url):
+        if i < len(block_configurations):
+            # Deletes all block entries:
+            queries = [Block.all().ancestor(construction)]
+            for query in queries:
+                for result in query:
+                    result.delete()
+
+            # Inserts blocks:
+            blocks = simplejson.loads(block_configurations[i])
+            for block in blocks:
+                x_b = block[0]
+                y_b = block[1]
+                z_b = block[2]
+                a = block[3]
+                block = Block.insert_at(construction, [x_b, y_b, z_b], a)
+                block.state = 2
+                block.put()
+
+            construction.increase_blocks_data_version();
+        else:
+            raise Exception('Could not get block configurations')
+
+    @classmethod
+    def updateImage(cls, construction, prerender_mode, i):
+        image_url_template = prerender_mode.image_url_template
+        image_url = image_url_template % (i)
+        
         construction.image_url = image_url
         construction.image_last_update = 0. # since the image URL has changed
         construction.put()
         construction.increase_image_data_version()
 
-    def run_if_prerender_mode_enabled(self, position_b, a, image_url):
+    # If prerender-mode is enabled, then:
+    # 
+    # 1. Replaces all blocks with the blocks in the prerendered block
+    #   configuration with index "i".
+    # 
+    # 2. Updates the prerendered image accordingly.
+    @classmethod
+    def transaction(cls, i):
         construction = Construction.get_main()
 
-        query = PrerenderMode.all().ancestor(construction)
-        prerender_mode = query.get()
-        if prerender_mode is None:
-            raise Exception('Could not get prerender-mode data')
+        prerender_mode = construction.prerender_mode()
 
-        # Separate transactions are used, for two reasons:
-        # 
-        # * Making transactions smalled probably makes the server more
-        #   responsive.
-        #
-        # * The second transaction modifies construction data and writes it
-        #   back to the datastore. If that would happen in the first
-        #   transaction, then special care would have to be taken since the
-        #   construction data is also changed when the block is made real, but
-        #   with a different construction object. The problem: Although both
-        #   construction objects refer to the same datastore entity, one will
-        #   not get updated when that datastore entry is changed elsewhere.
-        #   This is due to the datastore's concepts of "Isolation and
-        #   Consistency": When reading values, they are always as of the
-        #   beginning of the transaction.
         if prerender_mode.is_enabled:
-            made_real = \
-                db.run_in_transaction(RPCMakeRealPrerendered.transaction1, 
-                                      construction, position_b, a)
-            construction = Construction.get_main() # updates with latest data
-            if made_real:
-                db.run_in_transaction(RPCMakeRealPrerendered.transaction2, 
-                                      construction, image_url)
+            cls.updateBlocks (construction, prerender_mode, i)
+            cls.updateImage(construction, prerender_mode, i)
 
     # Only runs if prerender-mode is enabled.
     def post(self):
         try:
-            x_b = int(self.request.get('xB'))
-            y_b = int(self.request.get('yB'))
-            z_b = int(self.request.get('zB'))
-            a = int(self.request.get('a'))
-            image_url = self.request.get('imageUrl')
-
-            self.run_if_prerender_mode_enabled([x_b, y_b, z_b], a, image_url)
+            i = int(self.request.get('i'))
+            db.run_in_transaction(self.transaction, i)
         except Exception, e:
-            logging.error('Could not make block real in prerender-mode: ' + 
+            logging.error('Could not load prerendered block configuration: ' + 
                           str(e))
 
 # Sets the state of the block at the provided position to deleted.
@@ -969,7 +968,8 @@ application = webapp.WSGIApplication([
     ('/admin/rpc/update_settings', RPCAdminUpdateSettings),
     ('/rpc/construction', RPCConstruction),
     ('/rpc/create_pending', RPCCreatePending),
-    ('/rpc/make_real_prerendered', RPCMakeRealPrerendered)],
+    ('/rpc/load_prerendered_block_configuration', 
+     RPCLoadPrerenderedBlockConfiguration)],
     debug = debug)
 
 def main():

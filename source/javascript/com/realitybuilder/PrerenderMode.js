@@ -29,15 +29,10 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
     // With prerender-mode enabled, a block is automatically made real after
     // "_makeRealAfter" milliseconds, and if the total construction would
     // afterwards match one of the block configurations in the list
-    // "_blockConfigurations". Associated with each block configuration is an
-    // image, the URL of which is constructed using the template
-    // "imageUrlTemplate": %d is substituted with the block configuration
-    // number. This number is identical to the corresponding index in the array
-    // with the block configurations.
+    // "_blockConfigurations".
     _isEnabled: null,
     _makeRealAfter: null, // ms
     _blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...
-    _imageUrlTemplate: null,
 
     versionOnServer: function () {
         return this._versionOnServer;
@@ -56,7 +51,6 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
         this._isEnabled = serverData.isEnabled;
         this._makeRealAfter = serverData.makeRealAfter;
         this._blockConfigurations = serverData.blockConfigurations;
-        this._imageUrlTemplate = serverData.imageUrlTemplate;
 
         dojo.publish('com/realitybuilder/PrerenderMode/changed');
     },
@@ -142,9 +136,20 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
         return false; // no prerendered configuration matches
     },
 
-    // Returns the image URL of the image for the block configuration with the
-    // index "i".
-    imageUrl: function (i) {
-        return this._imageUrlTemplate.replace('%d', i);
+    _loadBlockConfigurationOnServerSucceeded: function () {
+        dojo.publish('com/realitybuilder/PrerenderMode/' + 
+                     'loadedBlockConfigurationOnServer');
+    },
+
+    // Loads the prerendered block configuration with index "i" on the server.
+    loadBlockConfigurationOnServer: function (i) {
+        dojo.xhrPost({
+            url: "/rpc/load_prerendered_block_configuration",
+            content: {
+                "i": i
+            },
+            load: dojo.hitch(this, 
+                             this._loadBlockConfigurationOnServerSucceeded)
+        });
     }
 });

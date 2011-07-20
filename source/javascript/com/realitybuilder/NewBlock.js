@@ -528,8 +528,10 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         dojo.publish('com/realitybuilder/NewBlock/createdPendingOnServer');
 
         if (this._prerenderMode.isEnabled()) {
-            setTimeout(dojo.hitch(this, this._makeRealPrerenderedOnServer), 
-                       this._prerenderMode.makeRealAfter());
+            setTimeout(
+                dojo.hitch(this, 
+                           this._makeRealIfInPrerenderedBlockConfiguration), 
+                this._prerenderMode.makeRealAfter());
         }
     },
 
@@ -547,39 +549,19 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         });
     },
 
-    _makeRealPrerenderedOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/NewBlock/' + 
-                     'madeRealPrerenderedOnServer');
-    },
-
     // If this block together with the real blocks matches a prerendered block
-    // configuration, then:
-    //
-    // * makes it real,
-    //
-    // * sets the background image to the prerendered one.
+    // configuration, then makes it real by loading the appropriate prerendered
+    // block configuration.
     //
     // Otherwise, just makes the block movable again.
-    _makeRealPrerenderedOnServer: function () {
-        var i, imageUrl, realBlocks;
+    _makeRealIfInPrerenderedBlockConfiguration: function () {
+        var i, realBlocks;
 
         realBlocks = this._constructionBlocks.realBlocksSorted();
         i = this._prerenderMode.matchingBlockConfiguration(realBlocks, this);
 
         if (i !== false) {
-            imageUrl = this._prerenderMode.imageUrl(i);
-            dojo.xhrPost({
-                url: "/rpc/make_real_prerendered",
-                content: {
-                    "xB": this.xB(),
-                    "yB": this.yB(),
-                    "zB": this.zB(),
-                    "a": this.a(),
-                    "imageUrl": this._prerenderMode.imageUrl(i)
-                },
-                load: dojo.hitch(this, 
-                                 this._makeRealPrerenderedOnServerSucceeded)
-            });
+            this._prerenderMode.loadBlockConfigurationOnServer(i);
         } else {
             // this block and the real block don't match a prerendered
             // configuration
