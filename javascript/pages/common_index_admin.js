@@ -22,7 +22,7 @@
 
 // Returns true, iff the browser works with the Dojo Toolkit.
 function realityBuilderIsDojoSupported() {
-    return (typeof dojo !== 'undefined');
+    return (typeof realitybuilderDojo !== 'undefined');
 }
 
 // Called after it has been detected whether images are enabled ("disabled"
@@ -38,7 +38,7 @@ function realityBuilderOnImageStateDetected(disabled) {
 }
 
 function realityBuilderInit() {
-    dojo.addOnLoad(function () {
+    realitybuilderDojo.addOnLoad(function () {
         if (com.realitybuilder.util.isCanvasSupported()) {
             DetectImageState.init('/images/placeholder.gif', 
                                   realityBuilderOnImageStateDetected);
@@ -49,16 +49,16 @@ function realityBuilderInit() {
 }
 
 if (realityBuilderIsDojoSupported()) {
-    if (dojo.config.isDebug) {
-        dojo.registerModulePath("com", "../../com");
-        dojo.require('com.realitybuilder.Construction');
-        dojo.require('com.realitybuilder.util');
+    if (realitybuilderDojo.config.isDebug) {
+        realitybuilderDojo.registerModulePath("com", "../../com");
+        realitybuilderDojo.require('com.realitybuilder.Construction');
+        realitybuilderDojo.require('com.realitybuilder.util');
     }
 
-    if (dojo.isIE < 9) {
+    if (realitybuilderDojo.isIE < 9) {
         // Initialization needs to be deferred, since otherwise it may happen
         // before FlashCanvas is ready.
-        dojo.connect('onload', realityBuilderInit);
+        realitybuilderDojo.connect('onload', realityBuilderInit);
     } else {
         realityBuilderInit();
     }

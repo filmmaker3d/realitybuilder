@@ -22,7 +22,7 @@ var DetectImageState = {
 		this.callback = cb;
 
         // Modification as mentioned above:
-        dojo.attr('DetectImageState', 'innerHTML', '<img id="'+this.inserted_id+'" style="visibility:hidden; position:absolute;left:-1000px;" src="'+testerimg+'?'+Math.random()+'" alt="">');
+        realitybuilderDojo.attr('DetectImageState', 'innerHTML', '<img id="'+this.inserted_id+'" style="visibility:hidden; position:absolute;left:-1000px;" src="'+testerimg+'?'+Math.random()+'" alt="">');
 //		document.body.innerHTML += '<img id="'+this.inserted_id+'" style="visibility:hidden; position:absolute;left:-1000px;" src="'+testerimg+'?'+Math.random()+'" alt="" />';
 
 		this.img = document.getElementById(this.inserted_id);

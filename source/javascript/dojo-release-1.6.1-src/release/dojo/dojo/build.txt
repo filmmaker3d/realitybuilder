@@ -21,9 +21,6 @@ dojo.js:
 ./../../release/dojo/dojo/_base/fx.js
 ./../../release/dojo/dojo/_base/browser.js
 ./../../release/dojo/dojo/_base.js
-./jslib/dojoGuardEnd.jsfrag
-
-realitybuilder.js:
 ./../../release/dojo/dojox/math/_base.js
 ./../../release/dojo/dojox/math.js
 ./../../release/dojo/dojox/math/matrix.js
@@ -55,3 +52,4 @@ realitybuilder.js:
 ./../../release/dojo/com/realitybuilder/ControlPanel.js
 ./../../release/dojo/com/realitybuilder/PrerenderMode.js
 ./../../release/dojo/com/realitybuilder/Construction.js
+./jslib/dojoGuardEnd.jsfrag

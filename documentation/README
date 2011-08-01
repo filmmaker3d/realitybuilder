@@ -298,15 +298,17 @@ Miscellaneous
   1. Run the following command in the Dojo "buildscripts" directory, from the
     Windows XP command line:
 
-    build.bat profile=realitybuilder action=clean,release optimize=shrinksafe
+    > SET SCOPE_MAP=[
+    > SET SCOPE_MAP=%SCOPE_MAP%[\"dojo\",\"realitybuilderDojo\"],
+    > SET SCOPE_MAP=%SCOPE_MAP%[\"dijit\",\"realitybuilderDijit\"],
+    > SET SCOPE_MAP=%SCOPE_MAP%[\"dojox\",\"realitybuilderDojox\"]]
+    > build.bat profile=realitybuilder action=clean,release ^
+      optimize=shrinksafe scopeMap=%SCOPE_MAP%
 
   2. Copy dojo and dojox related files and directories to "/javascript":
 
-    - dojo/realitybuilder.js: The so called layer, containing Reality Builder
-      code, plus dojo code that it depends on, except for Dojo Base and some
-      special resources.
-
-    - dojo/dojo.js: The layer, containing the Dojo Base
+    - dojo/dojo.js: The so called layer, containing Reality Builder and Dojo
+      code that it depends on, including Dojo Base.
 
     - dojo/_firebug: needed for Dojo debug mode
 
