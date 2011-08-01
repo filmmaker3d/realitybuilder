@@ -17,23 +17,23 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Construction');
+dojo.provide('realitybuilder.Construction');
 
-dojo.require('com.realitybuilder.BlockProperties');
-dojo.require('com.realitybuilder.ConstructionBlockProperties');
-dojo.require('com.realitybuilder.ConstructionBlocks');
-dojo.require('com.realitybuilder.ConstructionBlock');
-dojo.require('com.realitybuilder.NewBlock');
-dojo.require('com.realitybuilder.Image');
-dojo.require('com.realitybuilder.Camera');
-dojo.require('com.realitybuilder.AdminControls');
-dojo.require('com.realitybuilder.ControlPanel');
-dojo.require('com.realitybuilder.PrerenderMode');
-dojo.require('com.realitybuilder.util');
+dojo.require('realitybuilder.BlockProperties');
+dojo.require('realitybuilder.ConstructionBlockProperties');
+dojo.require('realitybuilder.ConstructionBlocks');
+dojo.require('realitybuilder.ConstructionBlock');
+dojo.require('realitybuilder.NewBlock');
+dojo.require('realitybuilder.Image');
+dojo.require('realitybuilder.Camera');
+dojo.require('realitybuilder.AdminControls');
+dojo.require('realitybuilder.ControlPanel');
+dojo.require('realitybuilder.PrerenderMode');
+dojo.require('realitybuilder.util');
 
-dojo.declare('com.realitybuilder.Construction', null, {
+dojo.declare('realitybuilder.Construction', null, {
     // True, iff admin controls should be shown:
     _showAdminControls: null,
 
@@ -85,7 +85,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // controls are shown, and - in the rendering - the real and pending
     // blocks.
     constructor: function (showAdminControls) {
-        var rb = com.realitybuilder;
+        var rb = realitybuilder;
 
         this._insertLoadIndicator();
 
@@ -119,42 +119,42 @@ dojo.declare('com.realitybuilder.Construction', null, {
             // back up to date. Reason: They may have been changed before, by
             // user selection.
             dojo.subscribe(
-                'com/realitybuilder/ConstructionBlocks/changeOnServerFailed', 
+                'realitybuilder/ConstructionBlocks/changeOnServerFailed', 
                 this._adminControls, this._adminControls.updateBlocksTable);
         }
 
-        dojo.subscribe('com/realitybuilder/ConstructionBlocks/changedOnServer', 
+        dojo.subscribe('realitybuilder/ConstructionBlocks/changedOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('com/realitybuilder/PrerenderMode/' + 
+        dojo.subscribe('realitybuilder/PrerenderMode/' + 
                        'loadedBlockConfigurationOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('com/realitybuilder/NewBlock/createdPendingOnServer', 
+        dojo.subscribe('realitybuilder/NewBlock/createdPendingOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('com/realitybuilder/NewBlock/' + 
+        dojo.subscribe('realitybuilder/NewBlock/' + 
                        'positionAngleInitialized', 
                        this, this._onNewBlockPositionAngleInitialized);
-        dojo.subscribe('com/realitybuilder/NewBlock/buildOrMoveSpaceChanged', 
+        dojo.subscribe('realitybuilder/NewBlock/buildOrMoveSpaceChanged', 
                        this, this._onMoveOrBuildSpaceChanged);
-        dojo.subscribe('com/realitybuilder/NewBlock/stopped', 
+        dojo.subscribe('realitybuilder/NewBlock/stopped', 
                        this, this._onNewBlockStopped);
-        dojo.subscribe('com/realitybuilder/NewBlock/madeMovable', 
+        dojo.subscribe('realitybuilder/NewBlock/madeMovable', 
                        this, this._onNewBlockMadeMovable);
-        dojo.subscribe('com/realitybuilder/NewBlock/movedOrRotated',
+        dojo.subscribe('realitybuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
-        dojo.subscribe('com/realitybuilder/NewBlock/' + 
+        dojo.subscribe('realitybuilder/NewBlock/' + 
                        'onNewBlockMakeRealRequested',
                        this, this._onNewBlockMakeRealRequested);
-        dojo.subscribe('com/realitybuilder/ConstructionBlocks/changed',
+        dojo.subscribe('realitybuilder/ConstructionBlocks/changed',
                        this, this._onConstructionBlocksChanged);
-        dojo.subscribe('com/realitybuilder/Camera/changed',
+        dojo.subscribe('realitybuilder/Camera/changed',
                        this, this._onCameraChanged);
-        dojo.subscribe('com/realitybuilder/Image/changed',
+        dojo.subscribe('realitybuilder/Image/changed',
                        this, this._onImageChanged);
-        dojo.subscribe('com/realitybuilder/BlockProperties/changed',
+        dojo.subscribe('realitybuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
-        dojo.subscribe('com/realitybuilder/ConstructionBlockProperties/changed',
+        dojo.subscribe('realitybuilder/ConstructionBlockProperties/changed',
                        this, this._onConstructionBlockPropertiesChanged);
-        dojo.subscribe('com/realitybuilder/PrerenderMode/changed',
+        dojo.subscribe('realitybuilder/PrerenderMode/changed',
                        this, this._onPrerenderModeChanged);
 
         dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
@@ -487,7 +487,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     storeSettingsOnServer: function () {
         var imageData, cameraData, content, util;
 
-        util = com.realitybuilder.util;
+        util = realitybuilder.util;
 
         imageData = util.addPrefix('image.', 
                                    this._adminControls.readImageControls());

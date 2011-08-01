@@ -17,13 +17,13 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.ControlPanel');
+dojo.provide('realitybuilder.ControlPanel');
 
-dojo.require('com.realitybuilder.ControlButton');
+dojo.require('realitybuilder.ControlButton');
 
-dojo.declare('com.realitybuilder.ControlPanel', null, {
+dojo.declare('realitybuilder.ControlPanel', null, {
     // New block that the control panel is associated with.
     _newBlock: null,
 
@@ -41,7 +41,7 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
 
         this._node = dojo.byId('controlPanel');
 
-        rb = com.realitybuilder;
+        rb = realitybuilder;
         nb = newBlock;
 
         buttons = [];
@@ -70,7 +70,7 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
                     newBlock.isMovable());
         };
 
-        return new com.realitybuilder.ControlButton(type + 'Button', 
+        return new realitybuilder.ControlButton(type + 'Button', 
                                                     onClicked, 
                                                     shouldBeEnabled);
     },
@@ -89,7 +89,7 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
                     newBlock.isRotatable());
         };
 
-        return new com.realitybuilder.ControlButton('rotate90Button', 
+        return new realitybuilder.ControlButton('rotate90Button', 
                                                     onClicked, 
                                                     shouldBeEnabled);
     },
@@ -107,7 +107,7 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
             return newBlock.canBeMadeReal() && !newBlock.isStopped();
         };
 
-        return new com.realitybuilder.ControlButton('requestRealButton', 
+        return new realitybuilder.ControlButton('requestRealButton', 
                                                     onClicked, 
                                                     shouldBeEnabled);
     },

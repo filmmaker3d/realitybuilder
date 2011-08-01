@@ -17,10 +17,10 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox */
+/*global realitybuilder, dojo, dojox */
 
 function realityBuilderCreateConstruction() {
     var construction = // to please JSLint
-        new com.realitybuilder.Construction(false);
+        new realitybuilder.Construction(false);
     construction = null; // to please JSLint
 }

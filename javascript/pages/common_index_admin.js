@@ -17,8 +17,8 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, swfobject, videoId, DetectImageState, 
-  realityBuilderCreateConstruction */
+/*global realitybuilder, realitybuilderDojo, realitybuilderDojox, swfobject, 
+  videoId, DetectImageState, realityBuilderCreateConstruction */
 
 // Returns true, iff the browser works with the Dojo Toolkit.
 function realityBuilderIsDojoSupported() {
@@ -31,7 +31,7 @@ function realityBuilderIsDojoSupported() {
 // to the user.
 function realityBuilderOnImageStateDetected(disabled) {
     if (disabled) {
-        com.realitybuilder.util.showNoImagesErrorMessage();
+        realitybuilder.util.showNoImagesErrorMessage();
     } else {
         realityBuilderCreateConstruction();
     }
@@ -39,11 +39,11 @@ function realityBuilderOnImageStateDetected(disabled) {
 
 function realityBuilderInit() {
     realitybuilderDojo.addOnLoad(function () {
-        if (com.realitybuilder.util.isCanvasSupported()) {
+        if (realitybuilder.util.isCanvasSupported()) {
             DetectImageState.init('/images/placeholder.gif', 
                                   realityBuilderOnImageStateDetected);
         } else {
-            com.realitybuilder.util.showNoCanvasErrorMessage();
+            realitybuilder.util.showNoCanvasErrorMessage();
         }
     });
 }
@@ -51,8 +51,8 @@ function realityBuilderInit() {
 if (realityBuilderIsDojoSupported()) {
     if (realitybuilderDojo.config.isDebug) {
         realitybuilderDojo.registerModulePath("com", "../../com");
-        realitybuilderDojo.require('com.realitybuilder.Construction');
-        realitybuilderDojo.require('com.realitybuilder.util');
+        realitybuilderDojo.require('realitybuilder.Construction');
+        realitybuilderDojo.require('realitybuilder.util');
     }
 
     if (realitybuilderDojo.isIE < 9) {

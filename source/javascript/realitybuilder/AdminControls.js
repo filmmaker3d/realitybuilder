@@ -17,13 +17,13 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.AdminControls');
+dojo.provide('realitybuilder.AdminControls');
 
 dojo.require('dojox.date.posix');
 
-dojo.declare('com.realitybuilder.AdminControls', null, {
+dojo.declare('realitybuilder.AdminControls', null, {
     // The construction that the admin controls are associated with.
     _construction: null,
 

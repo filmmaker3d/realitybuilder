@@ -17,11 +17,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Image');
+dojo.provide('realitybuilder.Image');
 
-dojo.declare('com.realitybuilder.Image', null, {
+dojo.declare('realitybuilder.Image', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -76,7 +76,7 @@ dojo.declare('com.realitybuilder.Image', null, {
         this._versionOnServer = serverData.version;
         this._updateIntervalServer = serverData.updateIntervalServer;
         this._url = serverData.url;
-        dojo.publish('com/realitybuilder/Image/changed');
+        dojo.publish('realitybuilder/Image/changed');
     },
 
     // Called when an image has been loaded for the first time. Notes that in a

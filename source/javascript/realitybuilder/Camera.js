@@ -31,16 +31,16 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Camera');
+dojo.provide('realitybuilder.Camera');
 
-dojo.require('com.realitybuilder.util');
-dojo.require('com.realitybuilder.Sensor');
+dojo.require('realitybuilder.util');
+dojo.require('realitybuilder.Sensor');
 
 dojo.require('dojox.math.matrix');
 
-dojo.declare('com.realitybuilder.Camera', null, {
+dojo.declare('realitybuilder.Camera', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
@@ -78,7 +78,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
         this._blockProperties = blockProperties;
         this._position = [0, 0, 1];
         this._sensor = 
-            new com.realitybuilder.Sensor(sensorWidth, sensorHeight);
+            new realitybuilder.Sensor(sensorWidth, sensorHeight);
         this._updateRotationMatrices();
         
     },
@@ -141,7 +141,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
         this._updateRotationMatrices();
         this._updateId();
 
-        dojo.publish('com/realitybuilder/Camera/changed');
+        dojo.publish('realitybuilder/Camera/changed');
     },
 
     // Updates the settings of the camera to the version on the server, which
@@ -177,7 +177,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
     // Returns the coordinates of the world space point "point" in view space.
     worldToView: function (point) {
-        var tmp = com.realitybuilder.util.subtractVectors3D(point, 
+        var tmp = realitybuilder.util.subtractVectors3D(point, 
                                                             this._position);
 
         // Rotation matrices are applied to the vector tmp, from the left side:
@@ -216,7 +216,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
     // space.
     blockToSensor: function (pointB) {
         return this.viewToSensor(this.worldToView(
-            com.realitybuilder.util.blockToWorld(pointB, 
+            realitybuilder.util.blockToWorld(pointB, 
                                                  this._blockProperties)));
     }
 });

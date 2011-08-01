@@ -35,7 +35,7 @@ Unit tests
 
 Run unit tests by visiting (relative to the root URL) with debug mode enabled:
 
-  /source/javascript/com/realitybuilder/tests/runTests.html
+  /source/javascript/realitybuilder/tests/runTests.html
 
 
 How to enable support for Internet Explorer versions less than 9

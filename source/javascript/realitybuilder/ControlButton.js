@@ -17,11 +17,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.ControlButton');
+dojo.provide('realitybuilder.ControlButton');
 
-dojo.declare('com.realitybuilder.ControlButton', null, {
+dojo.declare('realitybuilder.ControlButton', null, {
     // Function that's called when button is clicked:
     _onClicked: null,
 

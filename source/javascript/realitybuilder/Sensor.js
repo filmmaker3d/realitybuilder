@@ -18,11 +18,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Sensor');
+dojo.provide('realitybuilder.Sensor');
 
-dojo.declare('com.realitybuilder.Sensor', null, {
+dojo.declare('realitybuilder.Sensor', null, {
     // Canvases for drawing various parts.
     _realBlocksCanvas: null,
     _pendingBlocksCanvas: null,

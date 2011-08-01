@@ -18,14 +18,14 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Shadow');
+dojo.provide('realitybuilder.Shadow');
 
-dojo.require('com.realitybuilder.LayerShadow');
-dojo.require('com.realitybuilder.ShadowObscuringBlocks');
+dojo.require('realitybuilder.LayerShadow');
+dojo.require('realitybuilder.ShadowObscuringBlocks');
 
-dojo.declare('com.realitybuilder.Shadow', null, {
+dojo.declare('realitybuilder.Shadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
@@ -60,13 +60,13 @@ dojo.declare('com.realitybuilder.Shadow', null, {
         this._constructionBlocks = constructionBlocks;
 
         this._shadowObscuringBlocks =
-            new com.realitybuilder.ShadowObscuringBlocks(newBlock, 
+            new realitybuilder.ShadowObscuringBlocks(newBlock, 
                                                          blockProperties,
                                                          camera,
                                                          constructionBlocks);
 
         this._layerShadow = 
-            new com.realitybuilder.LayerShadow(newBlock, blockProperties,
+            new realitybuilder.LayerShadow(newBlock, blockProperties,
                                                camera, constructionBlocks);
     },
 
@@ -95,7 +95,7 @@ dojo.declare('com.realitybuilder.Shadow', null, {
 
         if (canvas.getContext) {
             context = canvas.getContext('2d');
-            com.realitybuilder.util.clearCanvas(canvas);
+            realitybuilder.util.clearCanvas(canvas);
 
             // draws shadow from bottom up, in each step removing parts that
             // are obscured by blocks in the layer above:
@@ -114,6 +114,6 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     // Makes sure that the shadow is not shown on the sensor.
     clear: function () {
         var canvas = this._camera.sensor().shadowCanvas();
-        com.realitybuilder.util.clearCanvas(canvas);
+        realitybuilder.util.clearCanvas(canvas);
     }
 });

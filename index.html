@@ -27,10 +27,8 @@
   <title>Reality Builder</title>        
   {%if debug%}
     <script type="text/javascript">
-      var com, djConfig;
-      com = {};
+      var djConfig;
       djConfig = {
-          parseOnLoad: false, 
           isDebug: true,
           debugContainerId: 'firebugLite',
           scopeMap: [
@@ -39,22 +37,16 @@
               ['dojox', 'realitybuilderDojox']
           ],
           modulePaths: {
-              "com": "/source/javascript/com"
+              "realitybuilder": "/source/javascript/realitybuilder"
           }
       };
     </script>
     <script type="text/javascript" 
-      src="/source/javascript/dojo-release-1.6.1/dojo/dojo.js">
+            src="/source/javascript/dojo-release-1.6.1/dojo/dojo.js">
     </script>
   {%else%}
-    <script type="text/javascript">
-      var djConfig = {
-          parseOnLoad: true, 
-          isDebug: false
-      };
-    </script>
     <script type="text/javascript" 
-      src="/javascript/dojo/dojo.js"></script>
+            src="/javascript/dojo/realitybuilder.js"></script>
   {%endif%}
   <!--[if lt IE 9]>
     <script type="text/javascript" src="/javascript/swfobject.js"></script>

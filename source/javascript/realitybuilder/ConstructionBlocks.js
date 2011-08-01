@@ -19,14 +19,14 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.ConstructionBlocks');
+dojo.provide('realitybuilder.ConstructionBlocks');
 
-dojo.require('com.realitybuilder.ConstructionBlock');
-dojo.require('com.realitybuilder.util');
+dojo.require('realitybuilder.ConstructionBlock');
+dojo.require('realitybuilder.util');
 
-dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
+dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // Version of blocks data last retrieved from the server, or "-1"
     // initially. Is a string in order to be able to contain very large
     // integers.
@@ -117,7 +117,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     },
 
     _createBlockFromServerData: function (serverData) {
-        var camera = this._construction.camera(), rb = com.realitybuilder;
+        var camera = this._construction.camera(), rb = realitybuilder;
         return new rb.ConstructionBlock(this._blockProperties,
                                         camera, 
                                         serverData.positionB, serverData.a,
@@ -137,7 +137,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
         this._updateRealBlocksSorted();
         this._updatePendingBlocks();
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changed');
+        dojo.publish('realitybuilder/ConstructionBlocks/changed');
     },
 
     // Sort function, for ordering blocks by height/layer. From top to bottom.
@@ -173,7 +173,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         var blocks = this.blocks(), block, i;
         for (i = 0; i < blocks.length; i += 1) {
             block = blocks[i];
-            if (com.realitybuilder.util.pointsIdenticalB(
+            if (realitybuilder.util.pointsIdenticalB(
                 positionB, block.positionB())) {
                 return block;
             }
@@ -213,12 +213,12 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Called if making the block pending on the server succeeded.
     _makePendingOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block pending on the server failed.
     _makePendingOnServerFailed: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/' + 
+        dojo.publish('realitybuilder/ConstructionBlocks/' + 
                      'changeOnServerFailed');
     },
 
@@ -242,12 +242,12 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Called if deleting the block on the server succeeded.
     _deleteOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if deleting the block on the server failed.
     _deleteOnServerFailed: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/' + 
+        dojo.publish('realitybuilder/ConstructionBlocks/' + 
                      'changeOnServerFailed');
     },
 
@@ -269,12 +269,12 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Called if making the block real on the server succeeded.
     _makeRealOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block real on the server failed.
     _makeRealOnServerFailed: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/' +
+        dojo.publish('realitybuilder/ConstructionBlocks/' +
                      'changeOnServerFailed');
     },
 
@@ -339,7 +339,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     _renderBlocks: function (canvas, blocks) {
         if (canvas.getContext) {
             var context = canvas.getContext('2d');
-            com.realitybuilder.util.clearCanvas(canvas);
+            realitybuilder.util.clearCanvas(canvas);
             dojo.forEach(blocks, function (b) {
                 b.render(context);
             });
