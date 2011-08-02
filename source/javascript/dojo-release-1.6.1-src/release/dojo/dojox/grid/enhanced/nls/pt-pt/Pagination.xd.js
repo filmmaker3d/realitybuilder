@@ -1,0 +1,5 @@
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.grid.enhanced.nls.pt-pt.Pagination"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.grid.enhanced.nls.pt-pt.Pagination");dojo._xdLoadFlattenedBundle("dojox.grid.enhanced", "Pagination", "pt-pt", ({"gotoButtonTitle":"Avançar para uma página específica","prevTip":"Página anterior","pageCountIndication":" (${0} páginas)","pageStepLabelTemplate":"Página ${0}","descTemplate":"${2} - ${3} de ${1} ${0}","lastTip":"Última página","nextTip":"Página seguinte","pageSizeLabelTemplate":"${0} itens por página","dialogCancel":"Cancelar","itemTitle":"itens","dialogConfirm":"Ir","firstTip":"Primeira página","allItemsLabelTemplate":"Todos os itens","dialogIndication":"Especificar o número de página","dialogTitle":"Avançar para a página"})
+);
+}};});

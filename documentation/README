@@ -302,13 +302,24 @@ Miscellaneous
     > SET SCOPE_MAP=%SCOPE_MAP%[\"dojo\",\"realitybuilderDojo\"],
     > SET SCOPE_MAP=%SCOPE_MAP%[\"dijit\",\"realitybuilderDijit\"],
     > SET SCOPE_MAP=%SCOPE_MAP%[\"dojox\",\"realitybuilderDojox\"]]
-    > build.bat profile=realitybuilder action=clean,release ^
+    > build.bat profile=realitybuilder action=release ^
+      scopeDjConfig=\{locale:\"en\",parseOnLoad:true\} ^
+      localeList=en loader=xdomain xdDojoScopeName=realitybuilderDojo ^
       optimize=shrinksafe scopeMap=%SCOPE_MAP%
 
-  2. Copy dojo and dojox related files and directories to "/javascript":
+    Note(s):
 
-    - dojo/dojo.js: The so called layer, containing Reality Builder and Dojo
-      code that it depends on, including Dojo Base.
+    * Specification of "scopeDjConfig" causes the global "djConfig" to be
+      without effect, and therefore without conflict if existent.
+
+    * The locale is "en" to keep things simple. Also then it seems that with
+      "en" no Dojo NLS bundle gets loaded.
+
+  2. Copy dojo and dojox related files and directories to "/javascript/dojo":
+
+    - dojo/dojo.xd.js: The so called Dojo layer, also containing the Reality
+      Builder code. The script file is cross domain compatible, i.e. it can be
+      hosted on another domain than that of the page loading it.
 
     - dojo/_firebug: needed for Dojo debug mode
 

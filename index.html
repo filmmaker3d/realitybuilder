@@ -30,6 +30,7 @@
       var djConfig;
       djConfig = {
           isDebug: true,
+          locale: "en-us",
           debugContainerId: 'firebugLite',
           scopeMap: [
               ['dojo', 'realitybuilderDojo'],
@@ -46,7 +47,7 @@
     </script>
   {%else%}
     <script type="text/javascript" 
-            src="/javascript/dojo/realitybuilder.js"></script>
+            src="/javascript/dojo/dojo.xd.js"></script>
   {%endif%}
   <!--[if lt IE 9]>
     <script type="text/javascript" src="/javascript/swfobject.js"></script>
@@ -55,9 +56,9 @@
   <![endif]-->
   {%block script%}
     <script type="text/javascript" 
-      src="/javascript/DetectImageState.js"></script>
+            src="/javascript/DetectImageState.js"></script>
     <script type="text/javascript" 
-      src="/javascript/pages/common_index_admin.js"></script>
+            src="/javascript/pages/common_index_admin.js"></script>
     <script type="text/javascript" src="/javascript/pages/index.js"></script>
   {%endblock%}
 {%endblock%}

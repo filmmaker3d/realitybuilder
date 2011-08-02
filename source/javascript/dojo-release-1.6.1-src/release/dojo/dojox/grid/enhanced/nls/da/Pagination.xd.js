@@ -1,0 +1,5 @@
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.grid.enhanced.nls.da.Pagination"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.grid.enhanced.nls.da.Pagination");dojo._xdLoadFlattenedBundle("dojox.grid.enhanced", "Pagination", "da", ({"gotoButtonTitle":"Gå til en bestemt side","prevTip":"Forrige side","pageCountIndication":" (${0} sider)","pageStepLabelTemplate":"Side ${0}","descTemplate":"${2} - ${3} af ${1} ${0}","lastTip":"Sidste side","nextTip":"Næste side","pageSizeLabelTemplate":"${0} elementer pr. side","dialogCancel":"Annullér","itemTitle":"elementer","dialogConfirm":"Gå","firstTip":"Første side","allItemsLabelTemplate":"Alle elementer","dialogIndication":"Angiv sidetallet","dialogTitle":"Gå til side"})
+);
+}};});

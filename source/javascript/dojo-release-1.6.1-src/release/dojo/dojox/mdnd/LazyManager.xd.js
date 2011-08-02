@@ -1,0 +1,8 @@
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
+
+
+realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.mdnd.LazyManager"],["require","dojo.dnd.Manager"],["require","dojox.mdnd.PureSource"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.mdnd.LazyManager"]){_4._hasResource["dojox.mdnd.LazyManager"]=true;_4.provide("dojox.mdnd.LazyManager");_4.require("dojo.dnd.Manager");_4.require("dojox.mdnd.PureSource");_4.declare("dojox.mdnd.LazyManager",null,{constructor:function(){this._registry={};this._fakeSource=new _6.mdnd.PureSource(_4.create("div"),{"copyOnly":false});this._fakeSource.startup();_4.addOnUnload(_4.hitch(this,"destroy"));this.manager=_4.dnd.manager();},getItem:function(_7){var _8=_7.getAttribute("dndType");return {"data":_7.getAttribute("dndData")||_7.innerHTML,"type":_8?_8.split(/\s*,\s*/):["text"]};},startDrag:function(e,_9){_9=_9||e.target;if(_9){var m=this.manager,_a=this.getItem(_9);if(_9.id==""){_4.attr(_9,"id",_4.dnd.getUniqueId());}_4.addClass(_9,"dojoDndItem");this._fakeSource.setItem(_9.id,_a);m.startDrag(this._fakeSource,[_9],false);m.onMouseMove(e);}},cancelDrag:function(){var m=this.manager;m.target=null;m.onMouseUp();},destroy:function(){this._fakeSource.destroy();}});}}};});

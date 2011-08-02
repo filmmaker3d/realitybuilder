@@ -50,7 +50,6 @@ function realityBuilderInit() {
 
 if (realityBuilderIsDojoSupported()) {
     if (realitybuilderDojo.config.isDebug) {
-        realitybuilderDojo.registerModulePath("com", "../../com");
         realitybuilderDojo.require('realitybuilder.Construction');
         realitybuilderDojo.require('realitybuilder.util');
     }

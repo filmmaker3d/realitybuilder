@@ -1,0 +1,5 @@
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.editor.plugins.nls.ru.FindReplace"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.ru.FindReplace");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "FindReplace", "ru", ({"replaceDialogText":"Заменено ${0} вхождений.","eofDialogTextFind":"найдено","eofDialogText":"Последнее вхождение ${0}","backwards":"Назад","replaceButton":"Заменить","replaceLabel":"Заменить на:","matchCase":"С учетом регистра","findTooltip":"Введите текст для поиска","replaceTooltip":"Введите текст для замены","replaceAllButton":"Заменить все","eofDialogTextReplace":"заменено","findReplace":"Найти и заменить","backwardsTooltip":"Поиск текста в обратном направлении","replaceAllButtonTooltip":"Заменить весь текст","replaceButtonTooltip":"Заменить текст","findLabel":"Найти:","findButton":"Найти","matchCaseTooltip":"С учетом регистра","findButtonTooltip":"Найти текст","replaceAll":"Все вхождения"})
+);
+}};});

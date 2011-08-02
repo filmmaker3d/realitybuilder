@@ -314,7 +314,8 @@ realitybuilder.util.isFlashCanvasActive = function () {
 };
 
 realitybuilder.util.isFlashReadyForFlashCanvas = function () {
-    return swfobject.hasFlashPlayerVersion("9"); // incl. higher versions
+    return (typeof swfobject !== 'undefined') &&
+        swfobject.hasFlashPlayerVersion("9"); // includes higher versions
 };
 
 // Returns true, iff the canvas functionality is somehow supported, either

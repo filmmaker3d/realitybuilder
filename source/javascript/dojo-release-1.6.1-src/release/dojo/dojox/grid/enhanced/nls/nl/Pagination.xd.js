@@ -1,0 +1,5 @@
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.grid.enhanced.nls.nl.Pagination"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.grid.enhanced.nls.nl.Pagination");dojo._xdLoadFlattenedBundle("dojox.grid.enhanced", "Pagination", "nl", ({"gotoButtonTitle":"Naar een specifieke pagina gaan","prevTip":"Vorige pagina","pageCountIndication":" (${0} pagina's)","pageStepLabelTemplate":"Pagina ${0}","descTemplate":"${2} - ${3} van ${1} ${0}","lastTip":"Laatste pagina","nextTip":"Volgende pagina","pageSizeLabelTemplate":"${0} items per pagina","dialogCancel":"Annuleren","itemTitle":"items","dialogConfirm":"Start","firstTip":"Eerste pagina","allItemsLabelTemplate":"Alle items","dialogIndication":"Geef het paginanummer op:","dialogTitle":"Naar pagina gaan"})
+);
+}};});

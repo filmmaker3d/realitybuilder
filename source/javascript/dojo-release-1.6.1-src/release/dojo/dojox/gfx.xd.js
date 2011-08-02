@@ -1,0 +1,8 @@
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
+
+
+realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){_1.loadInit(function(){var _4=_1.getObject("dojox.gfx",true),sl,_5,_6;while(!_4.renderer){if(_1.config.forceGfxRenderer){_3.gfx.renderer=_1.config.forceGfxRenderer;break;}var _7=(typeof _1.config.gfxRenderer=="string"?_1.config.gfxRenderer:"svg,vml,canvas,silverlight").split(",");for(var i=0;i<_7.length;++i){switch(_7[i]){case "svg":if("SVGAngle" in _1.global){_3.gfx.renderer="svg";}break;case "vml":if(_1.isIE){_3.gfx.renderer="vml";}break;case "silverlight":try{if(_1.isIE){sl=new ActiveXObject("AgControl.AgControl");if(sl&&sl.IsVersionSupported("1.0")){_5=true;}}else{if(navigator.plugins["Silverlight Plug-In"]){_5=true;}}}catch(e){_5=false;}finally{sl=null;}if(_5){_3.gfx.renderer="silverlight";}break;case "canvas":if(_1.global.CanvasRenderingContext2D){_3.gfx.renderer="canvas";}break;}if(_4.renderer){break;}}break;}if(_1.config.isDebug){console.log("gfx renderer = "+_4.renderer);}if(_4[_4.renderer]){_4.switchTo(_4.renderer);}else{_4.loadAndSwitch=_4.renderer;_1["require"]("dojox.gfx."+_4.renderer);}});return {depends:[["provide","dojox.gfx"],["require","dojox.gfx.matrix"],["require","dojox.gfx._base"]],defineResource:function(_8,_9,_a){if(!_8._hasResource["dojox.gfx"]){_8._hasResource["dojox.gfx"]=true;_8.provide("dojox.gfx");_8.require("dojox.gfx.matrix");_8.require("dojox.gfx._base");}}};});

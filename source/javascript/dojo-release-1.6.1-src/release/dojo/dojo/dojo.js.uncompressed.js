@@ -23,7 +23,7 @@
 	]
 	*/
 
-	/**Build will replace this comment with a scoped djConfig **/
+	eval("var djConfig = \{locale:\"en\",parseOnLoad:true\};");
 
 	//The null below can be relaced by a build-time value used instead of djConfig.scopeMap.
 	var sMap = [["dojo","realitybuilderDojo"],["dijit","realitybuilderDijit"],["dojox","realitybuilderDojox"]];
@@ -15351,8 +15351,8 @@ dojox.date.posix.getIsoWeeksInYear = function(/*Date*/dateObject) {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.BlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.BlockProperties'] = true;
+if(!dojo._hasResource['realitybuilder.BlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.BlockProperties'] = true;
 // Describes the properties of a block, including shape and dimensions.
 
 // Sometimes the term "full shadow" is used, which refers to the shadow how it
@@ -15376,11 +15376,11 @@ dojo._hasResource['com.realitybuilder.BlockProperties'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.BlockProperties');
+dojo.provide('realitybuilder.BlockProperties');
 
-dojo.declare('com.realitybuilder.BlockProperties', null, {
+dojo.declare('realitybuilder.BlockProperties', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -15464,7 +15464,7 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
         var that = this;
 
         return dojo.map(this._outlineBXY, function (pBXY) {
-            return com.realitybuilder.util.rotatePointBXY(pBXY,
+            return realitybuilder.util.rotatePointBXY(pBXY,
                                                           that._rotCenterBXY,
                                                           a);
         });
@@ -15480,7 +15480,7 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
     },
 
     _rotateCollisionOffsetsBXY: function (collisionOffsetsBXY, a) {
-        var util = com.realitybuilder.util;
+        var util = realitybuilder.util;
 
         return dojo.map(collisionOffsetsBXY, function (collisionOffsetBXY) {
             return util.rotatePointBXY(collisionOffsetBXY, [0, 0], a);
@@ -15512,7 +15512,7 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
     _rotateAttachmentOffsetB: function (attachmentOffsetB, a) {
         var pBXY, rotatedPBXY, rotatedPB, util;
 
-        util = com.realitybuilder.util;
+        util = realitybuilder.util;
 
         // Rotates in the x-y plane, keeping z constant:
         pBXY = [attachmentOffsetB[0], attachmentOffsetB[1]];
@@ -15566,7 +15566,7 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
         this._updateRotatedCollisionOffsetsListsBXY();
         this._updateRotatedAttachmentOffsetsListsB();
 
-        dojo.publish('com/realitybuilder/BlockProperties/changed');
+        dojo.publish('realitybuilder/BlockProperties/changed');
     },
 
     positionSpacingXY: function () {
@@ -15620,8 +15620,8 @@ dojo.declare('com.realitybuilder.BlockProperties', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.ConstructionBlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.ConstructionBlockProperties'] = true;
+if(!dojo._hasResource['realitybuilder.ConstructionBlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.ConstructionBlockProperties'] = true;
 // Describes the properties of a construction block.
 
 // Sometimes the term "full shadow" is used, which refers to the shadow how it
@@ -15645,11 +15645,11 @@ dojo._hasResource['com.realitybuilder.ConstructionBlockProperties'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.ConstructionBlockProperties');
+dojo.provide('realitybuilder.ConstructionBlockProperties');
 
-dojo.declare('com.realitybuilder.ConstructionBlockProperties', null, {
+dojo.declare('realitybuilder.ConstructionBlockProperties', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -15675,7 +15675,7 @@ dojo.declare('com.realitybuilder.ConstructionBlockProperties', null, {
         this._pendingColor = serverData.pendingColor;
         this._realColor = serverData.realColor;
 
-        dojo.publish('com/realitybuilder/ConstructionBlockProperties/changed');
+        dojo.publish('realitybuilder/ConstructionBlockProperties/changed');
     },
 
     pendingColor: function () {
@@ -15689,8 +15689,8 @@ dojo.declare('com.realitybuilder.ConstructionBlockProperties', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.Block']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.Block'] = true;
+if(!dojo._hasResource['realitybuilder.Block']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.Block'] = true;
 // A building block.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -15710,11 +15710,11 @@ dojo._hasResource['com.realitybuilder.Block'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas */
+/*global realitybuilder, dojo, dojox, FlashCanvas */
 
-dojo.provide('com.realitybuilder.Block');
+dojo.provide('realitybuilder.Block');
 
-dojo.declare('com.realitybuilder.Block', null, {
+dojo.declare('realitybuilder.Block', null, {
     // Position of the block in block space. From the position the block
     // extends in positive direction along the x-, y-, and z-axis.
     _positionB: null,
@@ -15846,7 +15846,7 @@ dojo.declare('com.realitybuilder.Block', null, {
 
         for (i = 0; i < len; i += 1) {
             lineV = [bottomVertexesV[i], topVertexesV[i]];
-            pointVXZ = com.realitybuilder.util.intersectionLinePlaneVXZ(lineV);
+            pointVXZ = realitybuilder.util.intersectionLinePlaneVXZ(lineV);
             if (!pointVXZ) {
                 tmp = null;
                 break;
@@ -15870,7 +15870,7 @@ dojo.declare('com.realitybuilder.Block', null, {
             testPositionB = [this.xB() + collisionOffsetBXY[0],
                              this.yB() + collisionOffsetBXY[1],
                              this.zB()];
-            if (com.realitybuilder.util.pointsIdenticalB(block.positionB(),
+            if (realitybuilder.util.pointsIdenticalB(block.positionB(),
                                                          testPositionB)) {
                 return true;
             }
@@ -15889,9 +15889,9 @@ dojo.declare('com.realitybuilder.Block', null, {
         for (i = 0; i < attachmentOffsetsB.length; i += 1) {
             attachmentOffsetB = attachmentOffsetsB[i];
             testPositionB = 
-                com.realitybuilder.util.addVectorsB(this.positionB(),
+                realitybuilder.util.addVectorsB(this.positionB(),
                                                     attachmentOffsetB);
-            if (com.realitybuilder.util.pointsIdenticalB(block.positionB(),
+            if (realitybuilder.util.pointsIdenticalB(block.positionB(),
                                                          testPositionB)) {
                 return true;
             }
@@ -15924,7 +15924,7 @@ dojo.declare('com.realitybuilder.Block', null, {
     },
 
     _blockToWorld: function (pB) {
-        return com.realitybuilder.util.blockToWorld(pB,
+        return realitybuilder.util.blockToWorld(pB,
                                                     this._blockProperties);
     },
 
@@ -15960,7 +15960,7 @@ dojo.declare('com.realitybuilder.Block', null, {
             this._blockProperties.versionOnServer();
         positionBHasChanged = 
             this._lastPositionB === null ||
-            !com.realitybuilder.util.pointsIdenticalB(this._lastPositionB,
+            !realitybuilder.util.pointsIdenticalB(this._lastPositionB,
                                                       this._positionB);
         aHasChanged = this._lastA !== this._a;
 
@@ -16268,8 +16268,8 @@ dojo.declare('com.realitybuilder.Block', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.ConstructionBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.ConstructionBlock'] = true;
+if(!dojo._hasResource['realitybuilder.ConstructionBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.ConstructionBlock'] = true;
 // A block that is permanently part of the construction, though it may be
 // marked as deleted or pending.
 
@@ -16290,14 +16290,14 @@ dojo._hasResource['com.realitybuilder.ConstructionBlock'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.ConstructionBlock');
+dojo.provide('realitybuilder.ConstructionBlock');
 
 
 
-dojo.declare('com.realitybuilder.ConstructionBlock', 
-             com.realitybuilder.Block,
+dojo.declare('realitybuilder.ConstructionBlock', 
+             realitybuilder.Block,
 {
     // State of the block: 0 = deleted, 1 = pending (= requested to be build),
     // 2 = real
@@ -16387,8 +16387,8 @@ dojo.declare('com.realitybuilder.ConstructionBlock',
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.util']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.util'] = true;
+if(!dojo._hasResource['realitybuilder.util']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.util'] = true;
 // Various utility functions.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -16408,21 +16408,21 @@ dojo._hasResource['com.realitybuilder.util'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl, swfobject */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl, swfobject */
 
-dojo.provide('com.realitybuilder.util');
+dojo.provide('realitybuilder.util');
 
 // Tolerance when comparing coordinates in sensor space.
-com.realitybuilder.util.TOLERANCE_S = 0.5;
+realitybuilder.util.TOLERANCE_S = 0.5;
 
 // Tolerance when comparing coordinates in view space.
-com.realitybuilder.util.TOLERANCE_V = 0.00001;
+realitybuilder.util.TOLERANCE_V = 0.00001;
 
 // Tolerance when comparing coordinates in the view space x-z-plane.
-com.realitybuilder.util.TOLERANCE_VXZ = 0.00001;
+realitybuilder.util.TOLERANCE_VXZ = 0.00001;
 
 // Returns the coordinates of the block space point "pB" in world space.
-com.realitybuilder.util.blockToWorld = function (pB, blockProperties) {
+realitybuilder.util.blockToWorld = function (pB, blockProperties) {
     var 
     factorX = blockProperties.positionSpacingXY(),
     factorY = blockProperties.positionSpacingXY(),
@@ -16436,11 +16436,11 @@ com.realitybuilder.util.blockToWorld = function (pB, blockProperties) {
 // false. Otherwise returns the x-z-coordinates (2D) of the intersection point.
 //
 // The tolerance "tolerance" is used for comparison of coordinates.
-com.realitybuilder.util.intersectionLinePlaneVXZ = function (lineV) {
+realitybuilder.util.intersectionLinePlaneVXZ = function (lineV) {
     var delta, p1 = lineV[0], p2 = lineV[1];
 
-    delta = com.realitybuilder.util.subtractVectors3D(p2, p1);
-    if (Math.abs(delta[1]) < com.realitybuilder.util.TOLERANCE_V) {
+    delta = realitybuilder.util.subtractVectors3D(p2, p1);
+    if (Math.abs(delta[1]) < realitybuilder.util.TOLERANCE_V) {
         // line in parallel to plane or undefined => no intersection point
         return false;
     } else {
@@ -16460,7 +16460,7 @@ com.realitybuilder.util.intersectionLinePlaneVXZ = function (lineV) {
 // 
 // * If the line touches a boundary point of a segment, then this is also
 //   regarded as intersection.
-com.realitybuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ, 
+realitybuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ, 
                                                                lineVXZ)
 {
     // As of 2010-Apr, an explanation can be found e.g. at:
@@ -16520,12 +16520,12 @@ com.realitybuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ,
 // It is assumed that the point and the segment are in front of the camera,
 // i.e. in front of the plane defined by the camera's sensor. If that's not the
 // case, then the result is undefined.
-com.realitybuilder.util.relationPointSegmentVXZ = function (pointVXZ, 
+realitybuilder.util.relationPointSegmentVXZ = function (pointVXZ, 
                                                             segmentVXZ)
 {
     var camPositionVXZ, lineVXZ, intersectionVXZ, util;
 
-    util = com.realitybuilder.util;
+    util = realitybuilder.util;
 
     camPositionVXZ = [0, 0]; // in origin of view space, naturally
 
@@ -16551,7 +16551,7 @@ com.realitybuilder.util.relationPointSegmentVXZ = function (pointVXZ,
 // In 2D, returns true, iff the point "p" lies somewhere between the points
 // "p1" and "p2", horizontally and vertically. If points coincide, the result
 // is undefined.
-com.realitybuilder.util.pointIsBetween2D = function (p, p1, p2) {
+realitybuilder.util.pointIsBetween2D = function (p, p1, p2) {
     var horizontally =
         (p[0] >= p1[0] && p[0] <= p2[0]) ||
         (p[0] <= p1[0] && p[0] >= p2[0]),
@@ -16563,28 +16563,28 @@ com.realitybuilder.util.pointIsBetween2D = function (p, p1, p2) {
 
 // Returns true, iff the points "p1" and "p2" are in the same position, within
 // the tolerance "tolerance".
-com.realitybuilder.util.pointsIdentical2D = function (p1, p2, tolerance) {
+realitybuilder.util.pointsIdentical2D = function (p1, p2, tolerance) {
     return (Math.abs(p1[0] - p2[0]) < tolerance &&
             Math.abs(p1[1] - p2[1]) < tolerance);
 };
 
 // Returns true, iff the points "p1" and "p2" are in the same position in
 // sensor space.
-com.realitybuilder.util.pointsIdenticalS = function (p1S, p2S) {
-    var tolerance = com.realitybuilder.util.TOLERANCE_S;
-    return com.realitybuilder.util.pointsIdentical2D(p1S, p2S, tolerance);
+realitybuilder.util.pointsIdenticalS = function (p1S, p2S) {
+    var tolerance = realitybuilder.util.TOLERANCE_S;
+    return realitybuilder.util.pointsIdentical2D(p1S, p2S, tolerance);
 };
 
 // Returns true, iff the points "p1" and "p2" are in the same position in
 // the view space x-z-plane.
-com.realitybuilder.util.pointsIdenticalVXZ = function (p1VXZ, p2VXZ) {
-    var tolerance = com.realitybuilder.util.TOLERANCE_VXZ;
-    return com.realitybuilder.util.pointsIdentical2D(p1VXZ, p2VXZ, tolerance);
+realitybuilder.util.pointsIdenticalVXZ = function (p1VXZ, p2VXZ) {
+    var tolerance = realitybuilder.util.TOLERANCE_VXZ;
+    return realitybuilder.util.pointsIdentical2D(p1VXZ, p2VXZ, tolerance);
 };
 
 // Returns true, iff the points "p1B" and "p2B" are in the same position in
 // block space.
-com.realitybuilder.util.pointsIdenticalB = function (p1B, p2B) {
+realitybuilder.util.pointsIdenticalB = function (p1B, p2B) {
     return (
         (p1B[0] - p2B[0]) === 0 &&
         (p1B[1] - p2B[1]) === 0 &&
@@ -16593,7 +16593,7 @@ com.realitybuilder.util.pointsIdenticalB = function (p1B, p2B) {
 
 // Subtracts the vectors "vector2" from the vector "vector1" in 3D and returns
 // the result.
-com.realitybuilder.util.subtractVectors3D = function (vector1, vector2) {
+realitybuilder.util.subtractVectors3D = function (vector1, vector2) {
     return [
         vector1[0] - vector2[0], 
         vector1[1] - vector2[1],
@@ -16602,7 +16602,7 @@ com.realitybuilder.util.subtractVectors3D = function (vector1, vector2) {
 
 // Adds the vectors "vector1B" and "vector2B" in blocks space and returns the
 // result.
-com.realitybuilder.util.addVectorsB = function (vector1B, vector2B) {
+realitybuilder.util.addVectorsB = function (vector1B, vector2B) {
     return [
         vector1B[0] + vector2B[0], 
         vector1B[1] + vector2B[1],
@@ -16611,7 +16611,7 @@ com.realitybuilder.util.addVectorsB = function (vector1B, vector2B) {
 
 // Subtracts the vectors "vector2B" from the vector "vector1B" in blocks space
 // and returns the result.
-com.realitybuilder.util.subtractVectorsB = function (vector1B, vector2B) {
+realitybuilder.util.subtractVectorsB = function (vector1B, vector2B) {
     return [
         vector1B[0] - vector2B[0], 
         vector1B[1] - vector2B[1],
@@ -16620,14 +16620,14 @@ com.realitybuilder.util.subtractVectorsB = function (vector1B, vector2B) {
 
 // Removes duplicate points from the list of points "ps". Returns the resulting
 // list. Removes points from the front. Does not change the order.
-com.realitybuilder.util.withDuplicatesRemoved = function (ps) {
+realitybuilder.util.withDuplicatesRemoved = function (ps) {
     var newPs = [], i, j, p1, p2, duplicate;
     for (i = 0; i < ps.length; i += 1) {
         p1 = ps[i];
         duplicate = false;
         for (j = i + 1; j < ps.length; j += 1) {
             p2 = ps[j];
-            if (com.realitybuilder.util.pointsIdenticalS(p1, p2)) {
+            if (realitybuilder.util.pointsIdenticalS(p1, p2)) {
                 duplicate = true;
                 break;
             }
@@ -16640,7 +16640,7 @@ com.realitybuilder.util.withDuplicatesRemoved = function (ps) {
 };
 
 // Returns the polar coordinates of the sensor space point "pS".
-com.realitybuilder.util.cartesianToPolar = function (pS) {
+realitybuilder.util.cartesianToPolar = function (pS) {
     var x = pS[0], y = pS[1],
     angle = Math.atan2(y, x),
     distance = Math.sqrt(x * x + y * y);
@@ -16649,7 +16649,7 @@ com.realitybuilder.util.cartesianToPolar = function (pS) {
 
 // Returns the cartesian coordinates of the sensor space point "polarPS", which
 // is in polar coordinates.
-com.realitybuilder.util.polarToCartesian = function (polarPS) {
+realitybuilder.util.polarToCartesian = function (polarPS) {
     var angle = polarPS[0], distance = polarPS[1],
     x = distance * Math.cos(angle),
     y = distance * Math.sin(angle);
@@ -16658,14 +16658,14 @@ com.realitybuilder.util.polarToCartesian = function (polarPS) {
 
 // Returns a new point, whose coordinates are the sum of the coordinates of the
 // points "p1S" and "p2S" in sensor space.
-com.realitybuilder.util.addS = function (p1S, p2S) {
+realitybuilder.util.addS = function (p1S, p2S) {
     return [p1S[0] + p2S[0], p1S[1] + p2S[1]];
 };
 
 // Returns the point "pBXY" in the block space x-z-plane, rotated about the
 // center "cBXY" by the angle "a", CCW when viewed from above. The angle is in
 // multiples of 90°.
-com.realitybuilder.util.rotatePointBXY = function (pBXY, cBXY, a) {
+realitybuilder.util.rotatePointBXY = function (pBXY, cBXY, a) {
     var tmpXB, tmpYB, cXB, cYB;
 
     if (a % 4 === 0) {
@@ -16688,7 +16688,7 @@ com.realitybuilder.util.rotatePointBXY = function (pBXY, cBXY, a) {
 
 // Returns the object "object" with all keys converted to strings and being
 // prefixed by "prefix".
-com.realitybuilder.util.addPrefix = function (prefix, object) {
+realitybuilder.util.addPrefix = function (prefix, object) {
     var tmp = [], i;
     for (i in object) {
         if (object.hasOwnProperty(i)) {
@@ -16700,23 +16700,24 @@ com.realitybuilder.util.addPrefix = function (prefix, object) {
 
 // Returns true, iff FlashCanvas has loaded. FlashCanvas implements HTML canvas
 // support for Internet Explorer.
-com.realitybuilder.util.isFlashCanvasActive = function () {
+realitybuilder.util.isFlashCanvasActive = function () {
     return (typeof FlashCanvas !== 'undefined');
 };
 
-com.realitybuilder.util.isFlashReadyForFlashCanvas = function () {
-    return swfobject.hasFlashPlayerVersion("9"); // incl. higher versions
+realitybuilder.util.isFlashReadyForFlashCanvas = function () {
+    return (typeof swfobject !== 'undefined') &&
+        swfobject.hasFlashPlayerVersion("9"); // includes higher versions
 };
 
 // Returns true, iff the canvas functionality is somehow supported, either
 // natively by the browser, or via some emulation.
-com.realitybuilder.util.isCanvasSupported = function () {
+realitybuilder.util.isCanvasSupported = function () {
     return (document.createElement('canvas').getContext ||  // Native support
-            (com.realitybuilder.util.isFlashCanvasActive() &&
-             com.realitybuilder.util.isFlashReadyForFlashCanvas()));
+            (realitybuilder.util.isFlashCanvasActive() &&
+             realitybuilder.util.isFlashReadyForFlashCanvas()));
 };
 
-com.realitybuilder.util.showNoCanvasErrorMessage = function () {
+realitybuilder.util.showNoCanvasErrorMessage = function () {
     dojo.attr('noCanvasErrorMessage', 'innerHTML', 
         '<p class="first">The Reality Builder does not work because your ' +
         'browser does not support the <a ' +
@@ -16724,14 +16725,14 @@ com.realitybuilder.util.showNoCanvasErrorMessage = function () {
         'element</a>.</p>');
 };
 
-com.realitybuilder.util.showNoImagesErrorMessage = function () {
+realitybuilder.util.showNoImagesErrorMessage = function () {
     dojo.attr('noImagesErrorMessage', 'innerHTML', 
         '<p class="first">The Reality Builder does not work because your ' +
         'browser does not load images.</p>');
 };
 
 // Clears the canvas "canvas".
-com.realitybuilder.util.clearCanvas = function (canvas) {
+realitybuilder.util.clearCanvas = function (canvas) {
     if (canvas.getContext) {
         var context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -16739,7 +16740,7 @@ com.realitybuilder.util.clearCanvas = function (canvas) {
 };
 
 // Fills the canvas "canvas" with color "color".
-com.realitybuilder.util.fillCanvas = function (canvas, color) {
+realitybuilder.util.fillCanvas = function (canvas, color) {
     if (canvas.getContext) {
         var context = canvas.getContext('2d');
         context.fillStyle = color;
@@ -16749,8 +16750,8 @@ com.realitybuilder.util.fillCanvas = function (canvas, color) {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.ConstructionBlocks']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.ConstructionBlocks'] = true;
+if(!dojo._hasResource['realitybuilder.ConstructionBlocks']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.ConstructionBlocks'] = true;
 // All blocks permanently in the construction, including deleted blocks and
 // pending blocks. The new, user positionable block is not part of the
 // construction.
@@ -16772,14 +16773,14 @@ dojo._hasResource['com.realitybuilder.ConstructionBlocks'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.ConstructionBlocks');
-
-
+dojo.provide('realitybuilder.ConstructionBlocks');
 
 
-dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
+
+
+dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // Version of blocks data last retrieved from the server, or "-1"
     // initially. Is a string in order to be able to contain very large
     // integers.
@@ -16870,7 +16871,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     },
 
     _createBlockFromServerData: function (serverData) {
-        var camera = this._construction.camera(), rb = com.realitybuilder;
+        var camera = this._construction.camera(), rb = realitybuilder;
         return new rb.ConstructionBlock(this._blockProperties,
                                         camera, 
                                         serverData.positionB, serverData.a,
@@ -16890,7 +16891,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
         this._updateRealBlocksSorted();
         this._updatePendingBlocks();
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changed');
+        dojo.publish('realitybuilder/ConstructionBlocks/changed');
     },
 
     // Sort function, for ordering blocks by height/layer. From top to bottom.
@@ -16926,7 +16927,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
         var blocks = this.blocks(), block, i;
         for (i = 0; i < blocks.length; i += 1) {
             block = blocks[i];
-            if (com.realitybuilder.util.pointsIdenticalB(
+            if (realitybuilder.util.pointsIdenticalB(
                 positionB, block.positionB())) {
                 return block;
             }
@@ -16966,12 +16967,12 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Called if making the block pending on the server succeeded.
     _makePendingOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block pending on the server failed.
     _makePendingOnServerFailed: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/' + 
+        dojo.publish('realitybuilder/ConstructionBlocks/' + 
                      'changeOnServerFailed');
     },
 
@@ -16995,12 +16996,12 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Called if deleting the block on the server succeeded.
     _deleteOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if deleting the block on the server failed.
     _deleteOnServerFailed: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/' + 
+        dojo.publish('realitybuilder/ConstructionBlocks/' + 
                      'changeOnServerFailed');
     },
 
@@ -17022,12 +17023,12 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
     // Called if making the block real on the server succeeded.
     _makeRealOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block real on the server failed.
     _makeRealOnServerFailed: function () {
-        dojo.publish('com/realitybuilder/ConstructionBlocks/' +
+        dojo.publish('realitybuilder/ConstructionBlocks/' +
                      'changeOnServerFailed');
     },
 
@@ -17092,7 +17093,7 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
     _renderBlocks: function (canvas, blocks) {
         if (canvas.getContext) {
             var context = canvas.getContext('2d');
-            com.realitybuilder.util.clearCanvas(canvas);
+            realitybuilder.util.clearCanvas(canvas);
             dojo.forEach(blocks, function (b) {
                 b.render(context);
             });
@@ -17108,8 +17109,8 @@ dojo.declare('com.realitybuilder.ConstructionBlocks', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.LayerShadow']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.LayerShadow'] = true;
+if(!dojo._hasResource['realitybuilder.LayerShadow']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.LayerShadow'] = true;
 // "Layer shadow": The shadow under the new block, projected onto a layer of
 // blocks under the assumption that there are no layers below and above that
 // layer.
@@ -17140,11 +17141,11 @@ dojo._hasResource['com.realitybuilder.LayerShadow'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.LayerShadow');
+dojo.provide('realitybuilder.LayerShadow');
 
-dojo.declare('com.realitybuilder.LayerShadow', null, {
+dojo.declare('realitybuilder.LayerShadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
@@ -17190,7 +17191,7 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         dojo.attr(this._helperCanvas, 'width', shadowCanvas.width);
         dojo.attr(this._helperCanvas, 'height', shadowCanvas.height);
 
-        if (com.realitybuilder.util.isFlashCanvasActive()) {
+        if (realitybuilder.util.isFlashCanvasActive()) {
             FlashCanvas.initElement(this._canvas);
             FlashCanvas.initElement(this._helperCanvas);
         }
@@ -17215,7 +17216,7 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
 
         // counterclockwise:
         dojo.forEach(blockOutlineBXY, function (vertexBXY) {
-            vs.push(com.realitybuilder.util.
+            vs.push(realitybuilder.util.
                     blockToWorld([xB + vertexBXY[0], 
                                   yB + vertexBXY[1], 
                                   zB],
@@ -17309,13 +17310,13 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
         // Chrome 11.
         if (canvas.getContext) {
             context = canvas.getContext('2d');
-            com.realitybuilder.util.clearCanvas(canvas);
+            realitybuilder.util.clearCanvas(canvas);
             helperContext = helperCanvas.getContext('2d');
-            com.realitybuilder.util.clearCanvas(helperCanvas);
+            realitybuilder.util.clearCanvas(helperCanvas);
 
             context.globalCompositeOperation = "source-over";
             if (layerZB === -1) {
-                com.realitybuilder.util.fillCanvas(canvas, "black");
+                realitybuilder.util.fillCanvas(canvas, "black");
             } else {
                 this._renderTops(layerZB, context); // slow with many blocks
             }
@@ -17338,8 +17339,8 @@ dojo.declare('com.realitybuilder.LayerShadow', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.ShadowObscuringBlocks']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.ShadowObscuringBlocks'] = true;
+if(!dojo._hasResource['realitybuilder.ShadowObscuringBlocks']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.ShadowObscuringBlocks'] = true;
 // "Shadow obscuring blocks": Blocks that are used for graphically removing
 // that parts of a shadow that are not actually visible.
 //
@@ -17423,11 +17424,11 @@ dojo._hasResource['com.realitybuilder.ShadowObscuringBlocks'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.ShadowObscuringBlocks');
+dojo.provide('realitybuilder.ShadowObscuringBlocks');
 
-dojo.declare('com.realitybuilder.ShadowObscuringBlocks', null, {
+dojo.declare('realitybuilder.ShadowObscuringBlocks', null, {
     // The blocks, sorted by height, from top to bottom.
     _blocksSorted: null,
 
@@ -17460,7 +17461,7 @@ dojo.declare('com.realitybuilder.ShadowObscuringBlocks', null, {
             var dstBlock, dstPositionB;
 
             dstPositionB = [srcBlock.xB(), srcBlock.yB(), dstZB];
-            dstBlock = new com.realitybuilder.Block(that._blockProperties,
+            dstBlock = new realitybuilder.Block(that._blockProperties,
                                                     camera, dstPositionB,
                                                     srcBlock.a());
             dstBlock.onlySubtractBottom();
@@ -17529,8 +17530,8 @@ dojo.declare('com.realitybuilder.ShadowObscuringBlocks', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.Shadow']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.Shadow'] = true;
+if(!dojo._hasResource['realitybuilder.Shadow']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.Shadow'] = true;
 // The shadow under the new block. It is used to indicate where the block is
 // hovering.
 
@@ -17551,14 +17552,14 @@ dojo._hasResource['com.realitybuilder.Shadow'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Shadow');
-
-
+dojo.provide('realitybuilder.Shadow');
 
 
-dojo.declare('com.realitybuilder.Shadow', null, {
+
+
+dojo.declare('realitybuilder.Shadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
@@ -17593,13 +17594,13 @@ dojo.declare('com.realitybuilder.Shadow', null, {
         this._constructionBlocks = constructionBlocks;
 
         this._shadowObscuringBlocks =
-            new com.realitybuilder.ShadowObscuringBlocks(newBlock, 
+            new realitybuilder.ShadowObscuringBlocks(newBlock, 
                                                          blockProperties,
                                                          camera,
                                                          constructionBlocks);
 
         this._layerShadow = 
-            new com.realitybuilder.LayerShadow(newBlock, blockProperties,
+            new realitybuilder.LayerShadow(newBlock, blockProperties,
                                                camera, constructionBlocks);
     },
 
@@ -17628,7 +17629,7 @@ dojo.declare('com.realitybuilder.Shadow', null, {
 
         if (canvas.getContext) {
             context = canvas.getContext('2d');
-            com.realitybuilder.util.clearCanvas(canvas);
+            realitybuilder.util.clearCanvas(canvas);
 
             // draws shadow from bottom up, in each step removing parts that
             // are obscured by blocks in the layer above:
@@ -17647,14 +17648,14 @@ dojo.declare('com.realitybuilder.Shadow', null, {
     // Makes sure that the shadow is not shown on the sensor.
     clear: function () {
         var canvas = this._camera.sensor().shadowCanvas();
-        com.realitybuilder.util.clearCanvas(canvas);
+        realitybuilder.util.clearCanvas(canvas);
     }
 });
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.NewBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.NewBlock'] = true;
+if(!dojo._hasResource['realitybuilder.NewBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.NewBlock'] = true;
 // The new block in the construction. It may be positioned by the user.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -17674,14 +17675,14 @@ dojo._hasResource['com.realitybuilder.NewBlock'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.NewBlock');
-
-
+dojo.provide('realitybuilder.NewBlock');
 
 
-dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
+
+
+dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
     '-chains-': {
         constructor: 'manual'
     },
@@ -17750,7 +17751,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
         this._isStopped = false;
         this._constructionBlocks = constructionBlocks;
-        this._shadow = new com.realitybuilder.Shadow(this, blockProperties, 
+        this._shadow = new realitybuilder.Shadow(this, blockProperties, 
                                                      camera, 
                                                      constructionBlocks);
         this._camera = camera;
@@ -17793,10 +17794,10 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         this._versionOnServer = serverData.version;
 
         if (positionAngleWereInitialized) {
-            dojo.publish('com/realitybuilder/NewBlock/' + 
+            dojo.publish('realitybuilder/NewBlock/' + 
                          'positionAngleInitialized');
         }
-        dojo.publish('com/realitybuilder/NewBlock/moveOrBuildSpaceChanged');
+        dojo.publish('realitybuilder/NewBlock/moveOrBuildSpaceChanged');
     },
 
     // Returns true, iff the current block collides with any real block.
@@ -17808,9 +17809,9 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     // it go out of range.
     move: function (deltaB) {
         if (!this.wouldGoOutOfRange(deltaB, 0)) {
-            this._positionB = com.realitybuilder.util.addVectorsB(
+            this._positionB = realitybuilder.util.addVectorsB(
                 this._positionB, deltaB);
-            dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
+            dojo.publish('realitybuilder/NewBlock/movedOrRotated');
         }
     },
 
@@ -17820,7 +17821,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         var congruencyA = this._blockProperties.congruencyA();
         if (!this.wouldGoOutOfRange([0, 0, 0], 1)) {
             this._a = (this._a + 1) % congruencyA; // multiples of 90°
-            dojo.publish('com/realitybuilder/NewBlock/movedOrRotated');
+            dojo.publish('realitybuilder/NewBlock/movedOrRotated');
         }
     },
 
@@ -17830,7 +17831,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
         if (this.canBeMadeReal()) {
             this._stop();
             this._createPendingOnServer();
-            dojo.publish('com/realitybuilder/NewBlock/makeRealRequested');
+            dojo.publish('realitybuilder/NewBlock/makeRealRequested');
         }
     },
 
@@ -17848,12 +17849,12 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
     _stop: function () {
         this._isStopped = true;
-        dojo.publish('com/realitybuilder/NewBlock/stopped');
+        dojo.publish('realitybuilder/NewBlock/stopped');
     },
 
     _makeMovable: function () {
         this._isStopped = false;
-        dojo.publish('com/realitybuilder/NewBlock/madeMovable');
+        dojo.publish('realitybuilder/NewBlock/madeMovable');
     },
 
     // Updates the position and state of this block to reflect changes in the
@@ -17895,7 +17896,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
             testZB = this.zB();
             do {
                 testZB += 1;
-                testBlock = new com.realitybuilder.Block(this._blockProperties,
+                testBlock = new realitybuilder.Block(this._blockProperties,
                                                          this._camera,
                                                          [xB, yB, testZB],
                                                          this.a());
@@ -17917,10 +17918,10 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
         congruencyA = this._blockProperties.congruencyA();
 
-        testPositionB = com.realitybuilder.util.addVectorsB(this.positionB(), 
+        testPositionB = realitybuilder.util.addVectorsB(this.positionB(), 
                                                             deltaB);
         testA = (this.a() + deltaA) % congruencyA;
-        testBlock = new com.realitybuilder.Block(this._blockProperties,
+        testBlock = new realitybuilder.Block(this._blockProperties,
                                                  this._camera, 
                                                  testPositionB, testA);
 
@@ -18000,7 +18001,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
     _relationVertexesEdges: function (vertexes1VXZ, vertexes2VXZ) {
         var util, len, i, j, relation, vertexVXZ, vertex1VXZ, edge2VXZ;
 
-        util = com.realitybuilder.util;
+        util = realitybuilder.util;
 
         len = vertexes2VXZ.length; // same for all blocks
         for (i = 0; i < len; i += 1) { // iterates edges of this block
@@ -18166,11 +18167,11 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
                 color = this.isMovable() ? this._color : this._stoppedColor;
 
                 // Shadow does currently not work with FlashCanvas.
-                if (!com.realitybuilder.util.isFlashCanvasActive()) {
+                if (!realitybuilder.util.isFlashCanvasActive()) {
                     this._renderShadow();
                 }
 
-                com.realitybuilder.util.clearCanvas(canvas);
+                realitybuilder.util.clearCanvas(canvas);
                 this.inherited(arguments, [context, color]);
 
                 // removes parts of the real block obscured by other blocks:
@@ -18182,7 +18183,7 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
     // Called if storing the block as pending on the server succeeded.
     _createPendingOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/NewBlock/createdPendingOnServer');
+        dojo.publish('realitybuilder/NewBlock/createdPendingOnServer');
 
         if (this._prerenderMode.isEnabled()) {
             setTimeout(
@@ -18229,8 +18230,8 @@ dojo.declare('com.realitybuilder.NewBlock', com.realitybuilder.Block, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.Image']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.Image'] = true;
+if(!dojo._hasResource['realitybuilder.Image']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.Image'] = true;
 // The live image, being updated regularly.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -18250,11 +18251,11 @@ dojo._hasResource['com.realitybuilder.Image'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Image');
+dojo.provide('realitybuilder.Image');
 
-dojo.declare('com.realitybuilder.Image', null, {
+dojo.declare('realitybuilder.Image', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -18309,7 +18310,7 @@ dojo.declare('com.realitybuilder.Image', null, {
         this._versionOnServer = serverData.version;
         this._updateIntervalServer = serverData.updateIntervalServer;
         this._url = serverData.url;
-        dojo.publish('com/realitybuilder/Image/changed');
+        dojo.publish('realitybuilder/Image/changed');
     },
 
     // Called when an image has been loaded for the first time. Notes that in a
@@ -18328,8 +18329,8 @@ dojo.declare('com.realitybuilder.Image', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.Sensor']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.Sensor'] = true;
+if(!dojo._hasResource['realitybuilder.Sensor']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.Sensor'] = true;
 // The sensor of the camera, displaying the live image plus objects on top of
 // it.
 
@@ -18350,11 +18351,11 @@ dojo._hasResource['com.realitybuilder.Sensor'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Sensor');
+dojo.provide('realitybuilder.Sensor');
 
-dojo.declare('com.realitybuilder.Sensor', null, {
+dojo.declare('realitybuilder.Sensor', null, {
     // Canvases for drawing various parts.
     _realBlocksCanvas: null,
     _pendingBlocksCanvas: null,
@@ -18442,8 +18443,8 @@ dojo.declare('com.realitybuilder.Sensor', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.Camera']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.Camera'] = true;
+if(!dojo._hasResource['realitybuilder.Camera']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.Camera'] = true;
 // A camera at position "x", "y", "z" looking along the direction defined by
 // the angles "aZ", "aX". With the angles set to zero, the directions of the
 // view space and the block space axes coincide: The camera looks along the
@@ -18477,16 +18478,16 @@ dojo._hasResource['com.realitybuilder.Camera'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Camera');
-
-
+dojo.provide('realitybuilder.Camera');
 
 
 
 
-dojo.declare('com.realitybuilder.Camera', null, {
+
+
+dojo.declare('realitybuilder.Camera', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
@@ -18524,7 +18525,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
         this._blockProperties = blockProperties;
         this._position = [0, 0, 1];
         this._sensor = 
-            new com.realitybuilder.Sensor(sensorWidth, sensorHeight);
+            new realitybuilder.Sensor(sensorWidth, sensorHeight);
         this._updateRotationMatrices();
         
     },
@@ -18587,7 +18588,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
         this._updateRotationMatrices();
         this._updateId();
 
-        dojo.publish('com/realitybuilder/Camera/changed');
+        dojo.publish('realitybuilder/Camera/changed');
     },
 
     // Updates the settings of the camera to the version on the server, which
@@ -18623,7 +18624,7 @@ dojo.declare('com.realitybuilder.Camera', null, {
 
     // Returns the coordinates of the world space point "point" in view space.
     worldToView: function (point) {
-        var tmp = com.realitybuilder.util.subtractVectors3D(point, 
+        var tmp = realitybuilder.util.subtractVectors3D(point, 
                                                             this._position);
 
         // Rotation matrices are applied to the vector tmp, from the left side:
@@ -18662,15 +18663,15 @@ dojo.declare('com.realitybuilder.Camera', null, {
     // space.
     blockToSensor: function (pointB) {
         return this.viewToSensor(this.worldToView(
-            com.realitybuilder.util.blockToWorld(pointB, 
+            realitybuilder.util.blockToWorld(pointB, 
                                                  this._blockProperties)));
     }
 });
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.AdminControls']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.AdminControls'] = true;
+if(!dojo._hasResource['realitybuilder.AdminControls']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.AdminControls'] = true;
 // Admin interface.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -18690,13 +18691,13 @@ dojo._hasResource['com.realitybuilder.AdminControls'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.AdminControls');
+dojo.provide('realitybuilder.AdminControls');
 
 
 
-dojo.declare('com.realitybuilder.AdminControls', null, {
+dojo.declare('realitybuilder.AdminControls', null, {
     // The construction that the admin controls are associated with.
     _construction: null,
 
@@ -18960,8 +18961,8 @@ dojo.declare('com.realitybuilder.AdminControls', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.ControlButton']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.ControlButton'] = true;
+if(!dojo._hasResource['realitybuilder.ControlButton']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.ControlButton'] = true;
 // Button in the control panel for moving and positioning the new block.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -18981,11 +18982,11 @@ dojo._hasResource['com.realitybuilder.ControlButton'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.ControlButton');
+dojo.provide('realitybuilder.ControlButton');
 
-dojo.declare('com.realitybuilder.ControlButton', null, {
+dojo.declare('realitybuilder.ControlButton', null, {
     // Function that's called when button is clicked:
     _onClicked: null,
 
@@ -19044,8 +19045,8 @@ dojo.declare('com.realitybuilder.ControlButton', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.ControlPanel']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.ControlPanel'] = true;
+if(!dojo._hasResource['realitybuilder.ControlPanel']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.ControlPanel'] = true;
 // Control panel for moving and positioning the new block.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -19065,13 +19066,13 @@ dojo._hasResource['com.realitybuilder.ControlPanel'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.ControlPanel');
+dojo.provide('realitybuilder.ControlPanel');
 
 
 
-dojo.declare('com.realitybuilder.ControlPanel', null, {
+dojo.declare('realitybuilder.ControlPanel', null, {
     // New block that the control panel is associated with.
     _newBlock: null,
 
@@ -19089,7 +19090,7 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
 
         this._node = dojo.byId('controlPanel');
 
-        rb = com.realitybuilder;
+        rb = realitybuilder;
         nb = newBlock;
 
         buttons = [];
@@ -19118,7 +19119,7 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
                     newBlock.isMovable());
         };
 
-        return new com.realitybuilder.ControlButton(type + 'Button', 
+        return new realitybuilder.ControlButton(type + 'Button', 
                                                     onClicked, 
                                                     shouldBeEnabled);
     },
@@ -19137,7 +19138,7 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
                     newBlock.isRotatable());
         };
 
-        return new com.realitybuilder.ControlButton('rotate90Button', 
+        return new realitybuilder.ControlButton('rotate90Button', 
                                                     onClicked, 
                                                     shouldBeEnabled);
     },
@@ -19155,7 +19156,7 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
             return newBlock.canBeMadeReal() && !newBlock.isStopped();
         };
 
-        return new com.realitybuilder.ControlButton('requestRealButton', 
+        return new realitybuilder.ControlButton('requestRealButton', 
                                                     onClicked, 
                                                     shouldBeEnabled);
     },
@@ -19176,8 +19177,8 @@ dojo.declare('com.realitybuilder.ControlPanel', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.PrerenderMode']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.PrerenderMode'] = true;
+if(!dojo._hasResource['realitybuilder.PrerenderMode']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.PrerenderMode'] = true;
 // Configuration for prerender-mode, if enabled.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -19197,11 +19198,11 @@ dojo._hasResource['com.realitybuilder.PrerenderMode'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.PrerenderMode');
+dojo.provide('realitybuilder.PrerenderMode');
 
-dojo.declare('com.realitybuilder.PrerenderMode', null, {
+dojo.declare('realitybuilder.PrerenderMode', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -19236,7 +19237,7 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
         this._blockConfigurations = serverData.blockConfigurations;
         this._i = serverData.i;
 
-        dojo.publish('com/realitybuilder/PrerenderMode/changed');
+        dojo.publish('realitybuilder/PrerenderMode/changed');
     },
 
     i: function () {
@@ -19325,7 +19326,7 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
     },
 
     _loadBlockConfigurationOnServerSucceeded: function () {
-        dojo.publish('com/realitybuilder/PrerenderMode/' + 
+        dojo.publish('realitybuilder/PrerenderMode/' + 
                      'loadedBlockConfigurationOnServer');
     },
 
@@ -19360,8 +19361,8 @@ dojo.declare('com.realitybuilder.PrerenderMode', null, {
 
 }
 
-if(!dojo._hasResource['com.realitybuilder.Construction']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['com.realitybuilder.Construction'] = true;
+if(!dojo._hasResource['realitybuilder.Construction']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.Construction'] = true;
 // The construction and the controls.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -19381,11 +19382,9 @@ dojo._hasResource['com.realitybuilder.Construction'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('com.realitybuilder.Construction');
-
-
+dojo.provide('realitybuilder.Construction');
 
 
 
@@ -19397,7 +19396,9 @@ dojo.provide('com.realitybuilder.Construction');
 
 
 
-dojo.declare('com.realitybuilder.Construction', null, {
+
+
+dojo.declare('realitybuilder.Construction', null, {
     // True, iff admin controls should be shown:
     _showAdminControls: null,
 
@@ -19449,7 +19450,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     // controls are shown, and - in the rendering - the real and pending
     // blocks.
     constructor: function (showAdminControls) {
-        var rb = com.realitybuilder;
+        var rb = realitybuilder;
 
         this._insertLoadIndicator();
 
@@ -19483,42 +19484,42 @@ dojo.declare('com.realitybuilder.Construction', null, {
             // back up to date. Reason: They may have been changed before, by
             // user selection.
             dojo.subscribe(
-                'com/realitybuilder/ConstructionBlocks/changeOnServerFailed', 
+                'realitybuilder/ConstructionBlocks/changeOnServerFailed', 
                 this._adminControls, this._adminControls.updateBlocksTable);
         }
 
-        dojo.subscribe('com/realitybuilder/ConstructionBlocks/changedOnServer', 
+        dojo.subscribe('realitybuilder/ConstructionBlocks/changedOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('com/realitybuilder/PrerenderMode/' + 
+        dojo.subscribe('realitybuilder/PrerenderMode/' + 
                        'loadedBlockConfigurationOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('com/realitybuilder/NewBlock/createdPendingOnServer', 
+        dojo.subscribe('realitybuilder/NewBlock/createdPendingOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('com/realitybuilder/NewBlock/' + 
+        dojo.subscribe('realitybuilder/NewBlock/' + 
                        'positionAngleInitialized', 
                        this, this._onNewBlockPositionAngleInitialized);
-        dojo.subscribe('com/realitybuilder/NewBlock/buildOrMoveSpaceChanged', 
+        dojo.subscribe('realitybuilder/NewBlock/buildOrMoveSpaceChanged', 
                        this, this._onMoveOrBuildSpaceChanged);
-        dojo.subscribe('com/realitybuilder/NewBlock/stopped', 
+        dojo.subscribe('realitybuilder/NewBlock/stopped', 
                        this, this._onNewBlockStopped);
-        dojo.subscribe('com/realitybuilder/NewBlock/madeMovable', 
+        dojo.subscribe('realitybuilder/NewBlock/madeMovable', 
                        this, this._onNewBlockMadeMovable);
-        dojo.subscribe('com/realitybuilder/NewBlock/movedOrRotated',
+        dojo.subscribe('realitybuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
-        dojo.subscribe('com/realitybuilder/NewBlock/' + 
+        dojo.subscribe('realitybuilder/NewBlock/' + 
                        'onNewBlockMakeRealRequested',
                        this, this._onNewBlockMakeRealRequested);
-        dojo.subscribe('com/realitybuilder/ConstructionBlocks/changed',
+        dojo.subscribe('realitybuilder/ConstructionBlocks/changed',
                        this, this._onConstructionBlocksChanged);
-        dojo.subscribe('com/realitybuilder/Camera/changed',
+        dojo.subscribe('realitybuilder/Camera/changed',
                        this, this._onCameraChanged);
-        dojo.subscribe('com/realitybuilder/Image/changed',
+        dojo.subscribe('realitybuilder/Image/changed',
                        this, this._onImageChanged);
-        dojo.subscribe('com/realitybuilder/BlockProperties/changed',
+        dojo.subscribe('realitybuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
-        dojo.subscribe('com/realitybuilder/ConstructionBlockProperties/changed',
+        dojo.subscribe('realitybuilder/ConstructionBlockProperties/changed',
                        this, this._onConstructionBlockPropertiesChanged);
-        dojo.subscribe('com/realitybuilder/PrerenderMode/changed',
+        dojo.subscribe('realitybuilder/PrerenderMode/changed',
                        this, this._onPrerenderModeChanged);
 
         dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
@@ -19851,7 +19852,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
     storeSettingsOnServer: function () {
         var imageData, cameraData, content, util;
 
-        util = com.realitybuilder.util;
+        util = realitybuilder.util;
 
         imageData = util.addPrefix('image.', 
                                    this._adminControls.readImageControls());
@@ -19874,7 +19875,7 @@ dojo.declare('com.realitybuilder.Construction', null, {
 }
 
 	
-dojo.i18n._preloadLocalizations("dojo.nls.dojo", ["ROOT","ar","ca","cs","da","de","de-de","el","en","en-gb","en-us","es","es-es","fi","fi-fi","fr","fr-fr","he","he-il","hu","it","it-it","ja","ja-jp","ko","ko-kr","nb","nl","nl-nl","pl","pt","pt-br","pt-pt","ru","sk","sl","sv","th","tr","xx","zh","zh-cn","zh-tw"]);
+dojo.i18n._preloadLocalizations("dojo.nls.dojo", ["ROOT","en","xx"]);
 
 
 	//Check if document already complete, and if so, just trigger page load
