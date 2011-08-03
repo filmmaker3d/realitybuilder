@@ -981,7 +981,17 @@ class Image(webapp.RequestHandler):
         except Exception, e:
             logging.error('Could not retrieve image: ' + str(e))
 
+class RealityBuilderJs(webapp.RequestHandler):
+    def get(self):
+        template_values = {'debug': debug}
+        
+        path = os.path.join(os.path.dirname(__file__), 'realitybuilder.js')
+        self.response.headers['Content-Type'] = \
+            'application/javascript; charset=utf-8';
+        self.response.out.write(template.render(path, template_values))
+
 application = webapp.WSGIApplication([
+    ('/realitybuilder.js', RealityBuilderJs),
     ('/', Index), ('/admin', Admin), 
     ('/images/live.jpg', Image),
     ('/admin/rpc/delete', RPCAdminDelete),

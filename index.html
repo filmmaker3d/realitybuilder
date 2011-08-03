@@ -25,30 +25,7 @@
     <link rel="stylesheet" href="/stylesheets/index_IE_6.css">
   <![endif]-->
   <title>Reality Builder</title>        
-  {%if debug%}
-    <script type="text/javascript">
-      var djConfig;
-      djConfig = {
-          isDebug: true,
-          locale: "en",
-          debugContainerId: 'firebugLite',
-          scopeMap: [
-              ['dojo', 'realitybuilderDojo'],
-              ['dijit', 'realitybuilderDijit'],
-              ['dojox', 'realitybuilderDojox']
-          ],
-          modulePaths: {
-              "realitybuilder": "/source/javascript/realitybuilder"
-          }
-      };
-    </script>
-    <script type="text/javascript" 
-            src="/source/javascript/dojo-release-1.6.1/dojo/dojo.js">
-    </script>
-  {%else%}
-    <script type="text/javascript" 
-            src="/javascript/dojo/dojo.xd.js"></script>
-  {%endif%}
+  <script type="text/javascript" src="/realitybuilder.js"></script>
   <!--[if lt IE 9]>
     <script type="text/javascript" src="/javascript/swfobject.js"></script>
     <script type="text/javascript" 
@@ -82,21 +59,6 @@
           <div id="noCanvasErrorMessage">
           </div>
           <div id="noImagesErrorMessage">
-          </div>
-          <div id="noDojoErrorMessage">
-            <script type="text/javascript">
-              <!--
-                if (!realityBuilderIsDojoSupported()) {
-                    // May be an old browser. Thus, it is best to stick to
-                    // "document.write".
-                    document.write('<p class="first">The Reality Builder ' +
-                        'does not work because your browser is not ' +
-                        'supported by the ' +
-                        '<a href="http://www.dojotoolkit.org/">Dojo ' +
-                        'Toolkit<\/a>.<\/p>');
-                }
-              // -->
-            </script>
           </div>
         </div>
         <div id="content">

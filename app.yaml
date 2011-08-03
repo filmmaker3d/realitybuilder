@@ -32,7 +32,7 @@ handlers:
 - url: /proprietary
   static_dir: proprietary
 
-# For development/debugging.
+# For development:
 - url: /source
   static_dir: source
 

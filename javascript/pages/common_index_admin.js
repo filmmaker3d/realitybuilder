@@ -17,11 +17,12 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, realitybuilderDojo, realitybuilderDojox, swfobject, 
-  videoId, DetectImageState, realityBuilderCreateConstruction */
+/*global realitybuilder, realitybuilderDojo,
+  realitybuilderDojox, swfobject, videoId, DetectImageState,
+  realitybuilderDemoCreateConstruction */
 
 // Returns true, iff the browser works with the Dojo Toolkit.
-function realityBuilderIsDojoSupported() {
+function realitybuilderDemoIsDojoSupported() {
     return (typeof realitybuilderDojo !== 'undefined');
 }
 
@@ -29,36 +30,40 @@ function realityBuilderIsDojoSupported() {
 // false) or disabled ("disabled" false) in the browser. If they are enabled,
 // continues with the initialization process. Otherwise shows an error message
 // to the user.
-function realityBuilderOnImageStateDetected(disabled) {
+function realitybuilderDemoOnImageStateDetected(disabled) {
     if (disabled) {
         realitybuilder.util.showNoImagesErrorMessage();
     } else {
-        realityBuilderCreateConstruction();
+        realitybuilderDemoCreateConstruction();
     }
 }
 
-function realityBuilderInit() {
+function realitybuilderDemoInit() {
     realitybuilderDojo.addOnLoad(function () {
         if (realitybuilder.util.isCanvasSupported()) {
             DetectImageState.init('/images/placeholder.gif', 
-                                  realityBuilderOnImageStateDetected);
+                                  realitybuilderDemoOnImageStateDetected);
         } else {
             realitybuilder.util.showNoCanvasErrorMessage();
         }
     });
 }
 
-if (realityBuilderIsDojoSupported()) {
-    if (realitybuilderDojo.config.isDebug) {
-        realitybuilderDojo.require('realitybuilder.Construction');
-        realitybuilderDojo.require('realitybuilder.util');
+realitybuilder.initialize({
+    ready: function () {
+        if (realitybuilderDemoIsDojoSupported()) {
+            if (realitybuilderDojo.config.isDebug) {
+                realitybuilderDojo.require('realitybuilder.Construction');
+                realitybuilderDojo.require('realitybuilder.util');
+            }
+            
+            if (realitybuilderDojo.isIE < 9) {
+                // Initialization needs to be deferred, since otherwise it may
+                // happen before FlashCanvas is ready.
+                realitybuilderDojo.connect('onload', realitybuilderDemoInit);
+            } else {
+                realitybuilderDemoInit();
+            }
+        }
     }
-
-    if (realitybuilderDojo.isIE < 9) {
-        // Initialization needs to be deferred, since otherwise it may happen
-        // before FlashCanvas is ready.
-        realitybuilderDojo.connect('onload', realityBuilderInit);
-    } else {
-        realityBuilderInit();
-    }
-}
+});

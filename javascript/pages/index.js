@@ -19,7 +19,7 @@
 
 /*global realitybuilder, dojo, dojox */
 
-function realityBuilderCreateConstruction() {
+function realitybuilderDemoCreateConstruction() {
     var construction = // to please JSLint
         new realitybuilder.Construction(false);
     construction = null; // to please JSLint
