@@ -18,7 +18,7 @@
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
 /*global realitybuilder, realitybuilderDojo,
-  realitybuilderDojox, swfobject, videoId, DetectImageState,
+  realitybuilderDojox, swfobject, videoId, 
   realitybuilderDemoCreateConstruction */
 
 // Returns true, iff the browser works with the Dojo Toolkit.
@@ -26,23 +26,10 @@ function realitybuilderDemoIsDojoSupported() {
     return (typeof realitybuilderDojo !== 'undefined');
 }
 
-// Called after it has been detected whether images are enabled ("disabled"
-// false) or disabled ("disabled" false) in the browser. If they are enabled,
-// continues with the initialization process. Otherwise shows an error message
-// to the user.
-function realitybuilderDemoOnImageStateDetected(disabled) {
-    if (disabled) {
-        realitybuilder.util.showNoImagesErrorMessage();
-    } else {
-        realitybuilderDemoCreateConstruction();
-    }
-}
-
 function realitybuilderDemoInit() {
     realitybuilderDojo.addOnLoad(function () {
         if (realitybuilder.util.isCanvasSupported()) {
-            DetectImageState.init('/images/placeholder.gif', 
-                                  realitybuilderDemoOnImageStateDetected);
+            realitybuilderDemoCreateConstruction();
         } else {
             realitybuilder.util.showNoCanvasErrorMessage();
         }

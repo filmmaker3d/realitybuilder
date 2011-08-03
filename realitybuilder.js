@@ -1,4 +1,4 @@
-// Provides the Reality Builder widget.
+// Provides the Reality Builder as a web widget.
 //
 // Copyright 2011 Felix E. Klee <felix.klee@inka.de>
 //
@@ -71,10 +71,10 @@
         var construction; // variable to please JSLint
 
         if (isLoaded()) {
-            // {%if debug%}
+            // {% if debug %}
             realitybuilderDojo.require('realitybuilder.Construction');
             realitybuilderDojo.require('realitybuilder.util');
-            // {%endif%}
+            // {% endif %}
             construction = 
                 new realitybuilder.Construction(settings2.showAdminControls);
             if ('ready' in settings2) {
