@@ -26,6 +26,8 @@ dojo.provide('realitybuilder.ConstructionBlocks');
 dojo.require('realitybuilder.ConstructionBlock');
 dojo.require('realitybuilder.util');
 
+dojo.require('dojo.io.script');
+
 dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // Version of blocks data last retrieved from the server, or "-1"
     // initially. Is a string in order to be able to contain very large
@@ -227,8 +229,9 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // the server. Once the server has completed the request, the list of
     // blocks is updated.
     makePendingOnServer: function (positionB, a) {
-        dojo.xhrPost({
-            url: "/admin/rpc/make_pending",
+        dojo.io.script.get({
+            url: realitybuilder.util.rootUrl() + "admin/rpc/make_pending",
+            callbackParamName: "callback",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
@@ -254,8 +257,9 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // Deletes the block positioned at the block space position "positionB" and
     // rotated by the angle "a", on the client and on the server.
     deleteOnServer: function (positionB, a) {
-        dojo.xhrPost({
-            url: "/admin/rpc/delete",
+        dojo.io.script.get({
+            url: realitybuilder.util.rootUrl() + "admin/rpc/delete",
+            callbackParamName: "callback",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
@@ -282,8 +286,9 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // "positionB" and rotated by the angle "a" to real: on the client and on
     // the server.
     makeRealOnServer: function (positionB, a) {
-        dojo.xhrPost({
-            url: "/admin/rpc/make_real",
+        dojo.io.script.get({
+            url: realitybuilder.util.rootUrl() + "admin/rpc/make_real",
+            callbackParamName: "callback",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],

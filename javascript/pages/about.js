@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global com, dojo, dojox, swfobject, videoId */
+/*global com, realitybuilderDojo, swfobject, videoId */
 
 // If Flash is available, hides all element that should only be shown in case
 // Flash is not available. An alternative would be to use a callback function
@@ -28,7 +28,7 @@
 // loaded, and thus neither the video nor the page heading is displayed.
 function realityBuilderSetNoFlashDisplay(event) {
     if (event.success) {
-        dojo.query('.noFlash').style('display', 'none');
+        realitybuilderDojo.query('.noFlash').style('display', 'none');
     }
 }
 

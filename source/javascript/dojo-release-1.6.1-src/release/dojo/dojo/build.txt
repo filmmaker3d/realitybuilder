@@ -39,6 +39,7 @@ dojo.js:
 ./../../release/dojo/realitybuilder/Block.js
 ./../../release/dojo/realitybuilder/ConstructionBlock.js
 ./../../release/dojo/realitybuilder/util.js
+./../../release/dojo/dojo/io/script.js
 ./../../release/dojo/realitybuilder/ConstructionBlocks.js
 ./../../release/dojo/realitybuilder/LayerShadow.js
 ./../../release/dojo/realitybuilder/ShadowObscuringBlocks.js
@@ -94,6 +95,7 @@ dojo.xd.js:
 ./../../release/dojo/realitybuilder/Block.js
 ./../../release/dojo/realitybuilder/ConstructionBlock.js
 ./../../release/dojo/realitybuilder/util.js
+./../../release/dojo/dojo/io/script.js
 ./../../release/dojo/realitybuilder/ConstructionBlocks.js
 ./../../release/dojo/realitybuilder/LayerShadow.js
 ./../../release/dojo/realitybuilder/ShadowObscuringBlocks.js

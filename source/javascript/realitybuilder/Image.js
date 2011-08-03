@@ -88,7 +88,7 @@ dojo.declare('realitybuilder.Image', null, {
 
     // Updates the image.
     update: function () {
-        this._node.src = 
-            '/images/live.jpg?nocache=' + Math.random().toString();
+        this._node.src = realitybuilder.util.rootUrl() + 
+            'images/live.jpg?nocache=' + Math.random().toString();
     }
 });

@@ -99,7 +99,7 @@ table#contentContainer tr.debug {
 #controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 
 #incZButton, #decZButton, #rotate90Button, #requestRealButton {
     position: absolute;
-    background-image: url(/images/control_panel.png);
+    background-image: url(../images/control_panel.png);
 }
 
 #controlPanel {

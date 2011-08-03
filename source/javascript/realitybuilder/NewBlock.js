@@ -24,6 +24,8 @@ dojo.provide('realitybuilder.NewBlock');
 dojo.require('realitybuilder.Block');
 dojo.require('realitybuilder.Shadow');
 
+dojo.require('dojo.io.script');
+
 dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
     '-chains-': {
         constructor: 'manual'
@@ -537,8 +539,9 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
     // Adds this block to the list of blocks on the server, with state pending.
     _createPendingOnServer: function () {
-        dojo.xhrPost({
-            url: "/rpc/create_pending",
+        dojo.io.script.get({
+            url: realitybuilder.util.rootUrl() + "rpc/create_pending",
+            callbackParamName: "callback",
             content: {
                 "xB": this.xB(),
                 "yB": this.yB(),

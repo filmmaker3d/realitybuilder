@@ -33,6 +33,8 @@ dojo.require('realitybuilder.ControlPanel');
 dojo.require('realitybuilder.PrerenderMode');
 dojo.require('realitybuilder.util');
 
+dojo.require('dojo.io.script');
+
 dojo.declare('realitybuilder.Construction', null, {
     // True, iff admin controls should be shown:
     _showAdminControls: null,
@@ -373,7 +375,7 @@ dojo.declare('realitybuilder.Construction', null, {
     //
     // Finally, sets timeout after which a new check for an update is
     // performed.
-    _updateSucceeded: function (data, ioargs) {
+    _updateSucceeded: function (data) {
         var that = this;
 
         if (data.blocksData.changed) {
@@ -426,8 +428,9 @@ dojo.declare('realitybuilder.Construction', null, {
     //
     // Also updates the background image.
     _update: function () {
-        dojo.xhrGet({
-            url: "/rpc/construction",
+        dojo.io.script.get({
+            url: realitybuilder.util.rootUrl() + "rpc/construction",
+            callbackParamName: "callback",
             content: {
                 "blocksDataVersion": 
                 this._constructionBlocks.versionOnServer(),
@@ -441,7 +444,6 @@ dojo.declare('realitybuilder.Construction', null, {
                 "prerenderModeDataVersion": 
                 this._prerenderMode.versionOnServer()
             },
-            handleAs: "json",
             load: dojo.hitch(this, this._updateSucceeded)
         });
 
@@ -499,8 +501,9 @@ dojo.declare('realitybuilder.Construction', null, {
         content = {};
 
         dojo.mixin(content, imageData, cameraData);
-        dojo.xhrPost({
-            url: "/admin/rpc/update_settings",
+        dojo.io.script.get({
+            url: realitybuilder.util.rootUrl() + "admin/rpc/update_settings",
+            callbackParamName: "callback",
             content: content,
             load: dojo.hitch(this, this._storeSettingsOnServerSucceeded)
         });

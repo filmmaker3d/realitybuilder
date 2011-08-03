@@ -17,7 +17,8 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl, swfobject */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl, swfobject,
+  acme */
 
 dojo.provide('realitybuilder.util');
 
@@ -356,3 +357,21 @@ realitybuilder.util.fillCanvas = function (canvas, color) {
         context.fillRect(0, 0, canvas.width, canvas.height);
     }
 };
+
+// Has a trailing slash.
+realitybuilder.util.rootUrl = function () {
+    if (dojo.config.isDebug) {
+        return dojo.baseUrl + '../../../../';
+    } else {
+        return dojo.baseUrl + '../../';
+    }
+};
+
+// Necessary to work around a bug in Dojo 1.6 where "scopeMap" breaks
+// "dojo.query":
+//
+// <url:http://groups.google.com/group/dojo-interest/browse_thread/thread/2bcd6
+// c8aff0487cb/4a164ecba59d16f9>
+if (!('query' in dojo) && typeof acme !== 'undefined' && 'query' in acme) {
+    dojo.query = acme.query; 
+}

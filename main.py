@@ -32,13 +32,14 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
-# Dumps the data "data" as JSON response, with the correct MIME type.
+# Dumps the data "data" as JSONP response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
-def dump_json(obj, data):
-    obj.response.headers['Content-Type'] = 'application/json; charset=utf-8';
-    obj.response.out.write(simplejson.dumps(data))
+def dump_jsonp(obj, data, callback):
+    obj.response.headers['Content-Type'] = \
+        'application/javascript; charset=utf-8';
+    obj.response.out.write(callback + '(' + simplejson.dumps(data) + ')')
 
 # General information about the construction.
 class Construction(db.Model):
@@ -608,6 +609,7 @@ class RPCConstruction(webapp.RequestHandler):
                 self.request.get('newBlockDataVersion')
             prerender_mode_data_version_client = \
                 self.request.get('prerenderModeDataVersion')
+            callback = self.request.get('callback')
 
             data = db.run_in_transaction \
                 (self.transaction, 
@@ -618,7 +620,7 @@ class RPCConstruction(webapp.RequestHandler):
                  construction_block_properties_data_version_client,
                  new_block_data_version_client,
                  prerender_mode_data_version_client)
-            dump_json(self, data)
+            dump_jsonp(self, data, callback)
         except Exception, e:
             logging.error('Could not retrieve data: ' + str(e))
 
@@ -642,14 +644,16 @@ class RPCAdminMakeReal(webapp.RequestHandler):
         else:
             block.make_real()
 
-    def post(self):
+    def get(self):
         try:
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
             a = int(self.request.get('a'))
+            callback = self.request.get('callback')
             db.run_in_transaction(RPCAdminMakeReal.transaction, 
                                   x_b, y_b, z_b, a)
+            dump_jsonp(self, {}, callback)
         except Exception, e:
             logging.error('Could not make block real: ' + str(e))
 
@@ -714,10 +718,12 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
             cls.updateImage(construction, prerender_mode, i)
 
     # Only runs if prerender-mode is enabled.
-    def post(self):
+    def get(self):
         try:
             i = int(self.request.get('i'))
+            callback = self.request.get('callback')
             db.run_in_transaction(self.transaction, i)
+            dump_jsonp(self, {}, callback)
         except Exception, e:
             logging.error('Could not load prerendered block configuration: ' + 
                           str(e))
@@ -737,13 +743,15 @@ class RPCAdminDelete(webapp.RequestHandler):
             # block found to be set to state deleted
             block.store_state_and_increase_blocks_data_version(0)
 
-    def post(self):
+    def get(self):
         try:
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
             a = int(self.request.get('a'))
+            callback = self.request.get('callback')
             db.run_in_transaction(self.transaction, x_b, y_b, z_b, a)
+            dump_jsonp(self, {}, callback)
         except Exception, e:
             logging.error('Could not delete block: ' + str(e))
 
@@ -814,13 +822,15 @@ Angle: %d
         block.store_state_and_increase_blocks_data_version(1) # Set to pending.
         cls.send_info_email(construction, [x_b, y_b, z_b], a)
 
-    def post(self):
+    def get(self):
         try:
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
             a = int(self.request.get('a'))
+            callback = self.request.get('callback')
             db.run_in_transaction(self.transaction, x_b, y_b, z_b, a)
+            dump_jsonp(self, {}, callback)
         except Exception, e:
             logging.error('Could not add pending block or set existing ' + 
                           'block to pending: ' + str(e))
@@ -853,13 +863,15 @@ class RPCAdminMakePending(webapp.RequestHandler):
 
         block.store_state_and_increase_blocks_data_version(new_state)
 
-    def post(self):
+    def get(self):
         try:
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
             a = int(self.request.get('a'))
+            callback = self.request.get('callback')
             db.run_in_transaction(self.transaction, x_b, y_b, z_b, a)
+            dump_jsonp(self, {}, callback)
         except Exception, e:
             logging.error('Could not make block pending: ' + str(e))
 
@@ -892,7 +904,7 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
         construction.increase_camera_data_version()
         construction.increase_image_data_version()
 
-    def post(self):
+    def get(self):
         try:
             data = {
                 'camera_position': [float(self.request.get('camera.x')),
@@ -907,7 +919,9 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
                 'image_url': self.request.get('image.url'),
                 'image_update_interval_server':
                     float(self.request.get('image.updateIntervalServer'))}
+            callback = self.request.get('callback')
             db.run_in_transaction(self.transaction, data)
+            dump_jsonp(self, {}, callback)
         except Exception, e:
             logging.error('Could not update camera and image data: ' + str(e))
 
