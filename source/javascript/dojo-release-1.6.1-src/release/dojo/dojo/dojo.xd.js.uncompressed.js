@@ -17041,7 +17041,8 @@ dojo._hasResource['realitybuilder.util'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl, swfobject */
+/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl, swfobject,
+  acme */
 
 dojo.provide('realitybuilder.util');
 
@@ -17389,6 +17390,15 @@ realitybuilder.util.rootUrl = function () {
         return dojo.baseUrl + '../../';
     }
 };
+
+// Necessary to work around a bug in Dojo 1.6 where "scopeMap" breaks
+// "dojo.query":
+//
+// <url:http://groups.google.com/group/dojo-interest/browse_thread/thread/2bcd6
+// c8aff0487cb/4a164ecba59d16f9>
+if (!('query' in dojo) && typeof acme !== 'undefined' && 'query' in acme) {
+    dojo.query = acme.query; 
+}
 
 }
 
@@ -17883,7 +17893,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // blocks is updated.
     makePendingOnServer: function (positionB, a) {
         dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "/admin/rpc/make_pending",
+            url: realitybuilder.util.rootUrl() + "admin/rpc/make_pending",
             callbackParamName: "callback",
             content: {
                 "xB": positionB[0],
@@ -17911,7 +17921,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // rotated by the angle "a", on the client and on the server.
     deleteOnServer: function (positionB, a) {
         dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "/admin/rpc/delete",
+            url: realitybuilder.util.rootUrl() + "admin/rpc/delete",
             callbackParamName: "callback",
             content: {
                 "xB": positionB[0],
@@ -17940,7 +17950,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // the server.
     makeRealOnServer: function (positionB, a) {
         dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "/admin/rpc/make_real",
+            url: realitybuilder.util.rootUrl() + "admin/rpc/make_real",
             callbackParamName: "callback",
             content: {
                 "xB": positionB[0],
@@ -19102,7 +19112,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
     // Adds this block to the list of blocks on the server, with state pending.
     _createPendingOnServer: function () {
         dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "/rpc/create_pending",
+            url: realitybuilder.util.rootUrl() + "rpc/create_pending",
             callbackParamName: "callback",
             content: {
                 "xB": this.xB(),
@@ -20243,7 +20253,7 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
     loadBlockConfigurationOnServer: function (i) {
         dojo.io.script.get({
             url: realitybuilder.util.rootUrl() + 
-                "/rpc/load_prerendered_block_configuration",
+                "rpc/load_prerendered_block_configuration",
             callbackParamName: "callback",
             content: {
                 "i": i
@@ -20705,7 +20715,7 @@ dojo.declare('realitybuilder.Construction', null, {
     // Also updates the background image.
     _update: function () {
         dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "/rpc/construction",
+            url: realitybuilder.util.rootUrl() + "rpc/construction",
             callbackParamName: "callback",
             content: {
                 "blocksDataVersion": 
@@ -20778,7 +20788,7 @@ dojo.declare('realitybuilder.Construction', null, {
 
         dojo.mixin(content, imageData, cameraData);
         dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "/admin/rpc/update_settings",
+            url: realitybuilder.util.rootUrl() + "admin/rpc/update_settings",
             callbackParamName: "callback",
             content: content,
             load: dojo.hitch(this, this._storeSettingsOnServerSucceeded)

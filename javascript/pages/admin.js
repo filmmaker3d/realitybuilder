@@ -19,8 +19,6 @@
 
 /*global realitybuilder, dojo, dojox, swfobject, videoId */
 
-function realitybuilderDemoCreateConstruction() {
-    var construction = // to please JSLint
-        new realitybuilder.Construction(true);
-    construction = null; // to please JSLint
-}
+realitybuilder.initialize({
+    showAdminControls: true
+});

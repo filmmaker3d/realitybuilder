@@ -49,14 +49,9 @@ function realitybuilderDemoInit() {
     });
 }
 
-realitybuilder.initialize({
-    ready: function () {
+/*fixme: put some of the below around the initialization        
+
         if (realitybuilderDemoIsDojoSupported()) {
-            if (realitybuilderDojo.config.isDebug) {
-                realitybuilderDojo.require('realitybuilder.Construction');
-                realitybuilderDojo.require('realitybuilder.util');
-            }
-            
             if (realitybuilderDojo.isIE < 9) {
                 // Initialization needs to be deferred, since otherwise it may
                 // happen before FlashCanvas is ready.
@@ -64,6 +59,4 @@ realitybuilder.initialize({
             } else {
                 realitybuilderDemoInit();
             }
-        }
-    }
-});
+        }*/
