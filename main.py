@@ -985,7 +985,7 @@ class RealityBuilderJs(webapp.RequestHandler):
     def get(self):
         template_values = {
             'debug': debug,
-            'http_host': os.environ['http_host']
+            'host': self.request.host,
             }
         
         path = os.path.join(os.path.dirname(__file__), 'realitybuilder.js')

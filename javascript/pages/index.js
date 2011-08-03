@@ -19,6 +19,14 @@
 
 /*global realitybuilder, dojo, dojox */
 
-realitybuilder.initialize({
-    showAdminControls: false
-});
+onload = function () {
+    // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
+
+// fixme:    if (realitybuilder.util.isCanvasSupported()) {
+        realitybuilder.initialize({
+            showAdminControls: false
+        });
+/*fixme:    } else {
+        realitybuilder.util.showNoCanvasErrorMessage();
+    }*/
+};

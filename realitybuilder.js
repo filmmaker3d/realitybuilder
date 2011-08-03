@@ -15,11 +15,11 @@
 // under the License.
 
 (function () {
-    var el, s, initialized, settings2, httpHost;
+    var el, s, initialized, settings2, host;
 
-    httpHost = '{{ http_host }}';
+    host = '{{ host }}';
 
-    initialized = false; // fixme
+    initialized = false;
 
     el = document.createElement('script');
     s = document.getElementsByTagName('script')[0];
@@ -28,7 +28,7 @@
     el.async = true;
     el.onload = function () {
         if (initialized) {
-            setupWidgetIfLoaded();
+            setupWidget();
         }
     };
 
@@ -49,12 +49,19 @@
             "realitybuilder": "/source/javascript/realitybuilder"
         }
     };
-    el.src = 'http://' + httpHost + 
-        '/source/javascript/dojo-release-1.6.1/dojo/dojo.js';
+
+    // For debugging it is assumed that this script is included from a file
+    // which is hosted on the same domain.
+    //
+    // This makes it possible to use for example Apache's "ProxyPass" to work
+    // around GAE's current limitation of only being able to serve one file at
+    // a time (slow!). "host" would be the host of the Google App Engine, and
+    // not of the proxy.
+    el.src = '/source/javascript/dojo-release-1.6.1/dojo/dojo.js';
     
     // {% else %}
 
-    el.src = 'http://' + httpHost + '/javascript/dojo/dojo.xd.js';
+    el.src = 'http://' + host + '/javascript/dojo/dojo.xd.js';
 
     // {% endif %}
 
@@ -62,24 +69,35 @@
 
     window.realitybuilder = {};
 
-    isLoaded = function () {
+    // Returns true, iff the requested script has been loaded. Then
+    // "realitybuilderDojo" is ready to be used.
+    isScriptLoaded = function () {
         return (typeof realitybuilderDojo !== 'undefined');
     };
 
     // Sets up the widget.
-    setupWidgetIfLoaded = function () {
-        var construction; // variable to please JSLint
+    setupWidget = function () {
+        // {% if debug %}
+        realitybuilderDojo.require('realitybuilder.Construction');
+        realitybuilderDojo.require('realitybuilder.util');
+        // {% endif %}
 
-        if (isLoaded()) {
-            // {% if debug %}
-            realitybuilderDojo.require('realitybuilder.Construction');
-            realitybuilderDojo.require('realitybuilder.util');
-            // {% endif %}
+        // "addOnLoad" is necessary to wait for the above dependencies to be
+        // resolved, if necessary by loading additional resources.
+        realitybuilderDojo.addOnLoad(function () {
             construction = 
                 new realitybuilder.Construction(settings2.showAdminControls);
             if ('ready' in settings2) {
                 settings2.ready();
             }
+        });
+    };
+
+    setupWidgetIfScriptIsLoaded = function () {
+        var construction; // variable to please JSLint
+
+        if (isScriptLoaded()) {
+            setupWidget();
         }
     };
 
@@ -92,6 +110,6 @@
     window.realitybuilder.initialize = function (settings) {
         settings2 = settings;
         initialized = true;
-        setupWidgetIfLoaded();
+        setupWidgetIfScriptIsLoaded();
     };
 }());
