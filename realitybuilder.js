@@ -14,102 +14,172 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-(function () {
-    var el, s, initialized, settings2, host;
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-    host = '{{ host }}';
+/*global realitybuilderDojo */
 
+var djConfig; // for configuring Dojo
+
+var realitybuilder = (function () {
+    var
+    scriptIsLoaded,
+    initialized, // true, after the public "initialize" has been called
+    settings, publicInterface;
+
+    function setupWidget() {
+        // The variable "construction" is never used, but witout it JSLint
+        // would complain.
+        var construction = new realitybuilder.Construction(settings);
+    }
+
+    // Some old browsers may support JavaScript but not Dojo. In this case,
+    // this function returns false.
+    function dojoIsSupported() {
+        return typeof realitybuilderDojo !== 'undefined';
+    }
+
+    // Returns false for some old browsers.
+    function w3cDOMIsSupported() {
+        // The check does not use "in" since older browsers such as Netscape 4
+        // don't support that operator.
+        return document.getElementById && document.createElement;
+    }
+
+    // Sets up the widget after waiting for Dojo to be ready.
+    function requestSetupWidget() {
+        if (dojoIsSupported()) {
+            // {% if debug %}
+            realitybuilderDojo.require('realitybuilder.Construction');
+            realitybuilderDojo.require('realitybuilder.util');
+            // {% endif %}
+
+            // "addOnLoad" is necessary to wait for Dojo dependencies to be
+            // resolved.
+            realitybuilderDojo.addOnLoad(function () {
+                setupWidget();
+            });
+        } else {
+            settings.onBrowserNotSupportedError();
+        }
+    }
+
+    function requestSetupWidgetIfScriptIsLoaded() {
+        if (scriptIsLoaded) {
+            requestSetupWidget();
+        }
+    }
+
+    function requestSetupWidgetIfInitialized() {
+        if (initialized) {
+            requestSetupWidget();
+        }
+    }
+
+    function onScriptLoaded() {
+        scriptIsLoaded = true;
+        requestSetupWidgetIfInitialized();
+    }
+
+    // Requests asynchronous loading of the specified JavaScript file.
+    //
+    // Note that this function causes "onload" to be blocked until the script
+    // is loaded in Firefox, Chrome, and Safari:
+    //
+    //   http://friendlybit.com/js/lazy-loading-asyncronous-javascript/
+    //
+    // However, this in general should be not problem. After all, in the
+    // anticipated use cases, the widget is an integral part of the page. Also,
+    // one can still work around the issue by loading the current script in an
+    // asynchronous way.
+    function requestLoadScript(scriptUrl) {
+        var newScriptEl, firstScriptEl;
+
+        if (w3cDOMIsSupported()) {
+            newScriptEl = document.createElement('script');
+            firstScriptEl = document.getElementsByTagName('script')[0];
+    
+            newScriptEl.type = 'text/javascript';
+            newScriptEl.async = true; // probably superfluous, but doesn't hurt
+            newScriptEl.onload = onScriptLoaded();
+
+            newScriptEl.src = scriptUrl;
+            firstScriptEl.parentNode.insertBefore(newScriptEl, firstScriptEl);
+        }
+    }
+
+    // Loads the Dojo JavaScript that is used for debugging mode.
+    function requestLoadDebugScript() {
+        var scriptUrl;
+
+        djConfig = {
+            isDebug: true,
+            locale: "en",
+            debugContainerId: 'firebugLite',
+            scopeMap: [
+                ['dojo', 'realitybuilderDojo'],
+                ['dijit', 'realitybuilderDijit'],
+                ['dojox', 'realitybuilderDojox']
+            ],
+            modulePaths: {
+                "realitybuilder": "/source/javascript/realitybuilder"
+            }
+        };
+
+        // For debugging it is assumed that this script is included from a file
+        // which is hosted on the same domain.
+        //
+        // This makes  it possible to  use for example Apache's  "ProxyPass" to
+        // work around GAE's current limitation of only being able to serve one
+        // file at a  time (slow!). "host" would be the host  of the Google App
+        // Engine, and not of the proxy.
+        scriptUrl = '/source/javascript/dojo-release-1.6.1/dojo/dojo.js';
+
+        requestLoadScript(scriptUrl);
+    }
+
+    // Loads the Dojo JavaScript that is used for release mode. Almost all
+    // functionality is built into one file.
+    function requestLoadReleaseScript() {
+        var host;
+        host = '{{ host }}';
+        requestLoadScript('http://' + host + '/javascript/dojo/dojo.xd.js');
+    }
+
+    function setSettings(x) {
+        settings = x;
+    }
+
+    scriptIsLoaded = false;
     initialized = false;
 
-    el = document.createElement('script');
-    s = document.getElementsByTagName('script')[0];
-    
-    el.type = 'text/javascript';
-    el.async = true;
-    el.onload = function () {
-        if (initialized) {
-            setupWidget();
-        }
-    };
-
     // {% if debug %}
-
-    // debug mode enabled on server
-
-    window.djConfig = {
-        isDebug: true,
-        locale: "en",
-        debugContainerId: 'firebugLite',
-        scopeMap: [
-            ['dojo', 'realitybuilderDojo'],
-            ['dijit', 'realitybuilderDijit'],
-            ['dojox', 'realitybuilderDojox']
-        ],
-        modulePaths: {
-            "realitybuilder": "/source/javascript/realitybuilder"
-        }
-    };
-
-    // For debugging it is assumed that this script is included from a file
-    // which is hosted on the same domain.
-    //
-    // This makes it possible to use for example Apache's "ProxyPass" to work
-    // around GAE's current limitation of only being able to serve one file at
-    // a time (slow!). "host" would be the host of the Google App Engine, and
-    // not of the proxy.
-    el.src = '/source/javascript/dojo-release-1.6.1/dojo/dojo.js';
-    
+    requestLoadDebugScript();
     // {% else %}
-
-    el.src = 'http://' + host + '/javascript/dojo/dojo.xd.js';
-
+    requestLoadReleaseScript();
     // {% endif %}
 
-    s.parentNode.insertBefore(el, s);
-
-    window.realitybuilder = {};
-
-    // Returns true, iff the requested script has been loaded. Then
-    // "realitybuilderDojo" is ready to be used.
-    isScriptLoaded = function () {
-        return (typeof realitybuilderDojo !== 'undefined');
-    };
-
-    // Sets up the widget.
-    setupWidget = function () {
-        // {% if debug %}
-        realitybuilderDojo.require('realitybuilder.Construction');
-        realitybuilderDojo.require('realitybuilder.util');
-        // {% endif %}
-
-        // "addOnLoad" is necessary to wait for the above dependencies to be
-        // resolved, if necessary by loading additional resources.
-        realitybuilderDojo.addOnLoad(function () {
-            construction = 
-                new realitybuilder.Construction(settings2.showAdminControls);
-            if ('ready' in settings2) {
-                settings2.ready();
+    publicInterface = {
+        // Available settings:
+        //
+        // * "showAdminControls": Iff true, then the admin controls are shown,
+        //   and - in the rendering - the real and pending blocks.
+        //
+        // * "onCanvasNotSupportedError": Optional function that is executed
+        //   when the HTML canvas element is not supported by the browser.
+        //   Without this element, the Reality Builder does not work.
+        initialize: function (settings) {
+            if (!w3cDOMIsSupported()) {
+                // Happens for example with Netscape 4. There is no point in
+                // continuing.
+                settings.onBrowserNotSupportedError();
+            } else {
+                setSettings(settings);
+                initialized = true;
+                requestSetupWidgetIfScriptIsLoaded();
             }
-        });
-    };
-
-    setupWidgetIfScriptIsLoaded = function () {
-        var construction; // variable to please JSLint
-
-        if (isScriptLoaded()) {
-            setupWidget();
         }
     };
 
-    // Attributes of "settings":
-    //
-    // "ready": Function that is called once the Reality Builder widget has
-    //   been loaded and embedded.
-    // 
-    // "showAdminControls": Whether admin controls should be shown.
-    window.realitybuilder.initialize = function (settings) {
-        settings2 = settings;
-        initialized = true;
-        setupWidgetIfScriptIsLoaded();
-    };
+    return publicInterface;
 }());

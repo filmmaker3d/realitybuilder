@@ -19,14 +19,19 @@
 
 /*global realitybuilder, dojo, dojox */
 
+(function () {
+
+function onBrowserNotSupportedError() {
+    alert('Your browser is not supported.');
+}
+
 onload = function () {
     // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
 
-// fixme:    if (realitybuilder.util.isCanvasSupported()) {
-        realitybuilder.initialize({
-            showAdminControls: false
-        });
-/*fixme:    } else {
-        realitybuilder.util.showNoCanvasErrorMessage();
-    }*/
+    realitybuilder.initialize({
+        showAdminControls: false,
+        onBrowserNotSupportedError: onBrowserNotSupportedError
+    });
 };
+
+}());

@@ -327,20 +327,6 @@ realitybuilder.util.isCanvasSupported = function () {
              realitybuilder.util.isFlashReadyForFlashCanvas()));
 };
 
-realitybuilder.util.showNoCanvasErrorMessage = function () {
-    dojo.attr('noCanvasErrorMessage', 'innerHTML', 
-        '<p class="first">The Reality Builder does not work because your ' +
-        'browser does not support the <a ' +
-        'href="http://www.w3.org/TR/html5/the-canvas-element.html">Canvas ' +
-        'element</a>.</p>');
-};
-
-realitybuilder.util.showNoImagesErrorMessage = function () {
-    dojo.attr('noImagesErrorMessage', 'innerHTML', 
-        '<p class="first">The Reality Builder does not work because your ' +
-        'browser does not load images.</p>');
-};
-
 // Clears the canvas "canvas".
 realitybuilder.util.clearCanvas = function (canvas) {
     if (canvas.getContext) {

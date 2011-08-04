@@ -19,6 +19,19 @@
 
 /*global realitybuilder, dojo, dojox, swfobject, videoId */
 
-realitybuilder.initialize({
-    showAdminControls: true
-});
+(function () {
+
+function onBrowserNotSupportedError() {
+    alert('Your browser is not supported.');
+}
+
+onload = function () {
+    // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
+
+    realitybuilder.initialize({
+        showAdminControls: true,
+        onBrowserNotSupportedError: onBrowserNotSupportedError
+    });
+};
+
+}());

@@ -83,17 +83,22 @@ dojo.declare('realitybuilder.Construction', null, {
     // construction data.
     _updateTimeout: null,
 
-    // Creates a construction. Iff "showAdminControls" is true, then the admin
-    // controls are shown, and - in the rendering - the real and pending
-    // blocks.
-    constructor: function (showAdminControls) {
+    // Creates a construction. For a documentation of the settings, see the
+    // main Reality Builder include script.
+    constructor: function (settings) {
         var rb = realitybuilder;
+
+        if (!rb.util.isCanvasSupported()) {
+            // canvas not supported => abort
+            settings.onBrowserNotSupportedError();
+            return;
+        }
 
         this._insertLoadIndicator();
 
-        this._showAdminControls = showAdminControls;
-        this._showReal = showAdminControls;
-        this._showPending = showAdminControls;
+        this._showAdminControls = settings.showAdminControls;
+        this._showReal = settings.showAdminControls;
+        this._showPending = settings.showAdminControls;
 
         this._blockProperties = new rb.BlockProperties();
         this._constructionBlockProperties = 
