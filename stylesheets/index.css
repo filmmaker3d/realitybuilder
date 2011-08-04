@@ -12,7 +12,8 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
-body, html, #view, #sensor, #coordinateControlsCanvas, #live, #status, #info {
+body, html, #view, #sensor, #coordinateControlsCanvas, #backgroundImage, 
+#status, #info {
     -moz-user-select: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -67,7 +68,7 @@ body {
     top: 0;
 }
 
-#live {
+#backgroundImage {
     position: absolute;
     left: 0;
     top: 0;

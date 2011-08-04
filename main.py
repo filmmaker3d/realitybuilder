@@ -64,18 +64,6 @@ class Construction(db.Model):
     camera_sensor_resolution = \
         db.FloatProperty(default=100.) # sensor resolution
 
-    # Live background image, its URL, when it was last updated, and how often
-    # it should be updated. When fetching the URL, a get parameter is appended,
-    # to avoid caching the request by App Engine. The image version is the
-    # version of the data below, not of the image itself. This version is
-    # increased every time the data is changed. See also the description of the
-    # blocks version.
-    image_data_version = db.StringProperty()
-    image = db.BlobProperty(default=None)
-    image_url = db.LinkProperty()
-    image_last_update = db.FloatProperty(default=0.) # s
-    image_update_interval_server = db.FloatProperty(default=5.) # s
-
     def prerender_mode(self):
         query = PrerenderMode.all().ancestor(self)
         prerender_mode = query.get()
@@ -92,11 +80,6 @@ class Construction(db.Model):
     # Increases the camera version number. Should be run in a transaction.
     def increase_camera_data_version(self):
         self.camera_data_version = str(int(self.camera_data_version) + 1)
-        self.put()
-
-    # Increases the image data version number. Should be run in a transaction.
-    def increase_image_data_version(self):
-        self.image_data_version = str(int(self.image_data_version) + 1)
         self.put()
 
     # Returns the main construction, which is the only construction. Raises an
@@ -118,15 +101,10 @@ class PrerenderMode(db.Model):
     # With prerender-mode enabled, a block is automatically made real after
     # "make_real_after" milliseconds, and if the total construction would
     # afterwards match one of the block configurations in the list
-    # "block_configurations". Associated with each block configuration is an
-    # image, the URL of which is constructed using the template
-    # "image_url_template": %d is substituted with the block configuration
-    # number. This number is identical to the corresponding index in the array
-    # with the block configurations.
+    # "block_configurations".
     is_enabled = db.BooleanProperty()
     make_real_after = db.IntegerProperty() # ms
     block_configurations = db.StringListProperty()
-    image_url_template = db.StringProperty()
 
     # Index of the currently loaded prerendered block configuration.
     i = db.IntegerProperty()
@@ -418,24 +396,6 @@ class RPCConstruction(webapp.RequestHandler):
                     'sensorResolution': construction.camera_sensor_resolution})
         return data
 
-    # Returns JSON serializable data related to the live image.
-    @classmethod
-    def get_image_data(cls, construction, image_data_version_client):
-        image_data_version = construction.image_data_version
-        image_data_changed = (image_data_version != 
-                              image_data_version_client)
-        data = {
-            'version': image_data_version,
-            'changed': image_data_changed}
-        if image_data_changed:
-            # Image data version on server not the same as on client. =>
-            # Deliver all the data.
-            data.update({
-                    'url': construction.image_url,
-                    'updateIntervalServer': \
-                        construction.image_update_interval_server})
-        return data
-
     @classmethod
     def json_decode_list(cls, l):
         return map(simplejson.loads, l)
@@ -555,8 +515,6 @@ class RPCConstruction(webapp.RequestHandler):
                          'blockConfigurations': \
                              cls.json_decode_list \
                              (prerender_mode.block_configurations),
-                         'imageUrlTemplate': 
-                         prerender_mode.image_url_template,
                          'i': prerender_mode.i})
         return data
 
@@ -566,7 +524,6 @@ class RPCConstruction(webapp.RequestHandler):
     def transaction(cls,
                     blocks_data_version_client, 
                     camera_data_version_client,
-                    image_data_version_client,
                     block_properties_data_version_client,
                     construction_block_properties_data_version_client,
                     new_block_data_version_client,
@@ -578,8 +535,6 @@ class RPCConstruction(webapp.RequestHandler):
                 cls.get_blocks_data(construction, blocks_data_version_client),
             'cameraData':
                 cls.get_camera_data(construction, camera_data_version_client),
-            'imageData':
-                cls.get_image_data(construction, image_data_version_client),
             'blockPropertiesData':
                 cls.get_block_properties_data(
                 construction, block_properties_data_version_client),
@@ -600,7 +555,6 @@ class RPCConstruction(webapp.RequestHandler):
                 self.request.get('blocksDataVersion')
             camera_data_version_client = \
                 self.request.get('cameraDataVersion')
-            image_data_version_client = self.request.get('imageDataVersion')
             block_properties_data_version_client = \
                 self.request.get('blockPropertiesDataVersion')
             construction_block_properties_data_version_client = \
@@ -615,7 +569,6 @@ class RPCConstruction(webapp.RequestHandler):
                 (self.transaction, 
                  blocks_data_version_client, 
                  camera_data_version_client,
-                 image_data_version_client,
                  block_properties_data_version_client,
                  construction_block_properties_data_version_client,
                  new_block_data_version_client,
@@ -657,8 +610,7 @@ class RPCAdminMakeReal(webapp.RequestHandler):
         except Exception, e:
             logging.error('Could not make block real: ' + str(e))
 
-# Loads the prerendered block configuration with the provided index and
-# replaces the background image appropriately.
+# Loads the prerendered block configuration with the provided index.
 # 
 # Silently fails on error.
 class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
@@ -691,22 +643,8 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
         else:
             raise Exception('Index out of bounds')
 
-    @classmethod
-    def updateImage(cls, construction, prerender_mode, i):
-        image_url_template = prerender_mode.image_url_template
-        image_url = image_url_template % (i)
-        
-        construction.image_url = image_url
-        construction.image_last_update = 0. # since the image URL has changed
-        construction.put()
-        construction.increase_image_data_version()
-
-    # If prerender-mode is enabled, then:
-    # 
-    # 1. Replaces all blocks with the blocks in the prerendered block
-    #   configuration with index "i".
-    # 
-    # 2. Updates the prerendered image accordingly.
+    # If prerender-mode is enabled, then replaces all blocks with the blocks in
+    # the prerendered block configuration with index "i".
     @classmethod
     def transaction(cls, i):
         construction = Construction.get_main()
@@ -715,7 +653,6 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
 
         if prerender_mode.is_enabled:
             cls.updateBlocks (construction, prerender_mode, i)
-            cls.updateImage(construction, prerender_mode, i)
 
     # Only runs if prerender-mode is enabled.
     def get(self):
@@ -875,13 +812,11 @@ class RPCAdminMakePending(webapp.RequestHandler):
         except Exception, e:
             logging.error('Could not make block pending: ' + str(e))
 
-# Updates the camera and live image settings and increases the camera version
-# number.
+# Updates the camera settings and increases the camera version number.
 #
 # The post request fails silently on error.
 class RPCAdminUpdateSettings(webapp.RequestHandler):
-    # Tries to update the image and camera settings. Ignores values that cannot
-    # be assigned.
+    # Tries to update camera settings. Ignores values that cannot be assigned.
     @classmethod
     def transaction(cls, data):
         construction = Construction.get_main()
@@ -892,17 +827,10 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
             except:
                 pass # nothing to be done
 
-        # In case the image URL has changed, then the image should be refreshed
-        # right away. And if the URL hasn't changed, then reloading the image
-        # should not be a problem, as this part of the code is usually not
-        # often called.
-        construction.image_last_update = 0.
-
         construction.put()
 
-        # Everything has gone well. Now the versions of the data are updated.
+        # Everything has gone well. Now the version of the data is updated.
         construction.increase_camera_data_version()
-        construction.increase_image_data_version()
 
     def get(self):
         try:
@@ -915,71 +843,12 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
                 'camera_a_z': float(self.request.get('camera.aZ')),
                 'camera_fl': float(self.request.get('camera.fl')),
                 'camera_sensor_resolution':
-                    float(self.request.get('camera.sensorResolution')),
-                'image_url': self.request.get('image.url'),
-                'image_update_interval_server':
-                    float(self.request.get('image.updateIntervalServer'))}
+                    float(self.request.get('camera.sensorResolution'))}
             callback = self.request.get('callback')
             db.run_in_transaction(self.transaction, data)
             dump_jsonp(self, {}, callback)
         except Exception, e:
-            logging.error('Could not update camera and image data: ' + str(e))
-
-# Provides the background image. Refetches it from the live source in certain
-# intervals. If the refetching fails, provides the old image, and if that image
-# is not valid, redirects to a place holder.
-class Image(webapp.RequestHandler):
-    # Retrieves a new image, stores it in the database for the entity
-    # "construction", and returns the image. Returns the old image, if the
-    # image retrieval fails.
-    @classmethod
-    def update_image(cls, construction):
-        old_image = construction.image
-        try:
-            if not construction.image_url:
-                return old_image
-            url = str(construction.image_url) + '?nocache=' + str(time.time())
-            
-            # To avoid concurrent requests, the deadline is set to a value less
-            # than the update interval:
-            deadline = construction.image_update_interval_server * 2. / 3.
-
-            tmp = urlfetch.Fetch(url, deadline=deadline)
-            if not tmp:
-                return old_image
-
-            new_image = db.Blob(tmp.content)
-        except:
-            return old_image
-        construction.image = new_image
-        construction.image_last_update = time.time()
-        construction.put()
-        return new_image
-
-    # Checks if the image needs to be updated. If not, returns the image
-    # currently stored in the data store. Otherwise, retrieves an up to date
-    # image, stores it in the data store and returns the result. If retrieving
-    # does fail, returns the image currently in the data store.
-    @classmethod
-    def transaction(cls):
-        construction = Construction.get_main()
-        if (time.time() > construction.image_last_update + \
-                construction.image_update_interval_server):
-            return cls.update_image(construction)
-        else:
-            return construction.image
-
-    def get(self):
-        try:
-            image = db.run_in_transaction(self.transaction)
-            if image:
-                self.response.headers['Content-Type'] = 'image/jpeg'
-                self.response.out.write(image)
-            else:
-                self.redirect(self.request.
-                              relative_url('/images/placeholder.gif'))
-        except Exception, e:
-            logging.error('Could not retrieve image: ' + str(e))
+            logging.error('Could not update camera data: ' + str(e))
 
 class RealityBuilderJs(webapp.RequestHandler):
     def get(self):
@@ -996,7 +865,6 @@ class RealityBuilderJs(webapp.RequestHandler):
 application = webapp.WSGIApplication([
     ('/realitybuilder.js', RealityBuilderJs),
     ('/', Index), ('/admin', Admin), 
-    ('/images/live.jpg', Image),
     ('/admin/rpc/delete', RPCAdminDelete),
     ('/admin/rpc/make_real', RPCAdminMakeReal),
     ('/admin/rpc/make_pending', RPCAdminMakePending),

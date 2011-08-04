@@ -35,6 +35,15 @@
     <script type="text/javascript" 
             src="/javascript/pages/common_index_admin.js"></script>
     <script type="text/javascript" src="/javascript/pages/index.js"></script>
+    <script type="text/javascript">
+      var djConfigBackup = djConfig;
+      djConfig = {};
+    </script>
+    <script type="text/javascript" 
+            src="/source/javascript/dojo-release-1.6.1/dojo/dojo.js"></script>
+    <script type="text/javascript">
+      djConfig = djConfigBackup;
+    </script>
   {%endblock%}
 {%endblock%}
 
@@ -62,6 +71,8 @@
         <div id="content">
           <div id="view">
             <img id="live" src="images/placeholder.gif" alt="Live Image">
+            <img id="backgroundImage" src="images/placeholder.gif" 
+                 alt="Background Image">
             <div id="sensor">
               <canvas id="sensorShadowCanvas" 
                       width="1" height="1"></canvas>

@@ -20,18 +20,26 @@
 /*global realitybuilder, dojo, dojox */
 
 (function () {
+    function onBrowserNotSupportedError() {
+        alert('Your browser is not supported.');
+    }
 
-function onBrowserNotSupportedError() {
-    alert('Your browser is not supported.');
-}
+    function onPrerenderedConfigurationChanged(i) {
+        var src = 'http://realitybuilder.googlecode.com/hg/documentation/' +
+            'sample_scene/prerendered_' + i + '.jpg';
 
-onload = function () {
-    // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
+        dojo.byId('backgroundImage').src = src;
+    }
 
-    realitybuilder.initialize({
-        showAdminControls: false,
-        onBrowserNotSupportedError: onBrowserNotSupportedError
-    });
-};
-
+    onload = function () {
+        // Note for IE < 9: FlashCanvas needs to be ready at this point in
+        // time!
+        
+        realitybuilder.initialize({
+            showAdminControls: false,
+            onBrowserNotSupportedError: onBrowserNotSupportedError,
+            onPrerenderedConfigurationChanged: 
+            onPrerenderedConfigurationChanged
+        });
+    };
 }());

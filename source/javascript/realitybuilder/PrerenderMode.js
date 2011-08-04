@@ -52,13 +52,15 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
     // Updates the settings of the camera to the version on the server, which
     // is described by "serverData".
     updateWithServerData: function (serverData) {
-        this._versionOnServer = serverData.version;
-        this._isEnabled = serverData.isEnabled;
-        this._makeRealAfter = serverData.makeRealAfter;
-        this._blockConfigurations = serverData.blockConfigurations;
-        this._i = serverData.i;
-
-        dojo.publish('realitybuilder/PrerenderMode/changed');
+        if (this._versionOnServer !== serverData.version) {
+            this._versionOnServer = serverData.version;
+            this._isEnabled = serverData.isEnabled;
+            this._makeRealAfter = serverData.makeRealAfter;
+            this._blockConfigurations = serverData.blockConfigurations;
+            this._i = serverData.i;
+            
+            dojo.publish('realitybuilder/PrerenderMode/changed');
+        }
     },
 
     i: function () {

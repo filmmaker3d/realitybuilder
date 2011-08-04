@@ -91,12 +91,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
             camera.sensorResolution();
     },
 
-    updateImageControls: function (image) {
-        dojo.byId('imageUrlTextField').value = image.url();
-        dojo.byId('imageUpdateIntervalServerTextField').value = 
-            image.updateIntervalServer();
-    },
-
     updatePrerenderModeControls: function () {
         var prerenderMode = this._construction.prerenderMode();
         if (prerenderMode.isEnabled()) {
@@ -127,17 +121,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
     nextPrerenderedBlockConfiguration: function () {
         var prerenderMode = this._construction.prerenderMode();
         prerenderMode.loadNextBlockConfigurationOnServer();
-    },
-
-    // Returns data describing the image settings in a format that is a subset
-    // of that used for exchanging image data with the server.
-    readImageControls: function () {
-        var data = {
-            'url': dojo.byId('imageUrlTextField').value || '',
-            'updateIntervalServer': 
-                parseFloat(dojo.byId('imageUpdateIntervalServerTextField').
-                           value) || 5};
-        return data;
     },
 
     // Returns data describing the camera settings in a format that is a subset

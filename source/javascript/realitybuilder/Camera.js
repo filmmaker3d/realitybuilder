@@ -147,8 +147,10 @@ dojo.declare('realitybuilder.Camera', null, {
     // Updates the settings of the camera to the version on the server, which
     // is described by "serverData".
     updateWithServerData: function (serverData) {
-        this._versionOnServer = serverData.version;
-        this.update(serverData);
+        if (this._versionOnServer !== serverData.version) {
+            this._versionOnServer = serverData.version;
+            this.update(serverData);
+        }
     },
 
     // Updates matrices describing the rotation of the camera. Should be called

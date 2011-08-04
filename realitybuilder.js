@@ -100,8 +100,8 @@ var realitybuilder = (function () {
             firstScriptEl = document.getElementsByTagName('script')[0];
     
             newScriptEl.type = 'text/javascript';
-            newScriptEl.async = true; // probably superfluous, but doesn't hurt
-            newScriptEl.onload = onScriptLoaded();
+            newScriptEl.onload = onScriptLoaded;
+            newScriptEl.async = 'true'; // probably superfluous
 
             newScriptEl.src = scriptUrl;
             firstScriptEl.parentNode.insertBefore(newScriptEl, firstScriptEl);
@@ -115,17 +115,17 @@ var realitybuilder = (function () {
         djConfig = {
             isDebug: true,
             locale: "en",
-            debugContainerId: 'firebugLite',
+            debugContainerId: "firebugLite",
             scopeMap: [
-                ['dojo', 'realitybuilderDojo'],
-                ['dijit', 'realitybuilderDijit'],
-                ['dojox', 'realitybuilderDojox']
+                ["dojo", "realitybuilderDojo"], 
+                ["dijit", "realitybuilderDijit"],
+                ["dojox", "realitybuilderDojox"]
             ],
             modulePaths: {
                 "realitybuilder": "/source/javascript/realitybuilder"
             }
         };
-
+            
         // For debugging it is assumed that this script is included from a file
         // which is hosted on the same domain.
         //
@@ -168,6 +168,9 @@ var realitybuilder = (function () {
         // * "onCanvasNotSupportedError": Optional function that is executed
         //   when the HTML canvas element is not supported by the browser.
         //   Without this element, the Reality Builder does not work.
+        //
+        // * "onPrerenderedConfigurationChanged": Optional function that is
+        //   executed when the prerendered configuration is changed.
         initialize: function (settings) {
             if (!w3cDOMIsSupported()) {
                 // Happens for example with Netscape 4. There is no point in

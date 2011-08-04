@@ -47,11 +47,13 @@ dojo.declare('realitybuilder.ConstructionBlockProperties', null, {
     // Updates the block properties to the version on the server, which is
     // described by "serverData".
     updateWithServerData: function (serverData) {
-        this._versionOnServer = serverData.version;
-        this._pendingColor = serverData.pendingColor;
-        this._realColor = serverData.realColor;
+        if (this._versionOnServer !== serverData.version) {
+            this._versionOnServer = serverData.version;
+            this._pendingColor = serverData.pendingColor;
+            this._realColor = serverData.realColor;
 
-        dojo.publish('realitybuilder/ConstructionBlockProperties/changed');
+            dojo.publish('realitybuilder/ConstructionBlockProperties/changed');
+        }
     },
 
     pendingColor: function () {

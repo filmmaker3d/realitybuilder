@@ -117,31 +117,33 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
     updateWithServerData: function (serverData) {
         var positionAngleWereInitialized;
 
-        if (!this.isInitializedWithServerData()) {
-            this._positionB = serverData.initPositionB;
-            this._a = serverData.initA;
-            positionAngleWereInitialized = true;
-        } else {
-            positionAngleWereInitialized = false;
+        if (this._versionOnServer !== serverData.version) {
+            if (!this.isInitializedWithServerData()) {
+                this._positionB = serverData.initPositionB;
+                this._a = serverData.initA;
+                positionAngleWereInitialized = true;
+            } else {
+                positionAngleWereInitialized = false;
+            }
+
+            this._moveSpace1B = serverData.moveSpace1B;
+            this._moveSpace2B = serverData.moveSpace2B;
+            this._buildSpace1B = serverData.buildSpace1B;
+            this._buildSpace2B = serverData.buildSpace2B;
+            
+            this._color = serverData.color;
+            this._stoppedColor = serverData.stoppedColor;
+            this._shadowColor = serverData.shadowColor;
+            this._shadowAlpha = serverData.shadowAlpha;
+
+            this._versionOnServer = serverData.version;
+
+            if (positionAngleWereInitialized) {
+                dojo.publish('realitybuilder/NewBlock/' + 
+                             'positionAngleInitialized');
+            }
+            dojo.publish('realitybuilder/NewBlock/moveOrBuildSpaceChanged');
         }
-
-        this._moveSpace1B = serverData.moveSpace1B;
-        this._moveSpace2B = serverData.moveSpace2B;
-        this._buildSpace1B = serverData.buildSpace1B;
-        this._buildSpace2B = serverData.buildSpace2B;
-
-        this._color = serverData.color;
-        this._stoppedColor = serverData.stoppedColor;
-        this._shadowColor = serverData.shadowColor;
-        this._shadowAlpha = serverData.shadowAlpha;
-
-        this._versionOnServer = serverData.version;
-
-        if (positionAngleWereInitialized) {
-            dojo.publish('realitybuilder/NewBlock/' + 
-                         'positionAngleInitialized');
-        }
-        dojo.publish('realitybuilder/NewBlock/moveOrBuildSpaceChanged');
     },
 
     // Returns true, iff the current block collides with any real block.

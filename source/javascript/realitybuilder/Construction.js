@@ -26,7 +26,6 @@ dojo.require('realitybuilder.ConstructionBlockProperties');
 dojo.require('realitybuilder.ConstructionBlocks');
 dojo.require('realitybuilder.ConstructionBlock');
 dojo.require('realitybuilder.NewBlock');
-dojo.require('realitybuilder.Image');
 dojo.require('realitybuilder.Camera');
 dojo.require('realitybuilder.AdminControls');
 dojo.require('realitybuilder.ControlPanel');
@@ -36,6 +35,8 @@ dojo.require('realitybuilder.util');
 dojo.require('dojo.io.script');
 
 dojo.declare('realitybuilder.Construction', null, {
+    _settings: null,
+
     // True, iff admin controls should be shown:
     _showAdminControls: null,
 
@@ -69,9 +70,6 @@ dojo.declare('realitybuilder.Construction', null, {
     // The camera, whose sensor is shown.
     _camera: null,
 
-    // The live image.
-    _image: null,
-
     // The control panel for moving around the block and requesting it to be
     // made real:
     _controlPanel: null,
@@ -94,6 +92,8 @@ dojo.declare('realitybuilder.Construction', null, {
             return;
         }
 
+        this._settings = settings;
+
         this._insertLoadIndicator();
 
         this._showAdminControls = settings.showAdminControls;
@@ -104,7 +104,6 @@ dojo.declare('realitybuilder.Construction', null, {
         this._constructionBlockProperties = 
             new rb.ConstructionBlockProperties();
         this._camera = new rb.Camera(this._blockProperties, 640, 480);
-        this._image = new rb.Image(this._camera);
         this._constructionBlocks = 
             new rb.ConstructionBlocks(this, 
                                       this._blockProperties,
@@ -155,8 +154,6 @@ dojo.declare('realitybuilder.Construction', null, {
                        this, this._onConstructionBlocksChanged);
         dojo.subscribe('realitybuilder/Camera/changed',
                        this, this._onCameraChanged);
-        dojo.subscribe('realitybuilder/Image/changed',
-                       this, this._onImageChanged);
         dojo.subscribe('realitybuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
         dojo.subscribe('realitybuilder/ConstructionBlockProperties/changed',
@@ -335,19 +332,19 @@ dojo.declare('realitybuilder.Construction', null, {
     },
 
     _onPrerenderModeChanged: function () {
+        var i;
+
         if (this._showAdminControls) {
             this._adminControls.
                 updatePrerenderModeControls();
         }
 
-        this._updateNewBlockStateIfFullyInitialized();
-    },
-
-    // Called after settings describing the live image have changed.
-    _onImageChanged: function () {
-        if (this._showAdminControls) {
-            this._adminControls.updateImageControls(this._image);
+        if ('onPrerenderedConfigurationChanged' in this._settings) {
+            i = this._prerenderMode.i();
+            this._settings.onPrerenderedConfigurationChanged(i);
         }
+
+        this._updateNewBlockStateIfFullyInitialized();
     },
 
     _insertLoadIndicator: function () {
@@ -360,8 +357,7 @@ dojo.declare('realitybuilder.Construction', null, {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
-            this._constructionBlockProperties.isInitializedWithServerData() &&
-            this._image.imageLoaded()) {
+            this._constructionBlockProperties.isInitializedWithServerData()) {
             // Shows the contents and removes the load indicator.
             dojo.destroy(dojo.byId('loadIndicator'));
             this._unhideContent();
@@ -384,8 +380,7 @@ dojo.declare('realitybuilder.Construction', null, {
         var that = this;
 
         if (data.blocksData.changed) {
-            this._constructionBlocks.updateWithServerData(data.blocksData, 
-                                                          this._image);
+            this._constructionBlocks.updateWithServerData(data.blocksData);
         }
 
         if (data.prerenderModeData.changed) {
@@ -394,10 +389,6 @@ dojo.declare('realitybuilder.Construction', null, {
 
         if (data.cameraData.changed) {
             this._camera.updateWithServerData(data.cameraData);
-        }
-
-        if (data.imageData.changed) {
-            this._image.updateWithServerData(data.imageData);
         }
 
         if (data.blockPropertiesData.changed) {
@@ -430,8 +421,6 @@ dojo.declare('realitybuilder.Construction', null, {
     // Triggers an update of the construction with the data stored on the
     // server. Only updates data where there is a new version. Fails silently
     // on error.
-    //
-    // Also updates the background image.
     _update: function () {
         dojo.io.script.get({
             url: realitybuilder.util.rootUrl() + "rpc/construction",
@@ -440,7 +429,6 @@ dojo.declare('realitybuilder.Construction', null, {
                 "blocksDataVersion": 
                 this._constructionBlocks.versionOnServer(),
                 "cameraDataVersion": this._camera.versionOnServer(),
-                "imageDataVersion": this._image.versionOnServer(),
                 "blockPropertiesDataVersion": 
                 this._blockProperties.versionOnServer(),
                 "constructionBlockPropertiesDataVersion": 
@@ -451,8 +439,6 @@ dojo.declare('realitybuilder.Construction', null, {
             },
             load: dojo.hitch(this, this._updateSucceeded)
         });
-
-        this._image.update();
     },
 
     // Unhides the content. Fades in the content, unless the browser is Internet
@@ -468,10 +454,9 @@ dojo.declare('realitybuilder.Construction', null, {
 
         dojo.style(contentNode, 'width', 'auto');
         dojo.style(contentNode, 'height', 'auto');
-        if (dojo.isIE && dojo.isIE <= 7) {
+        if (dojo.isIE && dojo.isIE <= 6) {
             // Necessary since otherwise IE 6 doesn't redraw after updating the
-            // dimensions, and IE 7 may otherwise not show the background
-            // image.
+            // dimensions.
             dojo.style(contentNode, 'zoom', '1');
         }
 
@@ -481,23 +466,19 @@ dojo.declare('realitybuilder.Construction', null, {
         }
     },
 
-    // Called if updating the camera and live image settings on the server
-    // succeeded. Triggers retrieval of the latest settings from the server,
-    // which would happen anyhow sooner or later, since the version of the
-    // settings has changed.
+    // Called if updating the settings on the server succeeded. Triggers
+    // retrieval of the latest settings from the server, which would happen
+    // anyhow sooner or later, since the version of the settings has changed.
     _storeSettingsOnServerSucceeded: function () {
         this._update(); // Will check for new settings.
     },
 
-    // Updates the camera and live image settings on the server. Fails silently
-    // on error.
+    // Updates certain settings on the server. Fails silently on error.
     storeSettingsOnServer: function () {
-        var imageData, cameraData, content, util;
+        var cameraData, content, util;
 
         util = realitybuilder.util;
 
-        imageData = util.addPrefix('image.', 
-                                   this._adminControls.readImageControls());
         cameraData = util.addPrefix('camera.', 
                                     this._adminControls.readCameraControls());
         cameraData['camera.x'] = cameraData['camera.position'][0];
@@ -505,7 +486,7 @@ dojo.declare('realitybuilder.Construction', null, {
         cameraData['camera.z'] = cameraData['camera.position'][2];
         content = {};
 
-        dojo.mixin(content, imageData, cameraData);
+        dojo.mixin(content, cameraData);
         dojo.io.script.get({
             url: realitybuilder.util.rootUrl() + "admin/rpc/update_settings",
             callbackParamName: "callback",

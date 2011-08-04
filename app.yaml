@@ -36,9 +36,6 @@ handlers:
 - url: /source
   static_dir: source
 
-- url: /images/live.jpg
-  script: main.py
-
 - url: /images
   static_dir: images
 

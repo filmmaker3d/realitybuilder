@@ -1,5 +1,4 @@
-// The sensor of the camera, displaying the live image plus objects on top of
-// it.
+// The sensor of the camera, displaying objects on top of the background image.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //

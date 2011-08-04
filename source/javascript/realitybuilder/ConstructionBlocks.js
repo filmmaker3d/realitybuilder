@@ -131,15 +131,18 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // Sets the data of construction blocks to the version on the server, which
     // is described by "serverData".
     updateWithServerData: function (serverData) {
-        this._versionOnServer = serverData.version;
+        if (this._versionOnServer !== serverData.version) {
+            this._versionOnServer = serverData.version;
 
-        this._blocks = dojo.map(serverData.blocks, 
-                                dojo.hitch(this,
-                                           this._createBlockFromServerData));
+            this._blocks = 
+                dojo.map(serverData.blocks, 
+                         dojo.hitch(this,
+                                    this._createBlockFromServerData));
 
-        this._updateRealBlocksSorted();
-        this._updatePendingBlocks();
-        dojo.publish('realitybuilder/ConstructionBlocks/changed');
+            this._updateRealBlocksSorted();
+            this._updatePendingBlocks();
+            dojo.publish('realitybuilder/ConstructionBlocks/changed');
+        }
     },
 
     // Sort function, for ordering blocks by height/layer. From top to bottom.

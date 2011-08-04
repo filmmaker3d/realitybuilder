@@ -20,18 +20,16 @@
 /*global realitybuilder, dojo, dojox, swfobject, videoId */
 
 (function () {
+    function onBrowserNotSupportedError() {
+        alert('Your browser is not supported.');
+    }
 
-function onBrowserNotSupportedError() {
-    alert('Your browser is not supported.');
-}
+    onload = function () {
+        // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
 
-onload = function () {
-    // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
-
-    realitybuilder.initialize({
-        showAdminControls: true,
-        onBrowserNotSupportedError: onBrowserNotSupportedError
-    });
-};
-
+        realitybuilder.initialize({
+            showAdminControls: true,
+            onBrowserNotSupportedError: onBrowserNotSupportedError
+        });
+    };
 }());

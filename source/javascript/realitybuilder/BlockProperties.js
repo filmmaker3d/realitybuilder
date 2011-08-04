@@ -197,21 +197,23 @@ dojo.declare('realitybuilder.BlockProperties', null, {
     // Updates the block properties to the version on the server, which is
     // described by "serverData".
     updateWithServerData: function (serverData) {
-        this._versionOnServer = serverData.version;
-        this._congruencyA = serverData.congruencyA;
-        this._positionSpacingXY = serverData.positionSpacingXY;
-        this._positionSpacingZ = serverData.positionSpacingZ;
-        this._outlineBXY = serverData.outlineBXY;
-        this._collisionOffsetsListBXY = serverData.collisionOffsetsListBXY;
-        this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
-        this._rotCenterBXY = serverData.rotCenterBXY;
-        this._backgroundAlpha = serverData.backgroundAlpha;
+        if (this._versionOnServer !== serverData.version) {
+            this._versionOnServer = serverData.version;
+            this._congruencyA = serverData.congruencyA;
+            this._positionSpacingXY = serverData.positionSpacingXY;
+            this._positionSpacingZ = serverData.positionSpacingZ;
+            this._outlineBXY = serverData.outlineBXY;
+            this._collisionOffsetsListBXY = serverData.collisionOffsetsListBXY;
+            this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
+            this._rotCenterBXY = serverData.rotCenterBXY;
+            this._backgroundAlpha = serverData.backgroundAlpha;
 
-        this._updateRotatedOutlinesBXY();
-        this._updateRotatedCollisionOffsetsListsBXY();
-        this._updateRotatedAttachmentOffsetsListsB();
+            this._updateRotatedOutlinesBXY();
+            this._updateRotatedCollisionOffsetsListsBXY();
+            this._updateRotatedAttachmentOffsetsListsB();
 
-        dojo.publish('realitybuilder/BlockProperties/changed');
+            dojo.publish('realitybuilder/BlockProperties/changed');
+        }
     },
 
     positionSpacingXY: function () {
