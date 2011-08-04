@@ -24,7 +24,6 @@ from google.appengine.dist import use_library
 use_library('django', '0.96')
 from google.appengine.api import mail
 from google.appengine.api import users
-from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -322,27 +321,6 @@ class ConstructionBlockProperties(db.Model):
 class PendingBlockEmail(db.Model):
     sender_address = db.EmailProperty()
     recipient_address = db.EmailProperty()
-
-class Index(webapp.RequestHandler):
-    def get(self):
-        template_values = {'debug': debug}
-        
-        path = os.path.join(os.path.dirname(__file__), 'index.html')
-        self.response.out.write(template.render(path, template_values))
-
-class Admin(webapp.RequestHandler):
-    def get(self):
-        user = users.get_current_user()
-        if user and users.is_current_user_admin():
-            template_values = {
-                'debug': debug, 
-                'logout_url': users.create_logout_url("/admin")}
-
-            path = os.path.join(os.path.dirname(__file__), 'admin.html')
-            self.response.out.write(template.render(path, template_values))
-        else:
-            self.redirect(users.create_login_url("/admin"))
-            return
 
 # Data describing a construction, including building blocks.
 class RPCConstruction(webapp.RequestHandler):
@@ -864,7 +842,6 @@ class RealityBuilderJs(webapp.RequestHandler):
 
 application = webapp.WSGIApplication([
     ('/realitybuilder.js', RealityBuilderJs),
-    ('/', Index), ('/admin', Admin), 
     ('/admin/rpc/delete', RPCAdminDelete),
     ('/admin/rpc/make_real', RPCAdminMakeReal),
     ('/admin/rpc/make_pending', RPCAdminMakePending),

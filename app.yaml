@@ -51,11 +51,15 @@ handlers:
   static_dir: demo/images
 
 - url: /demo/admin
-  script: demo/demo.py
+  script: demo/main.py
   login: required # admin check is done separately
 
-- url: /demo/admin/.*
-  script: demo/demo.py
+- url: /demo
+  script: demo/main.py
+
+# RPC for administration:
+- url: /admin/rpc/.*
+  script: main.py
   login: admin
   secure: always
 

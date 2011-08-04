@@ -45,7 +45,6 @@ dojo.js:
 ./../../release/dojo/realitybuilder/ShadowObscuringBlocks.js
 ./../../release/dojo/realitybuilder/Shadow.js
 ./../../release/dojo/realitybuilder/NewBlock.js
-./../../release/dojo/realitybuilder/Image.js
 ./../../release/dojo/realitybuilder/Sensor.js
 ./../../release/dojo/realitybuilder/Camera.js
 ./../../release/dojo/realitybuilder/AdminControls.js
@@ -101,7 +100,6 @@ dojo.xd.js:
 ./../../release/dojo/realitybuilder/ShadowObscuringBlocks.js
 ./../../release/dojo/realitybuilder/Shadow.js
 ./../../release/dojo/realitybuilder/NewBlock.js
-./../../release/dojo/realitybuilder/Image.js
 ./../../release/dojo/realitybuilder/Sensor.js
 ./../../release/dojo/realitybuilder/Camera.js
 ./../../release/dojo/realitybuilder/AdminControls.js

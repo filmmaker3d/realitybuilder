@@ -18,25 +18,14 @@
 
 {%block head%}
   {{block.super}}
-  <link rel="stylesheet" href="/stylesheets/admin.css">
+  <link rel="stylesheet" href="/demo/stylesheets/admin.css">
 {%endblock%}
 
 {%block script%}
   <script type="text/javascript">
-    var djConfigBackup = djConfig;
-    djConfig = {};
-  </script>
-  <script type="text/javascript" 
-          src="/source/javascript/dojo-release-1.6.1/dojo/dojo.js"></script>
-  <script type="text/javascript">
-    djConfig = djConfigBackup;
-  </script>
-  <script type="text/javascript">
     var logoutUrl = '{{logout_url}}'
   </script>
-  <script type="text/javascript" 
-    src="/javascript/pages/common_index_admin.js"></script>
-  <script type="text/javascript" src="/javascript/pages/admin.js"></script>
+  <script type="text/javascript" src="/demo/javascript/admin.js"></script>
 {%endblock%}
 
 {%block bottomBar%}

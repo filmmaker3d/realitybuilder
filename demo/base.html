@@ -22,15 +22,26 @@
   <meta http-equiv="content-type" content="text/html;charset=UTF-8">
   <meta http-equiv="content-language" content="en-us">
   <meta name="language" content="EN-US">
-  <link rel="SHORTCUT ICON" href="/images/favicon.png">
+  <link rel="SHORTCUT ICON" href="/demo/images/favicon.png">
   {# media="all" hides style sheets from Netscape 4 #}
-  <link rel="stylesheet" href="/stylesheets/base.css" media="all">
+  <link rel="stylesheet" href="/demo/stylesheets/base.css" media="all">
   <!--[if lte IE 7]>
-    <link rel="stylesheet" href="/stylesheets/base_lte_IE_7.css">
+    <link rel="stylesheet" href="/demo/stylesheets/base_lte_IE_7.css">
   <![endif]-->
   <!--[if IE 6]>
-    <link rel="stylesheet" href="/stylesheets/base_IE_6.css">
+    <link rel="stylesheet" href="/demo/stylesheets/base_IE_6.css">
   <![endif]-->
+
+  <script type="text/javascript">
+    var djConfigBackup = (typeof djConfig !== 'undefined') ? djConfig : {};
+    djConfig = {};
+  </script>
+  <script type="text/javascript" src="/demo/javascript/dojo.js"></script>
+  <script type="text/javascript">
+    djConfig = djConfigBackup;
+  </script>
+
+  <script type="text/javascript" src="/demo/javascript/common.js"></script>
   {%block head%}{%endblock%}
 </head>
 
