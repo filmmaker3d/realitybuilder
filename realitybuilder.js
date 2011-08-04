@@ -134,7 +134,7 @@ var realitybuilder = (function () {
         // work around GAE's current limitation of only being able to serve one
         // file at a  time (slow!). "host" would be the host  of the Google App
         // Engine, and not of the proxy.
-        scriptUrl = '/source/javascript/dojo-release-1.6.1/dojo/dojo.js';
+        scriptUrl = '/javascript/dojo-release-1.6.1/dojo/dojo.js';
 
         requestLoadScript(scriptUrl);
     }

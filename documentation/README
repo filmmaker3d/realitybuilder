@@ -10,8 +10,10 @@ Less well-known file extensions used:
 * 3dm: Rhino 3D
 
 
-Getting started
-===============
+Demo
+====
+
+To run the demo, proceed as follows:
 
 1. Upload the Reality Builder to the Google App Engine or start it on the
   development server included with the App Engine Python SDK.
@@ -19,15 +21,27 @@ Getting started
 2. Initialize sample data. For instuctions read the documentation at the top
   of:
 
-    /documentation/sample_scene/init.py
+    /demo/scene/init.py
 
-3. Visit the user interface. It is the home page of the site to where you
-  deployed.
+3. Visit the demo user and admin interfaces (URLs relative to document root):
 
-4. Visit the admin interface, where you can change settings and manage state of
-  blocks (path relative to user interface URL):
+    /demo
+    /demo/admin
 
-    /admin
+  In the admin interface you can change settings and manage state of blocks.
+
+To make the demo work with Internet Explorer versions less than 9, FlashCanvas
+Pro is required. For reasons of license, this library is not included in the
+distribution of the Reality Builder. If desired, install it as follows:
+
+1. Download FlashCanvas Pro 1.5 or compatible from: http://flashcanvas.net/
+
+2. Place FlashCanvas Pro into:
+
+    /proprietary/FlashCanvasPro
+
+  The directory "proprietary" is for proprietary software components that
+  should not be redistributed as part of the Reality Builder source code.
 
 
 Unit tests
@@ -36,23 +50,6 @@ Unit tests
 Run unit tests by visiting (relative to the root URL) with debug mode enabled:
 
   /source/javascript/realitybuilder/tests/runTests.html
-
-
-How to enable support for Internet Explorer versions less than 9
-================================================================
-
-To make the Reality Builder work with Internet Explorer versions less than 9,
-FlashCanvas Pro is required. For reasons of license, this library is not
-included in the distribution of the Reality Builder. To install it:
-
-1. Download FlashCanvas Pro 1.5 or compatible from: http://flashcanvas.net/
-
-2. Place FlashCanvas Pro into:
-
-  /proprietary/FlashCanvasPro
-
-  The directory "proprietary" is for proprietary software components that
-  should not be redistributed as part of the Reality Builder source code.
 
 
 About blocks

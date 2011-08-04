@@ -22,11 +22,9 @@ builtins:
 - remote_api: on
 
 handlers:
-- url: /stylesheets
-  static_dir: stylesheets
-
-- url: /javascript
-  static_dir: javascript
+- url: /
+  static_files: index.html
+  upload: index.html
 
 # For proprietary components such as FlashCanvas:
 - url: /proprietary
@@ -36,19 +34,28 @@ handlers:
 - url: /source
   static_dir: source
 
-- url: /images
-  static_dir: images
-
 # For development:
 - url: /documentation
   static_dir: documentation
 
-- url: /admin
-  script: main.py
+- url: /javascript
+  static_dir: javascript
+
+- url: /demo/stylesheets
+  static_dir: demo/stylesheets
+
+- url: /demo/javascript
+  static_dir: demo/javascript
+
+- url: /demo/images
+  static_dir: demo/images
+
+- url: /demo/admin
+  script: demo/demo.py
   login: required # admin check is done separately
 
-- url: /admin/.*
-  script: main.py
+- url: /demo/admin/.*
+  script: demo/demo.py
   login: admin
   secure: always
 

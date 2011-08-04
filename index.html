@@ -1,116 +1,41 @@
-{%comment%}
-  Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+<!DOCTYPE html>
+
+<!--
+
+    Copyright 2011 Felix E. Klee <felix.klee@inka.de>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not
+    use this file except in compliance with the License. You may obtain a copy
+    of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations
+    under the License.
+
+-->
+
+<html lang="en">
+  <head>
+    <meta charset ="utf-8" />
+    <title>Reality Builder</title>
+  </head>
   
-  Licensed under the Apache License, Version 2.0 (the "License"); you may not
-  use this file except in compliance with the License. You may obtain a copy of
-  the License at
+  <body>
+    <h1>Reality Builder</h1>
 
-    http://www.apache.org/licenses/LICENSE-2.0
+    <h2>Documentation</h2>
 
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-  License for the specific language governing permissions and limitations under
-  the License.
-{%endcomment%}
+    In the source distribution: <code>/documentation/README</code>
 
-{%extends "base.html"%}
+    <h2>Demo</h2>
 
-{%block head%}
-  <meta name="description" 
-        content="A tool for remote construction.">
-  {# media="all" hides style sheets from Netscape 4 #}
-  <link rel="stylesheet" href="/stylesheets/index.css" media="all">
-  <!--[if IE 6]>
-    <link rel="stylesheet" href="/stylesheets/index_IE_6.css">
-  <![endif]-->
-  <title>Reality Builder</title>        
-  <script type="text/javascript" src="/realitybuilder.js"></script>
-  <!--[if lt IE 9]>
-    <script type="text/javascript" src="/javascript/swfobject.js"></script>
-    <script type="text/javascript" 
-      src="/proprietary/FlashCanvasPro/bin/flashcanvas.js"></script>
-  <![endif]-->
-  {%block script%}
-    <script type="text/javascript">
-      var djConfigBackup = djConfig;
-      djConfig = {};
-    </script>
-    <script type="text/javascript" 
-            src="/source/javascript/dojo-release-1.6.1/dojo/dojo.js"></script>
-    <script type="text/javascript">
-      djConfig = djConfigBackup;
-    </script>
-    <script type="text/javascript" 
-            src="/javascript/pages/common_index_admin.js"></script>
-    <script type="text/javascript" src="/javascript/pages/index.js"></script>
-  {%endblock%}
-{%endblock%}
-
-{%block body%}
-  {%comment%}Certain content is added dynamically instead of being hidden and
-  later unhidden using CSS. Rationale: browsers that neither support CSS nor
-  JavaScript should only show the JavaScript-not-supported error
-  message.{%endcomment%}
-  <div id="loadIndicator"></div>
-  <table id="contentContainer">
-    <tr>
-      <td>
-        <div id="errorMessage">
-          <noscript>
-            <p class="first">The Reality Builder does not work because your
-            browser does not support <a 
-            href="http://developer.mozilla.org/en/JavaScript/About_JavaScript"
-            >JavaScript</a>, or because JavaScript is disabled.</p>
-          </noscript>
-          <div id="noCanvasErrorMessage">
-          </div>
-          <div id="noImagesErrorMessage">
-          </div>
-        </div>
-        <div id="content">
-          <div id="view">
-            <img id="backgroundImage" src="images/placeholder.gif" 
-                 alt="Background Image">
-            <div id="sensor">
-              <canvas id="sensorShadowCanvas" 
-                      width="1" height="1"></canvas>
-              <canvas id="sensorRealBlocksCanvas" 
-                      width="1" height="1"></canvas>
-              <canvas id="sensorPendingBlocksCanvas" 
-                      width="1" height="1"></canvas>
-              <canvas id="sensorNewBlockCanvas" 
-                      width="1" height="1"></canvas>
-            </div>
-            <div id="coordinateControls">
-              <canvas id="coordinateControlsCanvas" 
-                      width="1" height="1"></canvas>
-            </div>
-            <p id="status"></p>
-            <div id="controlPanel">
-              <div id="incXButton"></div>
-              <div id="decXButton"></div>
-              <div id="incYButton"></div>
-              <div id="decYButton"></div>
-              <div id="incZButton"></div>
-              <div id="decZButton"></div>
-              <div id="rotate90Button"></div>
-              <div id="requestRealButton"></div>
-            </div>
-          </div>
-
-          {# For admin mode. #}
-          {%block sideBar%}{%endblock%}
-          {%block bottomBar%}{%endblock%}
-        </div>
-      </td>
-    </tr>
-    {%if debug%}
-      <tr class="debug">
-        <td id="firebugLite">
-        </td>
-      </tr>
-    {%endif%}
-  </table>
-  <div id="DetectImageState"></div>
-{%endblock%}
+    <ul>
+      <li><a href="/demo">User Interface</a></li>
+      <li><a href="/demo/admin">Administration Interface</a></li>
+    </ul>
+  </body>
+</html>
