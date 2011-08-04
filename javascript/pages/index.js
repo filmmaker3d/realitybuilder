@@ -25,9 +25,7 @@
     }
 
     function onPrerenderedConfigurationChanged(i) {
-        var src = 'http://realitybuilder.googlecode.com/hg/documentation/' +
-            'sample_scene/prerendered_' + i + '.jpg';
-
+        var src = '/documentation/sample_scene/prerendered_' + i + '.jpg';
         dojo.byId('backgroundImage').src = src;
     }
 

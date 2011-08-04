@@ -24,12 +24,19 @@
         alert('Your browser is not supported.');
     }
 
+    function onPrerenderedConfigurationChanged(i) {
+        var src = '/documentation/sample_scene/prerendered_' + i + '.jpg';
+        dojo.byId('backgroundImage').src = src;
+    }
+
     onload = function () {
         // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
 
         realitybuilder.initialize({
             showAdminControls: true,
-            onBrowserNotSupportedError: onBrowserNotSupportedError
+            onBrowserNotSupportedError: onBrowserNotSupportedError,
+            onPrerenderedConfigurationChanged: 
+            onPrerenderedConfigurationChanged
         });
     };
 }());

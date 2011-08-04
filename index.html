@@ -32,9 +32,6 @@
       src="/proprietary/FlashCanvasPro/bin/flashcanvas.js"></script>
   <![endif]-->
   {%block script%}
-    <script type="text/javascript" 
-            src="/javascript/pages/common_index_admin.js"></script>
-    <script type="text/javascript" src="/javascript/pages/index.js"></script>
     <script type="text/javascript">
       var djConfigBackup = djConfig;
       djConfig = {};
@@ -44,6 +41,9 @@
     <script type="text/javascript">
       djConfig = djConfigBackup;
     </script>
+    <script type="text/javascript" 
+            src="/javascript/pages/common_index_admin.js"></script>
+    <script type="text/javascript" src="/javascript/pages/index.js"></script>
   {%endblock%}
 {%endblock%}
 
@@ -70,7 +70,6 @@
         </div>
         <div id="content">
           <div id="view">
-            <img id="live" src="images/placeholder.gif" alt="Live Image">
             <img id="backgroundImage" src="images/placeholder.gif" 
                  alt="Background Image">
             <div id="sensor">

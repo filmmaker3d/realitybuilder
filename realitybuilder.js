@@ -28,9 +28,10 @@ var realitybuilder = (function () {
     settings, publicInterface;
 
     function setupWidget() {
-        // The variable "construction" is never used, but witout it JSLint
-        // would complain.
+        // The variable "construction" is unused, but witout it JSLint
+        // complains.
         var construction = new realitybuilder.Construction(settings);
+        construction = null;
     }
 
     // Some old browsers may support JavaScript but not Dojo. In this case,
@@ -88,10 +89,10 @@ var realitybuilder = (function () {
     //
     //   http://friendlybit.com/js/lazy-loading-asyncronous-javascript/
     //
-    // However, this in general should be not problem. After all, in the
-    // anticipated use cases, the widget is an integral part of the page. Also,
-    // one can still work around the issue by loading the current script in an
-    // asynchronous way.
+    // However, in general this should be no problem. After all, in the
+    // anticipated use cases the widget is an integral part of a web page.
+    // Also, one can still work around the issue by loading the current script
+    // in an asynchronous way.
     function requestLoadScript(scriptUrl) {
         var newScriptEl, firstScriptEl;
 
