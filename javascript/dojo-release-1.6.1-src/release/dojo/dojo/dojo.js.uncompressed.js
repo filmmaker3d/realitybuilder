@@ -1,16 +1,20 @@
 /*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
-	Available via Academic Free License >= 2.1 OR the modified BSD license.
-	see: http://dojotoolkit.org/license for details
+
+  Copyright 2004-2011 Felix E. Klee <felix.klee@inka.de>, The Dojo Foundation
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+
 */
-
-/*
-	This is an optimized version of Dojo, built for deployment and not for
-	development. To get sources and documentation, please visit:
-
-		http://dojotoolkit.org
-*/
-
 ;(function(){
 
 	/*
@@ -16748,15 +16752,6 @@ realitybuilder.util.rootUrl = function () {
     }
 };
 
-// Necessary to work around a bug in Dojo 1.6 where "scopeMap" breaks
-// "dojo.query":
-//
-// <url:http://groups.google.com/group/dojo-interest/browse_thread/thread/2bcd6
-// c8aff0487cb/4a164ecba59d16f9>
-if (!('query' in dojo) && typeof acme !== 'undefined' && 'query' in acme) {
-    dojo.query = acme.query; 
-}
-
 }
 
 if(!dojo._hasResource["dojo.io.script"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
@@ -18880,12 +18875,11 @@ dojo.provide('realitybuilder.AdminControls');
 
 dojo.declare('realitybuilder.AdminControls', null, {
     // The construction that the admin controls are associated with.
-    _construction: null,
+    _main: null,
 
-    // Creates the admin interface associated with the construction
-    // "construction".
-    constructor: function (construction) {
-        this._construction = construction;
+    // Creates the admin interface associated with "main".
+    constructor: function (main) {
+        this._main = main;
 
         dojo.byId('bottomBar').style.width = 
             construction.camera().sensor().width() + 'px';
@@ -18894,14 +18888,14 @@ dojo.declare('realitybuilder.AdminControls', null, {
         this.updateTogglePendingButton();
 
         dojo.connect(dojo.byId('saveSettingsButton'), 'onclick', 
-            this._construction, this._construction.storeSettingsOnServer);
+            this._main, this._main.storeSettingsOnServer);
         dojo.connect(dojo.byId('previewCameraButton'), 'onclick', 
             this, this.updateCamera);
 
         dojo.connect(dojo.byId('toggleRealButton'), 'onclick', 
-            this._construction, this._construction.toggleReal);
+            this._main, this._main.toggleReal);
         dojo.connect(dojo.byId('togglePendingButton'), 'onclick', 
-            this._construction, this._construction.togglePending);
+            this._main, this._main.togglePending);
 
         dojo.connect(dojo.byId('logoutButton'), 'onclick', this, this.logOut);
 
@@ -18923,12 +18917,12 @@ dojo.declare('realitybuilder.AdminControls', null, {
 
     updateToggleRealButton: function () {
         dojo.byId('toggleRealButton').innerHTML = 
-            (this._construction.showReal() ? "Hide" : "Show") + " Real Blocks";
+            (this._main.showReal() ? "Hide" : "Show") + " Real Blocks";
     },
 
     updateTogglePendingButton: function () {
         dojo.byId('togglePendingButton').innerHTML = 
-            (this._construction.showPending() ? "Hide" : "Show") + 
+            (this._main.showPending() ? "Hide" : "Show") + 
             " Pending Blocks";
     },
 
@@ -18947,7 +18941,7 @@ dojo.declare('realitybuilder.AdminControls', null, {
     },
 
     updatePrerenderModeControls: function () {
-        var prerenderMode = this._construction.prerenderMode();
+        var prerenderMode = this._main.prerenderMode();
         if (prerenderMode.isEnabled()) {
             dojo.byId('prerenderedBlockConfigurationTextField').value =
                 prerenderMode.i();
@@ -18960,7 +18954,7 @@ dojo.declare('realitybuilder.AdminControls', null, {
     setPrerenderedBlockConfiguration: function () {
         var prerenderMode, i;
 
-        prerenderMode = this._construction.prerenderMode();
+        prerenderMode = this._main.prerenderMode();
 
         i = parseInt(dojo.byId('prerenderedBlockConfigurationTextField').value,
                      10);
@@ -18969,12 +18963,12 @@ dojo.declare('realitybuilder.AdminControls', null, {
     },
 
     prevPrerenderedBlockConfiguration: function () {
-        var prerenderMode = this._construction.prerenderMode();
+        var prerenderMode = this._main.prerenderMode();
         prerenderMode.loadPrevBlockConfigurationOnServer();
     },
 
     nextPrerenderedBlockConfiguration: function () {
-        var prerenderMode = this._construction.prerenderMode();
+        var prerenderMode = this._main.prerenderMode();
         prerenderMode.loadNextBlockConfigurationOnServer();
     },
 
@@ -18997,14 +18991,14 @@ dojo.declare('realitybuilder.AdminControls', null, {
 
     // Updates the camera, reading data from the camera controls.
     updateCamera: function () {
-        this._construction.camera().update(this.readCameraControls());
+        this._main.camera().update(this.readCameraControls());
     },
 
     updateCoordinateDisplays: function () {
         var positionB, a;
 
-        positionB = this._construction.newBlock().positionB();
-        a = this._construction.newBlock().a();
+        positionB = this._main.newBlock().positionB();
+        a = this._main.newBlock().a();
 
         dojo.byId('newBlockXB').innerHTML = positionB[0].toString();
         dojo.byId('newBlockYB').innerHTML = positionB[1].toString();
@@ -19039,7 +19033,7 @@ dojo.declare('realitybuilder.AdminControls', null, {
     _blocksSortedForTable: function () {
         // The blocks array is copied since the original array should not be
         // changed.
-        var tmp = dojo.map(this._construction.constructionBlocks().blocks(),
+        var tmp = dojo.map(this._main.constructionBlocks().blocks(),
             function (block) {
                 return block;
             });
@@ -19050,7 +19044,7 @@ dojo.declare('realitybuilder.AdminControls', null, {
     // Reads the value of the state selector "select" associated with the block
     // "block" and triggers setting of the state.
     _applyStateFromStateSelector: function (select, block) {
-        this._construction.constructionBlocks().
+        this._main.constructionBlocks().
             setBlockStateOnServer(block.positionB(), block.a(),
                                   parseInt(select.value, 10));
     },
@@ -19531,8 +19525,8 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.Construction']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.Construction'] = true;
+if(!dojo._hasResource['realitybuilder.Main']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realitybuilder.Main'] = true;
 // The construction and the controls.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -19554,7 +19548,7 @@ dojo._hasResource['realitybuilder.Construction'] = true;
 
 /*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.Construction');
+dojo.provide('realitybuilder.Main');
 
 
 
@@ -19569,7 +19563,7 @@ dojo.provide('realitybuilder.Construction');
 
 
 
-dojo.declare('realitybuilder.Construction', null, {
+dojo.declare('realitybuilder.Main', null, {
     _settings: null,
 
     // True, iff admin controls should be shown:

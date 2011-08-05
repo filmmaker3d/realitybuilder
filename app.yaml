@@ -75,6 +75,7 @@ skip_files:
 - ^javascript/dojo-release-1.6.1
 - ^javascript/dojo-release-1.6.1-src
 - ^javascript/realitybuilder
+- ^javascript/realitybuilder.profile.js
 - ^demo/source$
 - ^documentation$
 - ^LICENSE$

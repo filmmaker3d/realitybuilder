@@ -17,9 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDojo, acme */
-
-var djConfig; // for configuring Dojo
+/*global realitybuilderDojo, acme, djConfig */
 
 var realitybuilder = (function () {
     var
@@ -30,8 +28,8 @@ var realitybuilder = (function () {
     // Instanciates the widget and merges its global members into the
     // "realitybuilder" name space.
     function setupWidget() {
-        var tmp = new realitybuilder.Construction(settings);
-        realitybuilderDojo.mixin(realitybuilder, tmp);
+        var main = new realitybuilder.Main(settings);
+        realitybuilderDojo.mixin(realitybuilder, main);
     }
 
     // Some old browsers may support JavaScript but not Dojo. In this case,
@@ -51,8 +49,7 @@ var realitybuilder = (function () {
     function requestSetupWidget() {
         if (dojoIsSupported()) {
             // {% if debug %}
-            realitybuilderDojo.require('realitybuilder.Construction');
-            realitybuilderDojo.require('realitybuilder.util');
+            realitybuilderDojo.require('realitybuilder.Main');
             // {% endif %}
 
             // "addOnLoad" is necessary to wait for Dojo dependencies to be
@@ -77,12 +74,12 @@ var realitybuilder = (function () {
         }
     }
 
+    // Necessary to work around a bug in Dojo 1.6 where "scopeMap" breaks
+    // "dojo.query":
+    //
+    // <url:http://groups.google.com/group/dojo-interest/browse_thread/thread/2
+    // bcd6c8aff0487cb/4a164ecba59d16f9>
     function fixDojoBug() {
-        // Necessary to work around a bug in Dojo 1.6 where "scopeMap" breaks
-        // "dojo.query":
-        //
-        // <url:http://groups.google.com/group/dojo-interest/browse_thread/thre
-        // ad/2bcd6c8aff0487cb/4a164ecba59d16f9>
         if (!('query' in realitybuilderDojo) && 
             typeof acme !== 'undefined' && 'query' in acme) {
             realitybuilderDojo.query = acme.query; 

@@ -19,7 +19,7 @@
 
 /*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.Construction');
+dojo.provide('realitybuilder.Main');
 
 dojo.require('realitybuilder.BlockProperties');
 dojo.require('realitybuilder.ConstructionBlockProperties');
@@ -34,7 +34,7 @@ dojo.require('realitybuilder.util');
 
 dojo.require('dojo.io.script');
 
-dojo.declare('realitybuilder.Construction', null, {
+dojo.declare('realitybuilder.Main', null, {
     _settings: null,
 
     // True, iff admin controls should be shown:

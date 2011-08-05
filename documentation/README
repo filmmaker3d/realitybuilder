@@ -277,38 +277,41 @@ Miscellaneous
   
   How to create the build:
 
-  1. Run the following command in the Dojo "buildscripts" directory, from the
-    Windows XP command line:
+  a) Check that the copyright notice is still correct:
+
+    /javascript/realitybuilder.copyright
+
+  b) Run the following command in the Dojo source distribution's "buildscripts"
+    directory, from the Windows XP command line:
 
     > SET SCOPE_MAP=[
     > SET SCOPE_MAP=%SCOPE_MAP%[\"dojo\",\"realitybuilderDojo\"],
     > SET SCOPE_MAP=%SCOPE_MAP%[\"dijit\",\"realitybuilderDijit\"],
     > SET SCOPE_MAP=%SCOPE_MAP%[\"dojox\",\"realitybuilderDojox\"]]
-    > build.bat profile=realitybuilder action=release ^
+    > build.bat profileFile=../../../realitybuilder.profile.js action=release ^
       scopeDjConfig=\{locale:\"en\",parseOnLoad:true\} ^
       localeList=en loader=xdomain xdDojoScopeName=realitybuilderDojo ^
       optimize=shrinksafe scopeMap=%SCOPE_MAP%
+    > DEL /S /Q ..\..\..\dojo
+    > COPY ..\..\release\dojo\dojo\dojo.xd.js* ..\..\..\dojo
+    > XCOPY /E /I ..\..\release\dojo\dojo\_firebug ..\..\..\dojo\_firebug
+    > XCOPY /E /I ..\..\release\dojo\dojo\nls ..\..\..\dojo\nls
 
     Note(s):
 
-    * Specification of "scopeDjConfig" causes the global "djConfig" to be
+    . Specification of "scopeDjConfig" causes the global "djConfig" to be
       without effect, and therefore without conflict if existent.
 
-    * The locale is "en" to keep things simple. Also then it seems that with
+    . The locale is "en" to keep things simple. Also then it seems that with
       "en" no Dojo NLS bundle gets loaded.
 
-  2. Copy dojo and dojox related files and directories to "/javascript/dojo":
-
-    - dojo/dojo.xd.js: The so called Dojo layer, also containing the Reality
+    . dojo.xd.js: The so called Dojo layer, also containing the Reality
       Builder code. The script file is cross domain compatible, i.e. it can be
       hosted on another domain than that of the page loading it.
 
-    - dojo/_firebug: needed for Dojo debug mode
+    . _firebug: needed for Dojo debug mode
 
-    - dojo/nls: needed for at least "dojox.date.posix.strftime"
-
-    Source of the above resources, relative to the directory containing the
-    Dojo SDK: release/dojo/
+    . nls: needed for at least "dojox.date.posix.strftime"
 
 * Certain RPC calls require admin priveledges, namely those that are available
   only via the admin interface. This is necessary so that users cannot hack
