@@ -98,7 +98,7 @@ table#contentContainer tr.debug {
 }
 
 #controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 
-#incZButton, #decZButton, #rotate90Button, #requestRealButton {
+#incZButton, #decZButton, #rotate90Button, #requestMakeRealButton {
     position: absolute;
     background-image: url(../images/control_panel.png);
 }
@@ -125,11 +125,11 @@ table#contentContainer tr.debug {
     background-position: -170px -290px;
 }
 
-#incXButton.hover {
+#incXButton:hover {
     background-position: -170px -390px;
 }
 
-#incXButton.disabled {
+#incXButton.disabled, #incXButton.disabled:hover {
     background-position: -170px -490px;
 }
 
@@ -139,11 +139,11 @@ table#contentContainer tr.debug {
     background-position: -50px -240px;
 }
 
-#decXButton.hover {
+#decXButton:hover {
     background-position: -50px -340px;
 }
 
-#decXButton.disabled {
+#decXButton.disabled, #decXButton.disabled:hover {
     background-position: -50px -440px;
 }
 
@@ -153,11 +153,11 @@ table#contentContainer tr.debug {
     background-position: -170px -240px;
 }
 
-#incYButton.hover {
+#incYButton:hover {
     background-position: -170px -340px;
 }
 
-#incYButton.disabled {
+#incYButton.disabled, #incYButton.disabled:hover {
     background-position: -170px -440px;
 }
 
@@ -167,11 +167,11 @@ table#contentContainer tr.debug {
     background-position: -50px -290px;
 }
 
-#decYButton.hover {
+#decYButton:hover {
     background-position: -50px -390px;
 }
 
-#decYButton.disabled {
+#decYButton.disabled, #decYButton.disabled:hover {
     background-position: -50px -490px;
 }
 
@@ -186,11 +186,11 @@ table#contentContainer tr.debug {
     background-position: 0 -240px;
 }
 
-#incZButton.hover {
+#incZButton:hover {
     background-position: 0 -340px;
 }
 
-#incZButton.disabled {
+#incZButton.disabled, #incZButton.disabled:hover {
     background-position: 0 -440px;
 }
 
@@ -200,11 +200,11 @@ table#contentContainer tr.debug {
     background-position: 0 -290px;
 }
 
-#decZButton.hover {
+#decZButton:hover {
     background-position: 0 -390px;
 }
 
-#decZButton.disabled {
+#decZButton.disabled, #decZButton.disabled:hover {
     background-position: 0 -490px;
 }
 
@@ -216,15 +216,15 @@ table#contentContainer tr.debug {
     background-position: -110px -240px;
 }
 
-#rotate90Button.hover {
+#rotate90Button:hover {
     background-position: -110px -340px;
 }
 
-#rotate90Button.disabled {
+#rotate90Button.disabled, #rotate90Button.disabled:hover {
     background-position: -110px -440px;
 }
 
-#requestRealButton {
+#requestMakeRealButton {
     top: 10px;
     left: 250px;
     width: 90px;
@@ -232,10 +232,10 @@ table#contentContainer tr.debug {
     background-position: -230px -240px;
 }
 
-#requestRealButton.hover {
+#requestMakeRealButton:hover {
     background-position: -230px -340px;
 }
 
-#requestRealButton.disabled {
+#requestMakeRealButton.disabled, #requestMakeRealButton.disabled:hover {
     background-position: -230px -440px;
 }

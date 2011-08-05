@@ -27,9 +27,73 @@ var realitybuilderDemo = (function () {
         alert('Your web browser is not supported.');
     }
 
-    function onPrerenderedConfigurationChanged(i) {
+    function onPrerenderedBlockConfigurationChanged(i) {
         var src = '/demo/images/prerendered_' + i + '.jpg';
         dojo.byId('backgroundImage').src = src;
+    }
+
+    function controlButtonEl(type) {
+        return dojo.byId(type + 'Button');
+    }
+
+    // Updates the state of a control button, i.e. whether it's enabled or
+    // disabled.
+    function updateControlButtonState(type, shouldBeEnabled) {
+        var el = controlButtonEl(type);
+
+        if (shouldBeEnabled) {
+            dojo.removeClass(el, 'disabled');
+        } else {
+            dojo.addClass(el, 'disabled');
+        }
+    }
+
+    function updateMakeRealButtonState() {
+        updateControlButtonState('requestMakeReal', 
+                                 realitybuilder.newBlock().canBeMadeReal());
+    }
+
+    function onDegreesOfFreedomChanged() {
+        updateMakeRealButtonState();
+    }
+
+    function setUpControlButton(type, onClick) {
+        dojo.connect(controlButtonEl(type), 'onclick', onClick);
+    }
+
+    function setUpCoordinateButton(type, deltaB) {
+        setUpControlButton(type,
+                           function () {
+                               realitybuilder.newBlock().move(deltaB);
+                           });
+    }
+
+    function setUpRotate90Button() {
+        setUpControlButton('rotate90',
+                           function () {
+                               realitybuilder.newBlock().rotate90();
+                           });
+    }
+
+    function setUpRequestMakeRealButton() {
+        setUpControlButton('requestMakeReal',
+                           function () {
+                               realitybuilder.newBlock().requestMakeReal();
+                           });
+    }
+
+    // Called when the Reality Builder is ready.
+    //
+    // Sets up the user interface.
+    function onReady() {
+        setUpCoordinateButton('incX', [1, 0, 0]);
+        setUpCoordinateButton('decX', [-1, 0, 0]);
+        setUpCoordinateButton('incY', [0, 1, 0]);
+        setUpCoordinateButton('decY', [0, -1, 0]);
+        setUpCoordinateButton('incZ', [0, 0, 1]);
+        setUpCoordinateButton('decZ', [0, 0, -1]);
+        setUpRotate90Button();
+        setUpRequestMakeRealButton();
     }
 
     publicInterface = {
@@ -40,10 +104,12 @@ var realitybuilderDemo = (function () {
             realitybuilder.initialize({
                 width: 640,
                 height: 480,
+                onReady: onReady,
                 showAdminControls: showAdminControls,
                 onBrowserNotSupportedError: onBrowserNotSupportedError,
-                onPrerenderedConfigurationChanged: 
-                onPrerenderedConfigurationChanged
+                onPrerenderedBlockConfigurationChanged: 
+                onPrerenderedBlockConfigurationChanged,
+                onDegreesOfFreedomChanged: onDegreesOfFreedomChanged
             });
         }
     };

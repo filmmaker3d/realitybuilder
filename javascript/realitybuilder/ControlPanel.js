@@ -41,7 +41,7 @@ dojo.declare('realitybuilder.ControlPanel', null, {
 
         this._node = dojo.byId('controlPanel');
 
-        rb = realitybuilder;
+/*fixme:        rb = realitybuilder;
         nb = newBlock;
 
         buttons = [];
@@ -53,7 +53,9 @@ dojo.declare('realitybuilder.ControlPanel', null, {
         buttons.push(this._createCoordinateButton('decZ', [0, 0, -1]));
         buttons.push(this._createRotate90Button());
         buttons.push(this._createRequestRealButton());
-        this._buttons = buttons;
+        this._buttons = buttons;*/
+
+        this._buttons = [];
     },
 
     _createCoordinateButton: function (type, deltaB) {
@@ -71,8 +73,8 @@ dojo.declare('realitybuilder.ControlPanel', null, {
         };
 
         return new realitybuilder.ControlButton(type + 'Button', 
-                                                    onClicked, 
-                                                    shouldBeEnabled);
+                                                onClicked, 
+                                                shouldBeEnabled);
     },
 
     _createRotate90Button: function () {
@@ -90,8 +92,8 @@ dojo.declare('realitybuilder.ControlPanel', null, {
         };
 
         return new realitybuilder.ControlButton('rotate90Button', 
-                                                    onClicked, 
-                                                    shouldBeEnabled);
+                                                onClicked, 
+                                                shouldBeEnabled);
     },
 
     _createRequestRealButton: function () {
@@ -108,8 +110,8 @@ dojo.declare('realitybuilder.ControlPanel', null, {
         };
 
         return new realitybuilder.ControlButton('requestRealButton', 
-                                                    onClicked, 
-                                                    shouldBeEnabled);
+                                                onClicked, 
+                                                shouldBeEnabled);
     },
 
     // Updates the status of the buttons and that of the panel itself:
@@ -118,10 +120,10 @@ dojo.declare('realitybuilder.ControlPanel', null, {
             button.update();
         });
 
-        if (this._newBlock.isStopped()) {
+/*fixme:        if (this._newBlock.isStopped()) {
             dojo.addClass(this._node, 'disabled');
         } else {
             dojo.removeClass(this._node, 'disabled');
-        }
+        }*/
     }
 });

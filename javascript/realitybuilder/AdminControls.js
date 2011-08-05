@@ -32,7 +32,7 @@ dojo.declare('realitybuilder.AdminControls', null, {
         this._main = main;
 
         dojo.byId('bottomBar').style.width = 
-            construction.camera().sensor().width() + 'px';
+            main.camera().sensor().width() + 'px';
 
         this.updateToggleRealButton();
         this.updateTogglePendingButton();

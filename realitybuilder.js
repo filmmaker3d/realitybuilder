@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDojo, acme, djConfig */
+/*global realitybuilderDojo, acme, window */
 
 var realitybuilder = (function () {
     var
@@ -39,7 +39,7 @@ var realitybuilder = (function () {
     }
 
     // Returns false for some old browsers.
-    function w3cDOMIsSupported() {
+    function w3cDomIsSupported() {
         // The check does not use "in" since older browsers such as Netscape 4
         // don't support that operator.
         return document.getElementById && document.createElement;
@@ -79,7 +79,7 @@ var realitybuilder = (function () {
     //
     // <url:http://groups.google.com/group/dojo-interest/browse_thread/thread/2
     // bcd6c8aff0487cb/4a164ecba59d16f9>
-    function fixDojoBug() {
+    function fixDojoQueryBug() {
         if (!('query' in realitybuilderDojo) && 
             typeof acme !== 'undefined' && 'query' in acme) {
             realitybuilderDojo.query = acme.query; 
@@ -88,7 +88,7 @@ var realitybuilder = (function () {
 
     function onScriptLoaded() {
         scriptIsLoaded = true;
-        fixDojoBug();
+        fixDojoQueryBug();
         requestSetupWidgetIfInitialized();
     }
 
@@ -106,7 +106,7 @@ var realitybuilder = (function () {
     function requestLoadScript(scriptUrl) {
         var newScriptEl, firstScriptEl;
 
-        if (w3cDOMIsSupported()) {
+        if (w3cDomIsSupported()) {
             newScriptEl = document.createElement('script');
             firstScriptEl = document.getElementsByTagName('script')[0];
     
@@ -123,7 +123,7 @@ var realitybuilder = (function () {
     function requestLoadDebugScript() {
         var scriptUrl;
 
-        djConfig = {
+        window.djConfig = {
             isDebug: true,
             locale: "en",
             debugContainerId: "firebugLite",
@@ -157,12 +157,21 @@ var realitybuilder = (function () {
         requestLoadScript('http://' + host + '/javascript/dojo/dojo.xd.js');
     }
 
-    function setSettings(x) {
-        settings = x;
+    function mergeIntoSettings(newSettings) {
+        var prop;
+
+        for (prop in newSettings) {
+            if (newSettings.hasOwnProperty(prop)) {
+                settings[prop] = newSettings[prop];
+            }
+        }
     }
+
+    function nop() {}
 
     scriptIsLoaded = false;
     initialized = false;
+    settings = {};
 
     // {% if debug %}
     requestLoadDebugScript();
@@ -175,6 +184,12 @@ var realitybuilder = (function () {
         //
         // * "width", "height": dimensions (px)
         //
+        // Optional settings:
+        //
+        // * "onReady": Function that is called when the Reality Builder is
+        //   ready to use, i.e. after it has downloaded the required resources,
+        //   rendered itself, etc.
+        //
         // * "showAdminControls": Iff true, then the admin controls are shown,
         //   and - in the rendering - the real and pending blocks.
         //
@@ -183,17 +198,31 @@ var realitybuilder = (function () {
         //   the current browser doesn't support a required HTML element such
         //   as the canvas element.
         //
-        // Optional settings:
+        // * "onPrerenderedBlockConfigurationChanged": Function that is
+        //   executed when the prerendered configuration is changed.
         //
-        // * "onPrerenderedConfigurationChanged": Function that is executed
-        //   when the prerendered configuration is changed.
+        // * "onDegreesOfFreedomChanged": Function that is called when the
+        //   degrees of freedom of the new block changed.
+        //
+        //   That may happen for example when after the block has been moved
+        //   into a corner from where it can only be moved in certain
+        //   directions. Or it may happen if the block can now be made real.
         initialize: function (settings) {
-            if (!w3cDOMIsSupported()) {
+            var defaultSettings = {
+                showAdminControls: false,
+                onBrowserNotSupportedError: nop,
+                onPrerenderedBlockConfigurationChanged: nop,
+                onReady: nop,
+                onDegreesOfFreedomChanged: nop
+            };
+
+            if (!w3cDomIsSupported()) {
                 // Happens for example with Netscape 4. There is no point in
                 // continuing.
                 settings.onBrowserNotSupportedError();
             } else {
-                setSettings(settings);
+                mergeIntoSettings(defaultSettings);
+                mergeIntoSettings(settings);
                 initialized = true;
                 requestSetupWidgetIfScriptIsLoaded();
             }

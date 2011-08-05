@@ -196,12 +196,14 @@ dojo.declare('realitybuilder.Main', null, {
     _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
         this._controlPanel.update();
+        this._settings.onDegreesOfFreedomChanged();
     },
 
     // Called after the new block has been made movable.
     _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
         this._controlPanel.update();
+        this._settings.onDegreesOfFreedomChanged();
     },
 
     // Called after the block was requested to be made real.
@@ -247,6 +249,7 @@ dojo.declare('realitybuilder.Main', null, {
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
         this._controlPanel.update();
+        this._settings.onDegreesOfFreedomChanged();
         if (this._showAdminControls) {
             this._adminControls.updateCoordinateDisplays();
         }
@@ -275,8 +278,10 @@ dojo.declare('realitybuilder.Main', null, {
             this._newBlock.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
             this._prerenderMode.isInitializedWithServerData()) {
+
             this._newBlock.updatePositionAndMovability();
             this._controlPanel.update();
+            this._settings.onDegreesOfFreedomChanged();
 
             if (this._showAdminControls) {
                 // Necessary after updating the block position:
@@ -340,10 +345,8 @@ dojo.declare('realitybuilder.Main', null, {
                 updatePrerenderModeControls();
         }
 
-        if ('onPrerenderedConfigurationChanged' in this._settings) {
-            i = this._prerenderMode.i();
-            this._settings.onPrerenderedConfigurationChanged(i);
-        }
+        i = this._prerenderMode.i();
+        this._settings.onPrerenderedBlockConfigurationChanged(i);
 
         this._updateNewBlockStateIfFullyInitialized();
     },
@@ -353,7 +356,8 @@ dojo.declare('realitybuilder.Main', null, {
     },
 
     // Regularly checks if the construction has been loaded, so that the
-    // content on the web page can be unhidden.
+    // content on the web page can be unhidden and that it can be signaled that
+    // the widget is ready.
     _checkIfHasLoaded: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
@@ -362,6 +366,7 @@ dojo.declare('realitybuilder.Main', null, {
             // Shows the contents and removes the load indicator.
             dojo.destroy(dojo.byId('loadIndicator'));
             this._unhideContent();
+            this._settings.onReady();
         } else {
             // Schedules the next check.
             setTimeout(dojo.hitch(this, this._checkIfHasLoaded), 
