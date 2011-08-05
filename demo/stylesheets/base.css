@@ -19,7 +19,15 @@
     border-spacing: 0;
 }
 
-body, html {
+body, html, #view, #sensor, #coordinateControlsCanvas, #backgroundImage, 
+#status, #info {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+}
+
+html, body {
     height: 100%;
 }
 
@@ -84,4 +92,215 @@ p.first {
 
 #preload {
     display: none;
+}
+
+#loadIndicator {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+}
+
+#content {
+    /* Hides the content, and works with all browsers. Relying just on setting
+      the opacity didn't prove to work well with Internet Explorer version 8,
+      though perhaps it is doable. Setting display to "none" and later to
+      "block" seems IE6 to, at least sometimes, not draw all vector graphics.
+    */
+    width: 0;
+    height: 0;
+
+    overflow: hidden;
+}
+
+#errorMessage {
+    position: relative;
+    margin: 0 auto;
+    text-align: left;
+    width: 240px;
+}
+
+#sensor {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#sensorRealBlocksCanvas, #sensorPendingBlocksCanvas, #sensorShadowCanvas, 
+#sensorNewBlockCanvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#backgroundImage {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: #808080;
+}
+
+table#contentContainer {
+    position: absolute;
+}
+
+table#contentContainer td {
+    vertical-align: middle;
+}
+
+table#contentContainer tr {
+    height: 100%;
+}
+
+table#contentContainer tr.debug {
+    height: auto;
+}
+
+#view {
+    position: relative;
+    margin: 0 auto;
+    text-align: left;
+}
+
+#controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 
+#incZButton, #decZButton, #rotate90Button, #requestMakeRealButton {
+    position: absolute;
+    background-image: url(../images/control_panel.png);
+}
+
+#controlPanel {
+    bottom: 10px;
+    left: 145px;
+    width: 350px;
+    height: 110px;
+}
+
+#controlPanel.disabled {
+    background-position: 0px -120px;
+}
+
+#incXButton, #decXButton, #incYButton, #decYButton {
+    width: 50px;
+    height: 29px;
+}
+
+#incXButton {
+    top: 57px;
+    left: 174px;
+    background-position: -170px -290px;
+}
+
+#incXButton:hover {
+    background-position: -170px -390px;
+}
+
+#incXButton.disabled, #incXButton.disabled:hover {
+    background-position: -170px -490px;
+}
+
+#decXButton {
+    top: 24px;
+    left: 77px;
+    background-position: -50px -240px;
+}
+
+#decXButton:hover {
+    background-position: -50px -340px;
+}
+
+#decXButton.disabled, #decXButton.disabled:hover {
+    background-position: -50px -440px;
+}
+
+#incYButton {
+    top: 12px;
+    left: 154px;
+    background-position: -170px -240px;
+}
+
+#incYButton:hover {
+    background-position: -170px -340px;
+}
+
+#incYButton.disabled, #incYButton.disabled:hover {
+    background-position: -170px -440px;
+}
+
+#decYButton {
+    top: 68px;
+    left: 96px;
+    background-position: -50px -290px;
+}
+
+#decYButton:hover {
+    background-position: -50px -390px;
+}
+
+#decYButton.disabled, #decYButton.disabled:hover {
+    background-position: -50px -490px;
+}
+
+#incZButton, #decZButton {
+    width: 40px;
+    height: 40px;
+}
+
+#incZButton {
+    top: 10px;
+    left: 10px;
+    background-position: 0 -240px;
+}
+
+#incZButton:hover {
+    background-position: 0 -340px;
+}
+
+#incZButton.disabled, #incZButton.disabled:hover {
+    background-position: 0 -440px;
+}
+
+#decZButton {
+    top: 60px;
+    left: 10px;
+    background-position: 0 -290px;
+}
+
+#decZButton:hover {
+    background-position: 0 -390px;
+}
+
+#decZButton.disabled, #decZButton.disabled:hover {
+    background-position: 0 -490px;
+}
+
+#rotate90Button {
+    top: 40px;
+    left: 125px;
+    width: 49px;
+    height: 36px;
+    background-position: -110px -240px;
+}
+
+#rotate90Button:hover {
+    background-position: -110px -340px;
+}
+
+#rotate90Button.disabled, #rotate90Button.disabled:hover {
+    background-position: -110px -440px;
+}
+
+#requestMakeRealButton {
+    top: 10px;
+    left: 250px;
+    width: 90px;
+    height: 90px;
+    background-position: -230px -240px;
+}
+
+#requestMakeRealButton:hover {
+    background-position: -230px -340px;
+}
+
+#requestMakeRealButton.disabled, #requestMakeRealButton.disabled:hover {
+    background-position: -230px -440px;
 }

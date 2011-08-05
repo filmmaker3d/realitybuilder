@@ -275,6 +275,14 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
                 !this._wouldBeInMoveSpace(testPositionB));
     },
 
+    canBeRotated90: function () {
+        return !this.wouldGoOutOfRange([0, 0, 0], 1);
+    },
+
+    canBeMoved: function (deltaB) {
+        return !this.wouldGoOutOfRange(deltaB, 0);
+    },
+
     // Returns true, if this block would be outside the move space, if it was
     // at the position "testB" (block space coordinates). The move space is the
     // space in which the block is allowed to be moved around.

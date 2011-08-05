@@ -20,8 +20,27 @@
 /*global realitybuilder, dojo, dojox, alert */
 
 var realitybuilderDemo = (function () {
-    var publicInterface;
+    var publicInterface,
+    coordinateButtonDeltaBs = {
+        'incX': [1, 0, 0],
+        'decX': [-1, 0, 0],
+        'incY': [0, 1, 0],
+        'decY': [0, -1, 0],
+        'incZ': [0, 0, 1],
+        'decZ': [0, 0, -1]
+    };
     
+    function forEachCoordinateButton(f) {
+        var type, deltaB;
+
+        for (type in coordinateButtonDeltaBs) {
+            if (coordinateButtonDeltaBs.hasOwnProperty(type)) {
+                deltaB = coordinateButtonDeltaBs[type];
+                f(type, deltaB);
+            }
+        }
+    }
+
     function onBrowserNotSupportedError() {
         // "alert" works also in very old browsers such as Netscape 4.
         alert('Your web browser is not supported.');
@@ -48,12 +67,24 @@ var realitybuilderDemo = (function () {
         }
     }
 
+    function updateCoordinateButtonState(type, deltaB) {
+        updateControlButtonState(type, 
+                                 realitybuilder.newBlock().canBeMoved(deltaB));
+    }
+
+    function updateRotate90ButtonState() {
+        updateControlButtonState('rotate90', 
+                                 realitybuilder.newBlock().canBeRotated90());
+    }
+
     function updateMakeRealButtonState() {
         updateControlButtonState('requestMakeReal', 
                                  realitybuilder.newBlock().canBeMadeReal());
     }
 
     function onDegreesOfFreedomChanged() {
+        forEachCoordinateButton(updateCoordinateButtonState);
+        updateRotate90ButtonState();
         updateMakeRealButtonState();
     }
 
@@ -86,12 +117,7 @@ var realitybuilderDemo = (function () {
     //
     // Sets up the user interface.
     function onReady() {
-        setUpCoordinateButton('incX', [1, 0, 0]);
-        setUpCoordinateButton('decX', [-1, 0, 0]);
-        setUpCoordinateButton('incY', [0, 1, 0]);
-        setUpCoordinateButton('decY', [0, -1, 0]);
-        setUpCoordinateButton('incZ', [0, 0, 1]);
-        setUpCoordinateButton('decZ', [0, 0, -1]);
+        forEachCoordinateButton(setUpCoordinateButton);
         setUpRotate90Button();
         setUpRequestMakeRealButton();
     }

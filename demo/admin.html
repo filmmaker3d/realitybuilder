@@ -14,11 +14,18 @@
   the License.
 {%endcomment%}
 
-{%extends "index.html"%}
+{%extends "base.html"%}
 
 {%block head%}
   {{block.super}}
-  <link rel="stylesheet" href="/demo/stylesheets/admin.css">
+
+  <title>Reality Builder Administration</title>        
+  <meta name="description" content="A tool for remote construction.">
+
+  {# media="all" hides style sheets from Netscape 4 #}
+  <link rel="stylesheet" href="/demo/stylesheets/admin.css" media="all">
+
+  <script type="text/javascript" src="/demo/javascript/admin.js"></script>
 {%endblock%}
 
 {%block script%}

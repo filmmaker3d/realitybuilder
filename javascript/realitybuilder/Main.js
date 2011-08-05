@@ -28,7 +28,6 @@ dojo.require('realitybuilder.ConstructionBlock');
 dojo.require('realitybuilder.NewBlock');
 dojo.require('realitybuilder.Camera');
 dojo.require('realitybuilder.AdminControls');
-dojo.require('realitybuilder.ControlPanel');
 dojo.require('realitybuilder.PrerenderMode');
 dojo.require('realitybuilder.util');
 
@@ -69,10 +68,6 @@ dojo.declare('realitybuilder.Main', null, {
 
     // The camera, whose sensor is shown.
     _camera: null,
-
-    // The control panel for moving around the block and requesting it to be
-    // made real:
-    _controlPanel: null,
 
     // Controls for changing and inspecting settings and the construction.
     _adminControls: null,
@@ -115,8 +110,6 @@ dojo.declare('realitybuilder.Main', null, {
                                             this._camera,
                                             this._constructionBlocks,
                                             this._prerenderMode);
-        this._controlPanel = 
-            new rb.ControlPanel(this._newBlock);
 
         if (this._showAdminControls) {
             this._adminControls = new rb.AdminControls(this);
@@ -195,20 +188,17 @@ dojo.declare('realitybuilder.Main', null, {
     // Called after the new block has been stopped.
     _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
-        this._controlPanel.update();
         this._settings.onDegreesOfFreedomChanged();
     },
 
     // Called after the new block has been made movable.
     _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
-        this._controlPanel.update();
         this._settings.onDegreesOfFreedomChanged();
     },
 
     // Called after the block was requested to be made real.
     _onNewBlockMakeRealRequested: function () {
-        this._controlPanel.update();
     },
 
     // Toggles display of real blocks.
@@ -248,7 +238,6 @@ dojo.declare('realitybuilder.Main', null, {
     // updates controls.
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
-        this._controlPanel.update();
         this._settings.onDegreesOfFreedomChanged();
         if (this._showAdminControls) {
             this._adminControls.updateCoordinateDisplays();
@@ -280,7 +269,6 @@ dojo.declare('realitybuilder.Main', null, {
             this._prerenderMode.isInitializedWithServerData()) {
 
             this._newBlock.updatePositionAndMovability();
-            this._controlPanel.update();
             this._settings.onDegreesOfFreedomChanged();
 
             if (this._showAdminControls) {
