@@ -38,6 +38,8 @@ var realitybuilderDemo = (function () {
             // time!
         
             realitybuilder.initialize({
+                width: 640,
+                height: 480,
                 showAdminControls: showAdminControls,
                 onBrowserNotSupportedError: onBrowserNotSupportedError,
                 onPrerenderedConfigurationChanged: 

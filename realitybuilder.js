@@ -171,17 +171,22 @@ var realitybuilder = (function () {
     // {% endif %}
 
     publicInterface = {
-        // Available settings:
+        // Mandatory settings:
+        //
+        // * "width", "height": dimensions (px)
         //
         // * "showAdminControls": Iff true, then the admin controls are shown,
         //   and - in the rendering - the real and pending blocks.
         //
-        // * "onCanvasNotSupportedError": Optional function that is executed
-        //   when the HTML canvas element is not supported by the browser.
-        //   Without this element, the Reality Builder does not work.
+        // * "onBrowserNotSupportedError": Function that is executed when the
+        //   Reality Builder does not work with the current browser, e.g. when
+        //   the current browser doesn't support a required HTML element such
+        //   as the canvas element.
         //
-        // * "onPrerenderedConfigurationChanged": Optional function that is
-        //   executed when the prerendered configuration is changed.
+        // Optional settings:
+        //
+        // * "onPrerenderedConfigurationChanged": Function that is executed
+        //   when the prerendered configuration is changed.
         initialize: function (settings) {
             if (!w3cDOMIsSupported()) {
                 // Happens for example with Netscape 4. There is no point in
