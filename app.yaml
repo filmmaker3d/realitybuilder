@@ -30,11 +30,6 @@ handlers:
 - url: /proprietary
   static_dir: proprietary
 
-# For development:
-- url: /source
-  static_dir: source
-
-# For development:
 - url: /documentation
   static_dir: documentation
 
@@ -77,7 +72,10 @@ skip_files:
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
-- ^source$
+- ^javascript/dojo-release-1.6.1
+- ^javascript/dojo-release-1.6.1-src
+- ^javascript/realitybuilder
+- ^demo/source$
 - ^documentation$
 - ^LICENSE$
 - ^NOTICE$

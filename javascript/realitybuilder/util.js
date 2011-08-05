@@ -352,12 +352,3 @@ realitybuilder.util.rootUrl = function () {
         return dojo.baseUrl + '../../';
     }
 };
-
-// Necessary to work around a bug in Dojo 1.6 where "scopeMap" breaks
-// "dojo.query":
-//
-// <url:http://groups.google.com/group/dojo-interest/browse_thread/thread/2bcd6
-// c8aff0487cb/4a164ecba59d16f9>
-if (!('query' in dojo) && typeof acme !== 'undefined' && 'query' in acme) {
-    dojo.query = acme.query; 
-}

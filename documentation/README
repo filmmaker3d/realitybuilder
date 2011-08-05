@@ -21,7 +21,7 @@ To run the demo, proceed as follows:
 2. Initialize sample data. For instuctions read the documentation at the top
   of:
 
-    /demo/scene/init.py
+    /demo/source/scene/init.py
 
 3. Visit the demo user and admin interfaces (URLs relative to document root):
 
@@ -49,7 +49,7 @@ Unit tests
 
 Run unit tests by visiting (relative to the root URL) with debug mode enabled:
 
-  /source/javascript/realitybuilder/tests/runTests.html
+  /javascript/realitybuilder/tests/runTests.html
 
 
 About blocks
@@ -271,21 +271,6 @@ Miscellaneous
   Source: <url:http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2009-Septemb
   er/022702.html>
 
-* Centering of HTML content is done with the help of a table, since other
-  solutions don't seem to work decently with older browsers such as IE6. The
-  problem often is that when the window is too small, content is clipped from
-  the top.
-
-  When changing the implementation for centering, don't forget to check whether
-  the content is still displayed correctly when the browser window is smaller
-  than the content.
-
-* It seems that it's better to not set the interval of image updates by the
-  server too low, if the image source is slow. If it is not available, then
-  this may lead to many requests being stuck, at least on the client.
-
-* Image URLs at the same domain as the app don't seem to work.
-
 * The server directory "/javascript" is in part based on a so called custom
   Dojo build. One reason for using a custom build are limitations on the number
   and size of files on Google App Engine, as of April 2010.
@@ -333,9 +318,6 @@ Miscellaneous
   position the new block, even when there is little space left in the
   construction.
 
-* The date-time in the admin controls is shown in the time zone of the
-  system/browser.
-
 * States of blocks:
 
   - virtual: the new block which may be moved around has this state
@@ -345,11 +327,6 @@ Miscellaneous
   - real: a block that has been built
 
   - deleted: a block that has been removed or that is not planned to be build.
-
-* To initialize the set of blocks to some example set, visit the following URL,
-  relative to the root of the web site.
-
-    /admin/update
 
 * Polar coordinates are described by an array with two entries:
 
@@ -368,8 +345,6 @@ Miscellaneous
   block becomes a movable/virtual new block again. In other words: Through an
   entire session, there is only one new block object which changes state, from
   from virtual to pending to virtual and so on.
-
-* In the database, there are never two blocks at the same block space position.
 
 
 Legal

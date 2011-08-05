@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDojo */
+/*global realitybuilderDojo, acme */
 
 var djConfig; // for configuring Dojo
 
@@ -27,11 +27,11 @@ var realitybuilder = (function () {
     initialized, // true, after the public "initialize" has been called
     settings, publicInterface;
 
+    // Instanciates the widget and merges its global members into the
+    // "realitybuilder" name space.
     function setupWidget() {
-        // The variable "construction" is unused, but witout it JSLint
-        // complains.
-        var construction = new realitybuilder.Construction(settings);
-        construction = null;
+        var tmp = new realitybuilder.Construction(settings);
+        realitybuilderDojo.mixin(realitybuilder, tmp);
     }
 
     // Some old browsers may support JavaScript but not Dojo. In this case,
@@ -77,8 +77,21 @@ var realitybuilder = (function () {
         }
     }
 
+    function fixDojoBug() {
+        // Necessary to work around a bug in Dojo 1.6 where "scopeMap" breaks
+        // "dojo.query":
+        //
+        // <url:http://groups.google.com/group/dojo-interest/browse_thread/thre
+        // ad/2bcd6c8aff0487cb/4a164ecba59d16f9>
+        if (!('query' in realitybuilderDojo) && 
+            typeof acme !== 'undefined' && 'query' in acme) {
+            realitybuilderDojo.query = acme.query; 
+        }
+    }
+
     function onScriptLoaded() {
         scriptIsLoaded = true;
+        fixDojoBug();
         requestSetupWidgetIfInitialized();
     }
 
@@ -123,7 +136,7 @@ var realitybuilder = (function () {
                 ["dojox", "realitybuilderDojox"]
             ],
             modulePaths: {
-                "realitybuilder": "/source/javascript/realitybuilder"
+                "realitybuilder": "/javascript/realitybuilder"
             }
         };
             
