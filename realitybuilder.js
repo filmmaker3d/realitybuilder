@@ -186,6 +186,8 @@ var realitybuilder = (function () {
         //
         // Optional settings:
         //
+        // * "id": ID of HTML element into which to insert the Reality Builder.
+        //
         // * "onReady": Function that is called when the Reality Builder is
         //   ready to use, i.e. after it has downloaded the required resources,
         //   rendered itself, etc.
@@ -209,6 +211,7 @@ var realitybuilder = (function () {
         //   directions. Or it may happen if the block can now be made real.
         initialize: function (settings) {
             var defaultSettings = {
+                id: 'RealityBuilder',
                 showAdminControls: false,
                 onBrowserNotSupportedError: nop,
                 onPrerenderedBlockConfigurationChanged: nop,

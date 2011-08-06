@@ -17,8 +17,8 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDemo */
+/*global realitybuilderDemo, dojo */
 
-onload = function () { 
+dojo.addOnLoad(function () {
     realitybuilderDemo.onLoad(true); 
-};
+});

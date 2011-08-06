@@ -100,7 +100,7 @@ dojo.declare('realitybuilder.Main', null, {
             new rb.ConstructionBlockProperties();
         this._camera = new rb.Camera(this._blockProperties, 
                                      settings.width, settings.height,
-                                     dojo.byId('RealityBuilder'));
+                                     dojo.byId(settings.id));
         this._constructionBlocks = 
             new rb.ConstructionBlocks(this, 
                                       this._blockProperties,
