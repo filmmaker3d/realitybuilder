@@ -19,7 +19,7 @@
 
 /*global realitybuilder, dojo, dojox, alert */
 
-var realitybuilderDemo = (function () {
+var realitybuilderDemoBase = (function () {
     var publicInterface,
     coordinateButtonDeltaBs = {
         'incX': [1, 0, 0],
@@ -155,20 +155,16 @@ var realitybuilderDemo = (function () {
     }
 
     publicInterface = {
-        onLoad: function (showAdminControls) {
-            // Note for IE < 9: FlashCanvas needs to be ready at this point in
-            // time!
-        
-            realitybuilder.initialize({
+        settings: function () {
+            return {
                 width: 640,
                 height: 480,
                 onReady: onReady,
-                showAdminControls: showAdminControls,
                 onBrowserNotSupportedError: onBrowserNotSupportedError,
                 onPrerenderedBlockConfigurationChanged: 
                 onPrerenderedBlockConfigurationChanged,
                 onDegreesOfFreedomChanged: onDegreesOfFreedomChanged
-            });
+            };
         }
     };
 

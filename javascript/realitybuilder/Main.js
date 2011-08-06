@@ -201,18 +201,22 @@ dojo.declare('realitybuilder.Main', null, {
     _onNewBlockMakeRealRequested: function () {
     },
 
-    // Toggles display of real blocks.
-    toggleReal: function () {
-        this._showReal = !this._showReal;
-        this._camera.sensor().showRealBlocks(this._showReal);
-        this._adminControls.updateToggleRealButton();
+    setRealBlocksVisibility: function (shouldBeVisible) {
+        this._camera.sensor().setRealBlocksVisibility(shouldBeVisible);
+        this._settings.onRealBlocksVisibilityChanged();
     },
 
-    // Toggles display of pending blocks.
-    togglePending: function () {
-        this._showPending = !this._showPending;
-        this._camera.sensor().showPendingBlocks(this._showPending);
-        this._adminControls.updateTogglePendingButton();
+    setPendingBlocksVisibility: function (shouldBeVisible) {
+        this._camera.sensor().setPendingBlocksVisibility(shouldBeVisible);
+        this._settings.onPendingBlocksVisibilityChanged();
+    },
+
+    realBlocksAreVisible: function () {
+        return this._camera.sensor().realBlocksAreVisible();
+    },
+
+    pendingBlocksAreVisible: function () {
+        return this._camera.sensor().pendingBlocksAreVisible();
     },
 
     // Handles keys events.

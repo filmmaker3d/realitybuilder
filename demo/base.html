@@ -19,31 +19,30 @@
 <html lang="en">
 
 <head>
-  {% block head %}
-    <meta charset="UTF-8">
-    <link rel="SHORTCUT ICON" href="/demo/images/favicon.png">
+  <meta charset="UTF-8">
+  <link rel="SHORTCUT ICON" href="/demo/images/favicon.png">
 
-    {# media="all" hides style sheets from Netscape 4 #}
-    <link rel="stylesheet" href="/demo/stylesheets/reset.css" media="all">
-    <link rel="stylesheet" href="/demo/stylesheets/base.css" media="all">
+  {# media="all" hides style sheets from Netscape 4 #}
+  <link rel="stylesheet" href="/demo/stylesheets/reset.css" media="all">
+  <link rel="stylesheet" href="/demo/stylesheets/base.css" media="all">
 
-    <!--[if lte IE 7]>
-      <link rel="stylesheet" href="/demo/stylesheets/base_lte_IE_7.css">
-    <![endif]-->
+  <!--[if lte IE 7]>
+    <link rel="stylesheet" href="/demo/stylesheets/base_lte_IE_7.css">
+  <![endif]-->
 
-    {# Loaded before the RealityBuilder, to avoid "djConfig" conflicts: #}
-    <script type="text/javascript" src="/demo/javascript/dojo.js"></script>
+  {# Loaded before the RealityBuilder, to avoid "djConfig" conflicts: #}
+  <script type="text/javascript" src="/demo/javascript/dojo.js"></script>
 
-    <script type="text/javascript" src="/realitybuilder.js"></script>
-    <!--[if lt IE 9]>
-      <script type="text/javascript" 
-              src="/demo/javascript/swfobject.js"></script>
-      <script type="text/javascript" 
-              src="/proprietary/FlashCanvasPro/bin/flashcanvas.js"></script>
-    <![endif]-->
+  <script type="text/javascript" src="/realitybuilder.js"></script>
+  <!--[if lt IE 9]>
+    <script type="text/javascript" 
+            src="/demo/javascript/swfobject.js"></script>
+    <script type="text/javascript" 
+            src="/proprietary/FlashCanvasPro/bin/flashcanvas.js"></script>
+  <![endif]-->
 
-    <script type="text/javascript" src="/demo/javascript/base.js"></script>
-  {% endblock head %}
+  <script type="text/javascript" src="/demo/javascript/base.js"></script>
+  {% block head %}{% endblock head %}
 </head>
 
 <body>

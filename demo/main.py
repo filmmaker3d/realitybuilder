@@ -40,7 +40,7 @@ class Admin(webapp.RequestHandler):
         user = users.get_current_user()
         if user and users.is_current_user_admin():
             template_values = {
-                'logout_url': users.create_logout_url("/admin")}
+                'logout_url': users.create_logout_url("/demo/admin")}
 
             path = os.path.join(os.path.dirname(__file__), 'admin.html')
             self.response.out.write(template.render(path, template_values))

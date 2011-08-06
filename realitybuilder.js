@@ -221,7 +221,9 @@ var realitybuilder = (function () {
                 onBrowserNotSupportedError: nop,
                 onPrerenderedBlockConfigurationChanged: nop,
                 onReady: nop,
-                onDegreesOfFreedomChanged: nop
+                onDegreesOfFreedomChanged: nop,
+                onRealBlocksVisibilityChanged: nop,
+                onPendingBlocksVisibilityChanged: nop
             };
 
             if (!w3cDomIsSupported()) {

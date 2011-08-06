@@ -17,8 +17,74 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDemo, dojo */
+/*global realitybuilderDemoBase, realitybuilder, dojo */
 
-dojo.addOnLoad(function () {
-    realitybuilderDemo.onLoad(true); 
-});
+(function () {
+    var blocksVisibilityButtonHandles = {};
+
+    function updateBlocksVisibilityButton(type, text, blocksAreVisible, 
+                                          setVisibility)
+    {
+        var node = dojo.byId(type + 'BlocksVisibilityButton');
+        node.innerHTML = (blocksAreVisible ? "Hide" : "Show") + " " + 
+            text + " Blocks";
+        if (type in blocksVisibilityButtonHandles) {
+            dojo.disconnect(blocksVisibilityButtonHandles[type]);
+        }
+        blocksVisibilityButtonHandles[type] = 
+            dojo.connect(node, 'onclick', 
+                         function () { setVisibility(!blocksAreVisible); });
+    }
+
+    function updateRealBlocksVisibilityButton() {
+        var setVisibility, blocksAreVisible;
+
+        setVisibility = dojo.hitch(realitybuilder,
+                                   realitybuilder.setRealBlocksVisibility);
+        blocksAreVisible = realitybuilder.realBlocksAreVisible();
+        updateBlocksVisibilityButton('real', 'Real', 
+                                     blocksAreVisible, setVisibility);
+    }
+
+    function updatePendingBlocksVisibilityButton() {
+        var setVisibility, blocksAreVisible;
+
+        setVisibility = dojo.hitch(realitybuilder,
+                                   realitybuilder.setPendingBlocksVisibility);
+        blocksAreVisible = realitybuilder.pendingBlocksAreVisible();
+        updateBlocksVisibilityButton('pending', 'Pending', 
+                                     blocksAreVisible, setVisibility);
+    }
+
+    function onRealBlocksVisibilityChanged() {
+        updateRealBlocksVisibilityButton();
+    }
+
+    function onPendingBlocksVisibilityChanged() {
+        updatePendingBlocksVisibilityButton();
+    }
+
+    function onReady() {
+        updateRealBlocksVisibilityButton();
+        updatePendingBlocksVisibilityButton();
+    }
+
+    dojo.addOnLoad(function () {
+        var settings, baseOnReady;
+        
+        settings = realitybuilderDemoBase.settings();
+        baseOnReady = settings.onReady;
+        dojo.mixin(settings, {
+            showAdminControls: true,
+            onReady: function () {
+                baseOnReady();
+                onReady();
+            },
+            onRealBlocksVisibilityChanged: onRealBlocksVisibilityChanged,
+            onPendingBlocksVisibilityChanged: onPendingBlocksVisibilityChanged
+        });
+        
+        realitybuilder.initialize(settings);
+    });
+}());
+

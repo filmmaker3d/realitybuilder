@@ -17,8 +17,12 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDemo, dojo */
+/*global realitybuilderDemoBase, realitybuilder, dojo */
 
 dojo.addOnLoad(function () {
-    realitybuilderDemo.onLoad(false);
+    var settings = realitybuilderDemoBase.settings();
+
+    // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
+
+    realitybuilder.initialize(settings);
 });

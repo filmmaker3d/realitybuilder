@@ -116,18 +116,31 @@ dojo.declare('realitybuilder.Sensor', null, {
         return this._canvasNodes.newBlock;
     },
 
-    _setCanvasVisibility: function (canvas, show) {
-        dojo.style(canvas, 'visibility', show ? 'visible' : 'hidden');
+    _setCanvasVisibility: function (canvas, shouldBeVisible) {
+        dojo.style(canvas, 'visibility', 
+                   shouldBeVisible ? 'visible' : 'hidden');
     },
 
-    // Iff show is true, then shows the real blocks.
-    showRealBlocks: function (show) {
-        this._setCanvasVisibility(this._canvasNodes.realBlocks, show);
+    _canvasIsVisible: function (canvas) {
+        return dojo.style(canvas, 'visibility') === 'visible';
     },
 
-    // Iff show is true, then shows the pending blocks.
-    showPendingBlocks: function (show) {
-        this._setCanvasVisibility(this._canvasNodes.pendingBlocks, show);
+    realBlocksAreVisible: function () {
+        return this._canvasIsVisible(this._canvasNodes.realBlocks);
+    },
+
+    pendingBlocksAreVisible: function () {
+        return this._canvasIsVisible(this._canvasNodes.pendingBlocks);
+    },
+
+    setRealBlocksVisibility: function (shouldBeVisible) {
+        this._setCanvasVisibility(this._canvasNodes.realBlocks, 
+                                  shouldBeVisible);
+    },
+
+    setPendingBlocksVisibility: function (shouldBeVisible) {
+        this._setCanvasVisibility(this._canvasNodes.pendingBlocks, 
+                                  shouldBeVisible);
     },
 
     width: function () {

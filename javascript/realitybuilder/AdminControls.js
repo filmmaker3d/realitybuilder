@@ -34,18 +34,10 @@ dojo.declare('realitybuilder.AdminControls', null, {
         dojo.byId('bottomBar').style.width = 
             main.camera().sensor().width() + 'px';
 
-        this.updateToggleRealButton();
-        this.updateTogglePendingButton();
-
         dojo.connect(dojo.byId('saveSettingsButton'), 'onclick', 
             this._main, this._main.storeSettingsOnServer);
         dojo.connect(dojo.byId('previewCameraButton'), 'onclick', 
             this, this.updateCamera);
-
-        dojo.connect(dojo.byId('toggleRealButton'), 'onclick', 
-            this._main, this._main.toggleReal);
-        dojo.connect(dojo.byId('togglePendingButton'), 'onclick', 
-            this._main, this._main.togglePending);
 
         dojo.connect(dojo.byId('logoutButton'), 'onclick', this, this.logOut);
 
@@ -63,17 +55,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
     // Logs the administrator out, sending him back to the login screen.
     logOut: function () {
         location.href = logoutUrl;
-    },
-
-    updateToggleRealButton: function () {
-        dojo.byId('toggleRealButton').innerHTML = 
-            (this._main.showReal() ? "Hide" : "Show") + " Real Blocks";
-    },
-
-    updateTogglePendingButton: function () {
-        dojo.byId('togglePendingButton').innerHTML = 
-            (this._main.showPending() ? "Hide" : "Show") + 
-            " Pending Blocks";
     },
 
     // Updates controls defining the camera "camera".
