@@ -16746,7 +16746,7 @@ realitybuilder.util.fillCanvas = function (canvas, color) {
 // Has a trailing slash.
 realitybuilder.util.rootUrl = function () {
     if (dojo.config.isDebug) {
-        return dojo.baseUrl + '../../../../';
+        return dojo.baseUrl + '../../../';
     } else {
         return dojo.baseUrl + '../../';
     }
@@ -18202,6 +18202,14 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
                 !this._wouldBeInMoveSpace(testPositionB));
     },
 
+    canBeRotated90: function () {
+        return !this.wouldGoOutOfRange([0, 0, 0], 1);
+    },
+
+    canBeMoved: function (deltaB) {
+        return !this.wouldGoOutOfRange(deltaB, 0);
+    },
+
     // Returns true, if this block would be outside the move space, if it was
     // at the position "testB" (block space coordinates). The move space is the
     // space in which the block is allowed to be moved around.
@@ -18531,65 +18539,97 @@ dojo.provide('realitybuilder.Sensor');
 
 dojo.declare('realitybuilder.Sensor', null, {
     // Canvases for drawing various parts.
-    _realBlocksCanvas: null,
-    _pendingBlocksCanvas: null,
-    _shadowCanvas: null,
-    _newBlockCanvas: null,
+    _canvasNodes: null,
 
     // Dimensions in pixels.
     _width: null,
     _height: null,
 
     // Sets up the sensor of the camera, with width "width" and height
-    // "height".
-    constructor: function (width, height) {
-        this._realBlocksCanvas = dojo.byId('sensorRealBlocksCanvas');
-        this._pendingBlocksCanvas = dojo.byId('sensorPendingBlocksCanvas');
-        this._shadowCanvas = dojo.byId('sensorShadowCanvas');
-        this._newBlockCanvas = dojo.byId('sensorNewBlockCanvas');
+    // "height". The sensor is placed as a child of the DOM node "node".
+    constructor: function (width, height, node) {
+        var sensorNode;
+
+        sensorNode = this._addSensorNode(node);
+
+        this._canvasNodes = {};
+        dojo.forEach(['realBlocks', 'pendingBlocks', 'shadow', 'newBlock'],
+                     dojo.hitch(this, function (key) {
+                         this._canvasNodes[key] = 
+                             this._addCanvasNode(sensorNode, width, height);
+                     }));
 
         this._width = width;
         this._height = height;
-
-        this._setCanvasesDimensions();
-
-        // Sets the dimensions of the surrounding container so that it can
-        // float as desired:
-        var viewNode = dojo.byId('view');
-        viewNode.style.width = width + 'px';
-        viewNode.style.height = height + 'px';
     },
 
-    // Sets the dimensions of the canvases.
-    _setCanvasesDimensions: function () {
-        var canvases = [
-                this._realBlocksCanvas, 
-                this._pendingBlocksCanvas, 
-                this._shadowCanvas, 
-                this._newBlockCanvas],
-            width = this._width, height = this._height;
-        dojo.forEach(canvases, function (canvas) {
-            dojo.attr(canvas, 'width', width);
-            dojo.attr(canvas, 'height', height);
-            dojo.style(canvas, 'width', width + 'px');
-            dojo.style(canvas, 'height', height + 'px');
-        });        
+    // Merges "style" into some basic style settings, which reset the style of
+    // a block element to reasonable default values.
+    _styleBasedOnDefaults: function (style) {
+        var tmp;
+
+        tmp = {
+	        margin: 0,
+	        padding: 0,
+	        border: 0,
+            display: 'block'
+        };
+
+        dojo.mixin(tmp, style);
+
+        return tmp;
+    },
+
+    _addSensorNode: function (node) {
+        var sensorNode;
+
+        sensorNode = dojo.create('div', null, node);
+
+        dojo.style(sensorNode, this._styleBasedOnDefaults({
+            position: 'relative'
+        }));
+
+        return sensorNode;
+    },
+
+    // Returns the canvas node.
+    _addCanvasNode: function (sensorNode, width, height) {
+        var canvasNode;
+
+        canvasNode = dojo.create('canvas', {
+            width: width,
+            height: height
+        }, sensorNode);
+
+        dojo.style(canvasNode, this._styleBasedOnDefaults({
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: width,
+            height: height
+        }));
+
+        if (realitybuilder.util.isFlashCanvasActive()) {
+            FlashCanvas.initElement(canvasNode);
+        }
+
+        return canvasNode;
     },
 
     realBlocksCanvas: function () {
-        return this._realBlocksCanvas;
+        return this._canvasNodes.realBlocks;
     },
 
     pendingBlocksCanvas: function () {
-        return this._pendingBlocksCanvas;
+        return this._canvasNodes.pendingBlocks;
     },
 
     shadowCanvas: function () {
-        return this._shadowCanvas;
+        return this._canvasNodes.shadow;
     },
 
     newBlockCanvas: function () {
-        return this._newBlockCanvas;
+        return this._canvasNodes.newBlock;
     },
 
     _setCanvasVisibility: function (canvas, show) {
@@ -18598,12 +18638,12 @@ dojo.declare('realitybuilder.Sensor', null, {
 
     // Iff show is true, then shows the real blocks.
     showRealBlocks: function (show) {
-        this._setCanvasVisibility(this._realBlocksCanvas, show);
+        this._setCanvasVisibility(this._canvasNodes.realBlocks, show);
     },
 
     // Iff show is true, then shows the pending blocks.
     showPendingBlocks: function (show) {
-        this._setCanvasVisibility(this._pendingBlocksCanvas, show);
+        this._setCanvasVisibility(this._canvasNodes.pendingBlocks, show);
     },
 
     width: function () {
@@ -18695,11 +18735,11 @@ dojo.declare('realitybuilder.Camera', null, {
     // on every change of camera settings, not only on those on the server.
     _id: null,
 
-    constructor: function (blockProperties, sensorWidth, sensorHeight) {
+    constructor: function (blockProperties, sensorWidth, sensorHeight, node) {
         this._blockProperties = blockProperties;
         this._position = [0, 0, 1];
         this._sensor = 
-            new realitybuilder.Sensor(sensorWidth, sensorHeight);
+            new realitybuilder.Sensor(sensorWidth, sensorHeight, node);
         this._updateRotationMatrices();
         
     },
@@ -18882,7 +18922,7 @@ dojo.declare('realitybuilder.AdminControls', null, {
         this._main = main;
 
         dojo.byId('bottomBar').style.width = 
-            construction.camera().sensor().width() + 'px';
+            main.camera().sensor().width() + 'px';
 
         this.updateToggleRealButton();
         this.updateTogglePendingButton();
@@ -19119,222 +19159,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.ControlButton']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.ControlButton'] = true;
-// Button in the control panel for moving and positioning the new block.
-
-// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy
-// of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
-
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
-
-dojo.provide('realitybuilder.ControlButton');
-
-dojo.declare('realitybuilder.ControlButton', null, {
-    // Function that's called when button is clicked:
-    _onClicked: null,
-
-    // Function that's called to check whether button should be enabled:
-    _shouldBeEnabled: null,
-
-    // Status of the button:
-    _isEnabled: false,
-
-    // Node object representing the button.
-    _node: null,
-
-    // Creates a control button associated with the ID "id". When the button is
-    // clicked, then calls the function "onClicked". To decide whether the
-    // button should be enabled, executes the function "shouldBeEnabled".
-    constructor: function (id, onClicked, shouldBeEnabled) { 
-        this._onClicked = onClicked;
-        this._shouldBeEnabled = shouldBeEnabled;
-
-        this._node = dojo.byId(id);
-
-        dojo.connect(this._node, 'onclick', this, this._onClicked2);
-        dojo.connect(this._node, 'onmouseover', this, this._onMouseOver);
-        dojo.connect(this._node, 'onmouseout', this, this._onMouseOut);
-    },
-
-    _onMouseOver: function () {
-        if (this._isEnabled) {
-            dojo.addClass(this._node, 'hover');
-        }
-    },
-
-    _onMouseOut: function () {
-        dojo.removeClass(this._node, 'hover');
-    },
-
-    _onClicked2: function () {
-        if (this._isEnabled) {
-            this._onClicked();
-        }
-    },
-
-    // Updates the enabled status of the button.
-    update: function () {
-        this._isEnabled = this._shouldBeEnabled();
-
-        if (!this._isEnabled) {
-            this._onMouseOut(); // necessary if mouse cursor is still over
-                                // button
-            dojo.addClass(this._node, 'disabled');
-        } else {
-            dojo.removeClass(this._node, 'disabled');
-        }
-    }
-});
-
-}
-
-if(!dojo._hasResource['realitybuilder.ControlPanel']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.ControlPanel'] = true;
-// Control panel for moving and positioning the new block.
-
-// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy
-// of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
-
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
-
-dojo.provide('realitybuilder.ControlPanel');
-
-
-
-dojo.declare('realitybuilder.ControlPanel', null, {
-    // New block that the control panel is associated with.
-    _newBlock: null,
-
-    // Buttons:
-    _buttons: null,
-
-    // Node object representing the panel.
-    _node: null,
-
-    // Creates control panel for the block "newBlock".
-    constructor: function (newBlock) { 
-        var rb, nb, buttons;
-
-        this._newBlock = newBlock;
-
-        this._node = dojo.byId('controlPanel');
-
-        rb = realitybuilder;
-        nb = newBlock;
-
-        buttons = [];
-        buttons.push(this._createCoordinateButton('incX', [1, 0, 0]));
-        buttons.push(this._createCoordinateButton('decX', [-1, 0, 0]));
-        buttons.push(this._createCoordinateButton('incY', [0, 1, 0]));
-        buttons.push(this._createCoordinateButton('decY', [0, -1, 0]));
-        buttons.push(this._createCoordinateButton('incZ', [0, 0, 1]));
-        buttons.push(this._createCoordinateButton('decZ', [0, 0, -1]));
-        buttons.push(this._createRotate90Button());
-        buttons.push(this._createRequestRealButton());
-        this._buttons = buttons;
-    },
-
-    _createCoordinateButton: function (type, deltaB) {
-        var newBlock, onClicked, shouldBeEnabled;
-
-        newBlock = this._newBlock;
-
-        onClicked = function () {
-            newBlock.move(deltaB);
-        };
-
-        shouldBeEnabled = function () {
-            return (!newBlock.wouldGoOutOfRange(deltaB, 0) &&
-                    newBlock.isMovable());
-        };
-
-        return new realitybuilder.ControlButton(type + 'Button', 
-                                                    onClicked, 
-                                                    shouldBeEnabled);
-    },
-
-    _createRotate90Button: function () {
-        var newBlock, onClicked, shouldBeEnabled;
-
-        newBlock = this._newBlock;
-
-        onClicked = function () {
-            newBlock.rotate90();
-        };
-
-        shouldBeEnabled = function () {
-            return (!newBlock.wouldGoOutOfRange([0, 0, 0], 1) &&
-                    newBlock.isRotatable());
-        };
-
-        return new realitybuilder.ControlButton('rotate90Button', 
-                                                    onClicked, 
-                                                    shouldBeEnabled);
-    },
-
-    _createRequestRealButton: function () {
-        var newBlock, onClicked, shouldBeEnabled;
-
-        newBlock = this._newBlock;
-
-        onClicked = function () {
-            newBlock.requestMakeReal();
-        };
-
-        shouldBeEnabled = function () {
-            return newBlock.canBeMadeReal() && !newBlock.isStopped();
-        };
-
-        return new realitybuilder.ControlButton('requestRealButton', 
-                                                    onClicked, 
-                                                    shouldBeEnabled);
-    },
-
-    // Updates the status of the buttons and that of the panel itself:
-    update: function () {
-        dojo.forEach(this._buttons, function (button) {
-            button.update();
-        });
-
-        if (this._newBlock.isStopped()) {
-            dojo.addClass(this._node, 'disabled');
-        } else {
-            dojo.removeClass(this._node, 'disabled');
-        }
-    }
-});
-
-}
-
 if(!dojo._hasResource['realitybuilder.PrerenderMode']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource['realitybuilder.PrerenderMode'] = true;
 // Configuration for prerender-mode, if enabled.
@@ -19527,7 +19351,7 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
 
 if(!dojo._hasResource['realitybuilder.Main']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource['realitybuilder.Main'] = true;
-// The construction and the controls.
+// Main.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
@@ -19562,7 +19386,6 @@ dojo.provide('realitybuilder.Main');
 
 
 
-
 dojo.declare('realitybuilder.Main', null, {
     _settings: null,
 
@@ -19572,10 +19395,6 @@ dojo.declare('realitybuilder.Main', null, {
     // All blocks, permanently in the construction, including real and pending
     // blocks:
     _constructionBlocks: null,
-
-    // The interval in between checks whether the web page has finished loading
-    // can can be shown.
-    _CHECK_IF_HAS_LOADED_INTERVAL: 500, // ms
 
     // True, iff real/pending blocks should be shown. By default, always
     // enabled if the admin controls are shown. With only the user controls
@@ -19599,16 +19418,14 @@ dojo.declare('realitybuilder.Main', null, {
     // The camera, whose sensor is shown.
     _camera: null,
 
-    // The control panel for moving around the block and requesting it to be
-    // made real:
-    _controlPanel: null,
-
     // Controls for changing and inspecting settings and the construction.
     _adminControls: null,
 
     // Handle for the timeout between requests to the server for new
     // construction data.
     _updateTimeout: null,
+
+    _onReadyCalled: null,
 
     // Creates a construction. For a documentation of the settings, see the
     // main Reality Builder include script.
@@ -19623,6 +19440,8 @@ dojo.declare('realitybuilder.Main', null, {
 
         this._settings = settings;
 
+        this._onReadyCalled = false;
+
         this._insertLoadIndicator();
 
         this._showAdminControls = settings.showAdminControls;
@@ -19632,7 +19451,9 @@ dojo.declare('realitybuilder.Main', null, {
         this._blockProperties = new rb.BlockProperties();
         this._constructionBlockProperties = 
             new rb.ConstructionBlockProperties();
-        this._camera = new rb.Camera(this._blockProperties, 640, 480);
+        this._camera = new rb.Camera(this._blockProperties, 
+                                     settings.width, settings.height,
+                                     dojo.byId(settings.id));
         this._constructionBlocks = 
             new rb.ConstructionBlocks(this, 
                                       this._blockProperties,
@@ -19640,11 +19461,9 @@ dojo.declare('realitybuilder.Main', null, {
         this._prerenderMode = new rb.PrerenderMode();
         this._newBlock = 
             new rb.NewBlock(this._blockProperties,
-                                            this._camera,
-                                            this._constructionBlocks,
-                                            this._prerenderMode);
-        this._controlPanel = 
-            new rb.ControlPanel(this._newBlock);
+                            this._camera,
+                            this._constructionBlocks,
+                            this._prerenderMode);
 
         if (this._showAdminControls) {
             this._adminControls = new rb.AdminControls(this);
@@ -19693,7 +19512,6 @@ dojo.declare('realitybuilder.Main', null, {
         dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
 
         this._update();
-        this._checkIfHasLoaded();
     },
 
     newBlock: function () {
@@ -19723,18 +19541,17 @@ dojo.declare('realitybuilder.Main', null, {
     // Called after the new block has been stopped.
     _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
-        this._controlPanel.update();
+        this._settings.onDegreesOfFreedomChanged();
     },
 
     // Called after the new block has been made movable.
     _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
-        this._controlPanel.update();
+        this._settings.onDegreesOfFreedomChanged();
     },
 
     // Called after the block was requested to be made real.
     _onNewBlockMakeRealRequested: function () {
-        this._controlPanel.update();
     },
 
     // Toggles display of real blocks.
@@ -19774,7 +19591,7 @@ dojo.declare('realitybuilder.Main', null, {
     // updates controls.
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
-        this._controlPanel.update();
+        this._settings.onDegreesOfFreedomChanged();
         if (this._showAdminControls) {
             this._adminControls.updateCoordinateDisplays();
         }
@@ -19803,8 +19620,9 @@ dojo.declare('realitybuilder.Main', null, {
             this._newBlock.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
             this._prerenderMode.isInitializedWithServerData()) {
+
             this._newBlock.updatePositionAndMovability();
-            this._controlPanel.update();
+            this._settings.onDegreesOfFreedomChanged();
 
             if (this._showAdminControls) {
                 // Necessary after updating the block position:
@@ -19821,6 +19639,7 @@ dojo.declare('realitybuilder.Main', null, {
 
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the camera settings have changed.
@@ -19830,6 +19649,7 @@ dojo.declare('realitybuilder.Main', null, {
         }
 
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the new block's position, rotation angle have been
@@ -19837,6 +19657,7 @@ dojo.declare('realitybuilder.Main', null, {
     _onNewBlockPositionAngleInitialized: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the dimensions of the space where the new block may be
@@ -19844,6 +19665,7 @@ dojo.declare('realitybuilder.Main', null, {
     _onMoveOrBuildSpaceChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the block properties have changed.
@@ -19853,11 +19675,13 @@ dojo.declare('realitybuilder.Main', null, {
         this._updateNewBlockStateIfFullyInitialized();
 
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the block properties have changed.
     _onConstructionBlockPropertiesChanged: function () {
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     _onPrerenderModeChanged: function () {
@@ -19868,32 +19692,28 @@ dojo.declare('realitybuilder.Main', null, {
                 updatePrerenderModeControls();
         }
 
-        if ('onPrerenderedConfigurationChanged' in this._settings) {
-            i = this._prerenderMode.i();
-            this._settings.onPrerenderedConfigurationChanged(i);
-        }
+        i = this._prerenderMode.i();
+        this._settings.onPrerenderedBlockConfigurationChanged(i);
 
         this._updateNewBlockStateIfFullyInitialized();
+        this._checkIfReady();
     },
 
     _insertLoadIndicator: function () {
         dojo.attr('loadIndicator', 'innerHTML', 'Loading...');
     },
 
-    // Regularly checks if the construction has been loaded, so that the
-    // content on the web page can be unhidden.
-    _checkIfHasLoaded: function () {
+    // Checks if the widget is ready to be used. If so, signals that by calling
+    // the "onReady" function, but only the first time.
+    _checkIfReady: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
-            this._constructionBlockProperties.isInitializedWithServerData()) {
-            // Shows the contents and removes the load indicator.
-            dojo.destroy(dojo.byId('loadIndicator'));
-            this._unhideContent();
-        } else {
-            // Schedules the next check.
-            setTimeout(dojo.hitch(this, this._checkIfHasLoaded), 
-                this._CHECK_IF_HAS_LOADED_INTERVAL);
+            this._constructionBlockProperties.isInitializedWithServerData() &&
+            this._onReadyCalled === false) {
+
+            this._settings.onReady();
+            this._onReadyCalled = true;
         }
     },
 
@@ -19968,31 +19788,6 @@ dojo.declare('realitybuilder.Main', null, {
             },
             load: dojo.hitch(this, this._updateSucceeded)
         });
-    },
-
-    // Unhides the content. Fades in the content, unless the browser is Internet
-    // Explorer version 8 or earlier.
-    _unhideContent: function () {
-        var contentNode = dojo.byId('content'),
-            doFadeIn = (!dojo.isIE || dojo.isIE > 8),
-            fadeSettings;
-
-        if (doFadeIn) {
-            dojo.style(contentNode, 'opacity', '0');
-        }
-
-        dojo.style(contentNode, 'width', 'auto');
-        dojo.style(contentNode, 'height', 'auto');
-        if (dojo.isIE && dojo.isIE <= 6) {
-            // Necessary since otherwise IE 6 doesn't redraw after updating the
-            // dimensions.
-            dojo.style(contentNode, 'zoom', '1');
-        }
-
-        if (doFadeIn) {
-            fadeSettings = {node: contentNode, duration: 1000};
-            dojo.fadeIn(fadeSettings).play();
-        }
     },
 
     // Called if updating the settings on the server succeeded. Triggers

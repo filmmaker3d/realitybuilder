@@ -293,3 +293,12 @@ table#contentContainer tr.debug {
 #requestMakeRealButton.disabled, #requestMakeRealButton.disabled:hover {
     background-position: -230px -440px;
 }
+
+/* Disabled, for two reasons:
+
+* Takes up space also in release mode, in IE8 and Opera 11.50.
+
+* Is not needed with modern browsers. */
+#firebugLite {
+    display: none;
+}

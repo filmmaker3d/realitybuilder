@@ -48,8 +48,6 @@ dojo.js:
 ./../../release/dojo/realitybuilder/Sensor.js
 ./../../release/dojo/realitybuilder/Camera.js
 ./../../release/dojo/realitybuilder/AdminControls.js
-./../../release/dojo/realitybuilder/ControlButton.js
-./../../release/dojo/realitybuilder/ControlPanel.js
 ./../../release/dojo/realitybuilder/PrerenderMode.js
 ./../../release/dojo/realitybuilder/Main.js
 ./jslib/dojoGuardEnd.jsfrag
@@ -103,8 +101,6 @@ dojo.xd.js:
 ./../../release/dojo/realitybuilder/Sensor.js
 ./../../release/dojo/realitybuilder/Camera.js
 ./../../release/dojo/realitybuilder/AdminControls.js
-./../../release/dojo/realitybuilder/ControlButton.js
-./../../release/dojo/realitybuilder/ControlPanel.js
 ./../../release/dojo/realitybuilder/PrerenderMode.js
 ./../../release/dojo/realitybuilder/Main.js
 ./jslib/dojoGuardEnd.jsfrag
