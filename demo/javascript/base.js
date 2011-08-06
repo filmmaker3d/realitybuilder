@@ -51,14 +51,14 @@ var realitybuilderDemo = (function () {
         dojo.byId('backgroundImage').src = src;
     }
 
-    function controlButtonEl(type) {
+    function controlButtonNode(type) {
         return dojo.byId(type + 'Button');
     }
 
     // Updates the state of a control button, i.e. whether it's enabled or
     // disabled.
     function updateControlButtonState(type, shouldBeEnabled) {
-        var el = controlButtonEl(type);
+        var el = controlButtonNode(type);
 
         if (shouldBeEnabled) {
             dojo.removeClass(el, 'disabled');
@@ -89,7 +89,7 @@ var realitybuilderDemo = (function () {
     }
 
     function setUpControlButton(type, onClick) {
-        dojo.connect(controlButtonEl(type), 'onclick', onClick);
+        dojo.connect(controlButtonNode(type), 'onclick', onClick);
     }
 
     function setUpCoordinateButton(type, deltaB) {

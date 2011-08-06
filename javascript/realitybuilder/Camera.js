@@ -74,11 +74,11 @@ dojo.declare('realitybuilder.Camera', null, {
     // on every change of camera settings, not only on those on the server.
     _id: null,
 
-    constructor: function (blockProperties, sensorWidth, sensorHeight) {
+    constructor: function (blockProperties, sensorWidth, sensorHeight, node) {
         this._blockProperties = blockProperties;
         this._position = [0, 0, 1];
         this._sensor = 
-            new realitybuilder.Sensor(sensorWidth, sensorHeight);
+            new realitybuilder.Sensor(sensorWidth, sensorHeight, node);
         this._updateRotationMatrices();
         
     },

@@ -99,7 +99,8 @@ dojo.declare('realitybuilder.Main', null, {
         this._constructionBlockProperties = 
             new rb.ConstructionBlockProperties();
         this._camera = new rb.Camera(this._blockProperties, 
-                                     settings.width, settings.height);
+                                     settings.width, settings.height,
+                                     dojo.byId('RealityBuilder'));
         this._constructionBlocks = 
             new rb.ConstructionBlocks(this, 
                                       this._blockProperties,
@@ -107,9 +108,9 @@ dojo.declare('realitybuilder.Main', null, {
         this._prerenderMode = new rb.PrerenderMode();
         this._newBlock = 
             new rb.NewBlock(this._blockProperties,
-                                            this._camera,
-                                            this._constructionBlocks,
-                                            this._prerenderMode);
+                            this._camera,
+                            this._constructionBlocks,
+                            this._prerenderMode);
 
         if (this._showAdminControls) {
             this._adminControls = new rb.AdminControls(this);

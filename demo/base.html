@@ -25,6 +25,7 @@
     <link rel="SHORTCUT ICON" href="/demo/images/favicon.png">
 
     {# media="all" hides style sheets from Netscape 4 #}
+    <link rel="stylesheet" href="/demo/stylesheets/reset.css" media="all">
     <link rel="stylesheet" href="/demo/stylesheets/base.css" media="all">
 
     <!--[if lte IE 7]>
@@ -33,6 +34,7 @@
 
     <script type="text/javascript">
       // djConfig also used by the Reality Builder widget => back it up
+      // temporarily
       var djConfigBackup = (typeof djConfig !== 'undefined') ? djConfig : {};
       djConfig = {};
     </script>
@@ -74,16 +76,7 @@
           <div id="view">
             <img id="backgroundImage" src="/demo/images/placeholder.gif" 
                  alt="Background Image">
-            <div id="sensor">
-              <canvas id="sensorShadowCanvas" 
-                      width="1" height="1"></canvas>
-              <canvas id="sensorRealBlocksCanvas" 
-                      width="1" height="1"></canvas>
-              <canvas id="sensorPendingBlocksCanvas" 
-                      width="1" height="1"></canvas>
-              <canvas id="sensorNewBlockCanvas" 
-                      width="1" height="1"></canvas>
-            </div>
+            <div id="RealityBuilder"></div>
             <div id="controlPanel">
               <div id="incXButton"></div>
               <div id="decXButton"></div>

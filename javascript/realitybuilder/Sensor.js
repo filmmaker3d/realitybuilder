@@ -23,65 +23,93 @@ dojo.provide('realitybuilder.Sensor');
 
 dojo.declare('realitybuilder.Sensor', null, {
     // Canvases for drawing various parts.
-    _realBlocksCanvas: null,
-    _pendingBlocksCanvas: null,
-    _shadowCanvas: null,
-    _newBlockCanvas: null,
+    _canvasNodes: null,
 
     // Dimensions in pixels.
     _width: null,
     _height: null,
 
     // Sets up the sensor of the camera, with width "width" and height
-    // "height".
-    constructor: function (width, height) {
-        this._realBlocksCanvas = dojo.byId('sensorRealBlocksCanvas');
-        this._pendingBlocksCanvas = dojo.byId('sensorPendingBlocksCanvas');
-        this._shadowCanvas = dojo.byId('sensorShadowCanvas');
-        this._newBlockCanvas = dojo.byId('sensorNewBlockCanvas');
+    // "height". The sensor is placed as a child of the DOM node "node".
+    constructor: function (width, height, node) {
+        var sensorNode;
+
+        sensorNode = this._addSensorNode(node);
+
+        this._canvasNodes = {};
+        dojo.forEach(['realBlocks', 'pendingBlocks', 'shadow', 'newBlock'],
+                     dojo.hitch(this, function (key) {
+                         this._canvasNodes[key] = 
+                             this._addCanvasNode(sensorNode, width, height);
+                     }));
 
         this._width = width;
         this._height = height;
-
-        this._setCanvasesDimensions();
-
-        // Sets the dimensions of the surrounding container so that it can
-        // float as desired:
-        var viewNode = dojo.byId('view');
-        viewNode.style.width = width + 'px';
-        viewNode.style.height = height + 'px';
     },
 
-    // Sets the dimensions of the canvases.
-    _setCanvasesDimensions: function () {
-        var canvases = [
-                this._realBlocksCanvas, 
-                this._pendingBlocksCanvas, 
-                this._shadowCanvas, 
-                this._newBlockCanvas],
-            width = this._width, height = this._height;
-        dojo.forEach(canvases, function (canvas) {
-            dojo.attr(canvas, 'width', width);
-            dojo.attr(canvas, 'height', height);
-            dojo.style(canvas, 'width', width + 'px');
-            dojo.style(canvas, 'height', height + 'px');
-        });        
+    // Merges "style" into some basic style settings, which reset the style of
+    // a block element to reasonable default values.
+    _styleBasedOnDefaults: function (style) {
+        var tmp;
+
+        tmp = {
+	        margin: 0,
+	        padding: 0,
+	        border: 0,
+            display: 'block'
+        };
+
+        dojo.mixin(tmp, style);
+
+        return tmp;
+    },
+
+    _addSensorNode: function (node) {
+        var sensorNode;
+
+        sensorNode = dojo.create('div', null, node);
+
+        dojo.style(sensorNode, this._styleBasedOnDefaults({
+            position: 'relative'
+        }));
+
+        return sensorNode;
+    },
+
+    // Returns the canvas node.
+    _addCanvasNode: function (sensorNode, width, height) {
+        var canvasNode;
+
+        canvasNode = dojo.create('canvas', {
+            width: width,
+            height: height
+        }, sensorNode);
+
+        dojo.style(canvasNode, this._styleBasedOnDefaults({
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: width,
+            height: height
+        }));
+
+        return canvasNode;
     },
 
     realBlocksCanvas: function () {
-        return this._realBlocksCanvas;
+        return this._canvasNodes.realBlocks;
     },
 
     pendingBlocksCanvas: function () {
-        return this._pendingBlocksCanvas;
+        return this._canvasNodes.pendingBlocks;
     },
 
     shadowCanvas: function () {
-        return this._shadowCanvas;
+        return this._canvasNodes.shadow;
     },
 
     newBlockCanvas: function () {
-        return this._newBlockCanvas;
+        return this._canvasNodes.newBlock;
     },
 
     _setCanvasVisibility: function (canvas, show) {
@@ -90,12 +118,12 @@ dojo.declare('realitybuilder.Sensor', null, {
 
     // Iff show is true, then shows the real blocks.
     showRealBlocks: function (show) {
-        this._setCanvasVisibility(this._realBlocksCanvas, show);
+        this._setCanvasVisibility(this._canvasNodes.realBlocks, show);
     },
 
     // Iff show is true, then shows the pending blocks.
     showPendingBlocks: function (show) {
-        this._setCanvasVisibility(this._pendingBlocksCanvas, show);
+        this._setCanvasVisibility(this._canvasNodes.pendingBlocks, show);
     },
 
     width: function () {

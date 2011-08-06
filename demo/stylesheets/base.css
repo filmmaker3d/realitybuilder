@@ -19,7 +19,7 @@
     border-spacing: 0;
 }
 
-body, html, #view, #sensor, #coordinateControlsCanvas, #backgroundImage, 
+body, html, #view, #coordinateControlsCanvas, #backgroundImage, 
 #status, #info {
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -120,19 +120,6 @@ p.first {
     width: 240px;
 }
 
-#sensor {
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
-#sensorRealBlocksCanvas, #sensorPendingBlocksCanvas, #sensorShadowCanvas, 
-#sensorNewBlockCanvas {
-    position: absolute;
-    left: 0;
-    top: 0;
-}
-
 #backgroundImage {
     position: absolute;
     left: 0;
@@ -160,6 +147,8 @@ table#contentContainer tr.debug {
     position: relative;
     margin: 0 auto;
     text-align: left;
+    width: 640px;
+    height: 480px;
 }
 
 #controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 
