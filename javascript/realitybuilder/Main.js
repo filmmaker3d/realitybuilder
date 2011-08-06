@@ -43,10 +43,6 @@ dojo.declare('realitybuilder.Main', null, {
     // blocks:
     _constructionBlocks: null,
 
-    // The interval in between checks whether the web page has finished loading
-    // can can be shown.
-    _CHECK_IF_HAS_LOADED_INTERVAL: 500, // ms
-
     // True, iff real/pending blocks should be shown. By default, always
     // enabled if the admin controls are shown. With only the user controls
     // shown, by default disabled.
@@ -76,6 +72,8 @@ dojo.declare('realitybuilder.Main', null, {
     // construction data.
     _updateTimeout: null,
 
+    _onReadyCalled: null,
+
     // Creates a construction. For a documentation of the settings, see the
     // main Reality Builder include script.
     constructor: function (settings) {
@@ -88,6 +86,8 @@ dojo.declare('realitybuilder.Main', null, {
         }
 
         this._settings = settings;
+
+        this._onReadyCalled = false;
 
         this._insertLoadIndicator();
 
@@ -158,7 +158,6 @@ dojo.declare('realitybuilder.Main', null, {
         dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
 
         this._update();
-        this._checkIfHasLoaded();
     },
 
     newBlock: function () {
@@ -286,6 +285,7 @@ dojo.declare('realitybuilder.Main', null, {
 
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the camera settings have changed.
@@ -295,6 +295,7 @@ dojo.declare('realitybuilder.Main', null, {
         }
 
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the new block's position, rotation angle have been
@@ -302,6 +303,7 @@ dojo.declare('realitybuilder.Main', null, {
     _onNewBlockPositionAngleInitialized: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the dimensions of the space where the new block may be
@@ -309,6 +311,7 @@ dojo.declare('realitybuilder.Main', null, {
     _onMoveOrBuildSpaceChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the block properties have changed.
@@ -318,11 +321,13 @@ dojo.declare('realitybuilder.Main', null, {
         this._updateNewBlockStateIfFullyInitialized();
 
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     // Called after the block properties have changed.
     _onConstructionBlockPropertiesChanged: function () {
         this._renderBlocksIfFullyInitialized();
+        this._checkIfReady();
     },
 
     _onPrerenderModeChanged: function () {
@@ -337,28 +342,24 @@ dojo.declare('realitybuilder.Main', null, {
         this._settings.onPrerenderedBlockConfigurationChanged(i);
 
         this._updateNewBlockStateIfFullyInitialized();
+        this._checkIfReady();
     },
 
     _insertLoadIndicator: function () {
         dojo.attr('loadIndicator', 'innerHTML', 'Loading...');
     },
 
-    // Regularly checks if the construction has been loaded, so that the
-    // content on the web page can be unhidden and that it can be signaled that
-    // the widget is ready.
-    _checkIfHasLoaded: function () {
+    // Checks if the widget is ready to be used. If so, signals that by calling
+    // the "onReady" function, but only the first time.
+    _checkIfReady: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
-            this._constructionBlockProperties.isInitializedWithServerData()) {
-            // Shows the contents and removes the load indicator.
-            dojo.destroy(dojo.byId('loadIndicator'));
-            this._unhideContent();
+            this._constructionBlockProperties.isInitializedWithServerData() &&
+            this._onReadyCalled === false) {
+
             this._settings.onReady();
-        } else {
-            // Schedules the next check.
-            setTimeout(dojo.hitch(this, this._checkIfHasLoaded), 
-                this._CHECK_IF_HAS_LOADED_INTERVAL);
+            this._onReadyCalled = true;
         }
     },
 
@@ -433,31 +434,6 @@ dojo.declare('realitybuilder.Main', null, {
             },
             load: dojo.hitch(this, this._updateSucceeded)
         });
-    },
-
-    // Unhides the content. Fades in the content, unless the browser is Internet
-    // Explorer version 8 or earlier.
-    _unhideContent: function () {
-        var contentNode = dojo.byId('content'),
-            doFadeIn = (!dojo.isIE || dojo.isIE > 8),
-            fadeSettings;
-
-        if (doFadeIn) {
-            dojo.style(contentNode, 'opacity', '0');
-        }
-
-        dojo.style(contentNode, 'width', 'auto');
-        dojo.style(contentNode, 'height', 'auto');
-        if (dojo.isIE && dojo.isIE <= 6) {
-            // Necessary since otherwise IE 6 doesn't redraw after updating the
-            // dimensions.
-            dojo.style(contentNode, 'zoom', '1');
-        }
-
-        if (doFadeIn) {
-            fadeSettings = {node: contentNode, duration: 1000};
-            dojo.fadeIn(fadeSettings).play();
-        }
     },
 
     // Called if updating the settings on the server succeeded. Triggers

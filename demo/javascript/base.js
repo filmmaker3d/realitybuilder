@@ -113,13 +113,45 @@ var realitybuilderDemo = (function () {
                            });
     }
 
+    // Unhides the content. Fades in the content, unless the browser is
+    // Internet Explorer version 8 or earlier.
+    function unhideContent() {
+        var contentNode = dojo.byId('content'),
+            doFadeIn = (!dojo.isIE || dojo.isIE > 8),
+            fadeSettings;
+
+        if (doFadeIn) {
+            dojo.style(contentNode, 'opacity', '0');
+        }
+
+        dojo.style(contentNode, 'width', 'auto');
+        dojo.style(contentNode, 'height', 'auto');
+        if (dojo.isIE && dojo.isIE <= 6) {
+            // Necessary since otherwise IE 6 doesn't redraw after updating the
+            // dimensions.
+            dojo.style(contentNode, 'zoom', '1');
+        }
+
+        if (doFadeIn) {
+            fadeSettings = {node: contentNode, duration: 1000};
+            dojo.fadeIn(fadeSettings).play();
+        }
+    }
+
+    function removeLoadIndicator() {
+        dojo.destroy(dojo.byId('loadIndicator'));
+    }
+
     // Called when the Reality Builder is ready.
     //
-    // Sets up the user interface.
+    // Sets up the user interface and unhides content.
     function onReady() {
         forEachCoordinateButton(setUpCoordinateButton);
         setUpRotate90Button();
         setUpRequestMakeRealButton();
+
+        removeLoadIndicator();
+        unhideContent();
     }
 
     publicInterface = {
