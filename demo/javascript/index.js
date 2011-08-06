@@ -20,5 +20,5 @@
 /*global realitybuilderDemo, dojo */
 
 dojo.addOnLoad(function () {
-    realitybuilderDemo.onLoad(false); 
+    realitybuilderDemo.onLoad(false);
 });

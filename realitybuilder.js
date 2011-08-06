@@ -25,6 +25,10 @@ var realitybuilder = (function () {
     initialized, // true, after the public "initialize" has been called
     settings, publicInterface;
 
+    /* {{ "*" }}{{ "/" }} 
+       {% include "fixme-lazyload/lazyload-min.js" %}
+    {{ "/" }}{{ "*" }} */
+
     // Instanciates the widget and merges its global members into the
     // "realitybuilder" name space.
     function setupWidget() {
@@ -107,26 +111,37 @@ var realitybuilder = (function () {
         var newScriptEl, firstScriptEl;
 
         if (w3cDomIsSupported()) {
-            newScriptEl = document.createElement('script');
-            firstScriptEl = document.getElementsByTagName('script')[0];
-    
-            newScriptEl.type = 'text/javascript';
-            newScriptEl.onload = onScriptLoaded;
-            newScriptEl.async = 'true'; // probably superfluous
-
-            newScriptEl.src = scriptUrl;
-            firstScriptEl.parentNode.insertBefore(newScriptEl, firstScriptEl);
+            LazyLoad.js(scriptUrl, onScriptLoaded);
         }
     }
 
     // Loads the Dojo JavaScript that is used for debugging mode.
     function requestLoadDebugScript() {
-        var scriptUrl;
+        var scriptUrl, baseUrl;
+
+        // For debugging it is assumed that this script and related Dojo
+        // resources are included from files which are hosted on the same
+        // domain.
+        //
+        // This makes  it possible to  use for example Apache's  "ProxyPass" to
+        // work around GAE's current limitation of only being able to serve one
+        // file at a  time (slow!). "host" would be the host  of the Google App
+        // Engine, and not of the proxy.
+        //
+        // Note that with Dojo 1.6, the baseUrl has to be set manually because
+        // it is not detected correctly:
+        //
+        //   <url:http://groups.google.com/group/dojo-interest/msg/65a43ee98f27
+        //   cb6e>
+        scriptUrl = 
+            '/javascript/dojo-release-1.6.1/dojo/dojo.js.uncompressed.js';
+        baseUrl = '/javascript/dojo-release-1.6.1/dojo/';
 
         window.djConfig = {
             isDebug: true,
             locale: "en",
             debugContainerId: "firebugLite",
+            baseUrl: baseUrl,
             scopeMap: [
                 ["dojo", "realitybuilderDojo"], 
                 ["dijit", "realitybuilderDijit"],
@@ -136,15 +151,6 @@ var realitybuilder = (function () {
                 "realitybuilder": "/javascript/realitybuilder"
             }
         };
-            
-        // For debugging it is assumed that this script is included from a file
-        // which is hosted on the same domain.
-        //
-        // This makes  it possible to  use for example Apache's  "ProxyPass" to
-        // work around GAE's current limitation of only being able to serve one
-        // file at a  time (slow!). "host" would be the host  of the Google App
-        // Engine, and not of the proxy.
-        scriptUrl = '/javascript/dojo-release-1.6.1/dojo/dojo.js';
 
         requestLoadScript(scriptUrl);
     }
@@ -152,8 +158,7 @@ var realitybuilder = (function () {
     // Loads the Dojo JavaScript that is used for release mode. Almost all
     // functionality is built into one file.
     function requestLoadReleaseScript() {
-        var host;
-        host = '{{ host }}';
+        var host = '{{ host }}';
         requestLoadScript('http://' + host + '/javascript/dojo/dojo.xd.js');
     }
 

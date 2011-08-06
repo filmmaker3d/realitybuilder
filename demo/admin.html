@@ -1,4 +1,4 @@
-{%comment%}
+{% comment %}
   Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,11 +12,11 @@
   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
   License for the specific language governing permissions and limitations under
   the License.
-{%endcomment%}
+{% endcomment %}
 
-{%extends "base.html"%}
+{% extends "base.html" %}
 
-{%block head%}
+{% block head %}
   {{block.super}}
 
   <title>Reality Builder Administration</title>        
@@ -26,16 +26,16 @@
   <link rel="stylesheet" href="/demo/stylesheets/admin.css" media="all">
 
   <script type="text/javascript" src="/demo/javascript/admin.js"></script>
-{%endblock%}
+{% endblock %}
 
-{%block script%}
+{% block script %}
   <script type="text/javascript">
     var logoutUrl = '{{logout_url}}'
   </script>
   <script type="text/javascript" src="/demo/javascript/admin.js"></script>
-{%endblock%}
+{% endblock %}
 
-{%block bottomBar%}
+{% block bottomBar %}
   <div id="bottomBar">
     <div id="positionAndAngleDisplay">
       x&nbsp;=&nbsp;<span id="newBlockXB">0</span>,
@@ -47,9 +47,9 @@
     <button type="button" id="togglePendingButton"></button>
     <button type="button" id="logoutButton">Log Out</a>
   </div>
-{%endblock%}
+{% endblock %}
 
-{%block sideBar%}
+{% block sideBar %}
   <div id="sideBar">
     <h2 class="first">Settings</h2>
     <fieldset id="cameraSettings">
@@ -123,4 +123,4 @@
       </table>
     </div>
   </div>
-{%endblock%}
+{% endblock %}

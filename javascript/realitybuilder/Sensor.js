@@ -93,6 +93,10 @@ dojo.declare('realitybuilder.Sensor', null, {
             height: height
         }));
 
+        if (realitybuilder.util.isFlashCanvasActive()) {
+            FlashCanvas.initElement(canvasNode);
+        }
+
         return canvasNode;
     },
 

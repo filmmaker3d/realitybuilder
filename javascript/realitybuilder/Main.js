@@ -1,4 +1,4 @@
-// The construction and the controls.
+// Main.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //

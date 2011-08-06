@@ -347,7 +347,7 @@ realitybuilder.util.fillCanvas = function (canvas, color) {
 // Has a trailing slash.
 realitybuilder.util.rootUrl = function () {
     if (dojo.config.isDebug) {
-        return dojo.baseUrl + '../../../../';
+        return dojo.baseUrl + '../../../';
     } else {
         return dojo.baseUrl + '../../';
     }

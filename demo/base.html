@@ -1,4 +1,4 @@
-{%comment%}
+{% comment %}
   Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,14 +12,14 @@
   WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
   License for the specific language governing permissions and limitations under
   the License.
-{%endcomment%}
+{% endcomment %}
 
 <!DOCTYPE html>
 
 <html lang="en">
 
 <head>
-  {%block head%}
+  {% block head %}
     <meta charset="UTF-8">
     <meta name="language" content="EN-US">
     <link rel="SHORTCUT ICON" href="/demo/images/favicon.png">
@@ -32,16 +32,8 @@
       <link rel="stylesheet" href="/demo/stylesheets/base_lte_IE_7.css">
     <![endif]-->
 
-    <script type="text/javascript">
-      // djConfig also used by the Reality Builder widget => back it up
-      // temporarily
-      var djConfigBackup = (typeof djConfig !== 'undefined') ? djConfig : {};
-      djConfig = {};
-    </script>
+    {# Loaded before the RealityBuilder, to avoid "djConfig" conflicts: #}
     <script type="text/javascript" src="/demo/javascript/dojo.js"></script>
-    <script type="text/javascript">
-      djConfig = djConfigBackup;
-    </script>
 
     <script type="text/javascript" src="/realitybuilder.js"></script>
     <!--[if lt IE 9]>
@@ -52,14 +44,15 @@
     <![endif]-->
 
     <script type="text/javascript" src="/demo/javascript/base.js"></script>
-  {%endblock head%}
+  {% endblock head %}
 </head>
 
 <body>
-  {%comment%}Certain content is added dynamically instead of being hidden and
-  later unhidden using CSS. Rationale: browsers that neither support CSS nor
-  JavaScript should only show the JavaScript-not-supported error
-  message.{%endcomment%}
+  {% comment %}
+    Certain content is added dynamically instead of being hidden and later
+    unhidden using CSS. Rationale: browsers that neither support CSS nor
+    JavaScript should only show the JavaScript-not-supported error message.
+  {% endcomment %}
   <div id="loadIndicator"></div>
   <table id="contentContainer">
     <tr>
@@ -90,8 +83,8 @@
           </div>
 
           {# For admin mode. #}
-          {%block sideBar%}{%endblock%}
-          {%block bottomBar%}{%endblock%}
+          {% block sideBar %}{% endblock %}
+          {% block bottomBar %}{% endblock %}
         </div>
       </td>
     </tr>
