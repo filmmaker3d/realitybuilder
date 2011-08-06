@@ -26,7 +26,7 @@ var realitybuilder = (function () {
     settings, publicInterface;
 
     /* {{ "*" }}{{ "/" }} 
-       {% include "fixme-lazyload/lazyload-min.js" %}
+       {% include "javascript/lazyload/lazyload-min.js" %}
     {{ "/" }}{{ "*" }} */
 
     // Instanciates the widget and merges its global members into the
