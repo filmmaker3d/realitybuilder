@@ -331,18 +331,9 @@ dojo.declare('realitybuilder.Main', null, {
     },
 
     _onPrerenderModeChanged: function () {
-        var i;
-
-        if (this._showAdminControls) {
-            this._adminControls.
-                updatePrerenderModeControls();
-        }
-
-        i = this._prerenderMode.i();
-        this._settings.onPrerenderedBlockConfigurationChanged(i);
-
         this._updateNewBlockStateIfFullyInitialized();
         this._checkIfReady();
+        this._settings.onPrerenderedBlockConfigurationChanged();
     },
 
     // Checks if the widget is ready to be used. If so, signals that by calling

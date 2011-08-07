@@ -61,11 +61,11 @@ var realitybuilderDemo = (function () {
         }
     }
 
-    // Called also at the very beginning.
-    function onPrerenderedBlockConfigurationChanged(i) {
-        var src = '/demo/images/prerendered_' + i + '.jpg';
-
-        $('#backgroundImage').attr('src', src);
+    function updateBackgroundImage() {
+        $('#backgroundImage').
+            attr('src', 
+                 '/demo/images/prerendered_' + 
+                 realitybuilder.prerenderMode().i() + '.jpg');
 
         if (!backgroundImageIsLoaded) {
             $('#backgroundImage').one('load', function () { 
@@ -73,6 +73,12 @@ var realitybuilderDemo = (function () {
                 unhideViewIfAllReady();
             });
         }
+    }
+
+    // Called also at the very beginning, i.e. when there has been no previous
+    // prerendered block configuration displayed.
+    function onPrerenderedBlockConfigurationChanged() {
+        updateBackgroundImage();
     }
 
     function controlButtonNode(type) {

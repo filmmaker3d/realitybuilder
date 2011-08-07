@@ -30,48 +30,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
     // Creates the admin interface associated with "main".
     constructor: function (main) {
         this._main = main;
-
-        dojo.connect(dojo.byId('setPrerenderedBlockConfigurationButton'),
-                     'onclick', 
-                     this, this.setPrerenderedBlockConfiguration);
-        dojo.connect(dojo.byId('prevPrerenderedBlockConfigurationButton'),
-                     'onclick', 
-                     this, this.prevPrerenderedBlockConfiguration);
-        dojo.connect(dojo.byId('nextPrerenderedBlockConfigurationButton'),
-                     'onclick', 
-                     this, this.nextPrerenderedBlockConfiguration);
-    },
-
-    updatePrerenderModeControls: function () {
-        var prerenderMode = this._main.prerenderMode();
-        if (prerenderMode.isEnabled()) {
-            dojo.byId('prerenderedBlockConfigurationTextField').value =
-                prerenderMode.i();
-            dojo.style('prerenderedBlockConfigurations', 'display', 'block');
-        } else {
-            dojo.style('prerenderedBlockConfigurations', 'display', 'none');
-        }
-    },
-
-    setPrerenderedBlockConfiguration: function () {
-        var prerenderMode, i;
-
-        prerenderMode = this._main.prerenderMode();
-
-        i = parseInt(dojo.byId('prerenderedBlockConfigurationTextField').value,
-                     10);
-
-        prerenderMode.loadBlockConfigurationOnServer(i);
-    },
-
-    prevPrerenderedBlockConfiguration: function () {
-        var prerenderMode = this._main.prerenderMode();
-        prerenderMode.loadPrevBlockConfigurationOnServer();
-    },
-
-    nextPrerenderedBlockConfiguration: function () {
-        var prerenderMode = this._main.prerenderMode();
-        prerenderMode.loadNextBlockConfigurationOnServer();
     },
 
     updateCoordinateDisplays: function () {

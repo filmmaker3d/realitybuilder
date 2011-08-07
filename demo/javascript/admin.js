@@ -123,11 +123,47 @@ var realitybuilderAdminDemo = (function () {
         updateCameraControls();
     }
 
+    function updatePrerenderModeControls() {
+        var prerenderMode = realitybuilder.prerenderMode();
+        if (prerenderMode.isEnabled()) {
+            $('#prerenderedBlockConfigurationTextField').
+                val(prerenderMode.i());
+            $('#prerenderedBlockConfigurations').show();
+        } else {
+            $('#prerenderedBlockConfigurations').hide();
+        }
+    }
+
+    function setUpPrerenderModeButtons() {
+        var prerenderMode = realitybuilder.prerenderMode();
+
+        $('#setPrerenderedBlockConfigurationButton').click(function () {
+            var i = 
+                parseInt($('#prerenderedBlockConfigurationTextField').val(),
+                         10);
+            prerenderMode.loadBlockConfigurationOnServer(i);
+        }); 
+        $('#prevPrerenderedBlockConfigurationButton').click(function () {
+            prerenderMode.loadPrevBlockConfigurationOnServer();
+            updatePrerenderModeControls();
+        });
+        $('#nextPrerenderedBlockConfigurationButton').click(function () {
+            prerenderMode.loadNextBlockConfigurationOnServer();
+            updatePrerenderModeControls();
+        });
+    }
+
+    function onPrerenderedBlockConfigurationChanged() {
+        updatePrerenderModeControls();
+    }
+
     function onReady() {
         setUpLogoutButton();
         setUpSaveSettingsButton();
         setUpPreviewCameraButton();
+        setUpPrerenderModeButtons();
         updateCameraControls();
+        updatePrerenderModeControls();
         updateRealBlocksVisibilityButton();
         updatePendingBlocksVisibilityButton();
     }
@@ -138,16 +174,19 @@ var realitybuilderAdminDemo = (function () {
         },
 
         settings: function () {
-            var settings, baseOnReady;
+            var settings;
 
             settings = realitybuilderDemo.settings();
-            baseOnReady = settings.onReady;
 
-            return $.extend(settings, {
+            return $.extend({}, settings, {
                 showAdminControls: true,
                 onReady: function () {
-                    baseOnReady();
+                    settings.onReady();
                     onReady();
+                },
+                onPrerenderedBlockConfigurationChanged: function () {
+                    settings.onPrerenderedBlockConfigurationChanged();
+                    onPrerenderedBlockConfigurationChanged();
                 },
                 onRealBlocksVisibilityChanged: onRealBlocksVisibilityChanged,
                 onPendingBlocksVisibilityChanged: 
