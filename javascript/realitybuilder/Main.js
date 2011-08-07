@@ -112,16 +112,11 @@ dojo.declare('realitybuilder.Main', null, {
 
         if (this._showAdminControls) {
             this._adminControls = new rb.AdminControls(this);
-
-            // When an attempt to change construction block data on the server
-            // failed, then the relavant admin controls may have to be brought
-            // back up to date. Reason: They may have been changed before, by
-            // user selection.
-            dojo.subscribe(
-                'realitybuilder/ConstructionBlocks/changeOnServerFailed', 
-                this._adminControls, this._adminControls.updateBlocksTable);
         }
 
+        dojo.subscribe(
+            'realitybuilder/ConstructionBlocks/changeOnServerFailed', 
+            this, this._onServerError);
         dojo.subscribe('realitybuilder/ConstructionBlocks/changedOnServer', 
                        this, this._update); // Speeds up responsiveness.
         dojo.subscribe('realitybuilder/PrerenderMode/' + 
@@ -181,6 +176,10 @@ dojo.declare('realitybuilder.Main', null, {
 
     constructionBlocks: function () {
         return this._constructionBlocks;
+    },
+
+    _onServerError: function () {
+        this._settings.onServerError();
     },
 
     // Called after the new block has been stopped.
@@ -276,13 +275,10 @@ dojo.declare('realitybuilder.Main', null, {
 
     // Called after the construction blocks have changed.
     _onConstructionBlocksChanged: function () {
-        if (this._showAdminControls) {
-            this._adminControls.updateBlocksTable();
-        }
-
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
         this._checkIfReady();
+        this._settings.onConstructionBlocksChanged();
     },
 
     // Called after the camera settings have changed.

@@ -220,6 +220,12 @@ var realitybuilder = (function () {
         //
         // * "onCameraChanged": Function that is called when camera data has
         //   changed.
+        //
+        // * "onConstructionBlocksChanged": Called when new blocks have been
+        //   added, when a pending block has been made real, etc.
+        //
+        // * "onServerError": Called when the server could not process are
+        //   request, for example because the server was down.
         initialize: function (settings) {
             var defaultSettings = {
                 id: 'RealityBuilder',
@@ -231,7 +237,9 @@ var realitybuilder = (function () {
                 onRealBlocksVisibilityChanged: nop,
                 onPendingBlocksVisibilityChanged: nop,
                 onCameraChanged: nop,
-                onMovedOrRotated: nop
+                onMovedOrRotated: nop,
+                onConstructionBlocksChanged: nop,
+                onServerError: nop
             };
 
             if (!w3cDomIsSupported()) {

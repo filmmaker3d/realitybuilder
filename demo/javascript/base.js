@@ -48,6 +48,10 @@ var realitybuilderDemo = (function () {
         alert('Your web browser is not supported.');
     }
 
+    function onServerError() {
+        alert('Communication with the server failed.');
+    }
+
     // Unhides the content.
     function unhideView() {
         $('#loadIndicator').fadeOut(1000);
@@ -164,7 +168,8 @@ var realitybuilderDemo = (function () {
                 onBrowserNotSupportedError: onBrowserNotSupportedError,
                 onPrerenderedBlockConfigurationChanged: 
                 onPrerenderedBlockConfigurationChanged,
-                onDegreesOfFreedomChanged: onDegreesOfFreedomChanged
+                onDegreesOfFreedomChanged: onDegreesOfFreedomChanged,
+                onServerError: onServerError
             };
         }
     };

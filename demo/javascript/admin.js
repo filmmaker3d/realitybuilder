@@ -150,6 +150,115 @@ var realitybuilderAdminDemo = (function () {
         $('#newBlockA').text(newBlock.a());
     }
 
+    // Sorting function for sorting blocks for display in the table.
+    function sortForTable(x, y) {
+        // Sorts first by state (pending < real < deleted), and then by
+        // date-time.
+        if (x.state() === y.state()) {
+            // state the same => sort by date-time
+            if (x.timeStamp() > y.timeStamp()) {
+                return -1;
+            } else if (x.timeStamp() < y.timeStamp()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        } else if (x.state() === 1) {
+            return -1;
+        } else if (x.state() === 2) {
+            return y.state() === 1 ? 1 : -1;
+        } else {
+            return 1;
+        }
+    }
+
+    // Returns the list of all blocks, except the new block, sorted for display
+    // in the table.
+    function blocksSortedForTable() {
+        return realitybuilder.constructionBlocks().blocks().sort(sortForTable);
+    }
+
+    // Reads the value of the state selector "selectNode" associated with the
+    // block "block" and triggers setting of the state.
+    function applyStateFromStateSelector(selectNode, block) {
+        realitybuilder.constructionBlocks().
+            setBlockStateOnServer(block.positionB(), block.a(),
+                                  parseInt(selectNode.val(), 10));
+    }
+
+    // Returns a node representing a select button for the state of the block
+    // "block", with the state of that block preselected.
+    function stateSelectorNode(block) {
+        var node;
+
+        node = $('<select/>', {size: 1});
+        $.each(['Deleted', 'Pending', 'Real'], function (state, stateName) {
+            var optionNode = $('<option/>', {
+                value: state,
+                text: stateName,
+                selected: state === block.state()
+            });
+            node.append(optionNode);
+        });
+
+        node.change(function () {
+            applyStateFromStateSelector(node, block);
+        });
+
+        return node;
+    }
+
+    function padded(x) {
+        return ((x < 10) ? '0' : '') + x;
+    }
+
+    // Returns the date-time (local time) in a readable format.
+    function formattedDateTime(timestamp) {
+        var date = new Date(timestamp * 1000);
+
+        return (date.getFullYear() + '-' +
+                padded((date.getMonth() + 1)) + '-' +
+                padded(date.getDate()) + ' ' +
+                padded(date.getHours()) + ':' +
+                padded(date.getMinutes()) + ':' +
+                padded(date.getSeconds()));
+    }
+
+    // Creates a row for the blocks table and returns the row node.
+    function blocksTableRowNode(block) {
+        var node, rowValues, cellNode;
+
+        node = $('<tr/>');
+        rowValues = [
+            block.xB(), block.yB(), block.zB(), block.a(), 
+            formattedDateTime(block.timeStamp()), stateSelectorNode(block)];
+
+        $.each(rowValues, function (i, rowValue) {
+            cellNode = $('<td/>');
+            if (i < 5) {
+                cellNode.text(rowValue);
+            } else {
+                cellNode.append(rowValue);
+            }
+            if (i < 4) {
+                cellNode.addClass('number');
+            }
+            node.append(cellNode);
+        });
+
+        return node;
+    }
+
+    // Refreshes the table displaying the list of blocks.
+    function updateBlocksTable() {
+        var node = $('#blocksTable tbody');
+
+        node.empty();
+        $.each(blocksSortedForTable(), function (i, block) {
+            node.append(blocksTableRowNode(block));
+        });
+    }
+
     function onReady() {
         setUpLogoutButton();
         setUpSaveSettingsButton();
@@ -187,6 +296,7 @@ var realitybuilderAdminDemo = (function () {
                 onPendingBlocksVisibilityChanged: 
                 updatePendingBlocksVisibilityButton,
                 onCameraChanged: updateCameraControls,
+                onConstructionBlocksChanged: updateBlocksTable,
                 onMovedOrRotated: updatePositionAndAngleDisplay
             });
         }
