@@ -51,14 +51,6 @@ var realitybuilderAdminDemo = (function () {
                                      blocksAreVisible, setVisibility);
     }
 
-    function onRealBlocksVisibilityChanged() {
-        updateRealBlocksVisibilityButton();
-    }
-
-    function onPendingBlocksVisibilityChanged() {
-        updatePendingBlocksVisibilityButton();
-    }
-
     // Logs the administrator out, sending him back to the login screen.
     function logout() {
         if (typeof logoutUrl !== 'undefined') {
@@ -119,10 +111,6 @@ var realitybuilderAdminDemo = (function () {
         $('#cameraSensorResolutionTextField').val(camera.sensorResolution());
     }
 
-    function onCameraChanged() {
-        updateCameraControls();
-    }
-
     function updatePrerenderModeControls() {
         var prerenderMode = realitybuilder.prerenderMode();
         if (prerenderMode.isEnabled()) {
@@ -153,8 +141,13 @@ var realitybuilderAdminDemo = (function () {
         });
     }
 
-    function onPrerenderedBlockConfigurationChanged() {
-        updatePrerenderModeControls();
+    function updatePositionAndAngleDisplay() {
+        var newBlock = realitybuilder.newBlock();
+
+        $('#newBlockXB').text(newBlock.xB());
+        $('#newBlockYB').text(newBlock.yB());
+        $('#newBlockZB').text(newBlock.zB());
+        $('#newBlockA').text(newBlock.a());
     }
 
     function onReady() {
@@ -166,6 +159,7 @@ var realitybuilderAdminDemo = (function () {
         updatePrerenderModeControls();
         updateRealBlocksVisibilityButton();
         updatePendingBlocksVisibilityButton();
+        updatePositionAndAngleDisplay();
     }
 
     publicInterface = {
@@ -186,12 +180,14 @@ var realitybuilderAdminDemo = (function () {
                 },
                 onPrerenderedBlockConfigurationChanged: function () {
                     settings.onPrerenderedBlockConfigurationChanged();
-                    onPrerenderedBlockConfigurationChanged();
+                    updatePrerenderModeControls();
                 },
-                onRealBlocksVisibilityChanged: onRealBlocksVisibilityChanged,
+                onRealBlocksVisibilityChanged: 
+                updateRealBlocksVisibilityButton,
                 onPendingBlocksVisibilityChanged: 
-                onPendingBlocksVisibilityChanged,
-                onCameraChanged: onCameraChanged
+                updatePendingBlocksVisibilityButton,
+                onCameraChanged: updateCameraControls,
+                onMovedOrRotated: updatePositionAndAngleDisplay
             });
         }
     };

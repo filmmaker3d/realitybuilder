@@ -240,10 +240,8 @@ dojo.declare('realitybuilder.Main', null, {
     // updates controls.
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
-        this._settings.onDegreesOfFreedomChanged();
-        if (this._showAdminControls) {
-            this._adminControls.updateCoordinateDisplays();
-        }
+        this._settings.onDegreesOfFreedomChanged(); // may have changed
+        this._settings.onMovedOrRotated();
     },
 
     // (Re-)renders blocks, but only if all necessary components have been
@@ -272,11 +270,7 @@ dojo.declare('realitybuilder.Main', null, {
 
             this._newBlock.updatePositionAndMovability();
             this._settings.onDegreesOfFreedomChanged();
-
-            if (this._showAdminControls) {
-                // Necessary after updating the block position:
-                this._adminControls.updateCoordinateDisplays();
-            }
+            this._settings.onMovedOrRotated();
         }
     },
 

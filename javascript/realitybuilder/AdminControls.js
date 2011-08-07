@@ -32,18 +32,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
         this._main = main;
     },
 
-    updateCoordinateDisplays: function () {
-        var positionB, a;
-
-        positionB = this._main.newBlock().positionB();
-        a = this._main.newBlock().a();
-
-        dojo.byId('newBlockXB').innerHTML = positionB[0].toString();
-        dojo.byId('newBlockYB').innerHTML = positionB[1].toString();
-        dojo.byId('newBlockZB').innerHTML = positionB[2].toString();
-        dojo.byId('newBlockA').innerHTML = a.toString();
-    },
-
     // Sorting function for sorting blocks for display in the table.
     _sortForTable: function (x, y) {
         // Sorts first by state (pending < real < deleted), and then by

@@ -215,6 +215,9 @@ var realitybuilder = (function () {
         //   into a corner from where it can only be moved in certain
         //   directions. Or it may happen if the block can now be made real.
         //
+        // * "onMovedOrRotated": Function that is called when the new block has
+        //   been moved or rotated.
+        //
         // * "onCameraChanged": Function that is called when camera data has
         //   changed.
         initialize: function (settings) {
@@ -227,7 +230,8 @@ var realitybuilder = (function () {
                 onDegreesOfFreedomChanged: nop,
                 onRealBlocksVisibilityChanged: nop,
                 onPendingBlocksVisibilityChanged: nop,
-                onCameraChanged: nop
+                onCameraChanged: nop,
+                onMovedOrRotated: nop
             };
 
             if (!w3cDomIsSupported()) {
