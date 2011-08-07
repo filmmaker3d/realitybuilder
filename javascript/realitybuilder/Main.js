@@ -89,8 +89,6 @@ dojo.declare('realitybuilder.Main', null, {
 
         this._onReadyCalled = false;
 
-        this._insertLoadIndicator();
-
         this._showAdminControls = settings.showAdminControls;
         this._showReal = settings.showAdminControls;
         this._showPending = settings.showAdminControls;
@@ -348,10 +346,6 @@ dojo.declare('realitybuilder.Main', null, {
 
         this._updateNewBlockStateIfFullyInitialized();
         this._checkIfReady();
-    },
-
-    _insertLoadIndicator: function () {
-        dojo.attr('loadIndicator', 'innerHTML', 'Loading...');
     },
 
     // Checks if the widget is ready to be used. If so, signals that by calling

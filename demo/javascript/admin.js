@@ -17,30 +17,23 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDemoBase, realitybuilder, dojo */
+/*global realitybuilderDemoBase, realitybuilder, $ */
 
 (function () {
-    var blocksVisibilityButtonHandles = {};
-
     function updateBlocksVisibilityButton(type, text, blocksAreVisible, 
                                           setVisibility)
     {
-        var node = dojo.byId(type + 'BlocksVisibilityButton');
-        node.innerHTML = (blocksAreVisible ? "Hide" : "Show") + " " + 
-            text + " Blocks";
-        if (type in blocksVisibilityButtonHandles) {
-            dojo.disconnect(blocksVisibilityButtonHandles[type]);
-        }
-        blocksVisibilityButtonHandles[type] = 
-            dojo.connect(node, 'onclick', 
-                         function () { setVisibility(!blocksAreVisible); });
+        $('#' + type + 'BlocksVisibilityButton').
+            text((blocksAreVisible ? "Hide" : "Show") + " " + text + 
+                 " Blocks").
+            one('click', function () { setVisibility(!blocksAreVisible); });
     }
 
     function updateRealBlocksVisibilityButton() {
         var setVisibility, blocksAreVisible;
 
-        setVisibility = dojo.hitch(realitybuilder,
-                                   realitybuilder.setRealBlocksVisibility);
+        setVisibility = $.proxy(realitybuilder.setRealBlocksVisibility,
+                                realitybuilder);
         blocksAreVisible = realitybuilder.realBlocksAreVisible();
         updateBlocksVisibilityButton('real', 'Real', 
                                      blocksAreVisible, setVisibility);
@@ -49,8 +42,8 @@
     function updatePendingBlocksVisibilityButton() {
         var setVisibility, blocksAreVisible;
 
-        setVisibility = dojo.hitch(realitybuilder,
-                                   realitybuilder.setPendingBlocksVisibility);
+        setVisibility = $.proxy(realitybuilder.setPendingBlocksVisibility,
+                                realitybuilder);
         blocksAreVisible = realitybuilder.pendingBlocksAreVisible();
         updateBlocksVisibilityButton('pending', 'Pending', 
                                      blocksAreVisible, setVisibility);
@@ -69,12 +62,12 @@
         updatePendingBlocksVisibilityButton();
     }
 
-    dojo.addOnLoad(function () {
+    $(function () {
         var settings, baseOnReady;
         
         settings = realitybuilderDemoBase.settings();
         baseOnReady = settings.onReady;
-        dojo.mixin(settings, {
+        $.extend(settings, {
             showAdminControls: true,
             onReady: function () {
                 baseOnReady();
@@ -87,4 +80,3 @@
         realitybuilder.initialize(settings);
     });
 }());
-

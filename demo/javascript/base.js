@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, alert */
+/*global realitybuilder, $, alert */
 
 var realitybuilderDemoBase = (function () {
     var publicInterface,
@@ -28,7 +28,9 @@ var realitybuilderDemoBase = (function () {
         'decY': [0, -1, 0],
         'incZ': [0, 0, 1],
         'decZ': [0, 0, -1]
-    };
+    },
+    backgroundImageIsLoaded = false, // initially only a placeholder is loaded
+    realityBuilderIsReady = false;
     
     function forEachCoordinateButton(f) {
         var type, deltaB;
@@ -46,24 +48,46 @@ var realitybuilderDemoBase = (function () {
         alert('Your web browser is not supported.');
     }
 
+    // Unhides the content.
+    function unhideView() {
+        $('#loadIndicator').fadeOut(1000);
+    }
+
+    // Unhides the view, if the Reality Builder is ready and if the background
+    // image is ready, i.e. has been loaded.
+    function unhideViewIfAllReady() {
+        if (realityBuilderIsReady && backgroundImageIsLoaded) {
+            unhideView();
+        }
+    }
+
+    // Called also at the very beginning.
     function onPrerenderedBlockConfigurationChanged(i) {
         var src = '/demo/images/prerendered_' + i + '.jpg';
-        dojo.byId('backgroundImage').src = src;
+
+        $('#backgroundImage').attr('src', src);
+
+        if (!backgroundImageIsLoaded) {
+            $('#backgroundImage').one('load', function () { 
+                backgroundImageIsLoaded = true;
+                unhideViewIfAllReady();
+            });
+        }
     }
 
     function controlButtonNode(type) {
-        return dojo.byId(type + 'Button');
+        return $('#' + type + 'Button');
     }
 
     // Updates the state of a control button, i.e. whether it's enabled or
     // disabled.
     function updateControlButtonState(type, shouldBeEnabled) {
-        var el = controlButtonNode(type);
+        var node = controlButtonNode(type);
 
         if (shouldBeEnabled) {
-            dojo.removeClass(el, 'disabled');
+            node.removeClass('disabled');
         } else {
-            dojo.addClass(el, 'disabled');
+            node.addClass('disabled');
         }
     }
 
@@ -89,7 +113,7 @@ var realitybuilderDemoBase = (function () {
     }
 
     function setUpControlButton(type, onClick) {
-        dojo.connect(controlButtonNode(type), 'onclick', onClick);
+        controlButtonNode(type).click(onClick);
     }
 
     function setUpCoordinateButton(type, deltaB) {
@@ -113,45 +137,16 @@ var realitybuilderDemoBase = (function () {
                            });
     }
 
-    // Unhides the content. Fades in the content, unless the browser is
-    // Internet Explorer version 8 or earlier.
-    function unhideContent() {
-        var contentNode = dojo.byId('content'),
-            doFadeIn = (!dojo.isIE || dojo.isIE > 8),
-            fadeSettings;
-
-        if (doFadeIn) {
-            dojo.style(contentNode, 'opacity', '0');
-        }
-
-        dojo.style(contentNode, 'width', 'auto');
-        dojo.style(contentNode, 'height', 'auto');
-        if (dojo.isIE && dojo.isIE <= 6) {
-            // Necessary since otherwise IE 6 doesn't redraw after updating the
-            // dimensions.
-            dojo.style(contentNode, 'zoom', '1');
-        }
-
-        if (doFadeIn) {
-            fadeSettings = {node: contentNode, duration: 1000};
-            dojo.fadeIn(fadeSettings).play();
-        }
-    }
-
-    function removeLoadIndicator() {
-        dojo.destroy(dojo.byId('loadIndicator'));
-    }
-
-    // Called when the Reality Builder is ready.
-    //
-    // Sets up the user interface and unhides content.
+    // Called when the Reality Builder is ready. Note that the background image
+    // is separate and may still be in the process of being loaded.
     function onReady() {
         forEachCoordinateButton(setUpCoordinateButton);
         setUpRotate90Button();
         setUpRequestMakeRealButton();
 
-        removeLoadIndicator();
-        unhideContent();
+        realityBuilderIsReady = true;
+
+        unhideViewIfAllReady();
     }
 
     publicInterface = {
