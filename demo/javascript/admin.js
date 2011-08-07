@@ -266,7 +266,11 @@ var realitybuilderAdminDemo = (function () {
         setUpPrerenderModeButtons();
         updateCameraControls();
         updatePrerenderModeControls();
+
+        realitybuilder.setRealBlocksVisibility(true);
+        realitybuilder.setPendingBlocksVisibility(true);
         updateRealBlocksVisibilityButton();
+
         updatePendingBlocksVisibilityButton();
         updatePositionAndAngleDisplay();
     }
@@ -282,7 +286,6 @@ var realitybuilderAdminDemo = (function () {
             settings = realitybuilderDemo.settings();
 
             return $.extend({}, settings, {
-                showAdminControls: true,
                 onReady: function () {
                     settings.onReady();
                     onReady();

@@ -27,7 +27,6 @@ dojo.require('realitybuilder.ConstructionBlocks');
 dojo.require('realitybuilder.ConstructionBlock');
 dojo.require('realitybuilder.NewBlock');
 dojo.require('realitybuilder.Camera');
-dojo.require('realitybuilder.AdminControls');
 dojo.require('realitybuilder.PrerenderMode');
 dojo.require('realitybuilder.util');
 
@@ -35,9 +34,6 @@ dojo.require('dojo.io.script');
 
 dojo.declare('realitybuilder.Main', null, {
     _settings: null,
-
-    // True, iff admin controls should be shown:
-    _showAdminControls: null,
 
     // All blocks, permanently in the construction, including real and pending
     // blocks:
@@ -65,9 +61,6 @@ dojo.declare('realitybuilder.Main', null, {
     // The camera, whose sensor is shown.
     _camera: null,
 
-    // Controls for changing and inspecting settings and the construction.
-    _adminControls: null,
-
     // Handle for the timeout between requests to the server for new
     // construction data.
     _updateTimeout: null,
@@ -89,10 +82,6 @@ dojo.declare('realitybuilder.Main', null, {
 
         this._onReadyCalled = false;
 
-        this._showAdminControls = settings.showAdminControls;
-        this._showReal = settings.showAdminControls;
-        this._showPending = settings.showAdminControls;
-
         this._blockProperties = new rb.BlockProperties();
         this._constructionBlockProperties = 
             new rb.ConstructionBlockProperties();
@@ -109,10 +98,6 @@ dojo.declare('realitybuilder.Main', null, {
                             this._camera,
                             this._constructionBlocks,
                             this._prerenderMode);
-
-        if (this._showAdminControls) {
-            this._adminControls = new rb.AdminControls(this);
-        }
 
         dojo.subscribe(
             'realitybuilder/ConstructionBlocks/changeOnServerFailed', 
@@ -251,9 +236,7 @@ dojo.declare('realitybuilder.Main', null, {
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
             this._constructionBlockProperties.isInitializedWithServerData()) {
-            if (this._showAdminControls) {
-                this._constructionBlocks.render();
-            }
+            this._constructionBlocks.render();
             this._newBlock.render();
         }
     },

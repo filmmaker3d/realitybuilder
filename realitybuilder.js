@@ -197,9 +197,6 @@ var realitybuilder = (function () {
         //   ready to use, i.e. after it has downloaded the required resources,
         //   rendered itself, etc.
         //
-        // * "showAdminControls": Iff true, then the admin controls are shown,
-        //   and - in the rendering - the real and pending blocks.
-        //
         // * "onBrowserNotSupportedError": Function that is executed when the
         //   Reality Builder does not work with the current browser, e.g. when
         //   the current browser doesn't support a required HTML element such
@@ -229,7 +226,6 @@ var realitybuilder = (function () {
         initialize: function (settings) {
             var defaultSettings = {
                 id: 'RealityBuilder',
-                showAdminControls: false,
                 onBrowserNotSupportedError: nop,
                 onPrerenderedBlockConfigurationChanged: nop,
                 onReady: nop,

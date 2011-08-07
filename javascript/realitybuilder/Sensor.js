@@ -43,6 +43,10 @@ dojo.declare('realitybuilder.Sensor', null, {
                              this._addCanvasNode(sensorNode, width, height);
                      }));
 
+
+        this.setRealBlocksVisibility(false);
+        this.setPendingBlocksVisibility(false);
+
         this._width = width;
         this._height = height;
     },
