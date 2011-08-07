@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realitybuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realitybuilder.AdminControls');
 
@@ -39,8 +39,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
         dojo.connect(dojo.byId('previewCameraButton'), 'onclick', 
             this, this.updateCamera);
 
-        dojo.connect(dojo.byId('logoutButton'), 'onclick', this, this.logOut);
-
         dojo.connect(dojo.byId('setPrerenderedBlockConfigurationButton'),
                      'onclick', 
                      this, this.setPrerenderedBlockConfiguration);
@@ -50,11 +48,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
         dojo.connect(dojo.byId('nextPrerenderedBlockConfigurationButton'),
                      'onclick', 
                      this, this.nextPrerenderedBlockConfiguration);
-    },
-
-    // Logs the administrator out, sending him back to the login screen.
-    logOut: function () {
-        location.href = logoutUrl;
     },
 
     // Updates controls defining the camera "camera".

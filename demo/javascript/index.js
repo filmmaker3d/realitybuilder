@@ -17,10 +17,10 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDemoBase, realitybuilder, $ */
+/*global realitybuilderDemo, realitybuilder, $ */
 
 $(function () {
-    var settings = realitybuilderDemoBase.settings();
+    var settings = realitybuilderDemo.settings();
 
     // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
 

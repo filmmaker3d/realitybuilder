@@ -17,9 +17,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDemoBase, realitybuilder, $ */
+/*global realitybuilderDemo, realitybuilder, $ */
 
-(function () {
+var realitybuilderAdminDemo = (function () {
+    var publicInterface, logoutUrl;
+
     function updateBlocksVisibilityButton(type, text, blocksAreVisible, 
                                           setVisibility)
     {
@@ -57,26 +59,49 @@
         updatePendingBlocksVisibilityButton();
     }
 
+    // Logs the administrator out, sending him back to the login screen.
+    function logout() {
+        if (typeof logoutUrl !== 'undefined') {
+            location.href = logoutUrl;
+        }
+    }
+
     function onReady() {
+        $('#logoutButton').click(logout);
+
         updateRealBlocksVisibilityButton();
         updatePendingBlocksVisibilityButton();
     }
 
-    $(function () {
-        var settings, baseOnReady;
-        
-        settings = realitybuilderDemoBase.settings();
-        baseOnReady = settings.onReady;
-        $.extend(settings, {
-            showAdminControls: true,
-            onReady: function () {
-                baseOnReady();
-                onReady();
-            },
-            onRealBlocksVisibilityChanged: onRealBlocksVisibilityChanged,
-            onPendingBlocksVisibilityChanged: onPendingBlocksVisibilityChanged
-        });
-        
-        realitybuilder.initialize(settings);
-    });
+    publicInterface = {
+        setLogoutUrl: function (x) {
+            logoutUrl = x;
+        },
+
+        settings: function () {
+            var settings, baseOnReady;
+
+            settings = realitybuilderDemo.settings();
+            baseOnReady = settings.onReady;
+
+            return $.extend(settings, {
+                showAdminControls: true,
+                onReady: function () {
+                    baseOnReady();
+                    onReady();
+                },
+                onRealBlocksVisibilityChanged: onRealBlocksVisibilityChanged,
+                onPendingBlocksVisibilityChanged: 
+                onPendingBlocksVisibilityChanged
+            });
+        }
+    };
+
+    return publicInterface;
 }());
+
+$(function () {
+    var settings = realitybuilderAdminDemo.settings();
+    
+    realitybuilder.initialize(settings);
+});

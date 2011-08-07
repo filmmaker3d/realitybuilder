@@ -19,7 +19,7 @@
 
 /*global realitybuilder, $, alert */
 
-var realitybuilderDemoBase = (function () {
+var realitybuilderDemo = (function () {
     var publicInterface,
     coordinateButtonDeltaBs = {
         'incX': [1, 0, 0],
