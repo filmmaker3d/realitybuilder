@@ -66,9 +66,68 @@ var realitybuilderAdminDemo = (function () {
         }
     }
 
-    function onReady() {
+    function setUpLogoutButton() {
         $('#logoutButton').click(logout);
+    }
 
+    // Returns data read entered using the camera controls.
+    function cameraDataFromControls() {
+        return {
+            "position": [parseFloat($('#cameraXTextField').val()) || 0,
+                         parseFloat($('#cameraYTextField').val()) || 0,
+                         parseFloat($('#cameraZTextField').val()) || 0],
+            "aX": parseFloat($('#cameraAXTextField').val()) || 0,
+            "aY": parseFloat($('#cameraAYTextField').val()) || 0,
+            "aZ": parseFloat($('#cameraAZTextField').val()) || 0,
+            "fl": parseFloat($('#cameraFlTextField').val()) || 1,
+            "sensorResolution": 
+            parseFloat($('#cameraSensorResolutionTextField').val())
+                || 100};
+    }
+
+    function setUpSaveSettingsButton() {
+        $('#saveSettingsButton').click(function () {
+            var cameraData = cameraDataFromControls();
+
+            realitybuilder.storeSettingsOnServer({cameraData: cameraData});
+            realitybuilder.camera().update(cameraData);
+        });
+    }
+
+    // Updates the camera, reading data from the camera controls.
+    function updateCamera() {
+        realitybuilder.camera().update(cameraDataFromControls());
+    }
+
+    function setUpPreviewCameraButton() {
+        $('#previewCameraButton').click(updateCamera);
+    }
+
+    // Updates controls defining the camera "camera".
+    function updateCameraControls() {
+        var camera, position;
+
+        camera = realitybuilder.camera();
+        position = camera.position();
+        $('#cameraXTextField').val(position[0]);
+        $('#cameraYTextField').val(position[1]);
+        $('#cameraZTextField').val(position[2]);
+        $('#cameraAXTextField').val(camera.aX());
+        $('#cameraAYTextField').val(camera.aY());
+        $('#cameraAZTextField').val(camera.aZ());
+        $('#cameraFlTextField').val(camera.fl());
+        $('#cameraSensorResolutionTextField').val(camera.sensorResolution());
+    }
+
+    function onCameraChanged() {
+        updateCameraControls();
+    }
+
+    function onReady() {
+        setUpLogoutButton();
+        setUpSaveSettingsButton();
+        setUpPreviewCameraButton();
+        updateCameraControls();
         updateRealBlocksVisibilityButton();
         updatePendingBlocksVisibilityButton();
     }
@@ -92,7 +151,8 @@ var realitybuilderAdminDemo = (function () {
                 },
                 onRealBlocksVisibilityChanged: onRealBlocksVisibilityChanged,
                 onPendingBlocksVisibilityChanged: 
-                onPendingBlocksVisibilityChanged
+                onPendingBlocksVisibilityChanged,
+                onCameraChanged: onCameraChanged
             });
         }
     };

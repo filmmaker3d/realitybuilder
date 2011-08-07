@@ -31,14 +31,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
     constructor: function (main) {
         this._main = main;
 
-        dojo.byId('bottomBar').style.width = 
-            main.camera().sensor().width() + 'px';
-
-        dojo.connect(dojo.byId('saveSettingsButton'), 'onclick', 
-            this._main, this._main.storeSettingsOnServer);
-        dojo.connect(dojo.byId('previewCameraButton'), 'onclick', 
-            this, this.updateCamera);
-
         dojo.connect(dojo.byId('setPrerenderedBlockConfigurationButton'),
                      'onclick', 
                      this, this.setPrerenderedBlockConfiguration);
@@ -48,20 +40,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
         dojo.connect(dojo.byId('nextPrerenderedBlockConfigurationButton'),
                      'onclick', 
                      this, this.nextPrerenderedBlockConfiguration);
-    },
-
-    // Updates controls defining the camera "camera".
-    updateCameraControls: function (camera) {
-        var position = camera.position();
-        dojo.byId('cameraXTextField').value = position[0];
-        dojo.byId('cameraYTextField').value = position[1];
-        dojo.byId('cameraZTextField').value = position[2];
-        dojo.byId('cameraAXTextField').value = camera.aX();
-        dojo.byId('cameraAYTextField').value = camera.aY();
-        dojo.byId('cameraAZTextField').value = camera.aZ();
-        dojo.byId('cameraFlTextField').value = camera.fl();
-        dojo.byId('cameraSensorResolutionTextField').value = 
-            camera.sensorResolution();
     },
 
     updatePrerenderModeControls: function () {
@@ -94,28 +72,6 @@ dojo.declare('realitybuilder.AdminControls', null, {
     nextPrerenderedBlockConfiguration: function () {
         var prerenderMode = this._main.prerenderMode();
         prerenderMode.loadNextBlockConfigurationOnServer();
-    },
-
-    // Returns data describing the camera settings in a format that is a subset
-    // of that used for exchanging camera data with the server.
-    readCameraControls: function () {
-        var data = {
-            "position": [parseFloat(dojo.byId('cameraXTextField').value) || 0,
-                         parseFloat(dojo.byId('cameraYTextField').value) || 0,
-                         parseFloat(dojo.byId('cameraZTextField').value) || 0],
-            "aX": parseFloat(dojo.byId('cameraAXTextField').value) || 0,
-            "aY": parseFloat(dojo.byId('cameraAYTextField').value) || 0,
-            "aZ": parseFloat(dojo.byId('cameraAZTextField').value) || 0,
-            "fl": parseFloat(dojo.byId('cameraFlTextField').value) || 1,
-            "sensorResolution": 
-                parseFloat(dojo.byId('cameraSensorResolutionTextField').value)
-                || 100};
-        return data;
-    },
-
-    // Updates the camera, reading data from the camera controls.
-    updateCamera: function () {
-        this._main.camera().update(this.readCameraControls());
     },
 
     updateCoordinateDisplays: function () {

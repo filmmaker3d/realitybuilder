@@ -139,6 +139,7 @@ table#blocksTable td select {
     float: left;
     margin: 0 10px;
     text-align: left;
+    width: 640px;
 }
 
 #logoutButton {

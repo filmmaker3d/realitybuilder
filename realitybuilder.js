@@ -214,6 +214,9 @@ var realitybuilder = (function () {
         //   That may happen for example when after the block has been moved
         //   into a corner from where it can only be moved in certain
         //   directions. Or it may happen if the block can now be made real.
+        //
+        // * "onCameraChanged": Function that is called when camera data has
+        //   changed.
         initialize: function (settings) {
             var defaultSettings = {
                 id: 'RealityBuilder',
@@ -223,7 +226,8 @@ var realitybuilder = (function () {
                 onReady: nop,
                 onDegreesOfFreedomChanged: nop,
                 onRealBlocksVisibilityChanged: nop,
-                onPendingBlocksVisibilityChanged: nop
+                onPendingBlocksVisibilityChanged: nop,
+                onCameraChanged: nop
             };
 
             if (!w3cDomIsSupported()) {

@@ -293,12 +293,9 @@ dojo.declare('realitybuilder.Main', null, {
 
     // Called after the camera settings have changed.
     _onCameraChanged: function () {
-        if (this._showAdminControls) {
-            this._adminControls.updateCameraControls(this._camera);
-        }
-
         this._renderBlocksIfFullyInitialized();
         this._checkIfReady();
+        this._settings.onCameraChanged();
     },
 
     // Called after the new block's position, rotation angle have been
@@ -442,20 +439,26 @@ dojo.declare('realitybuilder.Main', null, {
         this._update(); // Will check for new settings.
     },
 
+    // Returns camera data, prepared to sending it to the server.
+    _preparedCameraData: function (cameraData) {
+        var preparedCameraData;
+
+        preparedCameraData = 
+            realitybuilder.util.addPrefix('camera.', cameraData);
+        preparedCameraData['camera.x'] = cameraData.position[0];
+        preparedCameraData['camera.y'] = cameraData.position[1];
+        preparedCameraData['camera.z'] = cameraData.position[2];
+        return preparedCameraData;
+    },
+
     // Updates certain settings on the server. Fails silently on error.
-    storeSettingsOnServer: function () {
-        var cameraData, content, util;
+    storeSettingsOnServer: function (settings) {
+        var content = {};
 
-        util = realitybuilder.util;
+        if ('cameraData' in settings) {
+            dojo.mixin(content, this._preparedCameraData(settings.cameraData));
+        }
 
-        cameraData = util.addPrefix('camera.', 
-                                    this._adminControls.readCameraControls());
-        cameraData['camera.x'] = cameraData['camera.position'][0];
-        cameraData['camera.y'] = cameraData['camera.position'][1];
-        cameraData['camera.z'] = cameraData['camera.position'][2];
-        content = {};
-
-        dojo.mixin(content, cameraData);
         dojo.io.script.get({
             url: realitybuilder.util.rootUrl() + "admin/rpc/update_settings",
             callbackParamName: "callback",
