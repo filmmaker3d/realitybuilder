@@ -13,7 +13,7 @@
 # the License.
 
 application: realitybuilderwidget
-version: 1-7-0
+version: 1-8-0
 runtime: python
 api_version: 1
 

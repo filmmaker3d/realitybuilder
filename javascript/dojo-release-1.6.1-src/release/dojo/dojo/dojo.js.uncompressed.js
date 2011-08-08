@@ -14463,7 +14463,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     _shadowAlpha: null,
 
     // Iff true, then the block is stopped, which means that it can neither be
-    // moved nor be rotated.
+    // moved nor be rotated, nor be made real.
     _isStopped: null,
 
     // Permament blocks in the construction, including real and pending blocks.
@@ -14609,7 +14609,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         dojo.publish('realityBuilder/NewBlock/stopped');
     },
 
-    _makeMovable: function () {
+    _go: function () {
         this._isStopped = false;
         dojo.publish('realityBuilder/NewBlock/madeMovable');
     },
@@ -14631,7 +14631,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                     // construction block real = make-real-request accepted,
                     // construction block deleted = request denied
 
-                    this._makeMovable(); // so that user can continue
+                    this._go(); // so that user can continue
                 } // else: pending or no data from the server
             }
         }
@@ -14687,11 +14687,11 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     },
 
     canBeRotated90: function () {
-        return !this.wouldGoOutOfRange([0, 0, 0], 1);
+        return !this.wouldGoOutOfRange([0, 0, 0], 1) && !this._isStopped;
     },
 
     canBeMoved: function (deltaB) {
-        return !this.wouldGoOutOfRange(deltaB, 0);
+        return !this.wouldGoOutOfRange(deltaB, 0) && !this._isStopped;
     },
 
     // Returns true, if this block would be outside the move space, if it was
@@ -14733,7 +14733,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     canBeMadeReal: function () {
         return this._isInBuildSpace() && this._isAttachable() && 
             (!this._prerenderMode.isEnabled() ||
-             this._isInPrerenderedBlockConfiguration());
+             this._isInPrerenderedBlockConfiguration()) &&
+            !this._isStopped;
     },
 
     // Returns true, iff the bounding box of the current block overlaps with
@@ -14988,7 +14989,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         } else {
             // this block and the real block don't match a prerendered
             // configuration
-            this._makeMovable();
+            this._go();
         }
     }
 });
