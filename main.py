@@ -34,7 +34,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSONP response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -111,7 +111,7 @@ class PrerenderMode(db.Model):
     # Index of the currently loaded prerendered block configuration, and of the
     # previously loaded one:
     i = db.IntegerProperty()
-    prevI = db.IntegerProperty(default=-1) # -1 = nothing
+    prev_i = db.IntegerProperty(default=-1) # -1 = nothing
 
     # Increases the data version number. Should be run in a transaction.
     def increase_data_version(self):
@@ -498,7 +498,8 @@ class RPCConstruction(webapp.RequestHandler):
                          'blockConfigurations': \
                              cls.json_decode_list \
                              (prerender_mode.block_configurations),
-                         'i': prerender_mode.i})
+                         'i': prerender_mode.i,
+                         'prevI': prerender_mode.prev_i})
         return data
 
     # A transaction may not be necessary, but it ensures data integrity for
@@ -621,6 +622,7 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
 
             construction.increase_blocks_data_version()
 
+            prerender_mode.prev_i = prerender_mode.i
             prerender_mode.i = i
             prerender_mode.increase_data_version()
         else:

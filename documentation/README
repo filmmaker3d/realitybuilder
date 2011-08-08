@@ -44,8 +44,8 @@ distribution of the Reality Builder. If desired, install it as follows:
   should not be redistributed as part of the Reality Builder source code.
 
 
-Enabling debug mode
-===================
+How to enable debugging
+=======================
 
 See the top of: main.py
 
