@@ -17,14 +17,14 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.NewBlock');
+dojo.provide('realityBuilder.NewBlock');
 
-dojo.require('realitybuilder.Block');
-dojo.require('realitybuilder.Shadow');
+dojo.require('realityBuilder.Block');
+dojo.require('realityBuilder.Shadow');
 
-dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
+dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     '-chains-': {
         constructor: 'manual'
     },
@@ -93,7 +93,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
         this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
         this._isStopped = false;
         this._constructionBlocks = constructionBlocks;
-        this._shadow = new realitybuilder.Shadow(this, blockProperties, 
+        this._shadow = new realityBuilder.Shadow(this, blockProperties, 
                                                      camera, 
                                                      constructionBlocks);
         this._camera = camera;
@@ -137,10 +137,10 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
             this._versionOnServer = serverData.version;
 
             if (positionAngleWereInitialized) {
-                dojo.publish('realitybuilder/NewBlock/' + 
+                dojo.publish('realityBuilder/NewBlock/' + 
                              'positionAngleInitialized');
             }
-            dojo.publish('realitybuilder/NewBlock/moveOrBuildSpaceChanged');
+            dojo.publish('realityBuilder/NewBlock/moveOrBuildSpaceChanged');
         }
     },
 
@@ -153,9 +153,9 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
     // it go out of range.
     move: function (deltaB) {
         if (!this.wouldGoOutOfRange(deltaB, 0)) {
-            this._positionB = realitybuilder.util.addVectorsB(
+            this._positionB = realityBuilder.util.addVectorsB(
                 this._positionB, deltaB);
-            dojo.publish('realitybuilder/NewBlock/movedOrRotated');
+            dojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
     },
 
@@ -165,7 +165,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
         var congruencyA = this._blockProperties.congruencyA();
         if (!this.wouldGoOutOfRange([0, 0, 0], 1)) {
             this._a = (this._a + 1) % congruencyA; // multiples of 90°
-            dojo.publish('realitybuilder/NewBlock/movedOrRotated');
+            dojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
     },
 
@@ -175,7 +175,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
         if (this.canBeMadeReal()) {
             this._stop();
             this._createPendingOnServer();
-            dojo.publish('realitybuilder/NewBlock/makeRealRequested');
+            dojo.publish('realityBuilder/NewBlock/makeRealRequested');
         }
     },
 
@@ -193,12 +193,12 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
     _stop: function () {
         this._isStopped = true;
-        dojo.publish('realitybuilder/NewBlock/stopped');
+        dojo.publish('realityBuilder/NewBlock/stopped');
     },
 
     _makeMovable: function () {
         this._isStopped = false;
-        dojo.publish('realitybuilder/NewBlock/madeMovable');
+        dojo.publish('realityBuilder/NewBlock/madeMovable');
     },
 
     // Updates the position and state of this block to reflect changes in the
@@ -240,7 +240,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
             testZB = this.zB();
             do {
                 testZB += 1;
-                testBlock = new realitybuilder.Block(this._blockProperties,
+                testBlock = new realityBuilder.Block(this._blockProperties,
                                                          this._camera,
                                                          [xB, yB, testZB],
                                                          this.a());
@@ -262,10 +262,10 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
         congruencyA = this._blockProperties.congruencyA();
 
-        testPositionB = realitybuilder.util.addVectorsB(this.positionB(), 
+        testPositionB = realityBuilder.util.addVectorsB(this.positionB(), 
                                                             deltaB);
         testA = (this.a() + deltaA) % congruencyA;
-        testBlock = new realitybuilder.Block(this._blockProperties,
+        testBlock = new realityBuilder.Block(this._blockProperties,
                                                  this._camera, 
                                                  testPositionB, testA);
 
@@ -353,7 +353,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
     _relationVertexesEdges: function (vertexes1VXZ, vertexes2VXZ) {
         var util, len, i, j, relation, vertexVXZ, vertex1VXZ, edge2VXZ;
 
-        util = realitybuilder.util;
+        util = realityBuilder.util;
 
         len = vertexes2VXZ.length; // same for all blocks
         for (i = 0; i < len; i += 1) { // iterates edges of this block
@@ -519,11 +519,11 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
                 color = this.isMovable() ? this._color : this._stoppedColor;
 
                 // Shadow does currently not work with FlashCanvas.
-                if (!realitybuilder.util.isFlashCanvasActive()) {
+                if (!realityBuilder.util.isFlashCanvasActive()) {
                     this._renderShadow();
                 }
 
-                realitybuilder.util.clearCanvas(canvas);
+                realityBuilder.util.clearCanvas(canvas);
                 this.inherited(arguments, [context, color]);
 
                 // removes parts of the real block obscured by other blocks:
@@ -535,7 +535,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
     // Called if storing the block as pending on the server succeeded.
     _createPendingOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/NewBlock/createdPendingOnServer');
+        dojo.publish('realityBuilder/NewBlock/createdPendingOnServer');
 
         if (this._prerenderMode.isEnabled()) {
             setTimeout(
@@ -547,8 +547,8 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
     // Adds this block to the list of blocks on the server, with state pending.
     _createPendingOnServer: function () {
-        realitybuilder.util.jsonpGet({
-            url: realitybuilder.util.rootUrl() + "rpc/create_pending",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "rpc/create_pending",
             content: {
                 "xB": this.xB(),
                 "yB": this.yB(),

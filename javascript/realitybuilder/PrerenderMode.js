@@ -17,11 +17,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.PrerenderMode');
+dojo.provide('realityBuilder.PrerenderMode');
 
-dojo.declare('realitybuilder.PrerenderMode', null, {
+dojo.declare('realityBuilder.PrerenderMode', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -57,7 +57,7 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
             this._blockConfigurations = serverData.blockConfigurations;
             this._i = serverData.i;
             
-            dojo.publish('realitybuilder/PrerenderMode/changed');
+            dojo.publish('realityBuilder/PrerenderMode/changed');
         }
     },
 
@@ -147,14 +147,14 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
     },
 
     _loadBlockConfigurationOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/PrerenderMode/' + 
+        dojo.publish('realityBuilder/PrerenderMode/' + 
                      'loadedBlockConfigurationOnServer');
     },
 
     // Loads the prerendered block configuration with index "i" on the server.
     loadBlockConfigurationOnServer: function (i) {
-        realitybuilder.util.jsonpGet({
-            url: realitybuilder.util.rootUrl() + 
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + 
                 "rpc/load_prerendered_block_configuration",
             content: {
                 "i": i

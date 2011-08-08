@@ -21,11 +21,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.ConstructionBlockProperties');
+dojo.provide('realityBuilder.ConstructionBlockProperties');
 
-dojo.declare('realitybuilder.ConstructionBlockProperties', null, {
+dojo.declare('realityBuilder.ConstructionBlockProperties', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -52,7 +52,7 @@ dojo.declare('realitybuilder.ConstructionBlockProperties', null, {
             this._pendingColor = serverData.pendingColor;
             this._realColor = serverData.realColor;
 
-            dojo.publish('realitybuilder/ConstructionBlockProperties/changed');
+            dojo.publish('realityBuilder/ConstructionBlockProperties/changed');
         }
     },
 

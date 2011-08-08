@@ -17,9 +17,9 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDemo, realitybuilder, $ */
+/*global realityBuilderDemo, realityBuilder, $ */
 
-var realitybuilderAdminDemo = (function () {
+var realityBuilderAdminDemo = (function () {
     var publicInterface, logoutUrl;
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible, 
@@ -40,9 +40,9 @@ var realitybuilderAdminDemo = (function () {
     function updateRealBlocksVisibilityButton() {
         var setVisibility, blocksAreVisible;
 
-        setVisibility = $.proxy(realitybuilder.setRealBlocksVisibility,
-                                realitybuilder);
-        blocksAreVisible = realitybuilder.realBlocksAreVisible();
+        setVisibility = $.proxy(realityBuilder.setRealBlocksVisibility,
+                                realityBuilder);
+        blocksAreVisible = realityBuilder.realBlocksAreVisible();
         updateBlocksVisibilityButton('real', 'Real', 
                                      blocksAreVisible, setVisibility);
     }
@@ -50,9 +50,9 @@ var realitybuilderAdminDemo = (function () {
     function updatePendingBlocksVisibilityButton() {
         var setVisibility, blocksAreVisible;
 
-        setVisibility = $.proxy(realitybuilder.setPendingBlocksVisibility,
-                                realitybuilder);
-        blocksAreVisible = realitybuilder.pendingBlocksAreVisible();
+        setVisibility = $.proxy(realityBuilder.setPendingBlocksVisibility,
+                                realityBuilder);
+        blocksAreVisible = realityBuilder.pendingBlocksAreVisible();
         updateBlocksVisibilityButton('pending', 'Pending', 
                                      blocksAreVisible, setVisibility);
     }
@@ -87,14 +87,14 @@ var realitybuilderAdminDemo = (function () {
         $('#saveSettingsButton').click(function () {
             var cameraData = cameraDataFromControls();
 
-            realitybuilder.storeSettingsOnServer({cameraData: cameraData});
-            realitybuilder.camera().update(cameraData);
+            realityBuilder.storeSettingsOnServer({cameraData: cameraData});
+            realityBuilder.camera().update(cameraData);
         });
     }
 
     // Updates the camera, reading data from the camera controls.
     function updateCamera() {
-        realitybuilder.camera().update(cameraDataFromControls());
+        realityBuilder.camera().update(cameraDataFromControls());
     }
 
     function setUpPreviewCameraButton() {
@@ -105,7 +105,7 @@ var realitybuilderAdminDemo = (function () {
     function updateCameraControls() {
         var camera, position;
 
-        camera = realitybuilder.camera();
+        camera = realityBuilder.camera();
         position = camera.position();
         $('#cameraXTextField').val(position[0]);
         $('#cameraYTextField').val(position[1]);
@@ -118,7 +118,7 @@ var realitybuilderAdminDemo = (function () {
     }
 
     function updatePrerenderModeControls() {
-        var prerenderMode = realitybuilder.prerenderMode();
+        var prerenderMode = realityBuilder.prerenderMode();
         if (prerenderMode.isEnabled()) {
             $('#prerenderedBlockConfigurationTextField').
                 val(prerenderMode.i());
@@ -129,7 +129,7 @@ var realitybuilderAdminDemo = (function () {
     }
 
     function setUpPrerenderModeButtons() {
-        var prerenderMode = realitybuilder.prerenderMode();
+        var prerenderMode = realityBuilder.prerenderMode();
 
         $('#setPrerenderedBlockConfigurationButton').click(function () {
             var i = 
@@ -148,7 +148,7 @@ var realitybuilderAdminDemo = (function () {
     }
 
     function updatePositionAndAngleDisplay() {
-        var newBlock = realitybuilder.newBlock();
+        var newBlock = realityBuilder.newBlock();
 
         $('#newBlockXB').text(newBlock.xB());
         $('#newBlockYB').text(newBlock.yB());
@@ -181,13 +181,13 @@ var realitybuilderAdminDemo = (function () {
     // Returns the list of all blocks, except the new block, sorted for display
     // in the table.
     function blocksSortedForTable() {
-        return realitybuilder.constructionBlocks().blocks().sort(sortForTable);
+        return realityBuilder.constructionBlocks().blocks().sort(sortForTable);
     }
 
     // Reads the value of the state selector "selectNode" associated with the
     // block "block" and triggers setting of the state.
     function applyStateFromStateSelector(selectNode, block) {
-        realitybuilder.constructionBlocks().
+        realityBuilder.constructionBlocks().
             setBlockStateOnServer(block.positionB(), block.a(),
                                   parseInt(selectNode.val(), 10));
     }
@@ -277,8 +277,8 @@ var realitybuilderAdminDemo = (function () {
         updateCameraControls();
         updatePrerenderModeControls();
 
-        realitybuilder.setRealBlocksVisibility(true);
-        realitybuilder.setPendingBlocksVisibility(true);
+        realityBuilder.setRealBlocksVisibility(true);
+        realityBuilder.setPendingBlocksVisibility(true);
         updateRealBlocksVisibilityButton();
 
         updatePendingBlocksVisibilityButton();
@@ -293,7 +293,7 @@ var realitybuilderAdminDemo = (function () {
         settings: function () {
             var settings;
 
-            settings = realitybuilderDemo.settings();
+            settings = realityBuilderDemo.settings();
 
             return $.extend({}, settings, {
                 onReady: function () {
@@ -321,7 +321,7 @@ var realitybuilderAdminDemo = (function () {
 }());
 
 $(function () {
-    var settings = realitybuilderAdminDemo.settings();
+    var settings = realityBuilderAdminDemo.settings();
     
-    realitybuilder.initialize(settings);
+    realityBuilder.initialize(settings);
 });

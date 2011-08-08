@@ -17,9 +17,9 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDojo, acme, window, LazyLoad */
+/*global realityBuilderDojo, acme, window, LazyLoad */
 
-var realitybuilder = (function () {
+var realityBuilder = (function () {
     var
     scriptIsLoaded,
     initialized, // true, after the public "initialize" has been called
@@ -30,16 +30,16 @@ var realitybuilder = (function () {
     {{ "/" }}{{ "*" }} */
 
     // Instanciates the widget and merges its global members into the
-    // "realitybuilder" name space.
+    // "realityBuilder" name space.
     function setupWidget() {
-        var main = new realitybuilder.Main(settings);
-        realitybuilderDojo.mixin(realitybuilder, main);
+        realityBuilderDojo.mixin(realityBuilder, 
+                                 new realityBuilder.RealityBuilder(settings));
     }
 
     // Some old browsers may support JavaScript but not Dojo. In this case,
     // this function returns false.
     function dojoIsSupported() {
-        return typeof realitybuilderDojo !== 'undefined';
+        return typeof realityBuilderDojo !== 'undefined';
     }
 
     // Returns false for some old browsers.
@@ -53,12 +53,12 @@ var realitybuilder = (function () {
     function requestSetupWidget() {
         if (dojoIsSupported()) {
             // {% if debug %}
-            realitybuilderDojo.require('realitybuilder.Main');
+            realityBuilderDojo.require('realityBuilder.RealityBuilder');
             // {% endif %}
 
             // "addOnLoad" is necessary to wait for Dojo dependencies to be
             // resolved.
-            realitybuilderDojo.addOnLoad(function () {
+            realityBuilderDojo.addOnLoad(function () {
                 setupWidget();
             });
         } else {
@@ -84,9 +84,9 @@ var realitybuilder = (function () {
     // <url:http://groups.google.com/group/dojo-interest/browse_thread/thread/2
     // bcd6c8aff0487cb/4a164ecba59d16f9>
     function fixDojoQueryBug() {
-        if (!('query' in realitybuilderDojo) && 
+        if (!('query' in realityBuilderDojo) && 
             typeof acme !== 'undefined' && 'query' in acme) {
-            realitybuilderDojo.query = acme.query; 
+            realityBuilderDojo.query = acme.query; 
         }
     }
 
@@ -139,12 +139,12 @@ var realitybuilder = (function () {
             debugContainerId: "firebugLite",
             baseUrl: baseUrl,
             scopeMap: [
-                ["dojo", "realitybuilderDojo"], 
-                ["dijit", "realitybuilderDijit"],
-                ["dojox", "realitybuilderDojox"]
+                ["dojo", "realityBuilderDojo"], 
+                ["dijit", "realityBuilderDijit"],
+                ["dojox", "realityBuilderDojox"]
             ],
             modulePaths: {
-                "realitybuilder": "/javascript/realitybuilder"
+                "realityBuilder": "/javascript/realityBuilder"
             }
         };
 
@@ -207,7 +207,10 @@ var realitybuilder = (function () {
         //
         //   This functionality is necessary since the method of making JSONP
         //   requests otherwise is incapable of reporting errors when the
-        //   server is not responding.
+        //   server is not responding:
+        //
+        //     <url:http://www.ibm.com/developerworks/library/wa-aj-jsonp1/?ca=
+        //     dgr-jw64JSONP-jQuery&S%5FTACT=105AGY46&S%5FCMP=grsitejw64>
         //
         //   Be careful with specifying a timeout though: A user of the Reality
         //   Builder may be behind a very slow connection.

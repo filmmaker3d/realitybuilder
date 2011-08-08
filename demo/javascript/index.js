@@ -17,16 +17,16 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDemo, realitybuilder, $, alert */
+/*global realityBuilderDemo, realityBuilder, $, alert */
 
 if (typeof $ !== 'undefined') {
     $(function () {
-        var settings = realitybuilderDemo.settings();
+        var settings = realityBuilderDemo.settings();
         
         // Note for IE < 9: FlashCanvas needs to be ready at this point in
         // time!
 
-        realitybuilder.initialize(settings);
+        realityBuilder.initialize(settings);
     });
 } else {
     alert('Your web browser is not supported.');

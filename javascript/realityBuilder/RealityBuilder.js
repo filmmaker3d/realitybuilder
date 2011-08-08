@@ -1,4 +1,4 @@
-// Main.
+// The Reality Builder.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
@@ -17,20 +17,20 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.Main');
+dojo.provide('realityBuilder.RealityBuilder');
 
-dojo.require('realitybuilder.BlockProperties');
-dojo.require('realitybuilder.ConstructionBlockProperties');
-dojo.require('realitybuilder.ConstructionBlocks');
-dojo.require('realitybuilder.ConstructionBlock');
-dojo.require('realitybuilder.NewBlock');
-dojo.require('realitybuilder.Camera');
-dojo.require('realitybuilder.PrerenderMode');
-dojo.require('realitybuilder.util');
+dojo.require('realityBuilder.BlockProperties');
+dojo.require('realityBuilder.ConstructionBlockProperties');
+dojo.require('realityBuilder.ConstructionBlocks');
+dojo.require('realityBuilder.ConstructionBlock');
+dojo.require('realityBuilder.NewBlock');
+dojo.require('realityBuilder.Camera');
+dojo.require('realityBuilder.PrerenderMode');
+dojo.require('realityBuilder.util');
 
-dojo.declare('realitybuilder.Main', null, {
+dojo.declare('realityBuilder.RealityBuilder', null, {
     // All blocks, permanently in the construction, including real and pending
     // blocks:
     _constructionBlocks: null,
@@ -66,7 +66,7 @@ dojo.declare('realitybuilder.Main', null, {
     // Creates a construction. For a documentation of the settings, see the
     // main Reality Builder include script.
     constructor: function (settings) {
-        var rb = realitybuilder;
+        var rb = realityBuilder;
 
         if (!rb.util.isCanvasSupported()) {
             // canvas not supported => abort
@@ -74,7 +74,7 @@ dojo.declare('realitybuilder.Main', null, {
             return;
         }
 
-        realitybuilder.util.SETTINGS = settings;
+        realityBuilder.util.SETTINGS = settings;
 
         this._onReadyCalled = false;
 
@@ -95,36 +95,36 @@ dojo.declare('realitybuilder.Main', null, {
                             this._constructionBlocks,
                             this._prerenderMode);
 
-        dojo.subscribe('realitybuilder/ConstructionBlocks/changedOnServer', 
+        dojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realitybuilder/PrerenderMode/' + 
+        dojo.subscribe('realityBuilder/PrerenderMode/' + 
                        'loadedBlockConfigurationOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realitybuilder/NewBlock/createdPendingOnServer', 
+        dojo.subscribe('realityBuilder/NewBlock/createdPendingOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realitybuilder/NewBlock/' + 
+        dojo.subscribe('realityBuilder/NewBlock/' + 
                        'positionAngleInitialized', 
                        this, this._onNewBlockPositionAngleInitialized);
-        dojo.subscribe('realitybuilder/NewBlock/buildOrMoveSpaceChanged', 
+        dojo.subscribe('realityBuilder/NewBlock/buildOrMoveSpaceChanged', 
                        this, this._onMoveOrBuildSpaceChanged);
-        dojo.subscribe('realitybuilder/NewBlock/stopped', 
+        dojo.subscribe('realityBuilder/NewBlock/stopped', 
                        this, this._onNewBlockStopped);
-        dojo.subscribe('realitybuilder/NewBlock/madeMovable', 
+        dojo.subscribe('realityBuilder/NewBlock/madeMovable', 
                        this, this._onNewBlockMadeMovable);
-        dojo.subscribe('realitybuilder/NewBlock/movedOrRotated',
+        dojo.subscribe('realityBuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
-        dojo.subscribe('realitybuilder/NewBlock/' + 
+        dojo.subscribe('realityBuilder/NewBlock/' + 
                        'onNewBlockMakeRealRequested',
                        this, this._onNewBlockMakeRealRequested);
-        dojo.subscribe('realitybuilder/ConstructionBlocks/changed',
+        dojo.subscribe('realityBuilder/ConstructionBlocks/changed',
                        this, this._onConstructionBlocksChanged);
-        dojo.subscribe('realitybuilder/Camera/changed',
+        dojo.subscribe('realityBuilder/Camera/changed',
                        this, this._onCameraChanged);
-        dojo.subscribe('realitybuilder/BlockProperties/changed',
+        dojo.subscribe('realityBuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
-        dojo.subscribe('realitybuilder/ConstructionBlockProperties/changed',
+        dojo.subscribe('realityBuilder/ConstructionBlockProperties/changed',
                        this, this._onConstructionBlockPropertiesChanged);
-        dojo.subscribe('realitybuilder/PrerenderMode/changed',
+        dojo.subscribe('realityBuilder/PrerenderMode/changed',
                        this, this._onPrerenderModeChanged);
 
         dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
@@ -159,13 +159,13 @@ dojo.declare('realitybuilder.Main', null, {
     // Called after the new block has been stopped.
     _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
-        realitybuilder.util.SETTINGS.onDegreesOfFreedomChanged();
+        realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
 
     // Called after the new block has been made movable.
     _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
-        realitybuilder.util.SETTINGS.onDegreesOfFreedomChanged();
+        realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
 
     // Called after the block was requested to be made real.
@@ -175,13 +175,13 @@ dojo.declare('realitybuilder.Main', null, {
     setRealBlocksVisibility: function (shouldBeVisible) {
         this._camera.sensor().setRealBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
-        realitybuilder.util.SETTINGS.onRealBlocksVisibilityChanged();
+        realityBuilder.util.SETTINGS.onRealBlocksVisibilityChanged();
     },
 
     setPendingBlocksVisibility: function (shouldBeVisible) {
         this._camera.sensor().setPendingBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
-        realitybuilder.util.SETTINGS.onPendingBlocksVisibilityChanged();
+        realityBuilder.util.SETTINGS.onPendingBlocksVisibilityChanged();
     },
 
     realBlocksAreVisible: function () {
@@ -215,9 +215,9 @@ dojo.declare('realitybuilder.Main', null, {
     // updates controls.
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
-        realitybuilder.util.SETTINGS.onDegreesOfFreedomChanged(); // may have
+        realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged(); // may have
                                                                   // changed
-        realitybuilder.util.SETTINGS.onMovedOrRotated();
+        realityBuilder.util.SETTINGS.onMovedOrRotated();
     },
 
     // (Re-)renders blocks, but only if all necessary components have been
@@ -243,8 +243,8 @@ dojo.declare('realitybuilder.Main', null, {
             this._prerenderMode.isInitializedWithServerData()) {
 
             this._newBlock.updatePositionAndMovability();
-            realitybuilder.util.SETTINGS.onDegreesOfFreedomChanged();
-            realitybuilder.util.SETTINGS.onMovedOrRotated();
+            realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
+            realityBuilder.util.SETTINGS.onMovedOrRotated();
         }
     },
 
@@ -253,14 +253,14 @@ dojo.declare('realitybuilder.Main', null, {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
         this._checkIfReady();
-        realitybuilder.util.SETTINGS.onConstructionBlocksChanged();
+        realityBuilder.util.SETTINGS.onConstructionBlocksChanged();
     },
 
     // Called after the camera settings have changed.
     _onCameraChanged: function () {
         this._renderBlocksIfFullyInitialized();
         this._checkIfReady();
-        realitybuilder.util.SETTINGS.onCameraChanged();
+        realityBuilder.util.SETTINGS.onCameraChanged();
     },
 
     // Called after the new block's position, rotation angle have been
@@ -298,7 +298,7 @@ dojo.declare('realitybuilder.Main', null, {
     _onPrerenderModeChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._checkIfReady();
-        realitybuilder.util.SETTINGS.onPrerenderedBlockConfigurationChanged();
+        realityBuilder.util.SETTINGS.onPrerenderedBlockConfigurationChanged();
     },
 
     // Checks if the widget is ready to be used. If so, signals that by calling
@@ -310,7 +310,7 @@ dojo.declare('realitybuilder.Main', null, {
             this._constructionBlockProperties.isInitializedWithServerData() &&
             this._onReadyCalled === false) {
 
-            realitybuilder.util.SETTINGS.onReady();
+            realityBuilder.util.SETTINGS.onReady();
             this._onReadyCalled = true;
         }
     },
@@ -369,8 +369,8 @@ dojo.declare('realitybuilder.Main', null, {
     // server. Only updates data where there is a new version. Fails silently
     // on error.
     _update: function () {
-        realitybuilder.util.jsonpGet({
-            url: realitybuilder.util.rootUrl() + "rpc/construction",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "rpc/construction",
             content: {
                 "blocksDataVersion": 
                 this._constructionBlocks.versionOnServer(),
@@ -399,7 +399,7 @@ dojo.declare('realitybuilder.Main', null, {
         var preparedCameraData;
 
         preparedCameraData = 
-            realitybuilder.util.addPrefix('camera.', cameraData);
+            realityBuilder.util.addPrefix('camera.', cameraData);
         preparedCameraData['camera.x'] = cameraData.position[0];
         preparedCameraData['camera.y'] = cameraData.position[1];
         preparedCameraData['camera.z'] = cameraData.position[2];
@@ -414,8 +414,8 @@ dojo.declare('realitybuilder.Main', null, {
             dojo.mixin(content, this._preparedCameraData(settings.cameraData));
         }
 
-        realitybuilder.util.jsonpGet({
-            url: realitybuilder.util.rootUrl() + "admin/rpc/update_settings",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "admin/rpc/update_settings",
             content: content,
             load: dojo.hitch(this, this._storeSettingsOnServerSucceeded)
         });

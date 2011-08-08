@@ -17,11 +17,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.Sensor');
+dojo.provide('realityBuilder.Sensor');
 
-dojo.declare('realitybuilder.Sensor', null, {
+dojo.declare('realityBuilder.Sensor', null, {
     // Canvases for drawing various parts.
     _canvasNodes: null,
 
@@ -97,7 +97,7 @@ dojo.declare('realitybuilder.Sensor', null, {
             height: height
         }));
 
-        if (realitybuilder.util.isFlashCanvasActive()) {
+        if (realityBuilder.util.isFlashCanvasActive()) {
             FlashCanvas.initElement(canvasNode);
         }
 

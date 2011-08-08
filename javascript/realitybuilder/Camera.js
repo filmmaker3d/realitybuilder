@@ -31,16 +31,16 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.Camera');
+dojo.provide('realityBuilder.Camera');
 
-dojo.require('realitybuilder.util');
-dojo.require('realitybuilder.Sensor');
+dojo.require('realityBuilder.util');
+dojo.require('realityBuilder.Sensor');
 
 dojo.require('dojox.math.matrix');
 
-dojo.declare('realitybuilder.Camera', null, {
+dojo.declare('realityBuilder.Camera', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
@@ -78,7 +78,7 @@ dojo.declare('realitybuilder.Camera', null, {
         this._blockProperties = blockProperties;
         this._position = [0, 0, 1];
         this._sensor = 
-            new realitybuilder.Sensor(sensorWidth, sensorHeight, node);
+            new realityBuilder.Sensor(sensorWidth, sensorHeight, node);
         this._updateRotationMatrices();
         
     },
@@ -141,7 +141,7 @@ dojo.declare('realitybuilder.Camera', null, {
         this._updateRotationMatrices();
         this._updateId();
 
-        dojo.publish('realitybuilder/Camera/changed');
+        dojo.publish('realityBuilder/Camera/changed');
     },
 
     // Updates the settings of the camera to the version on the server, which
@@ -179,8 +179,8 @@ dojo.declare('realitybuilder.Camera', null, {
 
     // Returns the coordinates of the world space point "point" in view space.
     worldToView: function (point) {
-        var tmp = realitybuilder.util.subtractVectors3D(point, 
-                                                            this._position);
+        var tmp = realityBuilder.util.subtractVectors3D(point, 
+                                                        this._position);
 
         // Rotation matrices are applied to the vector tmp, from the left side:
         tmp = dojox.math.matrix.transpose([tmp]);
@@ -218,7 +218,7 @@ dojo.declare('realitybuilder.Camera', null, {
     // space.
     blockToSensor: function (pointB) {
         return this.viewToSensor(this.worldToView(
-            realitybuilder.util.blockToWorld(pointB, 
-                                                 this._blockProperties)));
+            realityBuilder.util.blockToWorld(pointB, 
+                                             this._blockProperties)));
     }
 });

@@ -21,11 +21,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.BlockProperties');
+dojo.provide('realityBuilder.BlockProperties');
 
-dojo.declare('realitybuilder.BlockProperties', null, {
+dojo.declare('realityBuilder.BlockProperties', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -109,7 +109,7 @@ dojo.declare('realitybuilder.BlockProperties', null, {
         var that = this;
 
         return dojo.map(this._outlineBXY, function (pBXY) {
-            return realitybuilder.util.rotatePointBXY(pBXY,
+            return realityBuilder.util.rotatePointBXY(pBXY,
                                                           that._rotCenterBXY,
                                                           a);
         });
@@ -125,7 +125,7 @@ dojo.declare('realitybuilder.BlockProperties', null, {
     },
 
     _rotateCollisionOffsetsBXY: function (collisionOffsetsBXY, a) {
-        var util = realitybuilder.util;
+        var util = realityBuilder.util;
 
         return dojo.map(collisionOffsetsBXY, function (collisionOffsetBXY) {
             return util.rotatePointBXY(collisionOffsetBXY, [0, 0], a);
@@ -157,7 +157,7 @@ dojo.declare('realitybuilder.BlockProperties', null, {
     _rotateAttachmentOffsetB: function (attachmentOffsetB, a) {
         var pBXY, rotatedPBXY, rotatedPB, util;
 
-        util = realitybuilder.util;
+        util = realityBuilder.util;
 
         // Rotates in the x-y plane, keeping z constant:
         pBXY = [attachmentOffsetB[0], attachmentOffsetB[1]];
@@ -212,7 +212,7 @@ dojo.declare('realitybuilder.BlockProperties', null, {
             this._updateRotatedCollisionOffsetsListsBXY();
             this._updateRotatedAttachmentOffsetsListsB();
 
-            dojo.publish('realitybuilder/BlockProperties/changed');
+            dojo.publish('realityBuilder/BlockProperties/changed');
         }
     },
 

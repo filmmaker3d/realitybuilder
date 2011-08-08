@@ -81,11 +81,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.ShadowObscuringBlocks');
+dojo.provide('realityBuilder.ShadowObscuringBlocks');
 
-dojo.declare('realitybuilder.ShadowObscuringBlocks', null, {
+dojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
     // The blocks, sorted by height, from top to bottom.
     _blocksSorted: null,
 
@@ -118,7 +118,7 @@ dojo.declare('realitybuilder.ShadowObscuringBlocks', null, {
             var dstBlock, dstPositionB;
 
             dstPositionB = [srcBlock.xB(), srcBlock.yB(), dstZB];
-            dstBlock = new realitybuilder.Block(that._blockProperties,
+            dstBlock = new realityBuilder.Block(that._blockProperties,
                                                     camera, dstPositionB,
                                                     srcBlock.a());
             dstBlock.onlySubtractBottom();

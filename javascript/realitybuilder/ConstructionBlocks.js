@@ -19,14 +19,14 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.ConstructionBlocks');
+dojo.provide('realityBuilder.ConstructionBlocks');
 
-dojo.require('realitybuilder.ConstructionBlock');
-dojo.require('realitybuilder.util');
+dojo.require('realityBuilder.ConstructionBlock');
+dojo.require('realityBuilder.util');
 
-dojo.declare('realitybuilder.ConstructionBlocks', null, {
+dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // Version of blocks data last retrieved from the server, or "-1"
     // initially. Is a string in order to be able to contain very large
     // integers.
@@ -111,7 +111,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     },
 
     _createBlockFromServerData: function (serverData) {
-        var camera = this._camera, rb = realitybuilder;
+        var camera = this._camera, rb = realityBuilder;
         return new rb.ConstructionBlock(this._blockProperties,
                                         camera, 
                                         serverData.positionB, serverData.a,
@@ -133,7 +133,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
 
             this._updateRealBlocksSorted();
             this._updatePendingBlocks();
-            dojo.publish('realitybuilder/ConstructionBlocks/changed');
+            dojo.publish('realityBuilder/ConstructionBlocks/changed');
         }
     },
 
@@ -170,7 +170,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
         var blocks = this.blocks(), block, i;
         for (i = 0; i < blocks.length; i += 1) {
             block = blocks[i];
-            if (realitybuilder.util.pointsIdenticalB(
+            if (realityBuilder.util.pointsIdenticalB(
                 positionB, block.positionB())) {
                 return block;
             }
@@ -210,12 +210,12 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
 
     // Called if making the block pending on the server succeeded.
     _makePendingOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block pending on the server failed.
     _makePendingOnServerFailed: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/' + 
+        dojo.publish('realityBuilder/ConstructionBlocks/' + 
                      'changeOnServerFailed');
     },
 
@@ -224,8 +224,8 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // the server. Once the server has completed the request, the list of
     // blocks is updated.
     makePendingOnServer: function (positionB, a) {
-        realitybuilder.util.jsonpGet({
-            url: realitybuilder.util.rootUrl() + "admin/rpc/make_pending",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "admin/rpc/make_pending",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
@@ -238,14 +238,14 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
 
     // Called if deleting the block on the server succeeded.
     _deleteOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Deletes the block positioned at the block space position "positionB" and
     // rotated by the angle "a", on the client and on the server.
     deleteOnServer: function (positionB, a) {
-        realitybuilder.util.jsonpGet({
-            url: realitybuilder.util.rootUrl() + "admin/rpc/delete",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "admin/rpc/delete",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
@@ -258,12 +258,12 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
 
     // Called if making the block real on the server succeeded.
     _makeRealOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block real on the server failed.
     _makeRealOnServerFailed: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/' +
+        dojo.publish('realityBuilder/ConstructionBlocks/' +
                      'changeOnServerFailed');
     },
 
@@ -271,8 +271,8 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // "positionB" and rotated by the angle "a" to real: on the client and on
     // the server.
     makeRealOnServer: function (positionB, a) {
-        realitybuilder.util.jsonpGet({
-            url: realitybuilder.util.rootUrl() + "admin/rpc/make_real",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "admin/rpc/make_real",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
@@ -327,7 +327,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     _renderBlocks: function (canvas, blocks) {
         if (canvas.getContext) {
             var context = canvas.getContext('2d');
-            realitybuilder.util.clearCanvas(canvas);
+            realityBuilder.util.clearCanvas(canvas);
             dojo.forEach(blocks, function (b) {
                 b.render(context);
             });

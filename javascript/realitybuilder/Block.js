@@ -17,11 +17,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
-dojo.provide('realitybuilder.Block');
+dojo.provide('realityBuilder.Block');
 
-dojo.declare('realitybuilder.Block', null, {
+dojo.declare('realityBuilder.Block', null, {
     // Position of the block in block space. From the position the block
     // extends in positive direction along the x-, y-, and z-axis.
     _positionB: null,
@@ -153,7 +153,7 @@ dojo.declare('realitybuilder.Block', null, {
 
         for (i = 0; i < len; i += 1) {
             lineV = [bottomVertexesV[i], topVertexesV[i]];
-            pointVXZ = realitybuilder.util.intersectionLinePlaneVXZ(lineV);
+            pointVXZ = realityBuilder.util.intersectionLinePlaneVXZ(lineV);
             if (!pointVXZ) {
                 tmp = null;
                 break;
@@ -177,7 +177,7 @@ dojo.declare('realitybuilder.Block', null, {
             testPositionB = [this.xB() + collisionOffsetBXY[0],
                              this.yB() + collisionOffsetBXY[1],
                              this.zB()];
-            if (realitybuilder.util.pointsIdenticalB(block.positionB(),
+            if (realityBuilder.util.pointsIdenticalB(block.positionB(),
                                                          testPositionB)) {
                 return true;
             }
@@ -196,9 +196,9 @@ dojo.declare('realitybuilder.Block', null, {
         for (i = 0; i < attachmentOffsetsB.length; i += 1) {
             attachmentOffsetB = attachmentOffsetsB[i];
             testPositionB = 
-                realitybuilder.util.addVectorsB(this.positionB(),
+                realityBuilder.util.addVectorsB(this.positionB(),
                                                     attachmentOffsetB);
-            if (realitybuilder.util.pointsIdenticalB(block.positionB(),
+            if (realityBuilder.util.pointsIdenticalB(block.positionB(),
                                                          testPositionB)) {
                 return true;
             }
@@ -231,7 +231,7 @@ dojo.declare('realitybuilder.Block', null, {
     },
 
     _blockToWorld: function (pB) {
-        return realitybuilder.util.blockToWorld(pB,
+        return realityBuilder.util.blockToWorld(pB,
                                                     this._blockProperties);
     },
 
@@ -267,7 +267,7 @@ dojo.declare('realitybuilder.Block', null, {
             this._blockProperties.versionOnServer();
         positionBHasChanged = 
             this._lastPositionB === null ||
-            !realitybuilder.util.pointsIdenticalB(this._lastPositionB,
+            !realityBuilder.util.pointsIdenticalB(this._lastPositionB,
                                                       this._positionB);
         aHasChanged = this._lastA !== this._a;
 

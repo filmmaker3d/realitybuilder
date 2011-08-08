@@ -17,9 +17,9 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, $, alert */
+/*global realityBuilder, $, alert */
 
-var realitybuilderDemo = (function () {
+var realityBuilderDemo = (function () {
     var publicInterface,
     coordinateButtonDeltaBs = {
         'incX': [1, 0, 0],
@@ -69,7 +69,7 @@ var realitybuilderDemo = (function () {
         $('#backgroundImage').
             attr('src', 
                  '/demo/images/prerendered_' + 
-                 realitybuilder.prerenderMode().i() + '.jpg');
+                 realityBuilder.prerenderMode().i() + '.jpg');
 
         if (!backgroundImageIsLoaded) {
             $('#backgroundImage').one('load', function () { 
@@ -103,17 +103,17 @@ var realitybuilderDemo = (function () {
 
     function updateCoordinateButtonState(type, deltaB) {
         updateControlButtonState(type, 
-                                 realitybuilder.newBlock().canBeMoved(deltaB));
+                                 realityBuilder.newBlock().canBeMoved(deltaB));
     }
 
     function updateRotate90ButtonState() {
         updateControlButtonState('rotate90', 
-                                 realitybuilder.newBlock().canBeRotated90());
+                                 realityBuilder.newBlock().canBeRotated90());
     }
 
     function updateMakeRealButtonState() {
         updateControlButtonState('requestMakeReal', 
-                                 realitybuilder.newBlock().canBeMadeReal());
+                                 realityBuilder.newBlock().canBeMadeReal());
     }
 
     function onDegreesOfFreedomChanged() {
@@ -129,21 +129,21 @@ var realitybuilderDemo = (function () {
     function setUpCoordinateButton(type, deltaB) {
         setUpControlButton(type,
                            function () {
-                               realitybuilder.newBlock().move(deltaB);
+                               realityBuilder.newBlock().move(deltaB);
                            });
     }
 
     function setUpRotate90Button() {
         setUpControlButton('rotate90',
                            function () {
-                               realitybuilder.newBlock().rotate90();
+                               realityBuilder.newBlock().rotate90();
                            });
     }
 
     function setUpRequestMakeRealButton() {
         setUpControlButton('requestMakeReal',
                            function () {
-                               realitybuilder.newBlock().requestMakeReal();
+                               realityBuilder.newBlock().requestMakeReal();
                            });
     }
 

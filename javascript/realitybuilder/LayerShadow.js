@@ -28,11 +28,11 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.LayerShadow');
+dojo.provide('realityBuilder.LayerShadow');
 
-dojo.declare('realitybuilder.LayerShadow', null, {
+dojo.declare('realityBuilder.LayerShadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
@@ -78,7 +78,7 @@ dojo.declare('realitybuilder.LayerShadow', null, {
         dojo.attr(this._helperCanvas, 'width', shadowCanvas.width);
         dojo.attr(this._helperCanvas, 'height', shadowCanvas.height);
 
-        if (realitybuilder.util.isFlashCanvasActive()) {
+        if (realityBuilder.util.isFlashCanvasActive()) {
             FlashCanvas.initElement(this._canvas);
             FlashCanvas.initElement(this._helperCanvas);
         }
@@ -103,7 +103,7 @@ dojo.declare('realitybuilder.LayerShadow', null, {
 
         // counterclockwise:
         dojo.forEach(blockOutlineBXY, function (vertexBXY) {
-            vs.push(realitybuilder.util.
+            vs.push(realityBuilder.util.
                     blockToWorld([xB + vertexBXY[0], 
                                   yB + vertexBXY[1], 
                                   zB],
@@ -197,13 +197,13 @@ dojo.declare('realitybuilder.LayerShadow', null, {
         // Chrome 11.
         if (canvas.getContext) {
             context = canvas.getContext('2d');
-            realitybuilder.util.clearCanvas(canvas);
+            realityBuilder.util.clearCanvas(canvas);
             helperContext = helperCanvas.getContext('2d');
-            realitybuilder.util.clearCanvas(helperCanvas);
+            realityBuilder.util.clearCanvas(helperCanvas);
 
             context.globalCompositeOperation = "source-over";
             if (layerZB === -1) {
-                realitybuilder.util.fillCanvas(canvas, "black");
+                realityBuilder.util.fillCanvas(canvas, "black");
             } else {
                 this._renderTops(layerZB, context); // slow with many blocks
             }
