@@ -22,11 +22,6 @@
 
   {# media="all" hides style sheets from Netscape 4 #}
   <link rel="stylesheet" href="/demo/stylesheets/admin.css" media="all">
-
-  <script type="text/javascript" src="/demo/javascript/admin.js"></script>
-  <script type="text/javascript">
-    realitybuilderAdminDemo.setLogoutUrl('{{ logout_url }}');
-  </script>
 {% endblock %}
 
 {% block bottomBar %}
@@ -39,7 +34,7 @@
     </div>
     <button type="button" id="realBlocksVisibilityButton"></button>
     <button type="button" id="pendingBlocksVisibilityButton"></button>
-    <button type="button" id="logoutButton">Log Out</a>
+    <button type="button" id="logoutButton">Log Out</button>
   </div>
 {% endblock %}
 
@@ -118,3 +113,11 @@
     </div>
   </div>
 {% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript" src="/demo/javascript/admin.js"></script>
+  <script type="text/javascript">
+    realitybuilderAdminDemo.setLogoutUrl('{{ logout_url }}');
+  </script>
+{% endblock %}
+
