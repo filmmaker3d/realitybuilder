@@ -18,7 +18,7 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 from google.appengine.dist import use_library
-use_library('django', '1.2')
+use_library('django', '0.96')
 
 import logging
 import time
@@ -108,8 +108,10 @@ class PrerenderMode(db.Model):
     make_real_after = db.IntegerProperty() # ms
     block_configurations = db.StringListProperty()
 
-    # Index of the currently loaded prerendered block configuration.
+    # Index of the currently loaded prerendered block configuration, and of the
+    # previously loaded one:
     i = db.IntegerProperty()
+    prevI = db.IntegerProperty(default=-1) # -1 = nothing
 
     # Increases the data version number. Should be run in a transaction.
     def increase_data_version(self):

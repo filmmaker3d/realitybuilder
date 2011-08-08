@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realityBuilderDemo, realityBuilder, $ */
+/*global realityBuilderDemo, realityBuilder, $, alert */
 
 var realityBuilderAdminDemo = (function () {
     var publicInterface, logoutUrl;
@@ -27,11 +27,11 @@ var realityBuilderAdminDemo = (function () {
     {
         var node = $('#' + type + 'BlocksVisibilityButton');
 
-        node.unbind('click');
         node.
             text((blocksAreVisible ? "Hide" : "Show") + " " + text + 
                  " Blocks").
-            bind('click', function () { 
+            unbind('click'). // necessary if this code is run several times
+            click(function () { 
                 node.unbind('click');
                 setVisibility(!blocksAreVisible); 
             });

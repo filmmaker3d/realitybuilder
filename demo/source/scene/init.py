@@ -36,9 +36,6 @@ import os.path
 import sys
 sys.path.append(os.path.realpath('.'))
 
-from google.appengine.dist import use_library
-use_library('django', '0.96')
-
 from main import Construction
 from main import Block
 from main import BlockProperties
