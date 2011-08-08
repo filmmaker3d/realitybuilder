@@ -91,10 +91,6 @@ p {
     color: white;
 }
 
-p.first {
-    margin-top: 0.5em;
-}
-
 #loadIndicator {
     position: absolute;
     top: 0;
@@ -148,6 +144,9 @@ table#contentContainer tr.debug {
     text-align: left;
     width: 640px;
     height: 480px;
+
+    display: none; /* Initially hidden, and only unhidden for browsers that 
+                      support JavaScript with "document.getElementById". */
 }
 
 #controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 

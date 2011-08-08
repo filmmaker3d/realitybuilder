@@ -23,8 +23,8 @@
   <link rel="SHORTCUT ICON" href="/demo/images/favicon.png">
 
   {# media="all" hides style sheets from Netscape 4 #}
-  <link rel="stylesheet" href="/demo/stylesheets/reset.css" media="all">
-  <link rel="stylesheet" href="/demo/stylesheets/base.css" media="all">
+  <link rel="stylesheet" href="/demo/stylesheets/reset.css">
+  <link rel="stylesheet" href="/demo/stylesheets/base.css">
 
   <!--[if lte IE 7]>
     <link rel="stylesheet" href="/demo/stylesheets/base_lte_IE_7.css">
@@ -44,12 +44,13 @@
       <td>
         <div id="errorMessage">
           <noscript>
-            <p class="first">The Reality Builder does not work because your
-            browser does not support <a 
-            href="http://developer.mozilla.org/en/JavaScript/About_JavaScript"
-            >JavaScript</a>, or because JavaScript is disabled.</p>
+            <p>The Reality Builder does not work because your browser does not
+              support
+              <a href="http://developer.mozilla.org/en/JavaScript/About_JavaScript"
+                 >JavaScript</a>, or because JavaScript is disabled.</p>
           </noscript>
         </div>
+
         <div id="view">
           <img id="backgroundImage" src="/demo/images/placeholder.gif" 
                alt="Background Image">
@@ -80,7 +81,11 @@
       </td>
     </tr>
   </table>
-  <div id="DetectImageState"></div>
+
+  <script type="text/javascript">
+    // unhides view, unless JavaScript is not supported or browser is very old
+    document.getElementById('view').style.display = 'block';
+  </script>
 
   <script type="text/javascript" 
           src="/demo/javascript/jquery-1.6.2.min.js"></script>

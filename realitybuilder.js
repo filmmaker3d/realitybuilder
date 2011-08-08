@@ -17,7 +17,7 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilderDojo, acme, window */
+/*global realitybuilderDojo, acme, window, LazyLoad */
 
 var realitybuilder = (function () {
     var
@@ -108,11 +108,7 @@ var realitybuilder = (function () {
     // Also, one can still work around the issue by loading the current script
     // in an asynchronous way.
     function requestLoadScript(scriptUrl) {
-        var newScriptEl, firstScriptEl;
-
-        if (w3cDomIsSupported()) {
-            LazyLoad.js(scriptUrl, onScriptLoaded);
-        }
+        LazyLoad.js(scriptUrl, onScriptLoaded);
     }
 
     // Loads the Dojo JavaScript that is used for debugging mode.
@@ -178,11 +174,14 @@ var realitybuilder = (function () {
     initialized = false;
     settings = {};
 
-    // {% if debug %}
-    requestLoadDebugScript();
-    // {% else %}
-    requestLoadReleaseScript();
-    // {% endif %}
+    if (w3cDomIsSupported()) {
+        // {% if debug %}
+        requestLoadDebugScript();
+        // {% else %}
+        requestLoadReleaseScript();
+        // {% endif %}
+    } // else: don't do anything - "settings.onBrowserNotSupportedError" is not
+      // yet set.
 
     publicInterface = {
         // Mandatory settings:
