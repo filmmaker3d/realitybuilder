@@ -12,8 +12,8 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-application: realitybuilder
-version: 11
+application: realitybuilderwidget
+version: 1-7-0
 runtime: python
 api_version: 1
 
@@ -33,11 +33,20 @@ handlers:
 - url: /documentation
   static_dir: documentation
 
-# LazyLoad is not in the list below: It is included into a template using
-# Django, which wouldn't work if it was statically loaded.
-- url: /javascript/(dojo|dojo-release-1.6.1|dojo-release-1.6.1-src|realityBuilder)/(.*)
-  static_files: javascript/\1/\2
-  upload: /javascript/(dojo|dojo-release-1.6.1|dojo-release-1.6.1-src|realityBuilder)/(.*)
+- url: /javascript/dojo
+  static_dir: javascript/dojo
+
+- url: /javascript/dojo-release-1.6.1
+  static_dir: javascript/dojo-release-1.6.1
+
+- url: /javascript/dojo-release-1.6.1-src
+  static_dir: javascript/dojo-release-1.6.1-src
+
+- url: /javascript/realityBuilder
+  static_dir: javascript/realityBuilder
+
+# /javascript/lazyload is not statically served. Otherwise including it into a
+# template using Django wouldn't work.
 
 - url: /demo/stylesheets
   static_dir: demo/stylesheets
@@ -77,8 +86,8 @@ skip_files:
 - ^(.*/)?.*\.bak$
 - ^javascript/dojo-release-1.6.1
 - ^javascript/dojo-release-1.6.1-src
-- ^javascript/realitybuilder
-- ^javascript/realitybuilder.profile.js
+- ^javascript/realityBuilder
+- ^javascript/realityBuilder.profile.js
 - ^demo/source$
 - ^documentation$
 - ^LICENSE$

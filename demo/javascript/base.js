@@ -85,20 +85,21 @@ var realityBuilderDemo = (function () {
         updateBackgroundImage();
     }
 
-    function controlButtonNode(type) {
-        return $('#' + type + 'Button');
-    }
-
-    // Updates the state of a control button, i.e. whether it's enabled or
-    // disabled.
-    function updateControlButtonState(type, shouldBeEnabled) {
-        var node = controlButtonNode(type);
-
+    // Updates the state of a node, i.e. whether it's enabled or disabled.
+    function updateNodeState(node, shouldBeEnabled) {
         if (shouldBeEnabled) {
             node.removeClass('disabled');
         } else {
             node.addClass('disabled');
         }
+    }
+
+    function controlButtonNode(type) {
+        return $('#' + type + 'Button');
+    }
+
+    function updateControlButtonState(type, shouldBeEnabled) {
+        updateNodeState(controlButtonNode(type), shouldBeEnabled);
     }
 
     function updateCoordinateButtonState(type, deltaB) {
@@ -116,8 +117,14 @@ var realityBuilderDemo = (function () {
                                  realityBuilder.newBlock().canBeMadeReal());
     }
 
+    function updateControlPanelState() {
+        updateNodeState($('#controlPanel'), 
+                        !realityBuilder.newBlock().isStopped());
+    }
+
     function onDegreesOfFreedomChanged() {
         forEachCoordinateButton(updateCoordinateButtonState);
+        updateControlPanelState();
         updateRotate90ButtonState();
         updateMakeRealButtonState();
     }
