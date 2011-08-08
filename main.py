@@ -14,14 +14,17 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-import logging
 import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+
+from google.appengine.dist import use_library
+use_library('django', '1.2')
+
+import logging
 import time
 import sys
 import exceptions
 import google.appengine.ext.db
-from google.appengine.dist import use_library
-use_library('django', '0.96')
 from google.appengine.api import mail
 from google.appengine.api import users
 from google.appengine.ext.webapp import template
