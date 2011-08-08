@@ -1,4 +1,4 @@
-realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.editor.plugins.nls.fr.Smiley"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.fr.Smiley");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "Smiley", "fr", ({"emoticonLaughing":"rire","emoticonCool":"calme","emoticonTongue":"langue","emoticonCrying":"pleurs","emoticonOops":"oops","emoticonFrown":"froncement de sourcils","emoticonAngry":"colère","emoticonShy":"timide","emoticonNo":"non","emoticonAngel":"ange","smiley":"Insérer une émoticône","emoticonIdea":"idée","emoticonEyebrow":"sourcils","emoticonSmile":"sourire","emoticonWink":"clin d'oeil","emoticonYes":"oui","emoticonGrin":"sourire large","emoticonGoofy":"dingo","emoticonHalf":"demi"})
 );

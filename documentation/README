@@ -44,6 +44,62 @@ distribution of the Reality Builder. If desired, install it as follows:
   should not be redistributed as part of the Reality Builder source code.
 
 
+Enabling debug mode
+===================
+
+See the top of: main.py
+
+
+Embedding the Reality Builder in a web page
+===========================================
+
+Minimalistic code to embed the Reality Builder:
+
+  <script type="text/javascript" 
+          src="http://example.com/realitybuilder.js"></script>
+
+  <script type="text/javascript">
+    realityBuilder.initialize({width:640, height:480})
+  </script>
+
+  <div id="RealityBuilder"></div>
+
+See the demo for more information.
+
+Notes:
+
+* With debug mode enabled, the web page and the Reality Builder must be hosted
+  on the same domain.
+
+* The RealityBuilder is created using the Dojo Toolkit. Other versions of Dojo
+  can be used on the same page, if precautions are taken:
+
+  - Do not configure Dojo 1.6 using "data-dojo-config" parameters. Rationale:
+    Version 1.6 takes this parameter from the first script tag in the page, and
+    that may be the wrong one.
+
+  - Dojo for the Reality Builder is loaded asynchronously, and in debug mode it
+    is configured using "djConfig". When in debug mode and when using
+    "djConfig" to configure another version of Dojo, proceed for example as
+    follows:
+
+    (i) Make a backup of "djConfig".
+
+    (ii) Load Dojo non-asynchronously.
+
+    (iii) Restore "djConfig".
+
+* Don't clobber:
+
+  - realityBuilder
+  
+  - realityBuilderDojo, realityBuilderDojox, realityBuilderDijit
+  
+  - acme: due to a bug in Dojo 1.6
+
+  - djConfig: see above
+
+
 Unit tests
 ==========
 
@@ -285,12 +341,12 @@ Miscellaneous
     directory, from the Windows XP command line:
 
     > SET SCOPE_MAP=[
-    > SET SCOPE_MAP=%SCOPE_MAP%[\"dojo\",\"realitybuilderDojo\"],
-    > SET SCOPE_MAP=%SCOPE_MAP%[\"dijit\",\"realitybuilderDijit\"],
-    > SET SCOPE_MAP=%SCOPE_MAP%[\"dojox\",\"realitybuilderDojox\"]]
-    > build.bat profileFile=../../../realitybuilder.profile.js action=release ^
+    > SET SCOPE_MAP=%SCOPE_MAP%[\"dojo\",\"realityBuilderDojo\"],
+    > SET SCOPE_MAP=%SCOPE_MAP%[\"dijit\",\"realityBuilderDijit\"],
+    > SET SCOPE_MAP=%SCOPE_MAP%[\"dojox\",\"realityBuilderDojox\"]]
+    > build.bat profileFile=../../../realityBuilder.profile.js action=release ^
       scopeDjConfig=\{locale:\"en\",parseOnLoad:true\} ^
-      localeList=en loader=xdomain xdDojoScopeName=realitybuilderDojo ^
+      localeList=en loader=xdomain xdDojoScopeName=realityBuilderDojo ^
       optimize=shrinksafe scopeMap=%SCOPE_MAP%
     > DEL /S /Q ..\..\..\dojo
     > COPY ..\..\release\dojo\dojo\dojo.xd.js* ..\..\..\dojo

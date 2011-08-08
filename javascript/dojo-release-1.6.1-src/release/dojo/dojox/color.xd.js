@@ -5,4 +5,4 @@
 */
 
 
-realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.color"],["require","dojox.color._base"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.color"]){_4._hasResource["dojox.color"]=true;_4.provide("dojox.color");_4.require("dojox.color._base");}}};});
+realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.color"],["require","dojox.color._base"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.color"]){_4._hasResource["dojox.color"]=true;_4.provide("dojox.color");_4.require("dojox.color._base");}}};});

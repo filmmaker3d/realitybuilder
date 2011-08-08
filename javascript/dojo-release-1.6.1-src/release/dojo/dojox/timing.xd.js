@@ -5,4 +5,4 @@
 */
 
 
-realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.timing"],["require","dojox.timing._base"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.timing"]){_4._hasResource["dojox.timing"]=true;_4.provide("dojox.timing");_4.require("dojox.timing._base");}}};});
+realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.timing"],["require","dojox.timing._base"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.timing"]){_4._hasResource["dojox.timing"]=true;_4.provide("dojox.timing");_4.require("dojox.timing._base");}}};});

@@ -5,4 +5,4 @@
 */
 
 
-realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {defineResource:function(_4,_5,_6){}};});
+realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {defineResource:function(_4,_5,_6){}};});

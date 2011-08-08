@@ -30,7 +30,7 @@
 	eval("var djConfig = \{locale:\"en\",parseOnLoad:true\};");
 
 	//The null below can be relaced by a build-time value used instead of djConfig.scopeMap.
-	var sMap = [["dojo","realitybuilderDojo"],["dijit","realitybuilderDijit"],["dojox","realitybuilderDojox"]];
+	var sMap = [["dojo","realityBuilderDojo"],["dijit","realityBuilderDijit"],["dojox","realityBuilderDojox"]];
 
 	//See if new scopes need to be defined.
 	if((sMap || (typeof djConfig != "undefined" && djConfig.scopeMap)) && (typeof window != "undefined")){
@@ -8645,7 +8645,7 @@ dojo.provide("dojo._base.NodeList");
 			//	|	dojo.query(".note").addContent(dojo.byId("foo"));
 			//  example:
 			//  	Append nodes from a templatized string.
-			// 		
+			// 		dojo.require("dojo.string");
 			// 		dojo.query(".note").addContent({
 			//  		template: '<b>${id}: </b><span>${name}</span>',
 			// 			id: "user332",
@@ -8653,7 +8653,7 @@ dojo.provide("dojo._base.NodeList");
 			//  	});
 			//  example:
 			//  	Append nodes from a templatized string that also has widgets parsed.
-			//  	
+			//  	dojo.require("dojo.string");
 			//  	dojo.require("dojo.parser");
 			//  	var notes = dojo.query(".note").addContent({
 			//  		template: '<button dojoType="dijit.form.Button">${text}</button>',
@@ -12731,3265 +12731,8 @@ dojo.mixin(dojox.math.matrix, {
 
 }
 
-if(!dojo._hasResource["dojox.xml.parser"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojox.xml.parser"] = true;
-dojo.provide("dojox.xml.parser");
-
-//DOM type to int value for reference.
-//Ints make for more compact code than full constant names.
-//ELEMENT_NODE                  = 1;
-//ATTRIBUTE_NODE                = 2;
-//TEXT_NODE                     = 3;
-//CDATA_SECTION_NODE            = 4;
-//ENTITY_REFERENCE_NODE         = 5;
-//ENTITY_NODE                   = 6;
-//PROCESSING_INSTRUCTION_NODE   = 7;
-//COMMENT_NODE                  = 8;
-//DOCUMENT_NODE                 = 9;
-//DOCUMENT_TYPE_NODE            = 10;
-//DOCUMENT_FRAGMENT_NODE        = 11;
-//NOTATION_NODE                 = 12;
-
-dojox.xml.parser.parse = function(/*String?*/ str, /*String?*/ mimetype){
-	//	summary:
-	//		cross-browser implementation of creating an XML document object from null, empty string, and XML text..
-	//
-	//	str:
-	//		Optional text to create the document from.  If not provided, an empty XML document will be created.
-	//		If str is empty string "", then a new empty document will be created.
-	//	mimetype:
-	//		Optional mimetype of the text.  Typically, this is text/xml.  Will be defaulted to text/xml if not provided.
-	var _document = dojo.doc;
-	var doc;
-
-	mimetype = mimetype || "text/xml";
-	if(str && dojo.trim(str) && "DOMParser" in dojo.global){
-		//Handle parsing the text on Mozilla based browsers etc..
-		var parser = new DOMParser();
-		doc = parser.parseFromString(str, mimetype);
-		var de = doc.documentElement;
-		var errorNS = "http://www.mozilla.org/newlayout/xml/parsererror.xml";
-		if(de.nodeName == "parsererror" && de.namespaceURI == errorNS){
-			var sourceText = de.getElementsByTagNameNS(errorNS, 'sourcetext')[0];
-			if(sourceText){
-				sourceText = sourceText.firstChild.data;
-			}
-        	throw new Error("Error parsing text " + de.firstChild.data + " \n" + sourceText);
-		}
-		return doc;
-
-	}else if("ActiveXObject" in dojo.global){
-		//Handle IE.
-		var ms = function(n){ return "MSXML" + n + ".DOMDocument"; };
-		var dp = ["Microsoft.XMLDOM", ms(6), ms(4), ms(3), ms(2)];
-		dojo.some(dp, function(p){
-			try{
-				doc = new ActiveXObject(p);
-			}catch(e){ return false; }
-			return true;
-		});
-		if(str && doc){
-			doc.async = false;
-			doc.loadXML(str);
-			var pe = doc.parseError;
-			if(pe.errorCode !== 0){
-				throw new Error("Line: " + pe.line + "\n" +
-					"Col: " + pe.linepos + "\n" +
-					"Reason: " + pe.reason + "\n" +
-					"Error Code: " + pe.errorCode + "\n" +
-					"Source: " + pe.srcText);
-			}
-		}
-		if(doc){
-			return doc; //DOMDocument
-		}
-	}else if(_document.implementation && _document.implementation.createDocument){
-		if(str && dojo.trim(str) && _document.createElement){
-			//Everyone else that we couldn't get to work.  Fallback case.
-			// FIXME: this may change all tags to uppercase!
-			var tmp = _document.createElement("xml");
-			tmp.innerHTML = str;
-			var xmlDoc = _document.implementation.createDocument("foo", "", null);
-			dojo.forEach(tmp.childNodes, function(child){
-				xmlDoc.importNode(child, true);
-			});
-			return xmlDoc;	//	DOMDocument
-		}else{
-			return _document.implementation.createDocument("", "", null); // DOMDocument
-		}
-	}
-	return null;	//	null
-}
-
-dojox.xml.parser.textContent = function(/*Node*/node, /*String?*/text){
-	//	summary:
-	//		Implementation of the DOM Level 3 attribute; scan node for text
-	//	description:
-	//		Implementation of the DOM Level 3 attribute; scan node for text
-	//		This function can also update the text of a node by replacing all child
-	//		content of the node.
-	//	node:
-	//		The node to get the text off of or set the text on.
-	//	text:
-	//		Optional argument of the text to apply to the node.
-	if(arguments.length>1){
-		var _document = node.ownerDocument || dojo.doc;  //Preference is to get the node owning doc first or it may fail
-		dojox.xml.parser.replaceChildren(node, _document.createTextNode(text));
-		return text;	//	String
-	}else{
-		if(node.textContent !== undefined){ //FF 1.5 -- remove?
-			return node.textContent;	//	String
-		}
-		var _result = "";
-		if(node){
-			dojo.forEach(node.childNodes, function(child){
-				switch(child.nodeType){
-					case 1: // ELEMENT_NODE
-					case 5: // ENTITY_REFERENCE_NODE
-						_result += dojox.xml.parser.textContent(child);
-						break;
-					case 3: // TEXT_NODE
-					case 2: // ATTRIBUTE_NODE
-					case 4: // CDATA_SECTION_NODE
-						_result += child.nodeValue;
-				}
-			});
-		}
-		return _result;	//	String
-	}
-}
-
-dojox.xml.parser.replaceChildren = function(/*Element*/node, /*Node || Array*/ newChildren){
-	//	summary:
-	//		Removes all children of node and appends newChild. All the existing
-	//		children will be destroyed.
-	//	description:
-	//		Removes all children of node and appends newChild. All the existing
-	//		children will be destroyed.
-	// 	node:
-	//		The node to modify the children on
-	//	newChildren:
-	//		The children to add to the node.  It can either be a single Node or an
-	//		array of Nodes.
-	var nodes = [];
-
-	if(dojo.isIE){
-		dojo.forEach(node.childNodes, function(child){
-			nodes.push(child);
-		});
-	}
-
-	dojox.xml.parser.removeChildren(node);
-	dojo.forEach(nodes, dojo.destroy);
-
-	if(!dojo.isArray(newChildren)){
-		node.appendChild(newChildren);
-	}else{
-		dojo.forEach(newChildren, function(child){
-			node.appendChild(child);
-		});
-	}
-}
-
-dojox.xml.parser.removeChildren = function(/*Element*/node){
-	//	summary:
-	//		removes all children from node and returns the count of children removed.
-	//		The children nodes are not destroyed. Be sure to call dojo.destroy on them
-	//		after they are not used anymore.
-	//	node:
-	//		The node to remove all the children from.
-	var count = node.childNodes.length;
-	while(node.hasChildNodes()){
-		node.removeChild(node.firstChild);
-	}
-	return count; // int
-}
-
-
-dojox.xml.parser.innerXML = function(/*Node*/node){
-	//	summary:
-	//		Implementation of MS's innerXML function.
-	//	node:
-	//		The node from which to generate the XML text representation.
-	if(node.innerXML){
-		return node.innerXML;	//	String
-	}else if(node.xml){
-		return node.xml;		//	String
-	}else if(typeof XMLSerializer != "undefined"){
-		return (new XMLSerializer()).serializeToString(node);	//	String
-	}
-	return null;
-}
-
-}
-
-if(!dojo._hasResource["dojo.string"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojo.string"] = true;
-dojo.provide("dojo.string");
-
-
-dojo.getObject("string", true, dojo);
-
-/*=====
-dojo.string = {
-	// summary: String utilities for Dojo
-};
-=====*/
-
-dojo.string.rep = function(/*String*/str, /*Integer*/num){
-	//	summary:
-	//		Efficiently replicate a string `n` times.
-	//	str:
-	//		the string to replicate
-	//	num:
-	//		number of times to replicate the string
-	
-	if(num <= 0 || !str){ return ""; }
-	
-	var buf = [];
-	for(;;){
-		if(num & 1){
-			buf.push(str);
-		}
-		if(!(num >>= 1)){ break; }
-		str += str;
-	}
-	return buf.join("");	// String
-};
-
-dojo.string.pad = function(/*String*/text, /*Integer*/size, /*String?*/ch, /*Boolean?*/end){
-	//	summary:
-	//		Pad a string to guarantee that it is at least `size` length by
-	//		filling with the character `ch` at either the start or end of the
-	//		string. Pads at the start, by default.
-	//	text:
-	//		the string to pad
-	//	size:
-	//		length to provide padding
-	//	ch:
-	//		character to pad, defaults to '0'
-	//	end:
-	//		adds padding at the end if true, otherwise pads at start
-	//	example:
-	//	|	// Fill the string to length 10 with "+" characters on the right.  Yields "Dojo++++++".
-	//	|	dojo.string.pad("Dojo", 10, "+", true);
-
-	if(!ch){
-		ch = '0';
-	}
-	var out = String(text),
-		pad = dojo.string.rep(ch, Math.ceil((size - out.length) / ch.length));
-	return end ? out + pad : pad + out;	// String
-};
-
-dojo.string.substitute = function(	/*String*/		template,
-									/*Object|Array*/map,
-									/*Function?*/	transform,
-									/*Object?*/		thisObject){
-	//	summary:
-	//		Performs parameterized substitutions on a string. Throws an
-	//		exception if any parameter is unmatched.
-	//	template:
-	//		a string with expressions in the form `${key}` to be replaced or
-	//		`${key:format}` which specifies a format function. keys are case-sensitive.
-	//	map:
-	//		hash to search for substitutions
-	//	transform:
-	//		a function to process all parameters before substitution takes
-	//		place, e.g. mylib.encodeXML
-	//	thisObject:
-	//		where to look for optional format function; default to the global
-	//		namespace
-	//	example:
-	//		Substitutes two expressions in a string from an Array or Object
-	//	|	// returns "File 'foo.html' is not found in directory '/temp'."
-	//	|	// by providing substitution data in an Array
-	//	|	dojo.string.substitute(
-	//	|		"File '${0}' is not found in directory '${1}'.",
-	//	|		["foo.html","/temp"]
-	//	|	);
-	//	|
-	//	|	// also returns "File 'foo.html' is not found in directory '/temp'."
-	//	|	// but provides substitution data in an Object structure.  Dotted
-	//	|	// notation may be used to traverse the structure.
-	//	|	dojo.string.substitute(
-	//	|		"File '${name}' is not found in directory '${info.dir}'.",
-	//	|		{ name: "foo.html", info: { dir: "/temp" } }
-	//	|	);
-	//	example:
-	//		Use a transform function to modify the values:
-	//	|	// returns "file 'foo.html' is not found in directory '/temp'."
-	//	|	dojo.string.substitute(
-	//	|		"${0} is not found in ${1}.",
-	//	|		["foo.html","/temp"],
-	//	|		function(str){
-	//	|			// try to figure out the type
-	//	|			var prefix = (str.charAt(0) == "/") ? "directory": "file";
-	//	|			return prefix + " '" + str + "'";
-	//	|		}
-	//	|	);
-	//	example:
-	//		Use a formatter
-	//	|	// returns "thinger -- howdy"
-	//	|	dojo.string.substitute(
-	//	|		"${0:postfix}", ["thinger"], null, {
-	//	|			postfix: function(value, key){
-	//	|				return value + " -- howdy";
-	//	|			}
-	//	|		}
-	//	|	);
-
-	thisObject = thisObject || dojo.global;
-	transform = transform ?
-		dojo.hitch(thisObject, transform) : function(v){ return v; };
-
-	return template.replace(/\$\{([^\s\:\}]+)(?:\:([^\s\:\}]+))?\}/g,
-		function(match, key, format){
-			var value = dojo.getObject(key, false, map);
-			if(format){
-				value = dojo.getObject(format, false, thisObject).call(thisObject, value, key);
-			}
-			return transform(value, key).toString();
-		}); // String
-};
-
-/*=====
-dojo.string.trim = function(str){
-	//	summary:
-	//		Trims whitespace from both sides of the string
-	//	str: String
-	//		String to be trimmed
-	//	returns: String
-	//		Returns the trimmed string
-	//	description:
-	//		This version of trim() was taken from [Steven Levithan's blog](http://blog.stevenlevithan.com/archives/faster-trim-javascript).
-	//		The short yet performant version of this function is dojo.trim(),
-	//		which is part of Dojo base.  Uses String.prototype.trim instead, if available.
-	return "";	// String
-}
-=====*/
-
-dojo.string.trim = String.prototype.trim ?
-	dojo.trim : // aliasing to the native function
-	function(str){
-		str = str.replace(/^\s+/, '');
-		for(var i = str.length - 1; i >= 0; i--){
-			if(/\S/.test(str.charAt(i))){
-				str = str.substring(0, i + 1);
-				break;
-			}
-		}
-		return str;
-	};
-
-}
-
-if(!dojo._hasResource["dojo.date.stamp"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojo.date.stamp"] = true;
-dojo.provide("dojo.date.stamp");
-
-
-dojo.getObject("date.stamp", true, dojo);
-
-// Methods to convert dates to or from a wire (string) format using well-known conventions
-
-dojo.date.stamp.fromISOString = function(/*String*/formattedString, /*Number?*/defaultTime){
-	//	summary:
-	//		Returns a Date object given a string formatted according to a subset of the ISO-8601 standard.
-	//
-	//	description:
-	//		Accepts a string formatted according to a profile of ISO8601 as defined by
-	//		[RFC3339](http://www.ietf.org/rfc/rfc3339.txt), except that partial input is allowed.
-	//		Can also process dates as specified [by the W3C](http://www.w3.org/TR/NOTE-datetime)
-	//		The following combinations are valid:
-	//
-	//			* dates only
-	//			|	* yyyy
-	//			|	* yyyy-MM
-	//			|	* yyyy-MM-dd
-	// 			* times only, with an optional time zone appended
-	//			|	* THH:mm
-	//			|	* THH:mm:ss
-	//			|	* THH:mm:ss.SSS
-	// 			* and "datetimes" which could be any combination of the above
-	//
-	//		timezones may be specified as Z (for UTC) or +/- followed by a time expression HH:mm
-	//		Assumes the local time zone if not specified.  Does not validate.  Improperly formatted
-	//		input may return null.  Arguments which are out of bounds will be handled
-	// 		by the Date constructor (e.g. January 32nd typically gets resolved to February 1st)
-	//		Only years between 100 and 9999 are supported.
-	//
-  	//	formattedString:
-	//		A string such as 2005-06-30T08:05:00-07:00 or 2005-06-30 or T08:05:00
-	//
-	//	defaultTime:
-	//		Used for defaults for fields omitted in the formattedString.
-	//		Uses 1970-01-01T00:00:00.0Z by default.
-
-	if(!dojo.date.stamp._isoRegExp){
-		dojo.date.stamp._isoRegExp =
-//TODO: could be more restrictive and check for 00-59, etc.
-			/^(?:(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(.\d+)?)?((?:[+-](\d{2}):(\d{2}))|Z)?)?$/;
-	}
-
-	var match = dojo.date.stamp._isoRegExp.exec(formattedString),
-		result = null;
-
-	if(match){
-		match.shift();
-		if(match[1]){match[1]--;} // Javascript Date months are 0-based
-		if(match[6]){match[6] *= 1000;} // Javascript Date expects fractional seconds as milliseconds
-
-		if(defaultTime){
-			// mix in defaultTime.  Relatively expensive, so use || operators for the fast path of defaultTime === 0
-			defaultTime = new Date(defaultTime);
-			dojo.forEach(dojo.map(["FullYear", "Month", "Date", "Hours", "Minutes", "Seconds", "Milliseconds"], function(prop){
-				return defaultTime["get" + prop]();
-			}), function(value, index){
-				match[index] = match[index] || value;
-			});
-		}
-		result = new Date(match[0]||1970, match[1]||0, match[2]||1, match[3]||0, match[4]||0, match[5]||0, match[6]||0); //TODO: UTC defaults
-		if(match[0] < 100){
-			result.setFullYear(match[0] || 1970);
-		}
-
-		var offset = 0,
-			zoneSign = match[7] && match[7].charAt(0);
-		if(zoneSign != 'Z'){
-			offset = ((match[8] || 0) * 60) + (Number(match[9]) || 0);
-			if(zoneSign != '-'){ offset *= -1; }
-		}
-		if(zoneSign){
-			offset -= result.getTimezoneOffset();
-		}
-		if(offset){
-			result.setTime(result.getTime() + offset * 60000);
-		}
-	}
-
-	return result; // Date or null
-};
-
-/*=====
-	dojo.date.stamp.__Options = function(){
-		//	selector: String
-		//		"date" or "time" for partial formatting of the Date object.
-		//		Both date and time will be formatted by default.
-		//	zulu: Boolean
-		//		if true, UTC/GMT is used for a timezone
-		//	milliseconds: Boolean
-		//		if true, output milliseconds
-		this.selector = selector;
-		this.zulu = zulu;
-		this.milliseconds = milliseconds;
-	}
-=====*/
-
-dojo.date.stamp.toISOString = function(/*Date*/dateObject, /*dojo.date.stamp.__Options?*/options){
-	//	summary:
-	//		Format a Date object as a string according a subset of the ISO-8601 standard
-	//
-	//	description:
-	//		When options.selector is omitted, output follows [RFC3339](http://www.ietf.org/rfc/rfc3339.txt)
-	//		The local time zone is included as an offset from GMT, except when selector=='time' (time without a date)
-	//		Does not check bounds.  Only years between 100 and 9999 are supported.
-	//
-	//	dateObject:
-	//		A Date object
-
-	var _ = function(n){ return (n < 10) ? "0" + n : n; };
-	options = options || {};
-	var formattedDate = [],
-		getter = options.zulu ? "getUTC" : "get",
-		date = "";
-	if(options.selector != "time"){
-		var year = dateObject[getter+"FullYear"]();
-		date = ["0000".substr((year+"").length)+year, _(dateObject[getter+"Month"]()+1), _(dateObject[getter+"Date"]())].join('-');
-	}
-	formattedDate.push(date);
-	if(options.selector != "date"){
-		var time = [_(dateObject[getter+"Hours"]()), _(dateObject[getter+"Minutes"]()), _(dateObject[getter+"Seconds"]())].join(':');
-		var millis = dateObject[getter+"Milliseconds"]();
-		if(options.milliseconds){
-			time += "."+ (millis < 100 ? "0" : "") + _(millis);
-		}
-		if(options.zulu){
-			time += "Z";
-		}else if(options.selector != "time"){
-			var timezoneOffset = dateObject.getTimezoneOffset();
-			var absOffset = Math.abs(timezoneOffset);
-			time += (timezoneOffset > 0 ? "-" : "+") +
-				_(Math.floor(absOffset/60)) + ":" + _(absOffset%60);
-		}
-		formattedDate.push(time);
-	}
-	return formattedDate.join('T'); // String
-};
-
-}
-
-if(!dojo._hasResource["dojox.atom.io.model"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojox.atom.io.model"] = true;
-dojo.provide("dojox.atom.io.model");
-
-
-
-
-
-dojox.atom.io.model._Constants = {
-	//	summary:
-	//		Container for general constants.
-	//	description:
-	//		Container for general constants.
-	"ATOM_URI": "http://www.w3.org/2005/Atom",
-	"ATOM_NS": "http://www.w3.org/2005/Atom",
-	"PURL_NS": "http://purl.org/atom/app#",
-	"APP_NS": "http://www.w3.org/2007/app"
-};
-
-dojox.atom.io.model._actions = {
-	//	summary:
-	//		Container for tag handling functions.
-	//	description:
-	//		Container for tag handling functions.  Each child of this container is
-	//		a handler function for the given type of node. Each accepts two parameters:
-	//	obj:  Object.
-	//		  The object to insert data into.
-	//	node: DOM Node.
-	//		  The dom node containing the data
-	"link": function(obj,node){
-		if(obj.links === null){obj.links = [];}
-		var link = new dojox.atom.io.model.Link();
-		link.buildFromDom(node);
-		obj.links.push(link);
-	},
-	"author": function(obj,node){
-		if(obj.authors === null){obj.authors = [];}
-		var person = new dojox.atom.io.model.Person("author");
-		person.buildFromDom(node);
-		obj.authors.push(person);
-	},
-	"contributor": function(obj,node){
-		if(obj.contributors === null){obj.contributors = [];}
-		var person = new dojox.atom.io.model.Person("contributor");
-		person.buildFromDom(node);
-		obj.contributors.push(person);
-	},
-	"category": function(obj,node){
-		if(obj.categories === null){obj.categories = [];}
-		var cat = new dojox.atom.io.model.Category();
-		cat.buildFromDom(node);
-		obj.categories.push(cat);
-	},
-	"icon": function(obj,node){
-		obj.icon = dojox.xml.parser.textContent(node);
-	},
-	"id": function(obj,node){
-		obj.id = dojox.xml.parser.textContent(node);
-	},
-	"rights": function(obj,node){
-		obj.rights = dojox.xml.parser.textContent(node);
-	},
-	"subtitle": function(obj,node){
-		var cnt = new dojox.atom.io.model.Content("subtitle");
-		cnt.buildFromDom(node);
-		obj.subtitle = cnt;
-	},
-	"title": function(obj,node){
-		var cnt = new dojox.atom.io.model.Content("title");
-		cnt.buildFromDom(node);
-		obj.title = cnt;
-	},
-	"updated": function(obj,node){
-		obj.updated = dojox.atom.io.model.util.createDate(node);
-	},
-	// Google news
-	"issued": function(obj,node){
-		obj.issued = dojox.atom.io.model.util.createDate(node);
-	},
-	// Google news
-	"modified": function(obj,node){
-		obj.modified = dojox.atom.io.model.util.createDate(node);
-	},
-	"published": function(obj,node){
-		obj.published = dojox.atom.io.model.util.createDate(node);
-	},
-	"entry": function(obj,node){
-		if(obj.entries === null){obj.entries = [];}
-		//The object passed in should be a Feed object, since only feeds can contain Entries
-		var entry = obj.createEntry ? obj.createEntry() : new dojox.atom.io.model.Entry();
-		entry.buildFromDom(node);
-		obj.entries.push(entry);
-	},
-	"content": function(obj, node){
-		var cnt = new dojox.atom.io.model.Content("content");
-		cnt.buildFromDom(node);
-		obj.content = cnt;
-	},
-	"summary": function(obj, node){
-		var summary = new dojox.atom.io.model.Content("summary");
-		summary.buildFromDom(node);
-		obj.summary = summary;
-	},
-
-	"name": function(obj,node){
-		obj.name = dojox.xml.parser.textContent(node);
-	},
-	"email" : function(obj,node){
-		obj.email = dojox.xml.parser.textContent(node);
-	},
-	"uri" : function(obj,node){
-		obj.uri = dojox.xml.parser.textContent(node);
-	},
-	"generator" : function(obj,node){
-		obj.generator = new dojox.atom.io.model.Generator();
-		obj.generator.buildFromDom(node);
-	}
-};
-
-dojox.atom.io.model.util = {
-	createDate: function(/*DOM node*/node){
-		//	summary:
-		//		Utility function to create a date from a DOM node's text content.
-		//	description:
-		//		Utility function to create a date from a DOM node's text content.
-		//
-		//	node:
-		//		The DOM node to inspect.
-		//	returns:
-		//		Date object from a DOM Node containing a ISO-8610 string.
-		var textContent = dojox.xml.parser.textContent(node);
-		if(textContent){
-			return dojo.date.stamp.fromISOString(dojo.trim(textContent));
-		}
-		return null;
-	},
-	escapeHtml: function(/*String*/str){
-		//	summary:
-		//		Utility function to escape XML special characters in an HTML string.
-		//	description:
-		//		Utility function to escape XML special characters in an HTML string.
-		//
-		//	str:
-		//		The string to escape
-		//	returns:
-		//		HTML String with special characters (<,>,&, ", etc,) escaped.
-		return str.replace(/&/gm, "&amp;").replace(/</gm, "&lt;").replace(/>/gm, "&gt;").replace(/"/gm, "&quot;")
-			.replace(/'/gm, "&#39;"); // String
-	},
-	unEscapeHtml: function(/*String*/str){
-		//	summary:
-		//		Utility function to un-escape XML special characters in an HTML string.
-		//	description:
-		//		Utility function to un-escape XML special characters in an HTML string.
-		//
-		//	str:
-		//		The string to un-escape.
-		//	returns:
-		//		HTML String converted back to the normal text (unescaped) characters (<,>,&, ", etc,).
-		return str.replace(/&lt;/gm, "<").replace(/&gt;/gm, ">").replace(/&quot;/gm, "\"")
-			.replace(/&#39;/gm, "'").replace(/&amp;/gm, "&"); // String
-	},
-	getNodename: function(/*DOM node*/node){
-		//	summary:
-		//		Utility function to get a node name and deal with IE's bad handling of namespaces
-		//		on tag names.
-		//	description:
-		//		Utility function to get a node name and deal with IE's bad handling of namespaces
-		//		on tag names.
-		//
-		//	node:
-		//		The DOM node whose name to retrieve.
-		//	returns:
-		//		String
-		//	The name without namespace prefixes.
-		var name = null;
-		if(node !== null){
-			name = node.localName ? node.localName: node.nodeName;
-			if(name !== null){
-				var nsSep = name.indexOf(":");
-				if(nsSep !== -1){
-					name = name.substring((nsSep + 1), name.length);
-				}
-			}
-		}
-		return name;
-	}
-};
-
-dojo.declare('dojox.atom.io.model.Node', null, {
-	constructor: function(name_space,name, attributes,content, shortNs){
-		this.name_space = name_space;
-		this.name = name;
-		this.attributes = [];
-		if(attributes){
-			this.attributes = attributes;
-		}
-		this.content = [];
-		this.rawNodes = [];
-		this.textContent = null;
-		if(content){
-			this.content.push(content);
-		}
-		this.shortNs = shortNs;
-		this._objName = "Node";//for debugging purposes
-	},
-	buildFromDom: function(node){
-		this._saveAttributes(node);
-		this.name_space = node.namespaceURI;
-		this.shortNs = node.prefix;
-		this.name = dojox.atom.io.model.util.getNodename(node);
-		for(var x=0; x < node.childNodes.length; x++){
-			var c = node.childNodes[x];
-			if(dojox.atom.io.model.util.getNodename(c) != "#text" ){
-				this.rawNodes.push(c);
-				var n = new dojox.atom.io.model.Node();
-				n.buildFromDom(c, true);
-				this.content.push(n);
-			}else{
-				this.content.push(c.nodeValue);
-			}
-		}
-		this.textContent = dojox.xml.parser.textContent(node);
-	},
-	_saveAttributes: function(node){
-		if(!this.attributes){this.attributes = [];}
-		// Work around lack of hasAttributes() in IE
-		var hasAttributes = function(node){
-			var attrs = node.attributes;
-			if(attrs === null){return false;}
-			return (attrs.length !== 0);
-		};
-	
-		if(hasAttributes(node) && this._getAttributeNames){
-			var names = this._getAttributeNames(node);
-			if(names && names.length > 0){
-				for(var x in names){
-					var attrib = node.getAttribute(names[x]);
-					if(attrib){this.attributes[names[x]] = attrib;}
-				}
-			}
-		}
-	},
-	addAttribute: function(name, value){
-		this.attributes[name]=value;
-	},
-	getAttribute: function(name){
-		return this.attributes[name];
-	},
-	//if child objects want their attributes parsed, they should override
-	//to return an array of attrib names
-	_getAttributeNames: function(node){
-		var names = [];
-		for(var i =0; i<node.attributes.length; i++){
-			names.push(node.attributes[i].nodeName);
-		}
-		return names;
-	},
-	toString: function(){
-		var xml = [];
-		var x;
-		var name = (this.shortNs?this.shortNs+":":'')+this.name;
-		var cdata = (this.name == "#cdata-section");
-		if(cdata){
-			xml.push("<![CDATA[");
-			xml.push(this.textContent);
-			xml.push("]]>");
-		}else{
-			xml.push("<");
-			xml.push(name);
-			if(this.name_space){
-				xml.push(" xmlns='" + this.name_space + "'");
-			}
-			if(this.attributes){
-				for(x in this.attributes){
-					xml.push(" " + x + "='" + this.attributes[x] + "'");
-				}
-			}
-			if(this.content){
-				xml.push(">");
-				for(x in this.content){
-					xml.push(this.content[x]);
-				}
-				xml.push("</" + name + ">\n");
-			}else{
-				xml.push("/>\n");
-			}
-		}
-		return xml.join('');
-	},
-	addContent: function(content){
-		this.content.push(content);
-	}
-});
-//Types are as follows: links: array of Link, authors: array of Person, categories: array of Category
-//contributors: array of Person, ico
-dojo.declare("dojox.atom.io.model.AtomItem",dojox.atom.io.model.Node,{
-	 constructor: function(args){
-		this.ATOM_URI = dojox.atom.io.model._Constants.ATOM_URI;
-		this.links = null;						//Array of Link
-		this.authors = null;					//Array of Person
-		this.categories = null;					//Array of Category
-		this.contributors = null;				//Array of Person
-		this.icon = this.id = this.logo = this.xmlBase = this.rights = null; //String
-		this.subtitle = this.title = null;		//Content
-		this.updated = this.published = null;	//Date
-		// Google news
-		this.issued = this.modified = null;		//Date
-		this.content =  null;					//Content
-		this.extensions = null;					//Array of Node, non atom based
-		this.entries = null;					//Array of Entry
-		this.name_spaces = {};
-		this._objName = "AtomItem";			 //for debugging purposes
-	},
-	// summary: Class container for generic Atom items.
-	// description: Class container for generic Atom items.
-	_getAttributeNames: function(){return null;},
-	_accepts: {},
-	accept: function(tag){return Boolean(this._accepts[tag]);},
-	_postBuild: function(){},//child objects can override this if they want to be called after a Dom build
-	buildFromDom: function(node){
-		var i, c, n;
-		for(i=0; i<node.attributes.length; i++){
-			c = node.attributes.item(i);
-			n = dojox.atom.io.model.util.getNodename(c);
-			if(c.prefix == "xmlns" && c.prefix != n){
-				this.addNamespace(c.nodeValue, n);
-			}
-		}
-		c = node.childNodes;
-		for(i = 0; i< c.length; i++){
-			if(c[i].nodeType == 1) {
-				var name = dojox.atom.io.model.util.getNodename(c[i]);
-				if(!name){continue;}
-				if(c[i].namespaceURI != dojox.atom.io.model._Constants.ATOM_NS && name != "#text"){
-					if(!this.extensions){this.extensions = [];}
-					var extensionNode = new dojox.atom.io.model.Node();
-					extensionNode.buildFromDom(c[i]);
-					this.extensions.push(extensionNode);
-				}
-				if(!this.accept(name.toLowerCase())){
-					continue;
-				}
-				var fn = dojox.atom.io.model._actions[name];
-				if(fn) {
-					fn(this,c[i]);
-				}
-			}
-		}
-		this._saveAttributes(node);
-		if(this._postBuild){this._postBuild();}
-	},
-	addNamespace: function(fullName, shortName){
-		if(fullName && shortName){
-			this.name_spaces[shortName] = fullName;
-		}
-	},
-	addAuthor: function(/*String*/name, /*String*/email, /*String*/uri){
-		//	summary:
-		//		Function to add in an author to the list of authors.
-		//	description:
-		//		Function to add in an author to the list of authors.
-		//
-		//	name:
-		//		The author's name.
-		//	email:
-		//		The author's e-mail address.
-		//	uri:
-		//		A URI associated with the author.
-		if(!this.authors){this.authors = [];}
-		this.authors.push(new dojox.atom.io.model.Person("author",name,email,uri));
-	},
-	addContributor: function(/*String*/name, /*String*/email, /*String*/uri){
-		//	summary:
-		//		Function to add in an author to the list of authors.
-		//	description:
-		//		Function to add in an author to the list of authors.
-		//
-		//	name:
-		//		The author's name.
-		//	email:
-		//		The author's e-mail address.
-		//	uri:
-		//		A URI associated with the author.
-		if(!this.contributors){this.contributors = [];}
-		this.contributors.push(new dojox.atom.io.model.Person("contributor",name,email,uri));
-	},
-	addLink: function(/*String*/href,/*String*/rel,/*String*/hrefLang,/*String*/title,/*String*/type){
-		//	summary:
-		//		Function to add in a link to the list of links.
-		//	description:
-		//		Function to add in a link to the list of links.
-		//
-		//	href:
-		//		The href.
-		//	rel:
-		//		String
-		//	hrefLang:
-		//		String
-		//	title:
-		//		A title to associate with the link.
-		//	type:
-		//		The type of link is is.
-		if(!this.links){this.links=[];}
-		this.links.push(new dojox.atom.io.model.Link(href,rel,hrefLang,title,type));
-	},
-	removeLink: function(/*String*/href, /*String*/rel){
-		//	summary:
-		//		Function to remove a link from the list of links.
-		//	description:
-		//		Function to remove a link from the list of links.
-		//
-		//	href:
-		//		The href.
-		//	rel:
-		//		String
-		if(!this.links || !dojo.isArray(this.links)){return;}
-		var count = 0;
-		for(var i = 0; i < this.links.length; i++){
-			if((!href || this.links[i].href === href) && (!rel || this.links[i].rel === rel)){
-				this.links.splice(i,1); count++;
-			}
-		}
-		return count;
-	},
-	removeBasicLinks: function(){
-		//	summary:
-		//		Function to remove all basic links from the list of links.
-		//	description:
-		//		Function to remove all basic link from the list of links.
-		if(!this.links){return;}
-		var count = 0;
-		for(var i = 0; i < this.links.length; i++){
-			if(!this.links[i].rel){this.links.splice(i,1); count++; i--;}
-		}
-		return count;
-	},
-	addCategory: function(/*String*/scheme, /*String*/term, /*String*/label){
-		//	summary:
-		//		Function to add in a category to the list of categories.
-		//	description:
-		//		Function to add in a category to the list of categories.
-		//
-		//	scheme:
-		//		String
-		//	term:
-		//		String
-		//	label:
-		//		String
-		if(!this.categories){this.categories = [];}
-		this.categories.push(new dojox.atom.io.model.Category(scheme,term,label));
-	},
-	getCategories: function(/*String*/scheme){
-		//	summary:
-		//		Function to get all categories that match a particular scheme.
-		//	description:
-		//		Function to get all categories that match a particular scheme.
-		//
-		//	scheme:
-		//		String
-		//		The scheme to filter on.
-		if(!scheme){return this.categories;}
-		//If categories belonging to a particular scheme are required, then create a new array containing these
-		var arr = [];
-		for(var x in this.categories){
-			if(this.categories[x].scheme === scheme){arr.push(this.categories[x]);}
-		}
-		return arr;
-	},
-	removeCategories: function(/*String*/scheme, /*String*/term){
-		//	summary:
-		//		Function to remove all categories that match a particular scheme and term.
-		//	description:
-		//		Function to remove all categories that match a particular scheme and term.
-		//
-		//	scheme:
-		//		The scheme to filter on.
-		//	term:
-		//		The term to filter on.
-		if(!this.categories){return;}
-		var count = 0;
-		for(var i=0; i<this.categories.length; i++){
-			if((!scheme || this.categories[i].scheme === scheme) && (!term || this.categories[i].term === term)){
-				this.categories.splice(i, 1); count++; i--;
-			}
-		}
-		return count;
-	},
-	setTitle: function(/*String*/str, /*String*/type){
-		//	summary:
-		//		Function to set the title of the item.
-		//	description:
-		//		Function to set the title of the item.
-		//
-		//	str:
-		//		The title to set.
-		//	type:
-		//		The type of title format, text, xml, xhtml, etc.
-		if(!str){return;}
-		this.title = new dojox.atom.io.model.Content("title");
-		this.title.value = str;
-		if(type){this.title.type = type;}
-	},
-	addExtension: function(/*String*/name_space,/*String*/name, /*Array*/attributes, /*String*/content, /*String*/shortNS){
-		//	summary:
-		//		Function to add in an extension namespace into the item.
-		//	description:
-		//		Function to add in an extension namespace into the item.
-		//
-		//	name_space:
-		//		The namespace of the extension.
-		//	name:
-		//		The name of the extension
-		//	attributes:
-		//		The attributes associated with the extension.
-		//	content:
-		//		The content of the extension.
-		if(!this.extensions){this.extensions=[];}
-		this.extensions.push(new dojox.atom.io.model.Node(name_space,name,attributes,content, shortNS || "ns"+this.extensions.length));
-	},
-	getExtensions: function(/*String*/name_space, /*String*/name){
-		//	summary:
-		//		Function to get extensions that match a namespace and name.
-		//	description:
-		//		Function to get extensions that match a namespace and name.
-		//
-		//	name_space:
-		//		The namespace of the extension.
-		//	name:
-		//		The name of the extension
-		var arr = [];
-		if(!this.extensions){return arr;}
-		for(var x in this.extensions){
-			if((this.extensions[x].name_space === name_space || this.extensions[x].shortNs === name_space) && (!name || this.extensions[x].name === name)){
-				arr.push(this.extensions[x]);
-			}
-		}
-		return arr;
-	},
-	removeExtensions: function(/*String*/name_space, /*String*/name){
-		//	summary:
-		//		Function to remove extensions that match a namespace and name.
-		//	description:
-		//		Function to remove extensions that match a namespace and name.
-		//
-		//	name_space:
-		//		The namespace of the extension.
-		//	name:
-		//		The name of the extension
-		if(!this.extensions){return;}
-		for(var i=0; i< this.extensions.length; i++){
-			if((this.extensions[i].name_space == name_space || this.extensions[i].shortNs === name_space) && this.extensions[i].name === name){
-				this.extensions.splice(i,1);
-				i--;
-			}
-		}
-	},
-	destroy: function() {
-		this.links = null;
-		this.authors = null;
-		this.categories = null;
-		this.contributors = null;
-		this.icon = this.id = this.logo = this.xmlBase = this.rights = null;
-		this.subtitle = this.title = null;
-		this.updated = this.published = null;
-		// Google news
-		this.issued = this.modified = null;
-		this.content =  null;
-		this.extensions = null;
-		this.entries = null;
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Category",dojox.atom.io.model.Node,{
-	//	summary:
-	//		Class container for 'Category' types.
-	//	description:
-	//		Class container for 'Category' types.
-	constructor: function(/*String*/scheme, /*String*/term, /*String*/label){
-		this.scheme = scheme; this.term = term; this.label = label;
-		this._objName = "Category";//for debugging
-	},
-	_postBuild: function(){},
-	_getAttributeNames: function(){
-		return ["label","scheme","term"];
-	},
-	toString: function(){
-		//	summary:
-		//		Function to construct string form of the category tag, which is an XML structure.
-		//	description:
-		//		Function to construct string form of the category tag, which is an XML structure.
-		var s = [];
-		s.push('<category ');
-		if(this.label){s.push(' label="'+this.label+'" ');}
-		if(this.scheme){s.push(' scheme="'+this.scheme+'" ');}
-		if(this.term){s.push(' term="'+this.term+'" ');}
-		s.push('/>\n');
-		return s.join('');
-	},
-	buildFromDom: function(/*DOM node*/node){
-		//	summary:
-		//		Function to do construction of the Category data from the DOM node containing it.
-		//	description:
-		//		Function to do construction of the Category data from the DOM node containing it.
-		//
-		//	node:
-		//		The DOM node to process for content.
-		this._saveAttributes(node);//just get the attributes from the node
-		this.label = this.attributes.label;
-		this.scheme = this.attributes.scheme;
-		this.term = this.attributes.term;
-		if(this._postBuild){this._postBuild();}
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Content",dojox.atom.io.model.Node,{
-	//	summary:
-	//		Class container for 'Content' types. Such as summary, content, username, and so on types of data.
-	//	description:
-	//		Class container for 'Content' types. Such as summary, content, username, and so on types of data.
-	constructor: function(tagName, value, src, type,xmlLang){
-		this.tagName = tagName; this.value = value; this.src = src; this.type=type; this.xmlLang = xmlLang;
-		this.HTML = "html"; this.TEXT = "text"; this.XHTML = "xhtml"; this.XML="xml";
-		this._useTextContent = "true";
-	},
-	_getAttributeNames: function(){return ["type","src"];},
-	_postBuild: function(){},
-	buildFromDom: function(/*DOM node*/node){
-		//	summary:
-		//		Function to do construction of the Content data from the DOM node containing it.
-		//	description:
-		//		Function to do construction of the Content data from the DOM node containing it.
-		//
-		//	node:
-		//		The DOM node to process for content.
-		//Handle checking for XML content as the content type
-		var type = node.getAttribute("type");
-		if(type){
-			type = type.toLowerCase();
-			if(type == "xml" || "text/xml"){
-				type = this.XML;
-			}
-		}else{
-			type="text";
-		}
-		if(type === this.XML){
-			if(node.firstChild){
-				var i;
-				this.value = "";
-				for(i = 0; i < node.childNodes.length; i++){
-					var c = node.childNodes[i];
-					if(c){
-						this.value += dojox.xml.parser.innerXML(c);
-					}
-				}
-			}
-		} else if(node.innerHTML){
-			this.value = node.innerHTML;
-		}else{
-			this.value = dojox.xml.parser.textContent(node);
-		}
-
-		this._saveAttributes(node);
-
-		if(this.attributes){
-			this.type = this.attributes.type;
-			this.scheme = this.attributes.scheme;
-			this.term = this.attributes.term;
-		}
-		if(!this.type){this.type = "text";}
-
-		//We need to unescape the HTML content here so that it can be displayed correctly when the value is fetched.
-		var lowerType = this.type.toLowerCase();
-		if(lowerType === "html" || lowerType === "text/html" || lowerType === "xhtml" || lowerType === "text/xhtml"){
-			this.value = this.value?dojox.atom.io.model.util.unEscapeHtml(this.value):"";
-		}
-
-		if(this._postBuild){this._postBuild();}
-	},
-	toString: function(){
-		//	summary:
-		//		Function to construct string form of the content tag, which is an XML structure.
-		//	description:
-		//		Function to construct string form of the content tag, which is an XML structure.
-		var s = [];
-		s.push('<'+this.tagName+' ');
-		if(!this.type){this.type = "text";}
-		if(this.type){s.push(' type="'+this.type+'" ');}
-		if(this.xmlLang){s.push(' xml:lang="'+this.xmlLang+'" ');}
-		if(this.xmlBase){s.push(' xml:base="'+this.xmlBase+'" ');}
-		
-		//all HTML must be escaped
-		if(this.type.toLowerCase() == this.HTML){
-			s.push('>'+dojox.atom.io.model.util.escapeHtml(this.value)+'</'+this.tagName+'>\n');
-		}else{
-			s.push('>'+this.value+'</'+this.tagName+'>\n');
-		}
-		var ret = s.join('');
-		return ret;
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Link",dojox.atom.io.model.Node,{
-	//	summary:
-	//		Class container for 'link' types.
-	//	description:
-	//		Class container for 'link' types.
-	constructor: function(href,rel,hrefLang,title,type){
-		this.href = href; this.hrefLang = hrefLang; this.rel = rel; this.title = title;this.type = type;
-	},
-	_getAttributeNames: function(){return ["href","jrefLang","rel","title","type"];},
-	_postBuild: function(){},
-	buildFromDom: function(node){
-		//	summary:
-		//		Function to do construction of the link data from the DOM node containing it.
-		//	description:
-		//		Function to do construction of the link data from the DOM node containing it.
-		//
-		//	node:
-		//		The DOM node to process for link data.
-		this._saveAttributes(node);//just get the attributes from the node
-		this.href = this.attributes.href;
-		this.hrefLang = this.attributes.hreflang;
-		this.rel = this.attributes.rel;
-		this.title = this.attributes.title;
-		this.type = this.attributes.type;
-		if(this._postBuild){this._postBuild();}
-	},
-	toString: function(){
-		//	summary:
-		//		Function to construct string form of the link tag, which is an XML structure.
-		//	description:
-		//		Function to construct string form of the link tag, which is an XML structure.
-		var s = [];
-		s.push('<link ');
-		if(this.href){s.push(' href="'+this.href+'" ');}
-		if(this.hrefLang){s.push(' hrefLang="'+this.hrefLang+'" ');}
-		if(this.rel){s.push(' rel="'+this.rel+'" ');}
-		if(this.title){s.push(' title="'+this.title+'" ');}
-		if(this.type){s.push(' type = "'+this.type+'" ');}
-		s.push('/>\n');
-		return s.join('');
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Person",dojox.atom.io.model.Node,{
-	//	summary:
-	//		Class container for 'person' types, such as Author, controbutors, and so on.
-	//	description:
-	//		Class container for 'person' types, such as Author, controbutors, and so on.
-	constructor: function(personType, name, email, uri){
-		this.author = "author";
-		this.contributor = "contributor";
-		if(!personType){
-			personType = this.author;
-		}
-		this.personType = personType;
-		this.name = name || '';
-		this.email = email || '';
-		this.uri = uri || '';
-		this._objName = "Person";//for debugging
-	},
-	_getAttributeNames: function(){return null;},
-	_postBuild: function(){},
-	accept: function(tag){return Boolean(this._accepts[tag]);},
-	buildFromDom: function(node){
-		//	summary:
-		//		Function to do construction of the person data from the DOM node containing it.
-		//	description:
-		//		Function to do construction of the person data from the DOM node containing it.
-		//
-		//	node:
-		//		The DOM node to process for person data.
-		var c = node.childNodes;
-		for(var i = 0; i< c.length; i++){
-			var name = dojox.atom.io.model.util.getNodename(c[i]);
-			
-			if(!name){continue;}
-
-			if(c[i].namespaceURI != dojox.atom.io.model._Constants.ATOM_NS && name != "#text"){
-				if(!this.extensions){this.extensions = [];}
-				var extensionNode = new dojox.atom.io.model.Node();
-				extensionNode.buildFromDom(c[i]);
-				this.extensions.push(extensionNode);
-			}
-			if(!this.accept(name.toLowerCase())){
-				continue;
-			}
-			var fn = dojox.atom.io.model._actions[name];
-			if(fn) {
-				fn(this,c[i]);
-			}
-		}
-		this._saveAttributes(node);
-		if(this._postBuild){this._postBuild();}
-	},
-	_accepts: {
-		'name': true,
-		'uri': true,
-		'email': true
-	},
-	toString: function(){
-		//	summary:
-		//		Function to construct string form of the Person tag, which is an XML structure.
-		//	description:
-		//		Function to construct string form of the Person tag, which is an XML structure.
-		var s = [];
-		s.push('<'+this.personType+'>\n');
-		if(this.name){s.push('\t<name>'+this.name+'</name>\n');}
-		if(this.email){s.push('\t<email>'+this.email+'</email>\n');}
-		if(this.uri){s.push('\t<uri>'+this.uri+'</uri>\n');}
-		s.push('</'+this.personType+'>\n');
-		return s.join('');
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Generator",dojox.atom.io.model.Node,{
-	//	summary:
-	//		Class container for 'Generator' types.
-	//	description:
-	//		Class container for 'Generator' types.
-	constructor: function(/*String*/uri, /*String*/version, /*String*/value){
-		this.uri = uri;
-		this.version = version;
-		this.value = value;
-	},
-	_postBuild: function(){},
-	buildFromDom: function(node){
-		//	summary:
-		//		Function to do construction of the generator data from the DOM node containing it.
-		//	description:
-		//		Function to do construction of the generator data from the DOM node containing it.
-		//
-		//	node:
-		//		The DOM node to process for link data.
-
-		this.value = dojox.xml.parser.textContent(node);
-		this._saveAttributes(node);
-
-		this.uri = this.attributes.uri;
-		this.version = this.attributes.version;
-
-		if(this._postBuild){this._postBuild();}
-	},
-	toString: function(){
-		//	summary:
-		//		Function to construct string form of the Generator tag, which is an XML structure.
-		//	description:
-		//		Function to construct string form of the Generator tag, which is an XML structure.
-		var s = [];
-		s.push('<generator ');
-		if(this.uri){s.push(' uri="'+this.uri+'" ');}
-		if(this.version){s.push(' version="'+this.version+'" ');}
-		s.push('>'+this.value+'</generator>\n');
-		var ret = s.join('');
-		return ret;
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Entry",dojox.atom.io.model.AtomItem,{
-	//	summary:
-	//		Class container for 'Entry' types.
-	//	description:
-	//		Class container for 'Entry' types.
-	constructor: function(/*String*/id){
-		this.id = id; this._objName = "Entry"; this.feedUrl = null;
-	},
-	_getAttributeNames: function(){return null;},
-	_accepts: {
-		'author': true,
-		'content': true,
-		'category': true,
-		'contributor': true,
-		'created': true,
-		'id': true,
-		'link': true,
-		'published': true,
-		'rights': true,
-		'summary': true,
-		'title': true,
-		'updated': true,
-		'xmlbase': true,
-		'issued': true,
-		'modified': true
-	},
-	toString: function(amPrimary){
-		//	summary:
-		//		Function to construct string form of the entry tag, which is an XML structure.
-		//	description:
-		//		Function to construct string form of the entry tag, which is an XML structure.
-		var s = [];
-		var i;
-		if(amPrimary){
-			s.push("<?xml version='1.0' encoding='UTF-8'?>");
-			s.push("<entry xmlns='"+dojox.atom.io.model._Constants.ATOM_URI+"'");
-		}else{s.push("<entry");}
-		if(this.xmlBase){s.push(' xml:base="'+this.xmlBase+'" ');}
-		for(i in this.name_spaces){s.push(' xmlns:'+i+'="'+this.name_spaces[i]+'"');}
-		s.push('>\n');
-		s.push('<id>' + (this.id ? this.id: '') + '</id>\n');
-		if(this.issued && !this.published){this.published = this.issued;}
-		if(this.published){s.push('<published>'+dojo.date.stamp.toISOString(this.published)+'</published>\n');}
-		if(this.created){s.push('<created>'+dojo.date.stamp.toISOString(this.created)+'</created>\n');}
-		//Google News
-		if(this.issued){s.push('<issued>'+dojo.date.stamp.toISOString(this.issued)+'</issued>\n');}
-
-		//Google News
-		if(this.modified){s.push('<modified>'+dojo.date.stamp.toISOString(this.modified)+'</modified>\n');}
-
-		if(this.modified && !this.updated){this.updated = this.modified;}
-		if(this.updated){s.push('<updated>'+dojo.date.stamp.toISOString(this.updated)+'</updated>\n');}
-		if(this.rights){s.push('<rights>'+this.rights+'</rights>\n');}
-		if(this.title){s.push(this.title.toString());}
-		if(this.summary){s.push(this.summary.toString());}
-		var arrays = [this.authors,this.categories,this.links,this.contributors,this.extensions];
-		for(var x in arrays){
-			if(arrays[x]){
-				for(var y in arrays[x]){
-					s.push(arrays[x][y]);
-				}
-			}
-		}
-		if(this.content){s.push(this.content.toString());}
-		s.push("</entry>\n");
-		return s.join(''); //string
-	},
-	getEditHref: function(){
-		//	summary:
-		//		Function to get the href that allows editing of this feed entry.
-		//	description:
-		//		Function to get the href that allows editing of this feed entry.
-		//
-		//	returns:
-		//		The href that specifies edit capability.
-		if(this.links === null || this.links.length === 0){
-			return null;
-		}
-		for(var x in this.links){
-			if(this.links[x].rel && this.links[x].rel == "edit"){
-				return this.links[x].href; //string
-			}
-		}
-		return null;
-	},
-	setEditHref: function(url){
-		if(this.links === null){
-			this.links = [];
-		}
-		for(var x in this.links){
-			if(this.links[x].rel && this.links[x].rel == "edit"){
-				this.links[x].href = url;
-				return;
-			}
-		}
-		this.addLink(url, 'edit');
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Feed",dojox.atom.io.model.AtomItem,{
-	//	summary:
-	//		Class container for 'Feed' types.
-	//	description:
-	//		Class container for 'Feed' types.
-	_accepts: {
-		'author': true,
-		'content': true,
-		'category': true,
-		'contributor': true,
-		'created': true,
-		'id': true,
-		'link': true,
-		'published': true,
-		'rights': true,
-		'summary': true,
-		'title': true,
-		'updated': true,
-		'xmlbase': true,
-		'entry': true,
-		'logo': true,
-		'issued': true,
-		'modified': true,
-		'icon': true,
-		'subtitle': true
-	},
-	addEntry: function(/*object*/entry){
-		//	summary:
-		//		Function to add an entry to this feed.
-		//	description:
-		//		Function to add an entry to this feed.
-		//	entry:
-		//		The entry object to add.
-		if(!entry.id){
-			throw new Error("The entry object must be assigned an ID attribute.");
-		}
-		if(!this.entries){this.entries = [];}
-		entry.feedUrl = this.getSelfHref();
-		this.entries.push(entry);
-	},
-	getFirstEntry: function(){
-		//	summary:
-		//		Function to get the first entry of the feed.
-		//	description:
-		//		Function to get the first entry of the feed.
-		//
-		//	returns:
-		//		The first entry in the feed.
-		if(!this.entries || this.entries.length === 0){return null;}
-		return this.entries[0]; //object
-	},
-	getEntry: function(/*String*/entryId){
-		//	summary:
-		//		Function to get an entry by its id.
-		//	description:
-		//		Function to get an entry by its id.
-		//
-		//	returns:
-		//		The entry desired, or null if none.
-		if(!this.entries){return null;}
-		for(var x in this.entries){
-			if(this.entries[x].id == entryId){
-				return this.entries[x];
-			}
-		}
-		return null;
-	},
-	removeEntry: function(/*object*/entry){
-		//	summary:
-		//		Function to remove an entry from the list of links.
-		//	description:
-		//		Function to remove an entry from the list of links.
-		//
-		//	entry:
-		//		The entry.
-		if(!this.entries){return;}
-		var count = 0;
-		for(var i = 0; i < this.entries.length; i++){
-			if(this.entries[i] === entry){
-				this.entries.splice(i,1);
-				count++;
-			}
-		}
-		return count;
-	},
-	setEntries: function(/*array*/arrayOfEntry){
-		//	summary:
-		//		Function to add a set of entries to the feed.
-		//	description:
-		//		Function to get an entry by its id.
-		//
-		//	arrayOfEntry:
-		//		An array of entry objects to add to the feed.
-		for(var x in arrayOfEntry){
-			this.addEntry(arrayOfEntry[x]);
-		}
-	},
-	toString: function(){
-		//	summary:
-		//		Function to construct string form of the feed tag, which is an XML structure.
-		//	description:
-		//		Function to construct string form of the feed tag, which is an XML structure.
-		var s = [];
-		var i;
-		s.push('<?xml version="1.0" encoding="utf-8"?>\n');
-		s.push('<feed xmlns="'+dojox.atom.io.model._Constants.ATOM_URI+'"');
-		if(this.xmlBase){s.push(' xml:base="'+this.xmlBase+'"');}
-		for(i in this.name_spaces){s.push(' xmlns:'+i+'="'+this.name_spaces[i]+'"');}
-		s.push('>\n');
-		s.push('<id>' + (this.id ? this.id: '') + '</id>\n');
-		if(this.title){s.push(this.title);}
-		if(this.copyright && !this.rights){this.rights = this.copyright;}
-		if(this.rights){s.push('<rights>' + this.rights + '</rights>\n');}
-		
-		// Google news
-		if(this.issued){s.push('<issued>'+dojo.date.stamp.toISOString(this.issued)+'</issued>\n');}
-		if(this.modified){s.push('<modified>'+dojo.date.stamp.toISOString(this.modified)+'</modified>\n');}
-
-		if(this.modified && !this.updated){this.updated=this.modified;}
-		if(this.updated){s.push('<updated>'+dojo.date.stamp.toISOString(this.updated)+'</updated>\n');}
-		if(this.published){s.push('<published>'+dojo.date.stamp.toISOString(this.published)+'</published>\n');}
-		if(this.icon){s.push('<icon>'+this.icon+'</icon>\n');}
-		if(this.language){s.push('<language>'+this.language+'</language>\n');}
-		if(this.logo){s.push('<logo>'+this.logo+'</logo>\n');}
-		if(this.subtitle){s.push(this.subtitle.toString());}
-		if(this.tagline){s.push(this.tagline.toString());}
-		//TODO: need to figure out what to do with xmlBase
-		var arrays = [this.alternateLinks,this.authors,this.categories,this.contributors,this.otherLinks,this.extensions,this.entries];
-		for(i in arrays){
-			if(arrays[i]){
-				for(var x in arrays[i]){
-					s.push(arrays[i][x]);
-				}
-			}
-		}
-		s.push('</feed>');
-		return s.join('');
-	},
-	createEntry: function(){
-		//	summary:
-		//		Function to Create a new entry object in the feed.
-		//	description:
-		//		Function to Create a new entry object in the feed.
-		//	returns:
-		//		An empty entry object in the feed.
-		var entry = new dojox.atom.io.model.Entry();
-		entry.feedUrl = this.getSelfHref();
-		return entry; //object
-	},
-	getSelfHref: function(){
-		//	summary:
-		//		Function to get the href that refers to this feed.
-		//	description:
-		//		Function to get the href that refers to this feed.
-		//	returns:
-		//		The href that refers to this feed or null if none.
-		if(this.links === null || this.links.length === 0){
-			return null;
-		}
-		for(var x in this.links){
-			if(this.links[x].rel && this.links[x].rel == "self"){
-				return this.links[x].href; //string
-			}
-		}
-		return null;
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Service",dojox.atom.io.model.AtomItem,{
-	//	summary:
-	//		Class container for 'Feed' types.
-	//	description:
-	//		Class container for 'Feed' types.
-	constructor: function(href){
-		this.href = href;
-	},
-	//builds a Service document.  each element of this, except for the namespace, is the href of
-	//a service that the server supports.  Some of the common services are:
-	//"create-entry" , "user-prefs" , "search-entries" , "edit-template" , "categories"
-	buildFromDom: function(/*DOM node*/node){
-		//	summary:
-		//		Function to do construction of the Service data from the DOM node containing it.
-		//	description:
-		//		Function to do construction of the Service data from the DOM node containing it.
-		//
-		//	node:
-		//		The DOM node to process for content.
-		var i;
-		this.workspaces = [];
-		if(node.tagName != "service"){
-			// FIXME: Need 0.9 DOM util...
-			//node = dojox.xml.parser.firstElement(node,"service");
-			//if(!node){return;}
-			return;
-		}
-		if(node.namespaceURI != dojox.atom.io.model._Constants.PURL_NS && node.namespaceURI != dojox.atom.io.model._Constants.APP_NS){return;}
-		var ns = node.namespaceURI;
-		this.name_space = node.namespaceURI;
-		//find all workspaces, and create them
-		var workspaces ;
-		if(typeof(node.getElementsByTagNameNS)!= "undefined"){
-			workspaces = node.getElementsByTagNameNS(ns,"workspace");
-		}else{
-			// This block is IE only, which doesn't have a 'getElementsByTagNameNS' function
-			workspaces = [];
-			var temp = node.getElementsByTagName('workspace');
-			for(i=0; i<temp.length; i++){
-				if(temp[i].namespaceURI == ns){
-					workspaces.push(temp[i]);
-				}
-			}
-		}
-		if(workspaces && workspaces.length > 0){
-			var wkLen = 0;
-			var workspace;
-			for(i = 0; i< workspaces.length; i++){
-				workspace = (typeof(workspaces.item)==="undefined"?workspaces[i]:workspaces.item(i));
-				var wkspace = new dojox.atom.io.model.Workspace();
-				wkspace.buildFromDom(workspace);
-				this.workspaces[wkLen++] = wkspace;
-			}
-		}
-	},
-	getCollection: function(/*String*/url){
-		//	summary:
-		//		Function to collections that match a specific url.
-		//	description:
-		//		Function to collections that match a specific url.
-		//
-		//	url:
-		//		e URL to match collections against.
-		for(var i=0;i<this.workspaces.length;i++){
-			var coll=this.workspaces[i].collections;
-			for(var j=0;j<coll.length;j++){
-				if(coll[j].href == url){
-					return coll;
-				}
-			}
-		}
-		return null;
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Workspace",dojox.atom.io.model.AtomItem,{
-	//	summary:
-	//		Class container for 'Workspace' types.
-	//	description:
-	//		Class container for 'Workspace' types.
-	constructor: function(title){
-		this.title = title;
-		this.collections = [];
-	},
-
-	buildFromDom: function(/*DOM node*/node){
-		//	summary:
-		//		Function to do construction of the Workspace data from the DOM node containing it.
-		//	description:
-		//		Function to do construction of the Workspace data from the DOM node containing it.
-		//
-		//	node:
-		//		The DOM node to process for content.
-		var name = dojox.atom.io.model.util.getNodename(node);
-		if(name != "workspace"){return;}
-		var c = node.childNodes;
-		var len = 0;
-		for(var i = 0; i< c.length; i++){
-			var child = c[i];
-			if(child.nodeType === 1){
-				name = dojox.atom.io.model.util.getNodename(child);
-				if(child.namespaceURI == dojox.atom.io.model._Constants.PURL_NS || child.namespaceURI == dojox.atom.io.model._Constants.APP_NS){
-					if(name === "collection"){
-						var coll = new dojox.atom.io.model.Collection();
-						coll.buildFromDom(child);
-						this.collections[len++] = coll;
-					}
-				}else if(child.namespaceURI === dojox.atom.io.model._Constants.ATOM_NS){
-					if(name === "title"){
-						this.title = dojox.xml.parser.textContent(child);
-					}
-				}
-				//FIXME: Add an extension point so others can impl different namespaces.  For now just
-				//ignore unknown namespace tags.
-			}
-		}
-	}
-});
-
-dojo.declare("dojox.atom.io.model.Collection",dojox.atom.io.model.AtomItem,{
-	//	summary:
-	//		Class container for 'Collection' types.
-	//	description:
-	//		Class container for 'Collection' types.
-	constructor: function(href, title){
-		this.href = href;
-		this.title = title;
-		this.attributes = [];
-		this.features = [];
-		this.children = [];
-		this.memberType = null;
-		this.id = null;
-	},
-
-	buildFromDom: function(/*DOM node*/node){
-		//	summary:
-		//		Function to do construction of the Collection data from the DOM node containing it.
-		//	description:
-		//		Function to do construction of the Collection data from the DOM node containing it.
-		//
-		//	node:
-		//		The DOM node to process for content.
-		this.href = node.getAttribute("href");
-		var c = node.childNodes;
-		for(var i = 0; i< c.length; i++){
-			var child = c[i];
-			if(child.nodeType === 1){
-				var name = dojox.atom.io.model.util.getNodename(child);
-				if(child.namespaceURI == dojox.atom.io.model._Constants.PURL_NS || child.namespaceURI == dojox.atom.io.model._Constants.APP_NS){
-					if(name === "member-type"){
-						this.memberType = dojox.xml.parser.textContent(child);
-					}else if(name == "feature"){//this IF stmt might need some more work
-						if(child.getAttribute("id")){this.features.push(child.getAttribute("id"));}
-					}else{
-						var unknownTypeChild = new dojox.atom.io.model.Node();
-						unknownTypeChild.buildFromDom(child);
-						this.children.push(unknownTypeChild);
-					}
-				}else if(child.namespaceURI === dojox.atom.io.model._Constants.ATOM_NS){
-					if(name === "id"){
-						this.id = dojox.xml.parser.textContent(child);
-					}else if(name === "title"){
-						this.title = dojox.xml.parser.textContent(child);
-					}
-				}
-			}
-		}
-	}
-});
-
-}
-
-if(!dojo._hasResource["dojo.date"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojo.date"] = true;
-dojo.provide("dojo.date");
-
-
-dojo.getObject("date", true, dojo);
-
-/*=====
-dojo.date = {
-	// summary: Date manipulation utilities
-}
-=====*/
-
-dojo.date.getDaysInMonth = function(/*Date*/dateObject){
-	//	summary:
-	//		Returns the number of days in the month used by dateObject
-	var month = dateObject.getMonth();
-	var days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-	if(month == 1 && dojo.date.isLeapYear(dateObject)){ return 29; } // Number
-	return days[month]; // Number
-};
-
-dojo.date.isLeapYear = function(/*Date*/dateObject){
-	//	summary:
-	//		Determines if the year of the dateObject is a leap year
-	//	description:
-	//		Leap years are years with an additional day YYYY-02-29, where the
-	//		year number is a multiple of four with the following exception: If
-	//		a year is a multiple of 100, then it is only a leap year if it is
-	//		also a multiple of 400. For example, 1900 was not a leap year, but
-	//		2000 is one.
-
-	var year = dateObject.getFullYear();
-	return !(year%400) || (!(year%4) && !!(year%100)); // Boolean
-};
-
-// FIXME: This is not localized
-dojo.date.getTimezoneName = function(/*Date*/dateObject){
-	//	summary:
-	//		Get the user's time zone as provided by the browser
-	// dateObject:
-	//		Needed because the timezone may vary with time (daylight savings)
-	//	description:
-	//		Try to get time zone info from toString or toLocaleString method of
-	//		the Date object -- UTC offset is not a time zone.  See
-	//		http://www.twinsun.com/tz/tz-link.htm Note: results may be
-	//		inconsistent across browsers.
-
-	var str = dateObject.toString(); // Start looking in toString
-	var tz = ''; // The result -- return empty string if nothing found
-	var match;
-
-	// First look for something in parentheses -- fast lookup, no regex
-	var pos = str.indexOf('(');
-	if(pos > -1){
-		tz = str.substring(++pos, str.indexOf(')'));
-	}else{
-		// If at first you don't succeed ...
-		// If IE knows about the TZ, it appears before the year
-		// Capital letters or slash before a 4-digit year
-		// at the end of string
-		var pat = /([A-Z\/]+) \d{4}$/;
-		if((match = str.match(pat))){
-			tz = match[1];
-		}else{
-		// Some browsers (e.g. Safari) glue the TZ on the end
-		// of toLocaleString instead of putting it in toString
-			str = dateObject.toLocaleString();
-			// Capital letters or slash -- end of string,
-			// after space
-			pat = / ([A-Z\/]+)$/;
-			if((match = str.match(pat))){
-				tz = match[1];
-			}
-		}
-	}
-
-	// Make sure it doesn't somehow end up return AM or PM
-	return (tz == 'AM' || tz == 'PM') ? '' : tz; // String
-};
-
-// Utility methods to do arithmetic calculations with Dates
-
-dojo.date.compare = function(/*Date*/date1, /*Date?*/date2, /*String?*/portion){
-	//	summary:
-	//		Compare two date objects by date, time, or both.
-	//	description:
-	//  	Returns 0 if equal, positive if a > b, else negative.
-	//	date1:
-	//		Date object
-	//	date2:
-	//		Date object.  If not specified, the current Date is used.
-	//	portion:
-	//		A string indicating the "date" or "time" portion of a Date object.
-	//		Compares both "date" and "time" by default.  One of the following:
-	//		"date", "time", "datetime"
-
-	// Extra step required in copy for IE - see #3112
-	date1 = new Date(+date1);
-	date2 = new Date(+(date2 || new Date()));
-
-	if(portion == "date"){
-		// Ignore times and compare dates.
-		date1.setHours(0, 0, 0, 0);
-		date2.setHours(0, 0, 0, 0);
-	}else if(portion == "time"){
-		// Ignore dates and compare times.
-		date1.setFullYear(0, 0, 0);
-		date2.setFullYear(0, 0, 0);
-	}
-	
-	if(date1 > date2){ return 1; } // int
-	if(date1 < date2){ return -1; } // int
-	return 0; // int
-};
-
-dojo.date.add = function(/*Date*/date, /*String*/interval, /*int*/amount){
-	//	summary:
-	//		Add to a Date in intervals of different size, from milliseconds to years
-	//	date: Date
-	//		Date object to start with
-	//	interval:
-	//		A string representing the interval.  One of the following:
-	//			"year", "month", "day", "hour", "minute", "second",
-	//			"millisecond", "quarter", "week", "weekday"
-	//	amount:
-	//		How much to add to the date.
-
-	var sum = new Date(+date); // convert to Number before copying to accomodate IE (#3112)
-	var fixOvershoot = false;
-	var property = "Date";
-
-	switch(interval){
-		case "day":
-			break;
-		case "weekday":
-			//i18n FIXME: assumes Saturday/Sunday weekend, but this is not always true.  see dojo.cldr.supplemental
-
-			// Divide the increment time span into weekspans plus leftover days
-			// e.g., 8 days is one 5-day weekspan / and two leftover days
-			// Can't have zero leftover days, so numbers divisible by 5 get
-			// a days value of 5, and the remaining days make up the number of weeks
-			var days, weeks;
-			var mod = amount % 5;
-			if(!mod){
-				days = (amount > 0) ? 5 : -5;
-				weeks = (amount > 0) ? ((amount-5)/5) : ((amount+5)/5);
-			}else{
-				days = mod;
-				weeks = parseInt(amount/5);
-			}
-			// Get weekday value for orig date param
-			var strt = date.getDay();
-			// Orig date is Sat / positive incrementer
-			// Jump over Sun
-			var adj = 0;
-			if(strt == 6 && amount > 0){
-				adj = 1;
-			}else if(strt == 0 && amount < 0){
-			// Orig date is Sun / negative incrementer
-			// Jump back over Sat
-				adj = -1;
-			}
-			// Get weekday val for the new date
-			var trgt = strt + days;
-			// New date is on Sat or Sun
-			if(trgt == 0 || trgt == 6){
-				adj = (amount > 0) ? 2 : -2;
-			}
-			// Increment by number of weeks plus leftover days plus
-			// weekend adjustments
-			amount = (7 * weeks) + days + adj;
-			break;
-		case "year":
-			property = "FullYear";
-			// Keep increment/decrement from 2/29 out of March
-			fixOvershoot = true;
-			break;
-		case "week":
-			amount *= 7;
-			break;
-		case "quarter":
-			// Naive quarter is just three months
-			amount *= 3;
-			// fallthrough...
-		case "month":
-			// Reset to last day of month if you overshoot
-			fixOvershoot = true;
-			property = "Month";
-			break;
-//		case "hour":
-//		case "minute":
-//		case "second":
-//		case "millisecond":
-		default:
-			property = "UTC"+interval.charAt(0).toUpperCase() + interval.substring(1) + "s";
-	}
-
-	if(property){
-		sum["set"+property](sum["get"+property]()+amount);
-	}
-
-	if(fixOvershoot && (sum.getDate() < date.getDate())){
-		sum.setDate(0);
-	}
-
-	return sum; // Date
-};
-
-dojo.date.difference = function(/*Date*/date1, /*Date?*/date2, /*String?*/interval){
-	//	summary:
-	//		Get the difference in a specific unit of time (e.g., number of
-	//		months, weeks, days, etc.) between two dates, rounded to the
-	//		nearest integer.
-	//	date1:
-	//		Date object
-	//	date2:
-	//		Date object.  If not specified, the current Date is used.
-	//	interval:
-	//		A string representing the interval.  One of the following:
-	//			"year", "month", "day", "hour", "minute", "second",
-	//			"millisecond", "quarter", "week", "weekday"
-	//		Defaults to "day".
-
-	date2 = date2 || new Date();
-	interval = interval || "day";
-	var yearDiff = date2.getFullYear() - date1.getFullYear();
-	var delta = 1; // Integer return value
-
-	switch(interval){
-		case "quarter":
-			var m1 = date1.getMonth();
-			var m2 = date2.getMonth();
-			// Figure out which quarter the months are in
-			var q1 = Math.floor(m1/3) + 1;
-			var q2 = Math.floor(m2/3) + 1;
-			// Add quarters for any year difference between the dates
-			q2 += (yearDiff * 4);
-			delta = q2 - q1;
-			break;
-		case "weekday":
-			var days = Math.round(dojo.date.difference(date1, date2, "day"));
-			var weeks = parseInt(dojo.date.difference(date1, date2, "week"));
-			var mod = days % 7;
-
-			// Even number of weeks
-			if(mod == 0){
-				days = weeks*5;
-			}else{
-				// Weeks plus spare change (< 7 days)
-				var adj = 0;
-				var aDay = date1.getDay();
-				var bDay = date2.getDay();
-
-				weeks = parseInt(days/7);
-				mod = days % 7;
-				// Mark the date advanced by the number of
-				// round weeks (may be zero)
-				var dtMark = new Date(date1);
-				dtMark.setDate(dtMark.getDate()+(weeks*7));
-				var dayMark = dtMark.getDay();
-
-				// Spare change days -- 6 or less
-				if(days > 0){
-					switch(true){
-						// Range starts on Sat
-						case aDay == 6:
-							adj = -1;
-							break;
-						// Range starts on Sun
-						case aDay == 0:
-							adj = 0;
-							break;
-						// Range ends on Sat
-						case bDay == 6:
-							adj = -1;
-							break;
-						// Range ends on Sun
-						case bDay == 0:
-							adj = -2;
-							break;
-						// Range contains weekend
-						case (dayMark + mod) > 5:
-							adj = -2;
-					}
-				}else if(days < 0){
-					switch(true){
-						// Range starts on Sat
-						case aDay == 6:
-							adj = 0;
-							break;
-						// Range starts on Sun
-						case aDay == 0:
-							adj = 1;
-							break;
-						// Range ends on Sat
-						case bDay == 6:
-							adj = 2;
-							break;
-						// Range ends on Sun
-						case bDay == 0:
-							adj = 1;
-							break;
-						// Range contains weekend
-						case (dayMark + mod) < 0:
-							adj = 2;
-					}
-				}
-				days += adj;
-				days -= (weeks*2);
-			}
-			delta = days;
-			break;
-		case "year":
-			delta = yearDiff;
-			break;
-		case "month":
-			delta = (date2.getMonth() - date1.getMonth()) + (yearDiff * 12);
-			break;
-		case "week":
-			// Truncate instead of rounding
-			// Don't use Math.floor -- value may be negative
-			delta = parseInt(dojo.date.difference(date1, date2, "day")/7);
-			break;
-		case "day":
-			delta /= 24;
-			// fallthrough
-		case "hour":
-			delta /= 60;
-			// fallthrough
-		case "minute":
-			delta /= 60;
-			// fallthrough
-		case "second":
-			delta /= 1000;
-			// fallthrough
-		case "millisecond":
-			delta *= date2.getTime() - date1.getTime();
-	}
-
-	// Round for fractional values and DST leaps
-	return Math.round(delta); // Number (integer)
-};
-
-}
-
-if(!dojo._hasResource["dojo.cldr.supplemental"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojo.cldr.supplemental"] = true;
-dojo.provide("dojo.cldr.supplemental");
-
-
-
-dojo.getObject("cldr.supplemental", true, dojo);
-
-dojo.cldr.supplemental.getFirstDayOfWeek = function(/*String?*/locale){
-// summary: Returns a zero-based index for first day of the week
-// description:
-//		Returns a zero-based index for first day of the week, as used by the local (Gregorian) calendar.
-//		e.g. Sunday (returns 0), or Monday (returns 1)
-
-	// from http://www.unicode.org/cldr/data/common/supplemental/supplementalData.xml:supplementalData/weekData/firstDay
-	var firstDay = {/*default is 1=Monday*/
-		mv:5,
-		ae:6,af:6,bh:6,dj:6,dz:6,eg:6,er:6,et:6,iq:6,ir:6,jo:6,ke:6,kw:6,
-		ly:6,ma:6,om:6,qa:6,sa:6,sd:6,so:6,sy:6,tn:6,ye:6,
-		ar:0,as:0,az:0,bw:0,ca:0,cn:0,fo:0,ge:0,gl:0,gu:0,hk:0,
-		il:0,'in':0,jm:0,jp:0,kg:0,kr:0,la:0,mh:0,mn:0,mo:0,mp:0,
-		mt:0,nz:0,ph:0,pk:0,sg:0,th:0,tt:0,tw:0,um:0,us:0,uz:0,
-		vi:0,zw:0
-// variant. do not use?		gb:0,
-	};
-
-	var country = dojo.cldr.supplemental._region(locale);
-	var dow = firstDay[country];
-	return (dow === undefined) ? 1 : dow; /*Number*/
-};
-
-dojo.cldr.supplemental._region = function(/*String?*/locale){
-	locale = dojo.i18n.normalizeLocale(locale);
-	var tags = locale.split('-');
-	var region = tags[1];
-	if(!region){
-		// IE often gives language only (#2269)
-		// Arbitrary mappings of language-only locales to a country:
-		region = {de:"de", en:"us", es:"es", fi:"fi", fr:"fr", he:"il", hu:"hu", it:"it",
-			ja:"jp", ko:"kr", nl:"nl", pt:"br", sv:"se", zh:"cn"}[tags[0]];
-	}else if(region.length == 4){
-		// The ISO 3166 country code is usually in the second position, unless a
-		// 4-letter script is given. See http://www.ietf.org/rfc/rfc4646.txt
-		region = tags[2];
-	}
-	return region;
-};
-
-dojo.cldr.supplemental.getWeekend = function(/*String?*/locale){
-// summary: Returns a hash containing the start and end days of the weekend
-// description:
-//		Returns a hash containing the start and end days of the weekend according to local custom using locale,
-//		or by default in the user's locale.
-//		e.g. {start:6, end:0}
-
-	// from http://www.unicode.org/cldr/data/common/supplemental/supplementalData.xml:supplementalData/weekData/weekend{Start,End}
-	var weekendStart = {/*default is 6=Saturday*/
-		'in':0,
-		af:4,dz:4,ir:4,om:4,sa:4,ye:4,
-		ae:5,bh:5,eg:5,il:5,iq:5,jo:5,kw:5,ly:5,ma:5,qa:5,sd:5,sy:5,tn:5
-	};
-
-	var weekendEnd = {/*default is 0=Sunday*/
-		af:5,dz:5,ir:5,om:5,sa:5,ye:5,
-		ae:6,bh:5,eg:6,il:6,iq:6,jo:6,kw:6,ly:6,ma:6,qa:6,sd:6,sy:6,tn:6
-	};
-
-	var country = dojo.cldr.supplemental._region(locale);
-	var start = weekendStart[country];
-	var end = weekendEnd[country];
-	if(start === undefined){start=6;}
-	if(end === undefined){end=0;}
-	return {start:start, end:end}; /*Object {start,end}*/
-};
-
-}
-
-if(!dojo._hasResource["dojo.regexp"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojo.regexp"] = true;
-dojo.provide("dojo.regexp");
-
-
-dojo.getObject("regexp", true, dojo);
-
-/*=====
-dojo.regexp = {
-	// summary: Regular expressions and Builder resources
-};
-=====*/
-
-dojo.regexp.escapeString = function(/*String*/str, /*String?*/except){
-	//	summary:
-	//		Adds escape sequences for special characters in regular expressions
-	// except:
-	//		a String with special characters to be left unescaped
-
-	return str.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, function(ch){
-		if(except && except.indexOf(ch) != -1){
-			return ch;
-		}
-		return "\\" + ch;
-	}); // String
-};
-
-dojo.regexp.buildGroupRE = function(/*Object|Array*/arr, /*Function*/re, /*Boolean?*/nonCapture){
-	//	summary:
-	//		Builds a regular expression that groups subexpressions
-	//	description:
-	//		A utility function used by some of the RE generators. The
-	//		subexpressions are constructed by the function, re, in the second
-	//		parameter.  re builds one subexpression for each elem in the array
-	//		a, in the first parameter. Returns a string for a regular
-	//		expression that groups all the subexpressions.
-	// arr:
-	//		A single value or an array of values.
-	// re:
-	//		A function. Takes one parameter and converts it to a regular
-	//		expression.
-	// nonCapture:
-	//		If true, uses non-capturing match, otherwise matches are retained
-	//		by regular expression. Defaults to false
-
-	// case 1: a is a single value.
-	if(!(arr instanceof Array)){
-		return re(arr); // String
-	}
-
-	// case 2: a is an array
-	var b = [];
-	for(var i = 0; i < arr.length; i++){
-		// convert each elem to a RE
-		b.push(re(arr[i]));
-	}
-
-	 // join the REs as alternatives in a RE group.
-	return dojo.regexp.group(b.join("|"), nonCapture); // String
-};
-
-dojo.regexp.group = function(/*String*/expression, /*Boolean?*/nonCapture){
-	// summary:
-	//		adds group match to expression
-	// nonCapture:
-	//		If true, uses non-capturing match, otherwise matches are retained
-	//		by regular expression.
-	return "(" + (nonCapture ? "?:":"") + expression + ")"; // String
-};
-
-}
-
-if(!dojo._hasResource["dojo.date.locale"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojo.date.locale"] = true;
-dojo.provide("dojo.date.locale");
-
-
-
-
-
-
-
-
-dojo.getObject("date.locale", true, dojo);
-
-// Localization methods for Date.   Honor local customs using locale-dependent dojo.cldr data.
-
-
-// Load the bundles containing localization information for
-// names and formats
-
-//NOTE: Everything in this module assumes Gregorian calendars.
-// Other calendars will be implemented in separate modules.
-
-(function(){
-	// Format a pattern without literals
-	function formatPattern(dateObject, bundle, options, pattern){
-		return pattern.replace(/([a-z])\1*/ig, function(match){
-			var s, pad,
-				c = match.charAt(0),
-				l = match.length,
-				widthList = ["abbr", "wide", "narrow"];
-			switch(c){
-				case 'G':
-					s = bundle[(l < 4) ? "eraAbbr" : "eraNames"][dateObject.getFullYear() < 0 ? 0 : 1];
-					break;
-				case 'y':
-					s = dateObject.getFullYear();
-					switch(l){
-						case 1:
-							break;
-						case 2:
-							if(!options.fullYear){
-								s = String(s); s = s.substr(s.length - 2);
-								break;
-							}
-							// fallthrough
-						default:
-							pad = true;
-					}
-					break;
-				case 'Q':
-				case 'q':
-					s = Math.ceil((dateObject.getMonth()+1)/3);
-//					switch(l){
-//						case 1: case 2:
-							pad = true;
-//							break;
-//						case 3: case 4: // unimplemented
-//					}
-					break;
-				case 'M':
-					var m = dateObject.getMonth();
-					if(l<3){
-						s = m+1; pad = true;
-					}else{
-						var propM = ["months", "format", widthList[l-3]].join("-");
-						s = bundle[propM][m];
-					}
-					break;
-				case 'w':
-					var firstDay = 0;
-					s = dojo.date.locale._getWeekOfYear(dateObject, firstDay); pad = true;
-					break;
-				case 'd':
-					s = dateObject.getDate(); pad = true;
-					break;
-				case 'D':
-					s = dojo.date.locale._getDayOfYear(dateObject); pad = true;
-					break;
-				case 'E':
-					var d = dateObject.getDay();
-					if(l<3){
-						s = d+1; pad = true;
-					}else{
-						var propD = ["days", "format", widthList[l-3]].join("-");
-						s = bundle[propD][d];
-					}
-					break;
-				case 'a':
-					var timePeriod = (dateObject.getHours() < 12) ? 'am' : 'pm';
-					s = options[timePeriod] || bundle['dayPeriods-format-wide-' + timePeriod];
-					break;
-				case 'h':
-				case 'H':
-				case 'K':
-				case 'k':
-					var h = dateObject.getHours();
-					// strange choices in the date format make it impossible to write this succinctly
-					switch (c){
-						case 'h': // 1-12
-							s = (h % 12) || 12;
-							break;
-						case 'H': // 0-23
-							s = h;
-							break;
-						case 'K': // 0-11
-							s = (h % 12);
-							break;
-						case 'k': // 1-24
-							s = h || 24;
-							break;
-					}
-					pad = true;
-					break;
-				case 'm':
-					s = dateObject.getMinutes(); pad = true;
-					break;
-				case 's':
-					s = dateObject.getSeconds(); pad = true;
-					break;
-				case 'S':
-					s = Math.round(dateObject.getMilliseconds() * Math.pow(10, l-3)); pad = true;
-					break;
-				case 'v': // FIXME: don't know what this is. seems to be same as z?
-				case 'z':
-					// We only have one timezone to offer; the one from the browser
-					s = dojo.date.locale._getZone(dateObject, true, options);
-					if(s){break;}
-					l=4;
-					// fallthrough... use GMT if tz not available
-				case 'Z':
-					var offset = dojo.date.locale._getZone(dateObject, false, options);
-					var tz = [
-						(offset<=0 ? "+" : "-"),
-						dojo.string.pad(Math.floor(Math.abs(offset)/60), 2),
-						dojo.string.pad(Math.abs(offset)% 60, 2)
-					];
-					if(l==4){
-						tz.splice(0, 0, "GMT");
-						tz.splice(3, 0, ":");
-					}
-					s = tz.join("");
-					break;
-//				case 'Y': case 'u': case 'W': case 'F': case 'g': case 'A': case 'e':
-//					console.log(match+" modifier unimplemented");
-				default:
-					throw new Error("dojo.date.locale.format: invalid pattern char: "+pattern);
-			}
-			if(pad){ s = dojo.string.pad(s, l); }
-			return s;
-		});
-	}
-
-/*=====
-	dojo.date.locale.__FormatOptions = function(){
-	//	selector: String
-	//		choice of 'time','date' (default: date and time)
-	//	formatLength: String
-	//		choice of long, short, medium or full (plus any custom additions).  Defaults to 'short'
-	//	datePattern:String
-	//		override pattern with this string
-	//	timePattern:String
-	//		override pattern with this string
-	//	am: String
-	//		override strings for am in times
-	//	pm: String
-	//		override strings for pm in times
-	//	locale: String
-	//		override the locale used to determine formatting rules
-	//	fullYear: Boolean
-	//		(format only) use 4 digit years whenever 2 digit years are called for
-	//	strict: Boolean
-	//		(parse only) strict parsing, off by default
-		this.selector = selector;
-		this.formatLength = formatLength;
-		this.datePattern = datePattern;
-		this.timePattern = timePattern;
-		this.am = am;
-		this.pm = pm;
-		this.locale = locale;
-		this.fullYear = fullYear;
-		this.strict = strict;
-	}
-=====*/
-
-dojo.date.locale._getZone = function(/*Date*/dateObject, /*boolean*/getName, /*dojo.date.locale.__FormatOptions?*/options){
-	// summary:
-	//		Returns the zone (or offset) for the given date and options.  This
-	//		is broken out into a separate function so that it can be overridden
-	//		by timezone-aware code.
-	//
-	// dateObject:
-	//		the date and/or time being formatted.
-	//
-	// getName:
-	//		Whether to return the timezone string (if true), or the offset (if false)
-	//
-	// options:
-	//		The options being used for formatting
-	if(getName){
-		return dojo.date.getTimezoneName(dateObject);
-	}else{
-		return dateObject.getTimezoneOffset();
-	}
-};
-
-
-dojo.date.locale.format = function(/*Date*/dateObject, /*dojo.date.locale.__FormatOptions?*/options){
-	// summary:
-	//		Format a Date object as a String, using locale-specific settings.
-	//
-	// description:
-	//		Create a string from a Date object using a known localized pattern.
-	//		By default, this method formats both date and time from dateObject.
-	//		Formatting patterns are chosen appropriate to the locale.  Different
-	//		formatting lengths may be chosen, with "full" used by default.
-	//		Custom patterns may be used or registered with translations using
-	//		the dojo.date.locale.addCustomFormats method.
-	//		Formatting patterns are implemented using [the syntax described at
-	//		unicode.org](http://www.unicode.org/reports/tr35/tr35-4.html#Date_Format_Patterns)
-	//
-	// dateObject:
-	//		the date and/or time to be formatted.  If a time only is formatted,
-	//		the values in the year, month, and day fields are irrelevant.  The
-	//		opposite is true when formatting only dates.
-
-	options = options || {};
-
-	var locale = dojo.i18n.normalizeLocale(options.locale),
-		formatLength = options.formatLength || 'short',
-		bundle = dojo.date.locale._getGregorianBundle(locale),
-		str = [],
-		sauce = dojo.hitch(this, formatPattern, dateObject, bundle, options);
-	if(options.selector == "year"){
-		return _processPattern(bundle["dateFormatItem-yyyy"] || "yyyy", sauce);
-	}
-	var pattern;
-	if(options.selector != "date"){
-		pattern = options.timePattern || bundle["timeFormat-"+formatLength];
-		if(pattern){str.push(_processPattern(pattern, sauce));}
-	}
-	if(options.selector != "time"){
-		pattern = options.datePattern || bundle["dateFormat-"+formatLength];
-		if(pattern){str.push(_processPattern(pattern, sauce));}
-	}
-
-	return str.length == 1 ? str[0] : bundle["dateTimeFormat-"+formatLength].replace(/\{(\d+)\}/g,
-		function(match, key){ return str[key]; }); // String
-};
-
-dojo.date.locale.regexp = function(/*dojo.date.locale.__FormatOptions?*/options){
-	// summary:
-	//		Builds the regular needed to parse a localized date
-
-	return dojo.date.locale._parseInfo(options).regexp; // String
-};
-
-dojo.date.locale._parseInfo = function(/*dojo.date.locale.__FormatOptions?*/options){
-	options = options || {};
-	var locale = dojo.i18n.normalizeLocale(options.locale),
-		bundle = dojo.date.locale._getGregorianBundle(locale),
-		formatLength = options.formatLength || 'short',
-		datePattern = options.datePattern || bundle["dateFormat-" + formatLength],
-		timePattern = options.timePattern || bundle["timeFormat-" + formatLength],
-		pattern;
-	if(options.selector == 'date'){
-		pattern = datePattern;
-	}else if(options.selector == 'time'){
-		pattern = timePattern;
-	}else{
-		pattern = bundle["dateTimeFormat-"+formatLength].replace(/\{(\d+)\}/g,
-			function(match, key){ return [timePattern, datePattern][key]; });
-	}
-
-	var tokens = [],
-		re = _processPattern(pattern, dojo.hitch(this, _buildDateTimeRE, tokens, bundle, options));
-	return {regexp: re, tokens: tokens, bundle: bundle};
-};
-
-dojo.date.locale.parse = function(/*String*/value, /*dojo.date.locale.__FormatOptions?*/options){
-	// summary:
-	//		Convert a properly formatted string to a primitive Date object,
-	//		using locale-specific settings.
-	//
-	// description:
-	//		Create a Date object from a string using a known localized pattern.
-	//		By default, this method parses looking for both date and time in the string.
-	//		Formatting patterns are chosen appropriate to the locale.  Different
-	//		formatting lengths may be chosen, with "full" used by default.
-	//		Custom patterns may be used or registered with translations using
-	//		the dojo.date.locale.addCustomFormats method.
-	//
-	//		Formatting patterns are implemented using [the syntax described at
-	//		unicode.org](http://www.unicode.org/reports/tr35/tr35-4.html#Date_Format_Patterns)
-	//		When two digit years are used, a century is chosen according to a sliding
-	//		window of 80 years before and 20 years after present year, for both `yy` and `yyyy` patterns.
-	//		year < 100CE requires strict mode.
-	//
-	// value:
-	//		A string representation of a date
-
-	// remove non-printing bidi control chars from input and pattern
-	var controlChars = /[\u200E\u200F\u202A\u202E]/g,
-		info = dojo.date.locale._parseInfo(options),
-		tokens = info.tokens, bundle = info.bundle,
-		re = new RegExp("^" + info.regexp.replace(controlChars, "") + "$",
-			info.strict ? "" : "i"),
-		match = re.exec(value && value.replace(controlChars, ""));
-
-	if(!match){ return null; } // null
-
-	var widthList = ['abbr', 'wide', 'narrow'],
-		result = [1970,0,1,0,0,0,0], // will get converted to a Date at the end
-		amPm = "",
-		valid = dojo.every(match, function(v, i){
-		if(!i){return true;}
-		var token=tokens[i-1];
-		var l=token.length;
-		switch(token.charAt(0)){
-			case 'y':
-				if(l != 2 && options.strict){
-					//interpret year literally, so '5' would be 5 A.D.
-					result[0] = v;
-				}else{
-					if(v<100){
-						v = Number(v);
-						//choose century to apply, according to a sliding window
-						//of 80 years before and 20 years after present year
-						var year = '' + new Date().getFullYear(),
-							century = year.substring(0, 2) * 100,
-							cutoff = Math.min(Number(year.substring(2, 4)) + 20, 99),
-							num = (v < cutoff) ? century + v : century - 100 + v;
-						result[0] = num;
-					}else{
-						//we expected 2 digits and got more...
-						if(options.strict){
-							return false;
-						}
-						//interpret literally, so '150' would be 150 A.D.
-						//also tolerate '1950', if 'yyyy' input passed to 'yy' format
-						result[0] = v;
-					}
-				}
-				break;
-			case 'M':
-				if(l>2){
-					var months = bundle['months-format-' + widthList[l-3]].concat();
-					if(!options.strict){
-						//Tolerate abbreviating period in month part
-						//Case-insensitive comparison
-						v = v.replace(".","").toLowerCase();
-						months = dojo.map(months, function(s){ return s.replace(".","").toLowerCase(); } );
-					}
-					v = dojo.indexOf(months, v);
-					if(v == -1){
-//						console.log("dojo.date.locale.parse: Could not parse month name: '" + v + "'.");
-						return false;
-					}
-				}else{
-					v--;
-				}
-				result[1] = v;
-				break;
-			case 'E':
-			case 'e':
-				var days = bundle['days-format-' + widthList[l-3]].concat();
-				if(!options.strict){
-					//Case-insensitive comparison
-					v = v.toLowerCase();
-					days = dojo.map(days, function(d){return d.toLowerCase();});
-				}
-				v = dojo.indexOf(days, v);
-				if(v == -1){
-//					console.log("dojo.date.locale.parse: Could not parse weekday name: '" + v + "'.");
-					return false;
-				}
-
-				//TODO: not sure what to actually do with this input,
-				//in terms of setting something on the Date obj...?
-				//without more context, can't affect the actual date
-				//TODO: just validate?
-				break;
-			case 'D':
-				result[1] = 0;
-				// fallthrough...
-			case 'd':
-				result[2] = v;
-				break;
-			case 'a': //am/pm
-				var am = options.am || bundle['dayPeriods-format-wide-am'],
-					pm = options.pm || bundle['dayPeriods-format-wide-pm'];
-				if(!options.strict){
-					var period = /\./g;
-					v = v.replace(period,'').toLowerCase();
-					am = am.replace(period,'').toLowerCase();
-					pm = pm.replace(period,'').toLowerCase();
-				}
-				if(options.strict && v != am && v != pm){
-//					console.log("dojo.date.locale.parse: Could not parse am/pm part.");
-					return false;
-				}
-
-				// we might not have seen the hours field yet, so store the state and apply hour change later
-				amPm = (v == pm) ? 'p' : (v == am) ? 'a' : '';
-				break;
-			case 'K': //hour (1-24)
-				if(v == 24){ v = 0; }
-				// fallthrough...
-			case 'h': //hour (1-12)
-			case 'H': //hour (0-23)
-			case 'k': //hour (0-11)
-				//TODO: strict bounds checking, padding
-				if(v > 23){
-//					console.log("dojo.date.locale.parse: Illegal hours value");
-					return false;
-				}
-
-				//in the 12-hour case, adjusting for am/pm requires the 'a' part
-				//which could come before or after the hour, so we will adjust later
-				result[3] = v;
-				break;
-			case 'm': //minutes
-				result[4] = v;
-				break;
-			case 's': //seconds
-				result[5] = v;
-				break;
-			case 'S': //milliseconds
-				result[6] = v;
-//				break;
-//			case 'w':
-//TODO				var firstDay = 0;
-//			default:
-//TODO: throw?
-//				console.log("dojo.date.locale.parse: unsupported pattern char=" + token.charAt(0));
-		}
-		return true;
-	});
-
-	var hours = +result[3];
-	if(amPm === 'p' && hours < 12){
-		result[3] = hours + 12; //e.g., 3pm -> 15
-	}else if(amPm === 'a' && hours == 12){
-		result[3] = 0; //12am -> 0
-	}
-
-	//TODO: implement a getWeekday() method in order to test
-	//validity of input strings containing 'EEE' or 'EEEE'...
-
-	var dateObject = new Date(result[0], result[1], result[2], result[3], result[4], result[5], result[6]); // Date
-	if(options.strict){
-		dateObject.setFullYear(result[0]);
-	}
-
-	// Check for overflow.  The Date() constructor normalizes things like April 32nd...
-	//TODO: why isn't this done for times as well?
-	var allTokens = tokens.join(""),
-		dateToken = allTokens.indexOf('d') != -1,
-		monthToken = allTokens.indexOf('M') != -1;
-
-	if(!valid ||
-		(monthToken && dateObject.getMonth() > result[1]) ||
-		(dateToken && dateObject.getDate() > result[2])){
-		return null;
-	}
-
-	// Check for underflow, due to DST shifts.  See #9366
-	// This assumes a 1 hour dst shift correction at midnight
-	// We could compare the timezone offset after the shift and add the difference instead.
-	if((monthToken && dateObject.getMonth() < result[1]) ||
-		(dateToken && dateObject.getDate() < result[2])){
-		dateObject = dojo.date.add(dateObject, "hour", 1);
-	}
-
-	return dateObject; // Date
-};
-
-function _processPattern(pattern, applyPattern, applyLiteral, applyAll){
-	//summary: Process a pattern with literals in it
-
-	// Break up on single quotes, treat every other one as a literal, except '' which becomes '
-	var identity = function(x){return x;};
-	applyPattern = applyPattern || identity;
-	applyLiteral = applyLiteral || identity;
-	applyAll = applyAll || identity;
-
-	//split on single quotes (which escape literals in date format strings)
-	//but preserve escaped single quotes (e.g., o''clock)
-	var chunks = pattern.match(/(''|[^'])+/g),
-		literal = pattern.charAt(0) == "'";
-
-	dojo.forEach(chunks, function(chunk, i){
-		if(!chunk){
-			chunks[i]='';
-		}else{
-			chunks[i]=(literal ? applyLiteral : applyPattern)(chunk.replace(/''/g, "'"));
-			literal = !literal;
-		}
-	});
-	return applyAll(chunks.join(''));
-}
-
-function _buildDateTimeRE(tokens, bundle, options, pattern){
-	pattern = dojo.regexp.escapeString(pattern);
-	if(!options.strict){ pattern = pattern.replace(" a", " ?a"); } // kludge to tolerate no space before am/pm
-	return pattern.replace(/([a-z])\1*/ig, function(match){
-		// Build a simple regexp.  Avoid captures, which would ruin the tokens list
-		var s,
-			c = match.charAt(0),
-			l = match.length,
-			p2 = '', p3 = '';
-		if(options.strict){
-			if(l > 1){ p2 = '0' + '{'+(l-1)+'}'; }
-			if(l > 2){ p3 = '0' + '{'+(l-2)+'}'; }
-		}else{
-			p2 = '0?'; p3 = '0{0,2}';
-		}
-		switch(c){
-			case 'y':
-				s = '\\d{2,4}';
-				break;
-			case 'M':
-				s = (l>2) ? '\\S+?' : '1[0-2]|'+p2+'[1-9]';
-				break;
-			case 'D':
-				s = '[12][0-9][0-9]|3[0-5][0-9]|36[0-6]|'+p3+'[1-9][0-9]|'+p2+'[1-9]';
-				break;
-			case 'd':
-				s = '3[01]|[12]\\d|'+p2+'[1-9]';
-				break;
-			case 'w':
-				s = '[1-4][0-9]|5[0-3]|'+p2+'[1-9]';
-				break;
-			case 'E':
-				s = '\\S+';
-				break;
-			case 'h': //hour (1-12)
-				s = '1[0-2]|'+p2+'[1-9]';
-				break;
-			case 'k': //hour (0-11)
-				s = '1[01]|'+p2+'\\d';
-				break;
-			case 'H': //hour (0-23)
-				s = '1\\d|2[0-3]|'+p2+'\\d';
-				break;
-			case 'K': //hour (1-24)
-				s = '1\\d|2[0-4]|'+p2+'[1-9]';
-				break;
-			case 'm':
-			case 's':
-				s = '[0-5]\\d';
-				break;
-			case 'S':
-				s = '\\d{'+l+'}';
-				break;
-			case 'a':
-				var am = options.am || bundle['dayPeriods-format-wide-am'],
-					pm = options.pm || bundle['dayPeriods-format-wide-pm'];
-				s = am + '|' + pm;
-				if(!options.strict){
-					if(am != am.toLowerCase()){ s += '|' + am.toLowerCase(); }
-					if(pm != pm.toLowerCase()){ s += '|' + pm.toLowerCase(); }
-					if(s.indexOf('.') != -1){ s += '|' + s.replace(/\./g, ""); }
-				}
-				s = s.replace(/\./g, "\\.");
-				break;
-			default:
-			// case 'v':
-			// case 'z':
-			// case 'Z':
-				s = ".*";
-//				console.log("parse of date format, pattern=" + pattern);
-		}
-
-		if(tokens){ tokens.push(match); }
-
-		return "(" + s + ")"; // add capture
-	}).replace(/[\xa0 ]/g, "[\\s\\xa0]"); // normalize whitespace.  Need explicit handling of \xa0 for IE.
-}
-})();
-
-(function(){
-var _customFormats = [];
-dojo.date.locale.addCustomFormats = function(/*String*/packageName, /*String*/bundleName){
-	// summary:
-	//		Add a reference to a bundle containing localized custom formats to be
-	//		used by date/time formatting and parsing routines.
-	//
-	// description:
-	//		The user may add custom localized formats where the bundle has properties following the
-	//		same naming convention used by dojo.cldr: `dateFormat-xxxx` / `timeFormat-xxxx`
-	//		The pattern string should match the format used by the CLDR.
-	//		See dojo.date.locale.format() for details.
-	//		The resources must be loaded by dojo.requireLocalization() prior to use
-
-	_customFormats.push({pkg:packageName,name:bundleName});
-};
-
-dojo.date.locale._getGregorianBundle = function(/*String*/locale){
-	var gregorian = {};
-	dojo.forEach(_customFormats, function(desc){
-		var bundle = dojo.i18n.getLocalization(desc.pkg, desc.name, locale);
-		gregorian = dojo.mixin(gregorian, bundle);
-	}, this);
-	return gregorian; /*Object*/
-};
-})();
-
-dojo.date.locale.addCustomFormats("dojo.cldr","gregorian");
-
-dojo.date.locale.getNames = function(/*String*/item, /*String*/type, /*String?*/context, /*String?*/locale){
-	// summary:
-	//		Used to get localized strings from dojo.cldr for day or month names.
-	//
-	// item:
-	//	'months' || 'days'
-	// type:
-	//	'wide' || 'narrow' || 'abbr' (e.g. "Monday", "Mon", or "M" respectively, in English)
-	// context:
-	//	'standAlone' || 'format' (default)
-	// locale:
-	//	override locale used to find the names
-
-	var label,
-		lookup = dojo.date.locale._getGregorianBundle(locale),
-		props = [item, context, type];
-	if(context == 'standAlone'){
-		var key = props.join('-');
-		label = lookup[key];
-		// Fall back to 'format' flavor of name
-		if(label[0] == 1){ label = undefined; } // kludge, in the absence of real aliasing support in dojo.cldr
-	}
-	props[1] = 'format';
-
-	// return by copy so changes won't be made accidentally to the in-memory model
-	return (label || lookup[props.join('-')]).concat(); /*Array*/
-};
-
-dojo.date.locale.isWeekend = function(/*Date?*/dateObject, /*String?*/locale){
-	// summary:
-	//	Determines if the date falls on a weekend, according to local custom.
-
-	var weekend = dojo.cldr.supplemental.getWeekend(locale),
-		day = (dateObject || new Date()).getDay();
-	if(weekend.end < weekend.start){
-		weekend.end += 7;
-		if(day < weekend.start){ day += 7; }
-	}
-	return day >= weekend.start && day <= weekend.end; // Boolean
-};
-
-// These are used only by format and strftime.  Do they need to be public?  Which module should they go in?
-
-dojo.date.locale._getDayOfYear = function(/*Date*/dateObject){
-	// summary: gets the day of the year as represented by dateObject
-	return dojo.date.difference(new Date(dateObject.getFullYear(), 0, 1, dateObject.getHours()), dateObject) + 1; // Number
-};
-
-dojo.date.locale._getWeekOfYear = function(/*Date*/dateObject, /*Number*/firstDayOfWeek){
-	if(arguments.length == 1){ firstDayOfWeek = 0; } // Sunday
-
-	var firstDayOfYear = new Date(dateObject.getFullYear(), 0, 1).getDay(),
-		adj = (firstDayOfYear - firstDayOfWeek + 7) % 7,
-		week = Math.floor((dojo.date.locale._getDayOfYear(dateObject) + adj - 1) / 7);
-
-	// if year starts on the specified day, start counting weeks at 1
-	if(firstDayOfYear == firstDayOfWeek){ week++; }
-
-	return week; // Number
-};
-
-}
-
-if(!dojo._hasResource["dojox.date.posix"]){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource["dojox.date.posix"] = true;
-dojo.provide("dojox.date.posix");
-
-
-
-
-
-dojox.date.posix.strftime = function(/*Date*/dateObject, /*String*/format, /*String?*/locale){
-//
-// summary:
-//		Formats the date object using the specifications of the POSIX strftime function
-//
-// description:
-//		see http://www.opengroup.org/onlinepubs/007908799/xsh/strftime.html
-
-	// zero pad
-	var padChar = null;
-	var _ = function(s, n){
-		return dojo.string.pad(s, n || 2, padChar || "0");
-	};
-
-	var bundle = dojo.date.locale._getGregorianBundle(locale);
-
-	var $ = function(property){
-		switch(property){
-			case "a": // abbreviated weekday name according to the current locale
-				return dojo.date.locale.getNames('days', 'abbr', 'format', locale)[dateObject.getDay()];
-
-			case "A": // full weekday name according to the current locale
-				return dojo.date.locale.getNames('days', 'wide', 'format', locale)[dateObject.getDay()];
-
-			case "b":
-			case "h": // abbreviated month name according to the current locale
-				return dojo.date.locale.getNames('months', 'abbr', 'format', locale)[dateObject.getMonth()];
-				
-			case "B": // full month name according to the current locale
-				return dojo.date.locale.getNames('months', 'wide', 'format', locale)[dateObject.getMonth()];
-				
-			case "c": // preferred date and time representation for the current
-				      // locale
-				return dojo.date.locale.format(dateObject, {formatLength: 'full', locale: locale});
-
-			case "C": // century number (the year divided by 100 and truncated
-				      // to an integer, range 00 to 99)
-				return _(Math.floor(dateObject.getFullYear()/100));
-				
-			case "d": // day of the month as a decimal number (range 01 to 31)
-				return _(dateObject.getDate());
-				
-			case "D": // same as %m/%d/%y
-				return $("m") + "/" + $("d") + "/" + $("y");
-					
-			case "e": // day of the month as a decimal number, a single digit is
-				      // preceded by a space (range ' 1' to '31')
-				if(padChar == null){ padChar = " "; }
-				return _(dateObject.getDate());
-			
-			case "f": // month as a decimal number, a single digit is
-							// preceded by a space (range ' 1' to '12')
-				if(padChar == null){ padChar = " "; }
-				return _(dateObject.getMonth()+1);
-			
-			case "g": // like %G, but without the century.
-				break;
-			
-			case "G": // The 4-digit year corresponding to the ISO week number
-				      // (see %V).  This has the same format and value as %Y,
-				      // except that if the ISO week number belongs to the
-				      // previous or next year, that year is used instead.
-				dojo.unimplemented("unimplemented modifier 'G'");
-				break;
-			
-			case "F": // same as %Y-%m-%d
-				return $("Y") + "-" + $("m") + "-" + $("d");
-				
-			case "H": // hour as a decimal number using a 24-hour clock (range
-				      // 00 to 23)
-				return _(dateObject.getHours());
-				
-			case "I": // hour as a decimal number using a 12-hour clock (range
-				      // 01 to 12)
-				return _(dateObject.getHours() % 12 || 12);
-
-			case "j": // day of the year as a decimal number (range 001 to 366)
-				return _(dojo.date.locale._getDayOfYear(dateObject), 3);
-
-			case "k": // Hour as a decimal number using a 24-hour clock (range
-					  // 0 to 23 (space-padded))
-				if(padChar == null){ padChar = " "; }
-				return _(dateObject.getHours());
-
-			case "l": // Hour as a decimal number using a 12-hour clock (range
-					  // 1 to 12 (space-padded))
-				if(padChar == null){ padChar = " "; }
-				return _(dateObject.getHours() % 12 || 12);
-
-			case "m": // month as a decimal number (range 01 to 12)
-				return _(dateObject.getMonth() + 1);
-
-			case "M": // minute as a decimal number
-				return _(dateObject.getMinutes());
-
-			case "n":
-				return "\n";
-
-			case "p": // either `am' or `pm' according to the given time value,
-				      // or the corresponding strings for the current locale
-				return bundle['dayPeriods-format-wide-' + (dateObject.getHours() < 12 ? "am" : "pm")];
-				
-			case "r": // time in a.m. and p.m. notation
-				return $("I") + ":" + $("M") + ":" + $("S") + " " + $("p");
-				
-			case "R": // time in 24 hour notation
-				return $("H") + ":" + $("M");
-				
-			case "S": // second as a decimal number
-				return _(dateObject.getSeconds());
-
-			case "t":
-				return "\t";
-
-			case "T": // current time, equal to %H:%M:%S
-				return $("H") + ":" + $("M") + ":" + $("S");
-				
-			case "u": // weekday as a decimal number [1,7], with 1 representing
-				      // Monday
-				return String(dateObject.getDay() || 7);
-				
-			case "U": // week number of the current year as a decimal number,
-				      // starting with the first Sunday as the first day of the
-				      // first week
-				return _(dojo.date.locale._getWeekOfYear(dateObject));
-
-			case "V": // week number of the year (Monday as the first day of the
-				      // week) as a decimal number [01,53]. If the week containing
-				      // 1 January has four or more days in the new year, then it
-				      // is considered week 1. Otherwise, it is the last week of
-				      // the previous year, and the next week is week 1.
-				return _(dojox.date.posix.getIsoWeekOfYear(dateObject));
-				
-			case "W": // week number of the current year as a decimal number,
-				      // starting with the first Monday as the first day of the
-				      // first week
-				return _(dojo.date.locale._getWeekOfYear(dateObject, 1));
-				
-			case "w": // day of the week as a decimal, Sunday being 0
-				return String(dateObject.getDay());
-
-			case "x": // preferred date representation for the current locale
-				      // without the time
-				return dojo.date.locale.format(dateObject, {selector:'date', formatLength: 'full', locale:locale});
-
-			case "X": // preferred time representation for the current locale
-				      // without the date
-				return dojo.date.locale.format(dateObject, {selector:'time', formatLength: 'full', locale:locale});
-
-			case "y": // year as a decimal number without a century (range 00 to
-				      // 99)
-				return _(dateObject.getFullYear()%100);
-				
-			case "Y": // year as a decimal number including the century
-				return String(dateObject.getFullYear());
-			
-			case "z": // time zone or name or abbreviation
-				var timezoneOffset = dateObject.getTimezoneOffset();
-				return (timezoneOffset > 0 ? "-" : "+") +
-					_(Math.floor(Math.abs(timezoneOffset)/60)) + ":" +
-					_(Math.abs(timezoneOffset)%60);
-
-			case "Z": // time zone or name or abbreviation
-				return dojo.date.getTimezoneName(dateObject);
-			
-			case "%":
-				return "%";
-		}
-	};
-
-	// parse the formatting string and construct the resulting string
-	var string = "";
-	var i = 0;
-	var index = 0;
-	var switchCase = null;
-	while ((index = format.indexOf("%", i)) != -1){
-		string += format.substring(i, index++);
-		
-		// inspect modifier flag
-		switch (format.charAt(index++)) {
-			case "_": // Pad a numeric result string with spaces.
-				padChar = " "; break;
-			case "-": // Do not pad a numeric result string.
-				padChar = ""; break;
-			case "0": // Pad a numeric result string with zeros.
-				padChar = "0"; break;
-			case "^": // Convert characters in result string to uppercase.
-				switchCase = "upper"; break;
-			case "*": // Convert characters in result string to lowercase
-				switchCase = "lower"; break;
-			case "#": // Swap the case of the result string.
-				switchCase = "swap"; break;
-			default: // no modifier flag so decrement the index
-				padChar = null; index--; break;
-		}
-
-		// toggle case if a flag is set
-		var property = $(format.charAt(index++));
-		switch (switchCase){
-			case "upper":
-				property = property.toUpperCase();
-				break;
-			case "lower":
-				property = property.toLowerCase();
-				break;
-			case "swap": // Upper to lower, and versey-vicea
-				var compareString = property.toLowerCase();
-				var swapString = '';
-				var ch = '';
-				for (var j = 0; j < property.length; j++){
-					ch = property.charAt(j);
-					swapString += (ch == compareString.charAt(j)) ?
-						ch.toUpperCase() : ch.toLowerCase();
-				}
-				property = swapString;
-				break;
-			default:
-				break;
-		}
-		switchCase = null;
-		
-		string += property;
-		i = index;
-	}
-	string += format.substring(i);
-	
-	return string; // String
-};
-
-dojox.date.posix.getStartOfWeek = function(/*Date*/dateObject, /*Number*/firstDay){
-	// summary: Return a date object representing the first day of the given
-	//   date's week.
-	if(isNaN(firstDay)){
-		firstDay = dojo.cldr.supplemental.getFirstDayOfWeek ? dojo.cldr.supplemental.getFirstDayOfWeek() : 0;
-	}
-	var offset = firstDay;
-	if(dateObject.getDay() >= firstDay){
-		offset -= dateObject.getDay();
-	}else{
-		offset -= (7 - dateObject.getDay());
-	}
-	var date = new Date(dateObject);
-	date.setHours(0, 0, 0, 0);
-	return dojo.date.add(date, "day", offset); // Date
-}
-
-dojox.date.posix.setIsoWeekOfYear = function(/*Date*/dateObject, /*Number*/week){
-	// summary: Set the ISO8601 week number of the given date.
-	//   The week containing January 4th is the first week of the year.
-	// week:
-	//   can be positive or negative: -1 is the year's last week.
-	if(!week){ return dateObject; }
-	var currentWeek = dojox.date.posix.getIsoWeekOfYear(dateObject);
-	var offset = week - currentWeek;
-	if(week < 0){
-		var weeks = dojox.date.posix.getIsoWeeksInYear(dateObject);
-		offset = (weeks + week + 1) - currentWeek;
-	}
-	return dojo.date.add(dateObject, "week", offset); // Date
-}
-
-dojox.date.posix.getIsoWeekOfYear = function(/*Date*/dateObject){
-	// summary: Get the ISO8601 week number of the given date.
-	//   The week containing January 4th is the first week of the year.
-	//   See http://en.wikipedia.org/wiki/ISO_week_date
-	var weekStart = dojox.date.posix.getStartOfWeek(dateObject, 1);
-	var yearStart = new Date(dateObject.getFullYear(), 0, 4); // January 4th
-	yearStart = dojox.date.posix.getStartOfWeek(yearStart, 1);
-	var diff = weekStart.getTime() - yearStart.getTime();
-	if(diff < 0){ return dojox.date.posix.getIsoWeeksInYear(weekStart); } // Integer
-	return Math.ceil(diff / 604800000) + 1; // Integer
-}
-
-dojox.date.posix.getIsoWeeksInYear = function(/*Date*/dateObject) {
-	// summary: Determine the number of ISO8601 weeks in the year of the given
-	//   date. Most years have 52 but some have 53.
-	//   See http://www.phys.uu.nl/~vgent/calendar/isocalendar_text3.htm
-	function p(y) {
-		return y + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400);
-	}
-	var y = dateObject.getFullYear();
-	return ( p(y) % 7 == 4 || p(y-1) % 7 == 3 ) ? 53 : 52;	//	Integer
-}
-
-}
-
-if(!dojo._hasResource['realitybuilder.BlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.BlockProperties'] = true;
+if(!dojo._hasResource['realityBuilder.BlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.BlockProperties'] = true;
 // Describes the properties of a block, including shape and dimensions.
 
 // Sometimes the term "full shadow" is used, which refers to the shadow how it
@@ -16013,11 +12756,11 @@ dojo._hasResource['realitybuilder.BlockProperties'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.BlockProperties');
+dojo.provide('realityBuilder.BlockProperties');
 
-dojo.declare('realitybuilder.BlockProperties', null, {
+dojo.declare('realityBuilder.BlockProperties', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -16101,7 +12844,7 @@ dojo.declare('realitybuilder.BlockProperties', null, {
         var that = this;
 
         return dojo.map(this._outlineBXY, function (pBXY) {
-            return realitybuilder.util.rotatePointBXY(pBXY,
+            return realityBuilder.util.rotatePointBXY(pBXY,
                                                           that._rotCenterBXY,
                                                           a);
         });
@@ -16117,7 +12860,7 @@ dojo.declare('realitybuilder.BlockProperties', null, {
     },
 
     _rotateCollisionOffsetsBXY: function (collisionOffsetsBXY, a) {
-        var util = realitybuilder.util;
+        var util = realityBuilder.util;
 
         return dojo.map(collisionOffsetsBXY, function (collisionOffsetBXY) {
             return util.rotatePointBXY(collisionOffsetBXY, [0, 0], a);
@@ -16149,7 +12892,7 @@ dojo.declare('realitybuilder.BlockProperties', null, {
     _rotateAttachmentOffsetB: function (attachmentOffsetB, a) {
         var pBXY, rotatedPBXY, rotatedPB, util;
 
-        util = realitybuilder.util;
+        util = realityBuilder.util;
 
         // Rotates in the x-y plane, keeping z constant:
         pBXY = [attachmentOffsetB[0], attachmentOffsetB[1]];
@@ -16204,7 +12947,7 @@ dojo.declare('realitybuilder.BlockProperties', null, {
             this._updateRotatedCollisionOffsetsListsBXY();
             this._updateRotatedAttachmentOffsetsListsB();
 
-            dojo.publish('realitybuilder/BlockProperties/changed');
+            dojo.publish('realityBuilder/BlockProperties/changed');
         }
     },
 
@@ -16259,8 +13002,8 @@ dojo.declare('realitybuilder.BlockProperties', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.ConstructionBlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.ConstructionBlockProperties'] = true;
+if(!dojo._hasResource['realityBuilder.ConstructionBlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.ConstructionBlockProperties'] = true;
 // Describes the properties of a construction block.
 
 // Sometimes the term "full shadow" is used, which refers to the shadow how it
@@ -16284,11 +13027,11 @@ dojo._hasResource['realitybuilder.ConstructionBlockProperties'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.ConstructionBlockProperties');
+dojo.provide('realityBuilder.ConstructionBlockProperties');
 
-dojo.declare('realitybuilder.ConstructionBlockProperties', null, {
+dojo.declare('realityBuilder.ConstructionBlockProperties', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -16315,7 +13058,7 @@ dojo.declare('realitybuilder.ConstructionBlockProperties', null, {
             this._pendingColor = serverData.pendingColor;
             this._realColor = serverData.realColor;
 
-            dojo.publish('realitybuilder/ConstructionBlockProperties/changed');
+            dojo.publish('realityBuilder/ConstructionBlockProperties/changed');
         }
     },
 
@@ -16330,8 +13073,8 @@ dojo.declare('realitybuilder.ConstructionBlockProperties', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.Block']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.Block'] = true;
+if(!dojo._hasResource['realityBuilder.Block']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.Block'] = true;
 // A building block.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -16351,11 +13094,11 @@ dojo._hasResource['realitybuilder.Block'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
-dojo.provide('realitybuilder.Block');
+dojo.provide('realityBuilder.Block');
 
-dojo.declare('realitybuilder.Block', null, {
+dojo.declare('realityBuilder.Block', null, {
     // Position of the block in block space. From the position the block
     // extends in positive direction along the x-, y-, and z-axis.
     _positionB: null,
@@ -16487,7 +13230,7 @@ dojo.declare('realitybuilder.Block', null, {
 
         for (i = 0; i < len; i += 1) {
             lineV = [bottomVertexesV[i], topVertexesV[i]];
-            pointVXZ = realitybuilder.util.intersectionLinePlaneVXZ(lineV);
+            pointVXZ = realityBuilder.util.intersectionLinePlaneVXZ(lineV);
             if (!pointVXZ) {
                 tmp = null;
                 break;
@@ -16511,7 +13254,7 @@ dojo.declare('realitybuilder.Block', null, {
             testPositionB = [this.xB() + collisionOffsetBXY[0],
                              this.yB() + collisionOffsetBXY[1],
                              this.zB()];
-            if (realitybuilder.util.pointsIdenticalB(block.positionB(),
+            if (realityBuilder.util.pointsIdenticalB(block.positionB(),
                                                          testPositionB)) {
                 return true;
             }
@@ -16530,9 +13273,9 @@ dojo.declare('realitybuilder.Block', null, {
         for (i = 0; i < attachmentOffsetsB.length; i += 1) {
             attachmentOffsetB = attachmentOffsetsB[i];
             testPositionB = 
-                realitybuilder.util.addVectorsB(this.positionB(),
+                realityBuilder.util.addVectorsB(this.positionB(),
                                                     attachmentOffsetB);
-            if (realitybuilder.util.pointsIdenticalB(block.positionB(),
+            if (realityBuilder.util.pointsIdenticalB(block.positionB(),
                                                          testPositionB)) {
                 return true;
             }
@@ -16565,7 +13308,7 @@ dojo.declare('realitybuilder.Block', null, {
     },
 
     _blockToWorld: function (pB) {
-        return realitybuilder.util.blockToWorld(pB,
+        return realityBuilder.util.blockToWorld(pB,
                                                     this._blockProperties);
     },
 
@@ -16601,7 +13344,7 @@ dojo.declare('realitybuilder.Block', null, {
             this._blockProperties.versionOnServer();
         positionBHasChanged = 
             this._lastPositionB === null ||
-            !realitybuilder.util.pointsIdenticalB(this._lastPositionB,
+            !realityBuilder.util.pointsIdenticalB(this._lastPositionB,
                                                       this._positionB);
         aHasChanged = this._lastA !== this._a;
 
@@ -16909,8 +13652,8 @@ dojo.declare('realitybuilder.Block', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.ConstructionBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.ConstructionBlock'] = true;
+if(!dojo._hasResource['realityBuilder.ConstructionBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.ConstructionBlock'] = true;
 // A block that is permanently part of the construction, though it may be
 // marked as deleted or pending.
 
@@ -16931,15 +13674,13 @@ dojo._hasResource['realitybuilder.ConstructionBlock'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.ConstructionBlock');
+dojo.provide('realityBuilder.ConstructionBlock');
 
 
 
-dojo.declare('realitybuilder.ConstructionBlock', 
-             realitybuilder.Block,
-{
+dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
     // State of the block: 0 = deleted, 1 = pending (= requested to be build),
     // 2 = real
     _state: null,
@@ -17025,365 +13766,6 @@ dojo.declare('realitybuilder.ConstructionBlock',
         context.fill();
     }
 });
-
-}
-
-if(!dojo._hasResource['realitybuilder.util']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.util'] = true;
-// Various utility functions.
-
-// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy
-// of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
-
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl, swfobject,
-  acme */
-
-dojo.provide('realitybuilder.util');
-
-// Tolerance when comparing coordinates in sensor space.
-realitybuilder.util.TOLERANCE_S = 0.5;
-
-// Tolerance when comparing coordinates in view space.
-realitybuilder.util.TOLERANCE_V = 0.00001;
-
-// Tolerance when comparing coordinates in the view space x-z-plane.
-realitybuilder.util.TOLERANCE_VXZ = 0.00001;
-
-// Returns the coordinates of the block space point "pB" in world space.
-realitybuilder.util.blockToWorld = function (pB, blockProperties) {
-    var 
-    factorX = blockProperties.positionSpacingXY(),
-    factorY = blockProperties.positionSpacingXY(),
-    factorZ = blockProperties.positionSpacingZ();
-    return [pB[0] * factorX, pB[1] * factorY, pB[2] * factorZ];
-};
-
-// In view space, tries to calculate the interesection point between the
-// x-z-plane and the straight line "line", defined by a pair of points. If the
-// y coordinates of the points defining the line are identical, then returns
-// false. Otherwise returns the x-z-coordinates (2D) of the intersection point.
-//
-// The tolerance "tolerance" is used for comparison of coordinates.
-realitybuilder.util.intersectionLinePlaneVXZ = function (lineV) {
-    var delta, p1 = lineV[0], p2 = lineV[1];
-
-    delta = realitybuilder.util.subtractVectors3D(p2, p1);
-    if (Math.abs(delta[1]) < realitybuilder.util.TOLERANCE_V) {
-        // line in parallel to plane or undefined => no intersection point
-        return false;
-    } else {
-        return [p1[0] - p1[1] * delta[0] / delta[1], 
-                p1[2] - p1[1] * delta[2] / delta[1]];
-    }
-};
-
-// In the view space x-z-plane (2D):
-//
-// * If there is an intersection between the straight line "lineVXZ" (infinite
-//   extension) and the line segment "segmentVXZ", returns the intersection
-//   point. Otherwise returns false.
-//
-// * If the line segment lies on the straight line, they are defined to have no
-//   intersection.
-// 
-// * If the line touches a boundary point of a segment, then this is also
-//   regarded as intersection.
-realitybuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ, 
-                                                               lineVXZ)
-{
-    // As of 2010-Apr, an explanation can be found e.g. at:
-    // http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
-
-    var x1 = segmentVXZ[0][0], z1 = segmentVXZ[0][1],
-        x2 = segmentVXZ[1][0], z2 = segmentVXZ[1][1],
-        x3 = lineVXZ[0][0], y3 = lineVXZ[0][1],
-        x4 = lineVXZ[1][0], y4 = lineVXZ[1][1],
-        u1 = (x4 - x3) * (z1 - y3) - (y4 - y3) * (x1 - x3),
-        u2 = (y4 - y3) * (x2 - x1) - (x4 - x3) * (z2 - z1),
-        epsilon = 0.01, // not the same as for comparing position
-        u, x, y;
-
-    if (Math.abs(u2) < epsilon) {
-        // The segment line lies on the straight line (|u1| < epsilon) or the
-        // lines are parallel (|u1| >= epsilon).
-        return false;
-    } else {
-        u = u1 / u2;
-        if (u > -epsilon && u < 1 + epsilon) {
-            // u was between 0 and 1. => Intersection point is on segment.
-            // Reason for using epsilons: For the hidden lines removal
-            // algorithm it is important to not miss any intersections, for
-            // example if the line intersects with the join of two segments. If
-            // two intersection points are detected, they are later removed by
-            // the function "withDuplicatesRemoved".
-            x = x1 + u * (x2 - x1);
-            y = z1 + u * (z2 - z1);
-            return [x, y];
-        } else {
-            return false;
-        }
-    }
-};
-
-// Investigates the relation between the positions of the point "pointVXZ" and
-// the line segment "segmentVXZ", in the view space x-z-plane, when viewed with
-// the camera "camera".
-//
-// Return values:
-//
-// -1: point is visually in front of line segment
-//
-// 1: point is visually behind line segment
-//
-// 0: point neither in front nor behind line segment. This is the case under
-//   the following conditions:
-//
-//   - The point and the line segment don't overlap in screen space.
-//
-//   - The point is on the line segment in the view space x-z-plane.
-//
-//   - In the view space x-z-plane, The line segment is on the straight line
-//     going through the origin (camera) and the point.
-//
-// It is assumed that the point and the segment are in front of the camera,
-// i.e. in front of the plane defined by the camera's sensor. If that's not the
-// case, then the result is undefined.
-realitybuilder.util.relationPointSegmentVXZ = function (pointVXZ, 
-                                                            segmentVXZ)
-{
-    var camPositionVXZ, lineVXZ, intersectionVXZ, util;
-
-    util = realitybuilder.util;
-
-    camPositionVXZ = [0, 0]; // in origin of view space, naturally
-
-    lineVXZ = [camPositionVXZ, pointVXZ];
-
-    intersectionVXZ = util.intersectionSegmentLineVXZ(segmentVXZ, lineVXZ);
-
-    if (intersectionVXZ === false) {
-        // no intersection
-        return 0;
-    } else {
-        // intersection
-        if (util.pointsIdenticalVXZ(intersectionVXZ, pointVXZ)) {
-            return 0; // point on line segment
-        } else {
-            return util.pointIsBetween2D(pointVXZ, 
-                                         camPositionVXZ, 
-                                         intersectionVXZ) ? -1 : 1;
-        }
-    }
-};
-
-// In 2D, returns true, iff the point "p" lies somewhere between the points
-// "p1" and "p2", horizontally and vertically. If points coincide, the result
-// is undefined.
-realitybuilder.util.pointIsBetween2D = function (p, p1, p2) {
-    var horizontally =
-        (p[0] >= p1[0] && p[0] <= p2[0]) ||
-        (p[0] <= p1[0] && p[0] >= p2[0]),
-        vertically =
-        (p[1] >= p1[1] && p[1] <= p2[1]) ||
-        (p[1] <= p1[1] && p[1] >= p2[1]);
-    return horizontally && vertically;
-};
-
-// Returns true, iff the points "p1" and "p2" are in the same position, within
-// the tolerance "tolerance".
-realitybuilder.util.pointsIdentical2D = function (p1, p2, tolerance) {
-    return (Math.abs(p1[0] - p2[0]) < tolerance &&
-            Math.abs(p1[1] - p2[1]) < tolerance);
-};
-
-// Returns true, iff the points "p1" and "p2" are in the same position in
-// sensor space.
-realitybuilder.util.pointsIdenticalS = function (p1S, p2S) {
-    var tolerance = realitybuilder.util.TOLERANCE_S;
-    return realitybuilder.util.pointsIdentical2D(p1S, p2S, tolerance);
-};
-
-// Returns true, iff the points "p1" and "p2" are in the same position in
-// the view space x-z-plane.
-realitybuilder.util.pointsIdenticalVXZ = function (p1VXZ, p2VXZ) {
-    var tolerance = realitybuilder.util.TOLERANCE_VXZ;
-    return realitybuilder.util.pointsIdentical2D(p1VXZ, p2VXZ, tolerance);
-};
-
-// Returns true, iff the points "p1B" and "p2B" are in the same position in
-// block space.
-realitybuilder.util.pointsIdenticalB = function (p1B, p2B) {
-    return (
-        (p1B[0] - p2B[0]) === 0 &&
-        (p1B[1] - p2B[1]) === 0 &&
-        (p1B[2] - p2B[2]) === 0);
-};
-
-// Subtracts the vectors "vector2" from the vector "vector1" in 3D and returns
-// the result.
-realitybuilder.util.subtractVectors3D = function (vector1, vector2) {
-    return [
-        vector1[0] - vector2[0], 
-        vector1[1] - vector2[1],
-        vector1[2] - vector2[2]];
-};
-
-// Adds the vectors "vector1B" and "vector2B" in blocks space and returns the
-// result.
-realitybuilder.util.addVectorsB = function (vector1B, vector2B) {
-    return [
-        vector1B[0] + vector2B[0], 
-        vector1B[1] + vector2B[1],
-        vector1B[2] + vector2B[2]];
-};
-
-// Subtracts the vectors "vector2B" from the vector "vector1B" in blocks space
-// and returns the result.
-realitybuilder.util.subtractVectorsB = function (vector1B, vector2B) {
-    return [
-        vector1B[0] - vector2B[0], 
-        vector1B[1] - vector2B[1],
-        vector1B[2] - vector2B[2]];
-};
-
-// Removes duplicate points from the list of points "ps". Returns the resulting
-// list. Removes points from the front. Does not change the order.
-realitybuilder.util.withDuplicatesRemoved = function (ps) {
-    var newPs = [], i, j, p1, p2, duplicate;
-    for (i = 0; i < ps.length; i += 1) {
-        p1 = ps[i];
-        duplicate = false;
-        for (j = i + 1; j < ps.length; j += 1) {
-            p2 = ps[j];
-            if (realitybuilder.util.pointsIdenticalS(p1, p2)) {
-                duplicate = true;
-                break;
-            }
-        }
-        if (!duplicate) {
-            newPs.push(p1);
-        }
-    }
-    return newPs;
-};
-
-// Returns the polar coordinates of the sensor space point "pS".
-realitybuilder.util.cartesianToPolar = function (pS) {
-    var x = pS[0], y = pS[1],
-    angle = Math.atan2(y, x),
-    distance = Math.sqrt(x * x + y * y);
-    return [angle, distance];
-};
-
-// Returns the cartesian coordinates of the sensor space point "polarPS", which
-// is in polar coordinates.
-realitybuilder.util.polarToCartesian = function (polarPS) {
-    var angle = polarPS[0], distance = polarPS[1],
-    x = distance * Math.cos(angle),
-    y = distance * Math.sin(angle);
-    return [x, y];
-};
-
-// Returns a new point, whose coordinates are the sum of the coordinates of the
-// points "p1S" and "p2S" in sensor space.
-realitybuilder.util.addS = function (p1S, p2S) {
-    return [p1S[0] + p2S[0], p1S[1] + p2S[1]];
-};
-
-// Returns the point "pBXY" in the block space x-z-plane, rotated about the
-// center "cBXY" by the angle "a", CCW when viewed from above. The angle is in
-// multiples of 90°.
-realitybuilder.util.rotatePointBXY = function (pBXY, cBXY, a) {
-    var tmpXB, tmpYB, cXB, cYB;
-
-    if (a % 4 === 0) {
-        return pBXY;
-    } else {
-        cXB = cBXY[0];
-        cYB = cBXY[1];
-        tmpXB = pBXY[0] - cXB;
-        tmpYB = pBXY[1] - cYB;
-        
-        if (a % 4 === 1) {
-            return [Math.round(cXB - tmpYB), Math.round(cYB + tmpXB)];
-        } else if (a % 4 === 2) {
-            return [Math.round(cXB - tmpXB), Math.round(cYB - tmpYB)];
-        } else { // a % 4 === 3
-            return [Math.round(cXB + tmpYB), Math.round(cYB - tmpXB)];
-        }
-    }
-};
-
-// Returns the object "object" with all keys converted to strings and being
-// prefixed by "prefix".
-realitybuilder.util.addPrefix = function (prefix, object) {
-    var tmp = [], i;
-    for (i in object) {
-        if (object.hasOwnProperty(i)) {
-            tmp[prefix.toString() + i.toString()] = object[i];
-        }
-    }
-    return tmp;
-};
-
-// Returns true, iff FlashCanvas has loaded. FlashCanvas implements HTML canvas
-// support for Internet Explorer.
-realitybuilder.util.isFlashCanvasActive = function () {
-    return (typeof FlashCanvas !== 'undefined');
-};
-
-realitybuilder.util.isFlashReadyForFlashCanvas = function () {
-    return (typeof swfobject !== 'undefined') &&
-        swfobject.hasFlashPlayerVersion("9"); // includes higher versions
-};
-
-// Returns true, iff the canvas functionality is somehow supported, either
-// natively by the browser, or via some emulation.
-realitybuilder.util.isCanvasSupported = function () {
-    return (document.createElement('canvas').getContext ||  // Native support
-            (realitybuilder.util.isFlashCanvasActive() &&
-             realitybuilder.util.isFlashReadyForFlashCanvas()));
-};
-
-// Clears the canvas "canvas".
-realitybuilder.util.clearCanvas = function (canvas) {
-    if (canvas.getContext) {
-        var context = canvas.getContext('2d');
-        context.clearRect(0, 0, canvas.width, canvas.height);
-    }
-};
-
-// Fills the canvas "canvas" with color "color".
-realitybuilder.util.fillCanvas = function (canvas, color) {
-    if (canvas.getContext) {
-        var context = canvas.getContext('2d');
-        context.fillStyle = color;
-        context.fillRect(0, 0, canvas.width, canvas.height);
-    }
-};
-
-// Has a trailing slash.
-realitybuilder.util.rootUrl = function () {
-    if (dojo.config.isDebug) {
-        return dojo.baseUrl + '../../../';
-    } else {
-        return dojo.baseUrl + '../../';
-    }
-};
 
 }
 
@@ -17644,8 +14026,381 @@ dojo.declare("dojo.io.script.__ioArgs", dojo.__IoArgs, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.ConstructionBlocks']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.ConstructionBlocks'] = true;
+if(!dojo._hasResource['realityBuilder.util']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.util'] = true;
+// Various utility functions.
+
+// Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+//
+// Licensed under the Apache License, Version 2.0 (the "License"); you may not
+// use this file except in compliance with the License. You may obtain a copy
+// of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
+
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
+  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl, swfobject,
+  acme */
+
+dojo.provide('realityBuilder.util');
+
+
+
+// Tolerance when comparing coordinates in sensor space.
+realityBuilder.util.TOLERANCE_S = 0.5;
+
+// Tolerance when comparing coordinates in view space.
+realityBuilder.util.TOLERANCE_V = 0.00001;
+
+// Tolerance when comparing coordinates in the view space x-z-plane.
+realityBuilder.util.TOLERANCE_VXZ = 0.00001;
+
+// Settings, set once at the beginning.
+realityBuilder.util.SETTINGS = null;
+
+// Returns the coordinates of the block space point "pB" in world space.
+realityBuilder.util.blockToWorld = function (pB, blockProperties) {
+    var 
+    factorX = blockProperties.positionSpacingXY(),
+    factorY = blockProperties.positionSpacingXY(),
+    factorZ = blockProperties.positionSpacingZ();
+    return [pB[0] * factorX, pB[1] * factorY, pB[2] * factorZ];
+};
+
+// In view space, tries to calculate the interesection point between the
+// x-z-plane and the straight line "line", defined by a pair of points. If the
+// y coordinates of the points defining the line are identical, then returns
+// false. Otherwise returns the x-z-coordinates (2D) of the intersection point.
+//
+// The tolerance "tolerance" is used for comparison of coordinates.
+realityBuilder.util.intersectionLinePlaneVXZ = function (lineV) {
+    var delta, p1 = lineV[0], p2 = lineV[1];
+
+    delta = realityBuilder.util.subtractVectors3D(p2, p1);
+    if (Math.abs(delta[1]) < realityBuilder.util.TOLERANCE_V) {
+        // line in parallel to plane or undefined => no intersection point
+        return false;
+    } else {
+        return [p1[0] - p1[1] * delta[0] / delta[1], 
+                p1[2] - p1[1] * delta[2] / delta[1]];
+    }
+};
+
+// In the view space x-z-plane (2D):
+//
+// * If there is an intersection between the straight line "lineVXZ" (infinite
+//   extension) and the line segment "segmentVXZ", returns the intersection
+//   point. Otherwise returns false.
+//
+// * If the line segment lies on the straight line, they are defined to have no
+//   intersection.
+// 
+// * If the line touches a boundary point of a segment, then this is also
+//   regarded as intersection.
+realityBuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ, 
+                                                               lineVXZ)
+{
+    // As of 2010-Apr, an explanation can be found e.g. at:
+    // http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
+
+    var x1 = segmentVXZ[0][0], z1 = segmentVXZ[0][1],
+        x2 = segmentVXZ[1][0], z2 = segmentVXZ[1][1],
+        x3 = lineVXZ[0][0], y3 = lineVXZ[0][1],
+        x4 = lineVXZ[1][0], y4 = lineVXZ[1][1],
+        u1 = (x4 - x3) * (z1 - y3) - (y4 - y3) * (x1 - x3),
+        u2 = (y4 - y3) * (x2 - x1) - (x4 - x3) * (z2 - z1),
+        epsilon = 0.01, // not the same as for comparing position
+        u, x, y;
+
+    if (Math.abs(u2) < epsilon) {
+        // The segment line lies on the straight line (|u1| < epsilon) or the
+        // lines are parallel (|u1| >= epsilon).
+        return false;
+    } else {
+        u = u1 / u2;
+        if (u > -epsilon && u < 1 + epsilon) {
+            // u was between 0 and 1. => Intersection point is on segment.
+            // Reason for using epsilons: For the hidden lines removal
+            // algorithm it is important to not miss any intersections, for
+            // example if the line intersects with the join of two segments. If
+            // two intersection points are detected, they are later removed by
+            // the function "withDuplicatesRemoved".
+            x = x1 + u * (x2 - x1);
+            y = z1 + u * (z2 - z1);
+            return [x, y];
+        } else {
+            return false;
+        }
+    }
+};
+
+// Investigates the relation between the positions of the point "pointVXZ" and
+// the line segment "segmentVXZ", in the view space x-z-plane, when viewed with
+// the camera "camera".
+//
+// Return values:
+//
+// -1: point is visually in front of line segment
+//
+// 1: point is visually behind line segment
+//
+// 0: point neither in front nor behind line segment. This is the case under
+//   the following conditions:
+//
+//   - The point and the line segment don't overlap in screen space.
+//
+//   - The point is on the line segment in the view space x-z-plane.
+//
+//   - In the view space x-z-plane, The line segment is on the straight line
+//     going through the origin (camera) and the point.
+//
+// It is assumed that the point and the segment are in front of the camera,
+// i.e. in front of the plane defined by the camera's sensor. If that's not the
+// case, then the result is undefined.
+realityBuilder.util.relationPointSegmentVXZ = function (pointVXZ, 
+                                                            segmentVXZ)
+{
+    var camPositionVXZ, lineVXZ, intersectionVXZ, util;
+
+    util = realityBuilder.util;
+
+    camPositionVXZ = [0, 0]; // in origin of view space, naturally
+
+    lineVXZ = [camPositionVXZ, pointVXZ];
+
+    intersectionVXZ = util.intersectionSegmentLineVXZ(segmentVXZ, lineVXZ);
+
+    if (intersectionVXZ === false) {
+        // no intersection
+        return 0;
+    } else {
+        // intersection
+        if (util.pointsIdenticalVXZ(intersectionVXZ, pointVXZ)) {
+            return 0; // point on line segment
+        } else {
+            return util.pointIsBetween2D(pointVXZ, 
+                                         camPositionVXZ, 
+                                         intersectionVXZ) ? -1 : 1;
+        }
+    }
+};
+
+// In 2D, returns true, iff the point "p" lies somewhere between the points
+// "p1" and "p2", horizontally and vertically. If points coincide, the result
+// is undefined.
+realityBuilder.util.pointIsBetween2D = function (p, p1, p2) {
+    var horizontally =
+        (p[0] >= p1[0] && p[0] <= p2[0]) ||
+        (p[0] <= p1[0] && p[0] >= p2[0]),
+        vertically =
+        (p[1] >= p1[1] && p[1] <= p2[1]) ||
+        (p[1] <= p1[1] && p[1] >= p2[1]);
+    return horizontally && vertically;
+};
+
+// Returns true, iff the points "p1" and "p2" are in the same position, within
+// the tolerance "tolerance".
+realityBuilder.util.pointsIdentical2D = function (p1, p2, tolerance) {
+    return (Math.abs(p1[0] - p2[0]) < tolerance &&
+            Math.abs(p1[1] - p2[1]) < tolerance);
+};
+
+// Returns true, iff the points "p1" and "p2" are in the same position in
+// sensor space.
+realityBuilder.util.pointsIdenticalS = function (p1S, p2S) {
+    var tolerance = realityBuilder.util.TOLERANCE_S;
+    return realityBuilder.util.pointsIdentical2D(p1S, p2S, tolerance);
+};
+
+// Returns true, iff the points "p1" and "p2" are in the same position in
+// the view space x-z-plane.
+realityBuilder.util.pointsIdenticalVXZ = function (p1VXZ, p2VXZ) {
+    var tolerance = realityBuilder.util.TOLERANCE_VXZ;
+    return realityBuilder.util.pointsIdentical2D(p1VXZ, p2VXZ, tolerance);
+};
+
+// Returns true, iff the points "p1B" and "p2B" are in the same position in
+// block space.
+realityBuilder.util.pointsIdenticalB = function (p1B, p2B) {
+    return (
+        (p1B[0] - p2B[0]) === 0 &&
+        (p1B[1] - p2B[1]) === 0 &&
+        (p1B[2] - p2B[2]) === 0);
+};
+
+// Subtracts the vectors "vector2" from the vector "vector1" in 3D and returns
+// the result.
+realityBuilder.util.subtractVectors3D = function (vector1, vector2) {
+    return [
+        vector1[0] - vector2[0], 
+        vector1[1] - vector2[1],
+        vector1[2] - vector2[2]];
+};
+
+// Adds the vectors "vector1B" and "vector2B" in blocks space and returns the
+// result.
+realityBuilder.util.addVectorsB = function (vector1B, vector2B) {
+    return [
+        vector1B[0] + vector2B[0], 
+        vector1B[1] + vector2B[1],
+        vector1B[2] + vector2B[2]];
+};
+
+// Subtracts the vectors "vector2B" from the vector "vector1B" in blocks space
+// and returns the result.
+realityBuilder.util.subtractVectorsB = function (vector1B, vector2B) {
+    return [
+        vector1B[0] - vector2B[0], 
+        vector1B[1] - vector2B[1],
+        vector1B[2] - vector2B[2]];
+};
+
+// Removes duplicate points from the list of points "ps". Returns the resulting
+// list. Removes points from the front. Does not change the order.
+realityBuilder.util.withDuplicatesRemoved = function (ps) {
+    var newPs = [], i, j, p1, p2, duplicate;
+    for (i = 0; i < ps.length; i += 1) {
+        p1 = ps[i];
+        duplicate = false;
+        for (j = i + 1; j < ps.length; j += 1) {
+            p2 = ps[j];
+            if (realityBuilder.util.pointsIdenticalS(p1, p2)) {
+                duplicate = true;
+                break;
+            }
+        }
+        if (!duplicate) {
+            newPs.push(p1);
+        }
+    }
+    return newPs;
+};
+
+// Returns the polar coordinates of the sensor space point "pS".
+realityBuilder.util.cartesianToPolar = function (pS) {
+    var x = pS[0], y = pS[1],
+    angle = Math.atan2(y, x),
+    distance = Math.sqrt(x * x + y * y);
+    return [angle, distance];
+};
+
+// Returns the cartesian coordinates of the sensor space point "polarPS", which
+// is in polar coordinates.
+realityBuilder.util.polarToCartesian = function (polarPS) {
+    var angle = polarPS[0], distance = polarPS[1],
+    x = distance * Math.cos(angle),
+    y = distance * Math.sin(angle);
+    return [x, y];
+};
+
+// Returns a new point, whose coordinates are the sum of the coordinates of the
+// points "p1S" and "p2S" in sensor space.
+realityBuilder.util.addS = function (p1S, p2S) {
+    return [p1S[0] + p2S[0], p1S[1] + p2S[1]];
+};
+
+// Returns the point "pBXY" in the block space x-z-plane, rotated about the
+// center "cBXY" by the angle "a", CCW when viewed from above. The angle is in
+// multiples of 90°.
+realityBuilder.util.rotatePointBXY = function (pBXY, cBXY, a) {
+    var tmpXB, tmpYB, cXB, cYB;
+
+    if (a % 4 === 0) {
+        return pBXY;
+    } else {
+        cXB = cBXY[0];
+        cYB = cBXY[1];
+        tmpXB = pBXY[0] - cXB;
+        tmpYB = pBXY[1] - cYB;
+        
+        if (a % 4 === 1) {
+            return [Math.round(cXB - tmpYB), Math.round(cYB + tmpXB)];
+        } else if (a % 4 === 2) {
+            return [Math.round(cXB - tmpXB), Math.round(cYB - tmpYB)];
+        } else { // a % 4 === 3
+            return [Math.round(cXB + tmpYB), Math.round(cYB - tmpXB)];
+        }
+    }
+};
+
+// Returns the object "object" with all keys converted to strings and being
+// prefixed by "prefix".
+realityBuilder.util.addPrefix = function (prefix, object) {
+    var tmp = [], i;
+    for (i in object) {
+        if (object.hasOwnProperty(i)) {
+            tmp[prefix.toString() + i.toString()] = object[i];
+        }
+    }
+    return tmp;
+};
+
+// Returns true, iff FlashCanvas has loaded. FlashCanvas implements HTML canvas
+// support for Internet Explorer.
+realityBuilder.util.isFlashCanvasActive = function () {
+    return (typeof FlashCanvas !== 'undefined');
+};
+
+realityBuilder.util.isFlashReadyForFlashCanvas = function () {
+    return (typeof swfobject !== 'undefined') &&
+        swfobject.hasFlashPlayerVersion("9"); // includes higher versions
+};
+
+// Returns true, iff the canvas functionality is somehow supported, either
+// natively by the browser, or via some emulation.
+realityBuilder.util.isCanvasSupported = function () {
+    return (document.createElement('canvas').getContext ||  // Native support
+            (realityBuilder.util.isFlashCanvasActive() &&
+             realityBuilder.util.isFlashReadyForFlashCanvas()));
+};
+
+// Clears the canvas "canvas".
+realityBuilder.util.clearCanvas = function (canvas) {
+    if (canvas.getContext) {
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+};
+
+// Fills the canvas "canvas" with color "color".
+realityBuilder.util.fillCanvas = function (canvas, color) {
+    if (canvas.getContext) {
+        var context = canvas.getContext('2d');
+        context.fillStyle = color;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+    }
+};
+
+// Has a trailing slash.
+realityBuilder.util.rootUrl = function () {
+    if (dojo.config.isDebug) {
+        return dojo.baseUrl + '../../../';
+    } else {
+        return dojo.baseUrl + '../../';
+    }
+};
+
+// Performs a JSONP request, using some default settings.
+realityBuilder.util.jsonpGet = function (args) {
+    dojo.io.script.get(dojo.mixin({
+        callbackParamName: 'callback',
+        timeout: realityBuilder.util.SETTINGS.jsonpTimeout,
+        error: realityBuilder.util.SETTINGS.onJsonpError
+    }, args));
+};
+
+}
+
+if(!dojo._hasResource['realityBuilder.ConstructionBlocks']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.ConstructionBlocks'] = true;
 // All blocks permanently in the construction, including deleted blocks and
 // pending blocks. The new, user positionable block is not part of the
 // construction.
@@ -17667,16 +14422,14 @@ dojo._hasResource['realitybuilder.ConstructionBlocks'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.ConstructionBlocks');
-
-
+dojo.provide('realityBuilder.ConstructionBlocks');
 
 
 
 
-dojo.declare('realitybuilder.ConstructionBlocks', null, {
+dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // Version of blocks data last retrieved from the server, or "-1"
     // initially. Is a string in order to be able to contain very large
     // integers.
@@ -17761,7 +14514,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     },
 
     _createBlockFromServerData: function (serverData) {
-        var camera = this._camera, rb = realitybuilder;
+        var camera = this._camera, rb = realityBuilder;
         return new rb.ConstructionBlock(this._blockProperties,
                                         camera, 
                                         serverData.positionB, serverData.a,
@@ -17783,7 +14536,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
 
             this._updateRealBlocksSorted();
             this._updatePendingBlocks();
-            dojo.publish('realitybuilder/ConstructionBlocks/changed');
+            dojo.publish('realityBuilder/ConstructionBlocks/changed');
         }
     },
 
@@ -17820,7 +14573,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
         var blocks = this.blocks(), block, i;
         for (i = 0; i < blocks.length; i += 1) {
             block = blocks[i];
-            if (realitybuilder.util.pointsIdenticalB(
+            if (realityBuilder.util.pointsIdenticalB(
                 positionB, block.positionB())) {
                 return block;
             }
@@ -17860,12 +14613,12 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
 
     // Called if making the block pending on the server succeeded.
     _makePendingOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block pending on the server failed.
     _makePendingOnServerFailed: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/' + 
+        dojo.publish('realityBuilder/ConstructionBlocks/' + 
                      'changeOnServerFailed');
     },
 
@@ -17874,57 +14627,46 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // the server. Once the server has completed the request, the list of
     // blocks is updated.
     makePendingOnServer: function (positionB, a) {
-        dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "admin/rpc/make_pending",
-            callbackParamName: "callback",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "admin/rpc/make_pending",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
                 "zB": positionB[2],
                 "a": a
             },
-            load: dojo.hitch(this, this._makePendingOnServerSucceeded),
-            error: dojo.hitch(this, this._makePendingOnServerFailed),
-            timeout: 5000
+            load: dojo.hitch(this, this._makePendingOnServerSucceeded)
         });
     },
 
     // Called if deleting the block on the server succeeded.
     _deleteOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
-    },
-
-    // Called if deleting the block on the server failed.
-    _deleteOnServerFailed: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/' + 
-                     'changeOnServerFailed');
+        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Deletes the block positioned at the block space position "positionB" and
     // rotated by the angle "a", on the client and on the server.
     deleteOnServer: function (positionB, a) {
-        dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "admin/rpc/delete",
-            callbackParamName: "callback",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "admin/rpc/delete",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
                 "zB": positionB[2],
                 "a": a
             },
-            load: dojo.hitch(this, this._deleteOnServerSucceeded),
-            error: dojo.hitch(this, this._deleteOnServerFailed)
+            load: dojo.hitch(this, this._deleteOnServerSucceeded)
         });
     },
 
     // Called if making the block real on the server succeeded.
     _makeRealOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
+        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block real on the server failed.
     _makeRealOnServerFailed: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/' +
+        dojo.publish('realityBuilder/ConstructionBlocks/' +
                      'changeOnServerFailed');
     },
 
@@ -17932,17 +14674,15 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // "positionB" and rotated by the angle "a" to real: on the client and on
     // the server.
     makeRealOnServer: function (positionB, a) {
-        dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "admin/rpc/make_real",
-            callbackParamName: "callback",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "admin/rpc/make_real",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
                 "zB": positionB[2],
                 "a": a
             },
-            load: dojo.hitch(this, this._makeRealOnServerSucceeded),
-            error: dojo.hitch(this, this._makeRealOnServerFailed)
+            load: dojo.hitch(this, this._makeRealOnServerSucceeded)
         });
     },
 
@@ -17990,7 +14730,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     _renderBlocks: function (canvas, blocks) {
         if (canvas.getContext) {
             var context = canvas.getContext('2d');
-            realitybuilder.util.clearCanvas(canvas);
+            realityBuilder.util.clearCanvas(canvas);
             dojo.forEach(blocks, function (b) {
                 b.render(context);
             });
@@ -18014,8 +14754,8 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.LayerShadow']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.LayerShadow'] = true;
+if(!dojo._hasResource['realityBuilder.LayerShadow']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.LayerShadow'] = true;
 // "Layer shadow": The shadow under the new block, projected onto a layer of
 // blocks under the assumption that there are no layers below and above that
 // layer.
@@ -18046,11 +14786,11 @@ dojo._hasResource['realitybuilder.LayerShadow'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.LayerShadow');
+dojo.provide('realityBuilder.LayerShadow');
 
-dojo.declare('realitybuilder.LayerShadow', null, {
+dojo.declare('realityBuilder.LayerShadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
@@ -18096,7 +14836,7 @@ dojo.declare('realitybuilder.LayerShadow', null, {
         dojo.attr(this._helperCanvas, 'width', shadowCanvas.width);
         dojo.attr(this._helperCanvas, 'height', shadowCanvas.height);
 
-        if (realitybuilder.util.isFlashCanvasActive()) {
+        if (realityBuilder.util.isFlashCanvasActive()) {
             FlashCanvas.initElement(this._canvas);
             FlashCanvas.initElement(this._helperCanvas);
         }
@@ -18121,7 +14861,7 @@ dojo.declare('realitybuilder.LayerShadow', null, {
 
         // counterclockwise:
         dojo.forEach(blockOutlineBXY, function (vertexBXY) {
-            vs.push(realitybuilder.util.
+            vs.push(realityBuilder.util.
                     blockToWorld([xB + vertexBXY[0], 
                                   yB + vertexBXY[1], 
                                   zB],
@@ -18215,13 +14955,13 @@ dojo.declare('realitybuilder.LayerShadow', null, {
         // Chrome 11.
         if (canvas.getContext) {
             context = canvas.getContext('2d');
-            realitybuilder.util.clearCanvas(canvas);
+            realityBuilder.util.clearCanvas(canvas);
             helperContext = helperCanvas.getContext('2d');
-            realitybuilder.util.clearCanvas(helperCanvas);
+            realityBuilder.util.clearCanvas(helperCanvas);
 
             context.globalCompositeOperation = "source-over";
             if (layerZB === -1) {
-                realitybuilder.util.fillCanvas(canvas, "black");
+                realityBuilder.util.fillCanvas(canvas, "black");
             } else {
                 this._renderTops(layerZB, context); // slow with many blocks
             }
@@ -18244,8 +14984,8 @@ dojo.declare('realitybuilder.LayerShadow', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.ShadowObscuringBlocks']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.ShadowObscuringBlocks'] = true;
+if(!dojo._hasResource['realityBuilder.ShadowObscuringBlocks']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.ShadowObscuringBlocks'] = true;
 // "Shadow obscuring blocks": Blocks that are used for graphically removing
 // that parts of a shadow that are not actually visible.
 //
@@ -18329,11 +15069,11 @@ dojo._hasResource['realitybuilder.ShadowObscuringBlocks'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.ShadowObscuringBlocks');
+dojo.provide('realityBuilder.ShadowObscuringBlocks');
 
-dojo.declare('realitybuilder.ShadowObscuringBlocks', null, {
+dojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
     // The blocks, sorted by height, from top to bottom.
     _blocksSorted: null,
 
@@ -18366,7 +15106,7 @@ dojo.declare('realitybuilder.ShadowObscuringBlocks', null, {
             var dstBlock, dstPositionB;
 
             dstPositionB = [srcBlock.xB(), srcBlock.yB(), dstZB];
-            dstBlock = new realitybuilder.Block(that._blockProperties,
+            dstBlock = new realityBuilder.Block(that._blockProperties,
                                                     camera, dstPositionB,
                                                     srcBlock.a());
             dstBlock.onlySubtractBottom();
@@ -18435,8 +15175,8 @@ dojo.declare('realitybuilder.ShadowObscuringBlocks', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.Shadow']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.Shadow'] = true;
+if(!dojo._hasResource['realityBuilder.Shadow']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.Shadow'] = true;
 // The shadow under the new block. It is used to indicate where the block is
 // hovering.
 
@@ -18457,14 +15197,14 @@ dojo._hasResource['realitybuilder.Shadow'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.Shadow');
-
-
+dojo.provide('realityBuilder.Shadow');
 
 
-dojo.declare('realitybuilder.Shadow', null, {
+
+
+dojo.declare('realityBuilder.Shadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
@@ -18499,13 +15239,13 @@ dojo.declare('realitybuilder.Shadow', null, {
         this._constructionBlocks = constructionBlocks;
 
         this._shadowObscuringBlocks =
-            new realitybuilder.ShadowObscuringBlocks(newBlock, 
+            new realityBuilder.ShadowObscuringBlocks(newBlock, 
                                                          blockProperties,
                                                          camera,
                                                          constructionBlocks);
 
         this._layerShadow = 
-            new realitybuilder.LayerShadow(newBlock, blockProperties,
+            new realityBuilder.LayerShadow(newBlock, blockProperties,
                                                camera, constructionBlocks);
     },
 
@@ -18534,7 +15274,7 @@ dojo.declare('realitybuilder.Shadow', null, {
 
         if (canvas.getContext) {
             context = canvas.getContext('2d');
-            realitybuilder.util.clearCanvas(canvas);
+            realityBuilder.util.clearCanvas(canvas);
 
             // draws shadow from bottom up, in each step removing parts that
             // are obscured by blocks in the layer above:
@@ -18553,14 +15293,14 @@ dojo.declare('realitybuilder.Shadow', null, {
     // Makes sure that the shadow is not shown on the sensor.
     clear: function () {
         var canvas = this._camera.sensor().shadowCanvas();
-        realitybuilder.util.clearCanvas(canvas);
+        realityBuilder.util.clearCanvas(canvas);
     }
 });
 
 }
 
-if(!dojo._hasResource['realitybuilder.NewBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.NewBlock'] = true;
+if(!dojo._hasResource['realityBuilder.NewBlock']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.NewBlock'] = true;
 // The new block in the construction. It may be positioned by the user.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -18580,16 +15320,14 @@ dojo._hasResource['realitybuilder.NewBlock'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.NewBlock');
-
-
+dojo.provide('realityBuilder.NewBlock');
 
 
 
 
-dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
+dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     '-chains-': {
         constructor: 'manual'
     },
@@ -18658,7 +15396,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
         this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
         this._isStopped = false;
         this._constructionBlocks = constructionBlocks;
-        this._shadow = new realitybuilder.Shadow(this, blockProperties, 
+        this._shadow = new realityBuilder.Shadow(this, blockProperties, 
                                                      camera, 
                                                      constructionBlocks);
         this._camera = camera;
@@ -18702,10 +15440,10 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
             this._versionOnServer = serverData.version;
 
             if (positionAngleWereInitialized) {
-                dojo.publish('realitybuilder/NewBlock/' + 
+                dojo.publish('realityBuilder/NewBlock/' + 
                              'positionAngleInitialized');
             }
-            dojo.publish('realitybuilder/NewBlock/moveOrBuildSpaceChanged');
+            dojo.publish('realityBuilder/NewBlock/moveOrBuildSpaceChanged');
         }
     },
 
@@ -18718,9 +15456,9 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
     // it go out of range.
     move: function (deltaB) {
         if (!this.wouldGoOutOfRange(deltaB, 0)) {
-            this._positionB = realitybuilder.util.addVectorsB(
+            this._positionB = realityBuilder.util.addVectorsB(
                 this._positionB, deltaB);
-            dojo.publish('realitybuilder/NewBlock/movedOrRotated');
+            dojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
     },
 
@@ -18730,7 +15468,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
         var congruencyA = this._blockProperties.congruencyA();
         if (!this.wouldGoOutOfRange([0, 0, 0], 1)) {
             this._a = (this._a + 1) % congruencyA; // multiples of 90°
-            dojo.publish('realitybuilder/NewBlock/movedOrRotated');
+            dojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
     },
 
@@ -18740,7 +15478,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
         if (this.canBeMadeReal()) {
             this._stop();
             this._createPendingOnServer();
-            dojo.publish('realitybuilder/NewBlock/makeRealRequested');
+            dojo.publish('realityBuilder/NewBlock/makeRealRequested');
         }
     },
 
@@ -18758,12 +15496,12 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
     _stop: function () {
         this._isStopped = true;
-        dojo.publish('realitybuilder/NewBlock/stopped');
+        dojo.publish('realityBuilder/NewBlock/stopped');
     },
 
     _makeMovable: function () {
         this._isStopped = false;
-        dojo.publish('realitybuilder/NewBlock/madeMovable');
+        dojo.publish('realityBuilder/NewBlock/madeMovable');
     },
 
     // Updates the position and state of this block to reflect changes in the
@@ -18805,7 +15543,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
             testZB = this.zB();
             do {
                 testZB += 1;
-                testBlock = new realitybuilder.Block(this._blockProperties,
+                testBlock = new realityBuilder.Block(this._blockProperties,
                                                          this._camera,
                                                          [xB, yB, testZB],
                                                          this.a());
@@ -18827,10 +15565,10 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
         congruencyA = this._blockProperties.congruencyA();
 
-        testPositionB = realitybuilder.util.addVectorsB(this.positionB(), 
+        testPositionB = realityBuilder.util.addVectorsB(this.positionB(), 
                                                             deltaB);
         testA = (this.a() + deltaA) % congruencyA;
-        testBlock = new realitybuilder.Block(this._blockProperties,
+        testBlock = new realityBuilder.Block(this._blockProperties,
                                                  this._camera, 
                                                  testPositionB, testA);
 
@@ -18918,7 +15656,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
     _relationVertexesEdges: function (vertexes1VXZ, vertexes2VXZ) {
         var util, len, i, j, relation, vertexVXZ, vertex1VXZ, edge2VXZ;
 
-        util = realitybuilder.util;
+        util = realityBuilder.util;
 
         len = vertexes2VXZ.length; // same for all blocks
         for (i = 0; i < len; i += 1) { // iterates edges of this block
@@ -19084,11 +15822,11 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
                 color = this.isMovable() ? this._color : this._stoppedColor;
 
                 // Shadow does currently not work with FlashCanvas.
-                if (!realitybuilder.util.isFlashCanvasActive()) {
+                if (!realityBuilder.util.isFlashCanvasActive()) {
                     this._renderShadow();
                 }
 
-                realitybuilder.util.clearCanvas(canvas);
+                realityBuilder.util.clearCanvas(canvas);
                 this.inherited(arguments, [context, color]);
 
                 // removes parts of the real block obscured by other blocks:
@@ -19100,7 +15838,7 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
     // Called if storing the block as pending on the server succeeded.
     _createPendingOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/NewBlock/createdPendingOnServer');
+        dojo.publish('realityBuilder/NewBlock/createdPendingOnServer');
 
         if (this._prerenderMode.isEnabled()) {
             setTimeout(
@@ -19112,9 +15850,8 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
     // Adds this block to the list of blocks on the server, with state pending.
     _createPendingOnServer: function () {
-        dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "rpc/create_pending",
-            callbackParamName: "callback",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "rpc/create_pending",
             content: {
                 "xB": this.xB(),
                 "yB": this.yB(),
@@ -19148,8 +15885,8 @@ dojo.declare('realitybuilder.NewBlock', realitybuilder.Block, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.Sensor']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.Sensor'] = true;
+if(!dojo._hasResource['realityBuilder.Sensor']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.Sensor'] = true;
 // The sensor of the camera, displaying objects on top of the background image.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -19169,11 +15906,11 @@ dojo._hasResource['realitybuilder.Sensor'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.Sensor');
+dojo.provide('realityBuilder.Sensor');
 
-dojo.declare('realitybuilder.Sensor', null, {
+dojo.declare('realityBuilder.Sensor', null, {
     // Canvases for drawing various parts.
     _canvasNodes: null,
 
@@ -19249,7 +15986,7 @@ dojo.declare('realitybuilder.Sensor', null, {
             height: height
         }));
 
-        if (realitybuilder.util.isFlashCanvasActive()) {
+        if (realityBuilder.util.isFlashCanvasActive()) {
             FlashCanvas.initElement(canvasNode);
         }
 
@@ -19310,8 +16047,8 @@ dojo.declare('realitybuilder.Sensor', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.Camera']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.Camera'] = true;
+if(!dojo._hasResource['realityBuilder.Camera']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.Camera'] = true;
 // A camera at position "x", "y", "z" looking along the direction defined by
 // the angles "aZ", "aX". With the angles set to zero, the directions of the
 // view space and the block space axes coincide: The camera looks along the
@@ -19345,16 +16082,16 @@ dojo._hasResource['realitybuilder.Camera'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.Camera');
-
-
+dojo.provide('realityBuilder.Camera');
 
 
 
 
-dojo.declare('realitybuilder.Camera', null, {
+
+
+dojo.declare('realityBuilder.Camera', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
@@ -19392,7 +16129,7 @@ dojo.declare('realitybuilder.Camera', null, {
         this._blockProperties = blockProperties;
         this._position = [0, 0, 1];
         this._sensor = 
-            new realitybuilder.Sensor(sensorWidth, sensorHeight, node);
+            new realityBuilder.Sensor(sensorWidth, sensorHeight, node);
         this._updateRotationMatrices();
         
     },
@@ -19455,7 +16192,7 @@ dojo.declare('realitybuilder.Camera', null, {
         this._updateRotationMatrices();
         this._updateId();
 
-        dojo.publish('realitybuilder/Camera/changed');
+        dojo.publish('realityBuilder/Camera/changed');
     },
 
     // Updates the settings of the camera to the version on the server, which
@@ -19493,8 +16230,8 @@ dojo.declare('realitybuilder.Camera', null, {
 
     // Returns the coordinates of the world space point "point" in view space.
     worldToView: function (point) {
-        var tmp = realitybuilder.util.subtractVectors3D(point, 
-                                                            this._position);
+        var tmp = realityBuilder.util.subtractVectors3D(point, 
+                                                        this._position);
 
         // Rotation matrices are applied to the vector tmp, from the left side:
         tmp = dojox.math.matrix.transpose([tmp]);
@@ -19532,15 +16269,15 @@ dojo.declare('realitybuilder.Camera', null, {
     // space.
     blockToSensor: function (pointB) {
         return this.viewToSensor(this.worldToView(
-            realitybuilder.util.blockToWorld(pointB, 
-                                                 this._blockProperties)));
+            realityBuilder.util.blockToWorld(pointB, 
+                                             this._blockProperties)));
     }
 });
 
 }
 
-if(!dojo._hasResource['realitybuilder.PrerenderMode']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.PrerenderMode'] = true;
+if(!dojo._hasResource['realityBuilder.PrerenderMode']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.PrerenderMode'] = true;
 // Configuration for prerender-mode, if enabled.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
@@ -19560,13 +16297,11 @@ dojo._hasResource['realitybuilder.PrerenderMode'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.PrerenderMode');
+dojo.provide('realityBuilder.PrerenderMode');
 
-
-
-dojo.declare('realitybuilder.PrerenderMode', null, {
+dojo.declare('realityBuilder.PrerenderMode', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -19602,7 +16337,7 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
             this._blockConfigurations = serverData.blockConfigurations;
             this._i = serverData.i;
             
-            dojo.publish('realitybuilder/PrerenderMode/changed');
+            dojo.publish('realityBuilder/PrerenderMode/changed');
         }
     },
 
@@ -19692,16 +16427,15 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
     },
 
     _loadBlockConfigurationOnServerSucceeded: function () {
-        dojo.publish('realitybuilder/PrerenderMode/' + 
+        dojo.publish('realityBuilder/PrerenderMode/' + 
                      'loadedBlockConfigurationOnServer');
     },
 
     // Loads the prerendered block configuration with index "i" on the server.
     loadBlockConfigurationOnServer: function (i) {
-        dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + 
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + 
                 "rpc/load_prerendered_block_configuration",
-            callbackParamName: "callback",
             content: {
                 "i": i
             },
@@ -19729,9 +16463,9 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
 
 }
 
-if(!dojo._hasResource['realitybuilder.Main']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realitybuilder.Main'] = true;
-// Main.
+if(!dojo._hasResource['realityBuilder.RealityBuilder']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
+dojo._hasResource['realityBuilder.RealityBuilder'] = true;
+// The Reality Builder.
 
 // Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 //
@@ -19750,11 +16484,9 @@ dojo._hasResource['realitybuilder.Main'] = true;
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realitybuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
 
-dojo.provide('realitybuilder.Main');
-
-
+dojo.provide('realityBuilder.RealityBuilder');
 
 
 
@@ -19765,9 +16497,7 @@ dojo.provide('realitybuilder.Main');
 
 
 
-dojo.declare('realitybuilder.Main', null, {
-    _settings: null,
-
+dojo.declare('realityBuilder.RealityBuilder', null, {
     // All blocks, permanently in the construction, including real and pending
     // blocks:
     _constructionBlocks: null,
@@ -19803,7 +16533,7 @@ dojo.declare('realitybuilder.Main', null, {
     // Creates a construction. For a documentation of the settings, see the
     // main Reality Builder include script.
     constructor: function (settings) {
-        var rb = realitybuilder;
+        var rb = realityBuilder;
 
         if (!rb.util.isCanvasSupported()) {
             // canvas not supported => abort
@@ -19811,7 +16541,7 @@ dojo.declare('realitybuilder.Main', null, {
             return;
         }
 
-        this._settings = settings;
+        realityBuilder.util.SETTINGS = settings;
 
         this._onReadyCalled = false;
 
@@ -19832,39 +16562,36 @@ dojo.declare('realitybuilder.Main', null, {
                             this._constructionBlocks,
                             this._prerenderMode);
 
-        dojo.subscribe(
-            'realitybuilder/ConstructionBlocks/changeOnServerFailed', 
-            this, this._onServerError);
-        dojo.subscribe('realitybuilder/ConstructionBlocks/changedOnServer', 
+        dojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realitybuilder/PrerenderMode/' + 
+        dojo.subscribe('realityBuilder/PrerenderMode/' + 
                        'loadedBlockConfigurationOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realitybuilder/NewBlock/createdPendingOnServer', 
+        dojo.subscribe('realityBuilder/NewBlock/createdPendingOnServer', 
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realitybuilder/NewBlock/' + 
+        dojo.subscribe('realityBuilder/NewBlock/' + 
                        'positionAngleInitialized', 
                        this, this._onNewBlockPositionAngleInitialized);
-        dojo.subscribe('realitybuilder/NewBlock/buildOrMoveSpaceChanged', 
+        dojo.subscribe('realityBuilder/NewBlock/buildOrMoveSpaceChanged', 
                        this, this._onMoveOrBuildSpaceChanged);
-        dojo.subscribe('realitybuilder/NewBlock/stopped', 
+        dojo.subscribe('realityBuilder/NewBlock/stopped', 
                        this, this._onNewBlockStopped);
-        dojo.subscribe('realitybuilder/NewBlock/madeMovable', 
+        dojo.subscribe('realityBuilder/NewBlock/madeMovable', 
                        this, this._onNewBlockMadeMovable);
-        dojo.subscribe('realitybuilder/NewBlock/movedOrRotated',
+        dojo.subscribe('realityBuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
-        dojo.subscribe('realitybuilder/NewBlock/' + 
+        dojo.subscribe('realityBuilder/NewBlock/' + 
                        'onNewBlockMakeRealRequested',
                        this, this._onNewBlockMakeRealRequested);
-        dojo.subscribe('realitybuilder/ConstructionBlocks/changed',
+        dojo.subscribe('realityBuilder/ConstructionBlocks/changed',
                        this, this._onConstructionBlocksChanged);
-        dojo.subscribe('realitybuilder/Camera/changed',
+        dojo.subscribe('realityBuilder/Camera/changed',
                        this, this._onCameraChanged);
-        dojo.subscribe('realitybuilder/BlockProperties/changed',
+        dojo.subscribe('realityBuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
-        dojo.subscribe('realitybuilder/ConstructionBlockProperties/changed',
+        dojo.subscribe('realityBuilder/ConstructionBlockProperties/changed',
                        this, this._onConstructionBlockPropertiesChanged);
-        dojo.subscribe('realitybuilder/PrerenderMode/changed',
+        dojo.subscribe('realityBuilder/PrerenderMode/changed',
                        this, this._onPrerenderModeChanged);
 
         dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
@@ -19896,20 +16623,16 @@ dojo.declare('realitybuilder.Main', null, {
         return this._constructionBlocks;
     },
 
-    _onServerError: function () {
-        this._settings.onServerError();
-    },
-
     // Called after the new block has been stopped.
     _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
-        this._settings.onDegreesOfFreedomChanged();
+        realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
 
     // Called after the new block has been made movable.
     _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
-        this._settings.onDegreesOfFreedomChanged();
+        realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
 
     // Called after the block was requested to be made real.
@@ -19919,13 +16642,13 @@ dojo.declare('realitybuilder.Main', null, {
     setRealBlocksVisibility: function (shouldBeVisible) {
         this._camera.sensor().setRealBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
-        this._settings.onRealBlocksVisibilityChanged();
+        realityBuilder.util.SETTINGS.onRealBlocksVisibilityChanged();
     },
 
     setPendingBlocksVisibility: function (shouldBeVisible) {
         this._camera.sensor().setPendingBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
-        this._settings.onPendingBlocksVisibilityChanged();
+        realityBuilder.util.SETTINGS.onPendingBlocksVisibilityChanged();
     },
 
     realBlocksAreVisible: function () {
@@ -19959,8 +16682,9 @@ dojo.declare('realitybuilder.Main', null, {
     // updates controls.
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
-        this._settings.onDegreesOfFreedomChanged(); // may have changed
-        this._settings.onMovedOrRotated();
+        realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged(); // may have
+                                                                  // changed
+        realityBuilder.util.SETTINGS.onMovedOrRotated();
     },
 
     // (Re-)renders blocks, but only if all necessary components have been
@@ -19986,8 +16710,8 @@ dojo.declare('realitybuilder.Main', null, {
             this._prerenderMode.isInitializedWithServerData()) {
 
             this._newBlock.updatePositionAndMovability();
-            this._settings.onDegreesOfFreedomChanged();
-            this._settings.onMovedOrRotated();
+            realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
+            realityBuilder.util.SETTINGS.onMovedOrRotated();
         }
     },
 
@@ -19996,14 +16720,14 @@ dojo.declare('realitybuilder.Main', null, {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
         this._checkIfReady();
-        this._settings.onConstructionBlocksChanged();
+        realityBuilder.util.SETTINGS.onConstructionBlocksChanged();
     },
 
     // Called after the camera settings have changed.
     _onCameraChanged: function () {
         this._renderBlocksIfFullyInitialized();
         this._checkIfReady();
-        this._settings.onCameraChanged();
+        realityBuilder.util.SETTINGS.onCameraChanged();
     },
 
     // Called after the new block's position, rotation angle have been
@@ -20041,7 +16765,7 @@ dojo.declare('realitybuilder.Main', null, {
     _onPrerenderModeChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._checkIfReady();
-        this._settings.onPrerenderedBlockConfigurationChanged();
+        realityBuilder.util.SETTINGS.onPrerenderedBlockConfigurationChanged();
     },
 
     // Checks if the widget is ready to be used. If so, signals that by calling
@@ -20053,7 +16777,7 @@ dojo.declare('realitybuilder.Main', null, {
             this._constructionBlockProperties.isInitializedWithServerData() &&
             this._onReadyCalled === false) {
 
-            this._settings.onReady();
+            realityBuilder.util.SETTINGS.onReady();
             this._onReadyCalled = true;
         }
     },
@@ -20112,9 +16836,8 @@ dojo.declare('realitybuilder.Main', null, {
     // server. Only updates data where there is a new version. Fails silently
     // on error.
     _update: function () {
-        dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "rpc/construction",
-            callbackParamName: "callback",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "rpc/construction",
             content: {
                 "blocksDataVersion": 
                 this._constructionBlocks.versionOnServer(),
@@ -20143,7 +16866,7 @@ dojo.declare('realitybuilder.Main', null, {
         var preparedCameraData;
 
         preparedCameraData = 
-            realitybuilder.util.addPrefix('camera.', cameraData);
+            realityBuilder.util.addPrefix('camera.', cameraData);
         preparedCameraData['camera.x'] = cameraData.position[0];
         preparedCameraData['camera.y'] = cameraData.position[1];
         preparedCameraData['camera.z'] = cameraData.position[2];
@@ -20158,9 +16881,8 @@ dojo.declare('realitybuilder.Main', null, {
             dojo.mixin(content, this._preparedCameraData(settings.cameraData));
         }
 
-        dojo.io.script.get({
-            url: realitybuilder.util.rootUrl() + "admin/rpc/update_settings",
-            callbackParamName: "callback",
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "admin/rpc/update_settings",
             content: content,
             load: dojo.hitch(this, this._storeSettingsOnServerSucceeded)
         });
@@ -20169,9 +16891,7 @@ dojo.declare('realitybuilder.Main', null, {
 
 }
 
-	
-dojo.i18n._preloadLocalizations("dojo.nls.dojo", ["ROOT","en","xx"]);
-
+	//INSERT dojo.i18n._preloadLocalizations HERE
 
 	//Check if document already complete, and if so, just trigger page load
 	//listeners. NOTE: does not work with Firefox before 3.6. To support

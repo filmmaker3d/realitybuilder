@@ -1,3 +1,5 @@
+{% extends "base.html" %}
+
 {% comment %}
   Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
 
@@ -13,8 +15,6 @@
   License for the specific language governing permissions and limitations under
   the License.
 {% endcomment %}
-
-{% extends "base.html" %}
 
 {% block head %}
   <title>Reality Builder Administration</title>        
@@ -116,6 +116,6 @@
 {% block scripts %}
   <script type="text/javascript" src="/demo/javascript/admin.js"></script>
   <script type="text/javascript">
-    realitybuilderAdminDemo.setLogoutUrl('{{ logout_url }}');
+    realityBuilderAdminDemo.setLogoutUrl('{{ logout_url }}');
   </script>
 {% endblock %}

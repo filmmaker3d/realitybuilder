@@ -18,16 +18,14 @@ dependencies = {
     layers: [{
         name: "dojo.js", // if not "dojo.js", then 2 files would be created,
                          // and scopeMap would fail
-        copyrightFile: "../../../realitybuilder.copyright.js",
+        copyrightFile: "../../../realityBuilder.copyright.js",
         dependencies: [
             "dojox.math", 
             "dojox.math.matrix", 
-            "dojox.atom.io.model", 
-            "dojox.date.posix", 
-            "realitybuilder.Main"]
+            "realityBuilder.RealityBuilder"]
     }],
     prefixes: [
         ["dojox", "../dojox"], 
-        ["realitybuilder", "../../realitybuilder"]
+        ["realityBuilder", "../../realityBuilder"]
     ]
 };

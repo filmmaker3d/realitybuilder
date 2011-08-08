@@ -35,9 +35,9 @@ handlers:
 
 # LazyLoad is not in the list below: It is included into a template using
 # Django, which wouldn't work if it was statically loaded.
-- url: /javascript/(dojo|dojo-release-1.6.1|dojo-release-1.6.1-src|realitybuilder)/(.*)
+- url: /javascript/(dojo|dojo-release-1.6.1|dojo-release-1.6.1-src|realityBuilder)/(.*)
   static_files: javascript/\1/\2
-  upload: /javascript/(dojo|dojo-release-1.6.1|dojo-release-1.6.1-src|realitybuilder)/(.*)
+  upload: /javascript/(dojo|dojo-release-1.6.1|dojo-release-1.6.1-src|realityBuilder)/(.*)
 
 - url: /demo/stylesheets
   static_dir: demo/stylesheets
