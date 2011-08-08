@@ -1,4 +1,4 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.editor.plugins.nls.hu.AutoSave"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.hu.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "hu", ({"saveLabel":"Mentés","saveSettingdialogTitle":"Automatikus mentés","saveSettingdialogButtonOk":"Időköz beállítása","saveMessageSuccess":"Mentés: ${0}","saveSettingdialogButtonCancel":"Mégse","saveSettingdialogDescription":"Automatikus mentés időközének megadása","saveSettingLabelOn":"Automatikus mentés időközének beállítása...","saveSettingdialogParamLabel":"perc","saveSettingdialogParamName":"Automatikus mentés időköze","saveMessageFail":"Sikertelen mentés: ${0}","saveSettingLabelOff":"Automatikus mentés kikapcsolása"})
 );

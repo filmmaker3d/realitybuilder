@@ -5,4 +5,4 @@
 */
 
 
-realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojo.jaxer"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojo.jaxer"]){_4._hasResource["dojo.jaxer"]=true;_4.provide("dojo.jaxer");if(typeof print=="function"){console.debug=Jaxer.Log.debug;console.warn=Jaxer.Log.warn;console.error=Jaxer.Log.error;console.info=Jaxer.Log.info;console.log=Jaxer.Log.warn;}onserverload=_4._loadInit;}}};});
+realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojo.jaxer"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojo.jaxer"]){_4._hasResource["dojo.jaxer"]=true;_4.provide("dojo.jaxer");if(typeof print=="function"){console.debug=Jaxer.Log.debug;console.warn=Jaxer.Log.warn;console.error=Jaxer.Log.error;console.info=Jaxer.Log.info;console.log=Jaxer.Log.warn;}onserverload=_4._loadInit;}}};});

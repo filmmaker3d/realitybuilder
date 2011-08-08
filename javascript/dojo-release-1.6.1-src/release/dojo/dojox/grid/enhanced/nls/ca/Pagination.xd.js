@@ -1,4 +1,4 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.grid.enhanced.nls.ca.Pagination"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.grid.enhanced.nls.ca.Pagination");dojo._xdLoadFlattenedBundle("dojox.grid.enhanced", "Pagination", "ca", ({"gotoButtonTitle":"Vés a una pàgina específica","prevTip":"Pàgina anterior","pageCountIndication":" (${0} pàgines)","pageStepLabelTemplate":"Pàgina ${0}","descTemplate":"${2} - ${3} de ${1} ${0}","lastTip":"Darrera pàgina","nextTip":"Pàgina següent","pageSizeLabelTemplate":"${0} elements per pàgina","dialogCancel":"Cancel·la","itemTitle":"elements","dialogConfirm":"Vés-hi","firstTip":"Primera pàgina","allItemsLabelTemplate":"Tots els elements","dialogIndication":"Especifiqueu el número de pàgina","dialogTitle":"Vés a pàgina"})
 );

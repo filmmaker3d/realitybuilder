@@ -1,4 +1,4 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojo.cldr.nls.fr-ch.number"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojo.cldr.nls.fr-ch.number");dojo._xdLoadFlattenedBundle("dojo.cldr", "number", "fr-ch", ({"currencyFormat":"¤ #,##0.00;¤-#,##0.00","group":"'","decimal":".","percentSign":"%","exponential":"E","percentFormat":"#,##0 %","scientificFormat":"#E0","list":";","infinity":"∞","patternDigit":"#","minusSign":"-","nan":"NaN","nativeZeroDigit":"0","perMille":"‰","decimalFormat":"#,##0.###","plusSign":"+","currencySpacing-afterCurrency-currencyMatch":"[:letter:]","currencySpacing-beforeCurrency-surroundingMatch":"[:digit:]","decimalFormat-short":"000T","currencySpacing-afterCurrency-insertBetween":" ","currencySpacing-afterCurrency-surroundingMatch":"[:digit:]","currencySpacing-beforeCurrency-currencyMatch":"[:letter:]","currencySpacing-beforeCurrency-insertBetween":" "})
 );

@@ -1,4 +1,4 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.editor.plugins.nls.da.AutoSave"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.da.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "da", ({"saveLabel":"Gem","saveSettingdialogTitle":"Gem automatisk","saveSettingdialogButtonOk":"Angiv interval","saveMessageSuccess":"Gemt i ${0}","saveSettingdialogButtonCancel":"Annullér","saveSettingdialogDescription":"Angiv interval for automatisk lagring","saveSettingLabelOn":"Angiv interval for automatisk lagring...","saveSettingdialogParamLabel":"min.","saveSettingdialogParamName":"Interval for automatisk lagring","saveMessageFail":"Ikke gemt i ${0}","saveSettingLabelOff":"Deaktivér automatisk lagring"})
 );

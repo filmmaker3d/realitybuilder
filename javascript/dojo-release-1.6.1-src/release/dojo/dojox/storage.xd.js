@@ -5,4 +5,4 @@
 */
 
 
-realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.storage"],["require","dojox.storage._common"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.storage"]){_4._hasResource["dojox.storage"]=true;_4.provide("dojox.storage");_4.require("dojox.storage._common");}}};});
+realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.storage"],["require","dojox.storage._common"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.storage"]){_4._hasResource["dojox.storage"]=true;_4.provide("dojox.storage");_4.require("dojox.storage._common");}}};});

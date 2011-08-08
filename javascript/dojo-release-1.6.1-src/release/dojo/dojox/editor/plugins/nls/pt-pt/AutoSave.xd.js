@@ -1,4 +1,4 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.editor.plugins.nls.pt-pt.AutoSave"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.pt-pt.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "pt-pt", ({"saveLabel":"Guardar","saveSettingdialogTitle":"Gravação automática","saveSettingdialogButtonOk":"Definir intervalo","saveMessageSuccess":"Guardado às ${0}","saveSettingdialogButtonCancel":"Cancelar","saveSettingdialogDescription":"Especificar intervalo de gravação automática","saveSettingLabelOn":"Definir intervalo de gravação automática...","saveSettingdialogParamLabel":"mín.","saveSettingdialogParamName":"Intervalo de gravação automática","saveMessageFail":"Falha ao guardar às ${0}","saveSettingLabelOff":"Desactivar gravação automática"})
 );

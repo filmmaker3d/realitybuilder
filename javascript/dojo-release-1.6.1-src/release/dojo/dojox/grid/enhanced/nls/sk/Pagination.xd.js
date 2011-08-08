@@ -1,4 +1,4 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.grid.enhanced.nls.sk.Pagination"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.grid.enhanced.nls.sk.Pagination");dojo._xdLoadFlattenedBundle("dojox.grid.enhanced", "Pagination", "sk", ({"gotoButtonTitle":"Prejsť na špecifickú stranu","prevTip":"Predošlá strana","pageCountIndication":" (${0} strán)","pageStepLabelTemplate":"Strana ${0}","descTemplate":"${2} - ${3} z ${1} ${0}","lastTip":"Posledná strana","nextTip":"Ďalšia strana","pageSizeLabelTemplate":"${0} položiek na strane","dialogCancel":"Zrušiť","itemTitle":"položiek","dialogConfirm":"Prejsť","firstTip":"Prvá strana","allItemsLabelTemplate":"Všetky položky","dialogIndication":"Zadajte číslo strany","dialogTitle":"Prejsť na stranu"})
 );

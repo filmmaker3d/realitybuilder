@@ -5,4 +5,4 @@
 */
 
 
-realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.charting.themes.CubanShirts"],["require","dojox.charting.Theme"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.charting.themes.CubanShirts"]){_4._hasResource["dojox.charting.themes.CubanShirts"]=true;_4.provide("dojox.charting.themes.CubanShirts");_4.require("dojox.charting.Theme");(function(){var _7=_6.charting;_7.themes.CubanShirts=new _7.Theme({colors:["#d42d2a","#004f80","#989736","#2085c7","#7f7f33"]});})();}}};});
+realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.charting.themes.CubanShirts"],["require","dojox.charting.Theme"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.charting.themes.CubanShirts"]){_4._hasResource["dojox.charting.themes.CubanShirts"]=true;_4.provide("dojox.charting.themes.CubanShirts");_4.require("dojox.charting.Theme");(function(){var _7=_6.charting;_7.themes.CubanShirts=new _7.Theme({colors:["#d42d2a","#004f80","#989736","#2085c7","#7f7f33"]});})();}}};});

@@ -5,4 +5,4 @@
 */
 
 
-realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.math.random.Simple"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.math.random.Simple"]){_4._hasResource["dojox.math.random.Simple"]=true;_4.provide("dojox.math.random.Simple");_4.declare("dojox.math.random.Simple",null,{destroy:function(){},nextBytes:function(_7){for(var i=0,l=_7.length;i<l;++i){_7[i]=Math.floor(256*Math.random());}}});}}};});
+realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.math.random.Simple"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.math.random.Simple"]){_4._hasResource["dojox.math.random.Simple"]=true;_4.provide("dojox.math.random.Simple");_4.declare("dojox.math.random.Simple",null,{destroy:function(){},nextBytes:function(_7){for(var i=0,l=_7.length;i<l;++i){_7[i]=Math.floor(256*Math.random());}}});}}};});

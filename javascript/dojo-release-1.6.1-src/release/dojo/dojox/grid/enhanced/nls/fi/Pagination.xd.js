@@ -1,4 +1,4 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.grid.enhanced.nls.fi.Pagination"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.grid.enhanced.nls.fi.Pagination");dojo._xdLoadFlattenedBundle("dojox.grid.enhanced", "Pagination", "fi", ({"gotoButtonTitle":"Siirry tietylle sivulle","prevTip":"Edellinen sivu","pageCountIndication":" (${0} sivua)","pageStepLabelTemplate":"Sivu ${0}","descTemplate":"${2} - ${3} / ${1} ${0}","lastTip":"Viimeinen sivu","nextTip":"Seuraava sivu","pageSizeLabelTemplate":"${0} nimikettä sivua kohti","dialogCancel":"Peruuta","itemTitle":"nimikkeet","dialogConfirm":"Siirry","firstTip":"Ensimmäinen sivu","allItemsLabelTemplate":"Kaikki nimikkeet","dialogIndication":"Kirjoita sivunumero","dialogTitle":"Siirry sivulle"})
 );

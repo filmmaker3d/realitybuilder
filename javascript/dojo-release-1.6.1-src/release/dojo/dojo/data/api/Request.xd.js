@@ -5,4 +5,4 @@
 */
 
 
-realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojo.data.api.Request"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojo.data.api.Request"]){_4._hasResource["dojo.data.api.Request"]=true;_4.provide("dojo.data.api.Request");_4.declare("dojo.data.api.Request",null,{abort:function(){throw new Error("Unimplemented API: dojo.data.api.Request.abort");}});}}};});
+realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojo.data.api.Request"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojo.data.api.Request"]){_4._hasResource["dojo.data.api.Request"]=true;_4.provide("dojo.data.api.Request");_4.declare("dojo.data.api.Request",null,{abort:function(){throw new Error("Unimplemented API: dojo.data.api.Request.abort");}});}}};});

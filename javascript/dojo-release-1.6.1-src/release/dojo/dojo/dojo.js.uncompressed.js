@@ -15424,8 +15424,10 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     _makeRealAfter: null, // ms
     _blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...
 
-    // Index of the currently loaded prerendered block configuration.
+    // Index of the currently and of the previously loaded prerendered block
+    // configuration.
     _i: null,
+    _prevI: null,
 
     versionOnServer: function () {
         return this._versionOnServer;
@@ -15446,6 +15448,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
             this._makeRealAfter = serverData.makeRealAfter;
             this._blockConfigurations = serverData.blockConfigurations;
             this._i = serverData.i;
+            this._prevI = serverData.prevI;
             
             dojo.publish('realityBuilder/PrerenderMode/changed');
         }
@@ -15453,6 +15456,10 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
 
     i: function () {
         return this._i;
+    },
+
+    prevI: function () {
+        return this._prevI;
     },
 
     isEnabled: function () {

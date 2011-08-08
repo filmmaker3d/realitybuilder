@@ -5,4 +5,4 @@
 */
 
 
-realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.cometd.HttpChannels"],["require","dojox.io.httpParse"],["require","dojox.cometd.RestChannels"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.cometd.HttpChannels"]){_4._hasResource["dojox.cometd.HttpChannels"]=true;_4.provide("dojox.cometd.HttpChannels");_4.require("dojox.io.httpParse");_4.require("dojox.cometd.RestChannels");_6.cometd.HttpChannels=_6.cometd.RestChannels;}}};});
+realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.cometd.HttpChannels"],["require","dojox.io.httpParse"],["require","dojox.cometd.RestChannels"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.cometd.HttpChannels"]){_4._hasResource["dojox.cometd.HttpChannels"]=true;_4.provide("dojox.cometd.HttpChannels");_4.require("dojox.io.httpParse");_4.require("dojox.cometd.RestChannels");_6.cometd.HttpChannels=_6.cometd.RestChannels;}}};});

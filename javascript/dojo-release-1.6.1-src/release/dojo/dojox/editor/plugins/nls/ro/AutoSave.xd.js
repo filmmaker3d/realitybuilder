@@ -1,4 +1,4 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.editor.plugins.nls.ro.AutoSave"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.ro.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "ro", ({"saveLabel":"Salvare","saveSettingdialogTitle":"Auto-salvare","saveSettingdialogButtonOk":"Setare interval","saveMessageSuccess":"Salvat la ${0}","saveSettingdialogButtonCancel":"Anulare","saveSettingdialogDescription":"Specificare interval auto-salvare","saveSettingLabelOn":"Setare interval auto-salvare...","saveSettingdialogParamLabel":"min","saveSettingdialogParamName":"Interval auto-salvare","saveMessageFail":"A eşuat să salveze la${0}","saveSettingLabelOff":"Oprire auto-salvare"})
 );

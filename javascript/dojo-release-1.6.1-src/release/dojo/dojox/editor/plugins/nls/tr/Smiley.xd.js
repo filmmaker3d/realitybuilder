@@ -1,4 +1,4 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.editor.plugins.nls.tr.Smiley"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.tr.Smiley");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "Smiley", "tr", ({"emoticonLaughing":"kahkaha","emoticonCool":"havalı","emoticonTongue":"dil çıkaran ifade","emoticonCrying":"ağlayan ifade","emoticonOops":"şaşıran ifade","emoticonFrown":"kaşı çatık ifade","emoticonAngry":"kızgın","emoticonShy":"utangaç","emoticonNo":"hayır","emoticonAngel":"melek","smiley":"İfade Ekle","emoticonIdea":"aklına bir fikir gelmiş","emoticonEyebrow":"kaşı kalkık ifade","emoticonSmile":"gülümseme","emoticonWink":"göz kırpma","emoticonYes":"evet","emoticonGrin":"sırıtma","emoticonGoofy":"ağzı açık ifade","emoticonHalf":"kafası karışık ifade"})
 );
