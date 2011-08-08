@@ -49,7 +49,7 @@ var realitybuilderDemo = (function () {
     }
 
     function onServerError() {
-        alert('Communication with the server failed.');
+        alert('Server error.');
     }
 
     // Unhides the content.

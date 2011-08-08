@@ -89,9 +89,9 @@ dojo.declare('realitybuilder.Main', null, {
                                      settings.width, settings.height,
                                      dojo.byId(settings.id));
         this._constructionBlocks = 
-            new rb.ConstructionBlocks(this, 
-                                      this._blockProperties,
-                                      this._constructionBlockProperties);
+            new rb.ConstructionBlocks(this._blockProperties,
+                                      this._constructionBlockProperties,
+                                      this._camera);
         this._prerenderMode = new rb.PrerenderMode();
         this._newBlock = 
             new rb.NewBlock(this._blockProperties,
@@ -185,11 +185,13 @@ dojo.declare('realitybuilder.Main', null, {
 
     setRealBlocksVisibility: function (shouldBeVisible) {
         this._camera.sensor().setRealBlocksVisibility(shouldBeVisible);
+        this._constructionBlocks.renderIfVisible();
         this._settings.onRealBlocksVisibilityChanged();
     },
 
     setPendingBlocksVisibility: function (shouldBeVisible) {
         this._camera.sensor().setPendingBlocksVisibility(shouldBeVisible);
+        this._constructionBlocks.renderIfVisible();
         this._settings.onPendingBlocksVisibilityChanged();
     },
 
@@ -236,7 +238,7 @@ dojo.declare('realitybuilder.Main', null, {
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
             this._constructionBlockProperties.isInitializedWithServerData()) {
-            this._constructionBlocks.render();
+            this._constructionBlocks.renderIfVisible();
             this._newBlock.render();
         }
     },

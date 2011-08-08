@@ -34,8 +34,8 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // integers.
     _versionOnServer: '-1',
 
-    // Construction that the blocks are associated with.
-    _construction: null,
+    // Camera that sees the blocks (for rendering):
+    _camera: null,
 
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
@@ -52,22 +52,16 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // All blocks that are pending.
     _pendingBlocks: null,
 
-    // Canvases for drawing real and pending blocks.
-    _realBlocksCanvas: null,
-    _pendingBlocksCanvas: null,
-
     // Creates a container for the blocks associated with the construction
     // "construction".
-    constructor: function (construction, blockProperties, 
-                           constructionBlockProperties) {
+    constructor: function (blockProperties, constructionBlockProperties, 
+                           camera)
+    {
         this._blockProperties = blockProperties;
         this._constructionBlockProperties = constructionBlockProperties;
         this._blocks = [];
         this._realBlocksSorted = [];
-        this._construction = construction;
-        var sensor = construction.camera().sensor();
-        this._realBlocksCanvas = sensor.realBlocksCanvas();
-        this._pendingBlocksCanvas = sensor.pendingBlocksCanvas();
+        this._camera = camera;
     },
 
     blocks: function () {
@@ -119,7 +113,7 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     },
 
     _createBlockFromServerData: function (serverData) {
-        var camera = this._construction.camera(), rb = realitybuilder;
+        var camera = this._camera, rb = realitybuilder;
         return new rb.ConstructionBlock(this._blockProperties,
                                         camera, 
                                         serverData.positionB, serverData.a,
@@ -242,7 +236,8 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
                 "a": a
             },
             load: dojo.hitch(this, this._makePendingOnServerSucceeded),
-            error: dojo.hitch(this, this._makePendingOnServerFailed)
+            error: dojo.hitch(this, this._makePendingOnServerFailed),
+            timeout: 5000
         });
     },
 
@@ -354,9 +349,17 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
         }
     },
 
-    // Renders the construction blocks as seen by the camera's sensor.
-    render: function () {
-        this._renderBlocks(this._realBlocksCanvas, this._realBlocksSorted);
-        this._renderBlocks(this._pendingBlocksCanvas, this._pendingBlocks);
+    renderIfVisible: function () {
+        var sensor = this._camera.sensor();
+
+        if (sensor.realBlocksAreVisible()) {
+            this._renderBlocks(sensor.realBlocksCanvas(), 
+                               this._realBlocksSorted);
+        }
+
+        if (sensor.pendingBlocksAreVisible()) {
+            this._renderBlocks(sensor.pendingBlocksCanvas(), 
+                               this._pendingBlocks);
+        }
     }
 });

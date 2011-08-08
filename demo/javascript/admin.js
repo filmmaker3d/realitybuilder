@@ -25,10 +25,16 @@ var realitybuilderAdminDemo = (function () {
     function updateBlocksVisibilityButton(type, text, blocksAreVisible, 
                                           setVisibility)
     {
-        $('#' + type + 'BlocksVisibilityButton').
+        var node = $('#' + type + 'BlocksVisibilityButton');
+
+        node.unbind('click');
+        node.
             text((blocksAreVisible ? "Hide" : "Show") + " " + text + 
                  " Blocks").
-            one('click', function () { setVisibility(!blocksAreVisible); });
+            bind('click', function () { 
+                node.unbind('click');
+                setVisibility(!blocksAreVisible); 
+            });
     }
 
     function updateRealBlocksVisibilityButton() {
