@@ -265,6 +265,10 @@ var realitybuilderAdminDemo = (function () {
         });
     }
 
+    function onJsonpError() {
+        alert('JSONP request failed.');
+    }
+
     function onReady() {
         setUpLogoutButton();
         setUpSaveSettingsButton();
@@ -300,6 +304,8 @@ var realitybuilderAdminDemo = (function () {
                     settings.onPrerenderedBlockConfigurationChanged();
                     updatePrerenderModeControls();
                 },
+                jsonpTimeout: 5000,
+                onJsonpError: onJsonpError,
                 onRealBlocksVisibilityChanged: 
                 updateRealBlocksVisibilityButton,
                 onPendingBlocksVisibilityChanged: 

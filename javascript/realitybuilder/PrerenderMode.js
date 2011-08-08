@@ -21,8 +21,6 @@
 
 dojo.provide('realitybuilder.PrerenderMode');
 
-dojo.require('dojo.io.script');
-
 dojo.declare('realitybuilder.PrerenderMode', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
@@ -155,10 +153,9 @@ dojo.declare('realitybuilder.PrerenderMode', null, {
 
     // Loads the prerendered block configuration with index "i" on the server.
     loadBlockConfigurationOnServer: function (i) {
-        dojo.io.script.get({
+        realitybuilder.util.jsonpGet({
             url: realitybuilder.util.rootUrl() + 
                 "rpc/load_prerendered_block_configuration",
-            callbackParamName: "callback",
             content: {
                 "i": i
             },

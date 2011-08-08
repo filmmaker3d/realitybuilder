@@ -22,6 +22,8 @@
 
 dojo.provide('realitybuilder.util');
 
+dojo.require('dojo.io.script');
+
 // Tolerance when comparing coordinates in sensor space.
 realitybuilder.util.TOLERANCE_S = 0.5;
 
@@ -30,6 +32,9 @@ realitybuilder.util.TOLERANCE_V = 0.00001;
 
 // Tolerance when comparing coordinates in the view space x-z-plane.
 realitybuilder.util.TOLERANCE_VXZ = 0.00001;
+
+// Settings, set once at the beginning.
+realitybuilder.util.SETTINGS = null;
 
 // Returns the coordinates of the block space point "pB" in world space.
 realitybuilder.util.blockToWorld = function (pB, blockProperties) {
@@ -351,4 +356,13 @@ realitybuilder.util.rootUrl = function () {
     } else {
         return dojo.baseUrl + '../../';
     }
+};
+
+// Performs a JSONP request, using some default settings.
+realitybuilder.util.jsonpGet = function (args) {
+    dojo.io.script.get(dojo.mixin({
+        callbackParamName: 'callback',
+        timeout: realitybuilder.util.SETTINGS.jsonpTimeout,
+        error: realitybuilder.util.SETTINGS.onJsonpError
+    }, args));
 };

@@ -26,8 +26,6 @@ dojo.provide('realitybuilder.ConstructionBlocks');
 dojo.require('realitybuilder.ConstructionBlock');
 dojo.require('realitybuilder.util');
 
-dojo.require('dojo.io.script');
-
 dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // Version of blocks data last retrieved from the server, or "-1"
     // initially. Is a string in order to be able to contain very large
@@ -226,18 +224,15 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // the server. Once the server has completed the request, the list of
     // blocks is updated.
     makePendingOnServer: function (positionB, a) {
-        dojo.io.script.get({
+        realitybuilder.util.jsonpGet({
             url: realitybuilder.util.rootUrl() + "admin/rpc/make_pending",
-            callbackParamName: "callback",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
                 "zB": positionB[2],
                 "a": a
             },
-            load: dojo.hitch(this, this._makePendingOnServerSucceeded),
-            error: dojo.hitch(this, this._makePendingOnServerFailed),
-            timeout: 5000
+            load: dojo.hitch(this, this._makePendingOnServerSucceeded)
         });
     },
 
@@ -246,26 +241,18 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
         dojo.publish('realitybuilder/ConstructionBlocks/changedOnServer');
     },
 
-    // Called if deleting the block on the server failed.
-    _deleteOnServerFailed: function () {
-        dojo.publish('realitybuilder/ConstructionBlocks/' + 
-                     'changeOnServerFailed');
-    },
-
     // Deletes the block positioned at the block space position "positionB" and
     // rotated by the angle "a", on the client and on the server.
     deleteOnServer: function (positionB, a) {
-        dojo.io.script.get({
+        realitybuilder.util.jsonpGet({
             url: realitybuilder.util.rootUrl() + "admin/rpc/delete",
-            callbackParamName: "callback",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
                 "zB": positionB[2],
                 "a": a
             },
-            load: dojo.hitch(this, this._deleteOnServerSucceeded),
-            error: dojo.hitch(this, this._deleteOnServerFailed)
+            load: dojo.hitch(this, this._deleteOnServerSucceeded)
         });
     },
 
@@ -284,17 +271,15 @@ dojo.declare('realitybuilder.ConstructionBlocks', null, {
     // "positionB" and rotated by the angle "a" to real: on the client and on
     // the server.
     makeRealOnServer: function (positionB, a) {
-        dojo.io.script.get({
+        realitybuilder.util.jsonpGet({
             url: realitybuilder.util.rootUrl() + "admin/rpc/make_real",
-            callbackParamName: "callback",
             content: {
                 "xB": positionB[0],
                 "yB": positionB[1],
                 "zB": positionB[2],
                 "a": a
             },
-            load: dojo.hitch(this, this._makeRealOnServerSucceeded),
-            error: dojo.hitch(this, this._makeRealOnServerFailed)
+            load: dojo.hitch(this, this._makeRealOnServerSucceeded)
         });
     },
 

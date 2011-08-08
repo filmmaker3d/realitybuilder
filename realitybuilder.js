@@ -196,6 +196,22 @@ var realitybuilder = (function () {
         //   ready to use, i.e. after it has downloaded the required resources,
         //   rendered itself, etc.
         //
+        // * "jsonpTimeout", "onJsonpError": 
+        //
+        //   Possible values of the timeout "jsonpTimeout":
+        //   
+        //   0: no effect
+        // 
+        //   >0 (ms): "onJsonpError" is called when the server doesn't respond
+        //     to a JSONP request before the timeout has been reached.
+        //
+        //   This functionality is necessary since the method of making JSONP
+        //   requests otherwise is incapable of reporting errors when the
+        //   server is not responding.
+        //
+        //   Be careful with specifying a timeout though: A user of the Reality
+        //   Builder may be behind a very slow connection.
+        //
         // * "onBrowserNotSupportedError": Function that is executed when the
         //   Reality Builder does not work with the current browser, e.g. when
         //   the current browser doesn't support a required HTML element such
@@ -225,6 +241,8 @@ var realitybuilder = (function () {
         initialize: function (settings) {
             var defaultSettings = {
                 id: 'RealityBuilder',
+                jsonpTimeout: 0,
+                onServerCommunicationError: nop,
                 onBrowserNotSupportedError: nop,
                 onPrerenderedBlockConfigurationChanged: nop,
                 onReady: nop,

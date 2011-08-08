@@ -83,20 +83,17 @@
   </table>
 
   <script type="text/javascript">
-    // unhides view, unless JavaScript is not supported or browser is very old
+    // unhides view, unless JavaScript is not supported or JavaScript engine is
+    // very old (i.e. doesn't support "getElementByID"):
     document.getElementById('view').style.display = 'block';
   </script>
+
+  {% include "base_IE.html" %}
 
   <script type="text/javascript" 
           src="/demo/javascript/jquery-1.6.2.min.js"></script>
 
   <script type="text/javascript" src="/realitybuilder.js"></script>
-  <!--[if lt IE 9]>
-    <script type="text/javascript" 
-            src="/demo/javascript/swfobject.js"></script>
-    <script type="text/javascript" 
-            src="/proprietary/FlashCanvasPro/bin/flashcanvas.js"></script>
-  <![endif]-->
 
   <script type="text/javascript" src="/demo/javascript/base.js"></script>
 

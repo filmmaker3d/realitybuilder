@@ -30,11 +30,7 @@ dojo.require('realitybuilder.Camera');
 dojo.require('realitybuilder.PrerenderMode');
 dojo.require('realitybuilder.util');
 
-dojo.require('dojo.io.script');
-
 dojo.declare('realitybuilder.Main', null, {
-    _settings: null,
-
     // All blocks, permanently in the construction, including real and pending
     // blocks:
     _constructionBlocks: null,
@@ -78,7 +74,7 @@ dojo.declare('realitybuilder.Main', null, {
             return;
         }
 
-        this._settings = settings;
+        realitybuilder.util.SETTINGS = settings;
 
         this._onReadyCalled = false;
 
@@ -99,9 +95,6 @@ dojo.declare('realitybuilder.Main', null, {
                             this._constructionBlocks,
                             this._prerenderMode);
 
-        dojo.subscribe(
-            'realitybuilder/ConstructionBlocks/changeOnServerFailed', 
-            this, this._onServerError);
         dojo.subscribe('realitybuilder/ConstructionBlocks/changedOnServer', 
                        this, this._update); // Speeds up responsiveness.
         dojo.subscribe('realitybuilder/PrerenderMode/' + 
@@ -163,20 +156,16 @@ dojo.declare('realitybuilder.Main', null, {
         return this._constructionBlocks;
     },
 
-    _onServerError: function () {
-        this._settings.onServerError();
-    },
-
     // Called after the new block has been stopped.
     _onNewBlockStopped: function () {
         this._newBlock.render(); // color changes
-        this._settings.onDegreesOfFreedomChanged();
+        realitybuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
 
     // Called after the new block has been made movable.
     _onNewBlockMadeMovable: function () {
         this._newBlock.render(); // color changes
-        this._settings.onDegreesOfFreedomChanged();
+        realitybuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
 
     // Called after the block was requested to be made real.
@@ -186,13 +175,13 @@ dojo.declare('realitybuilder.Main', null, {
     setRealBlocksVisibility: function (shouldBeVisible) {
         this._camera.sensor().setRealBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
-        this._settings.onRealBlocksVisibilityChanged();
+        realitybuilder.util.SETTINGS.onRealBlocksVisibilityChanged();
     },
 
     setPendingBlocksVisibility: function (shouldBeVisible) {
         this._camera.sensor().setPendingBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
-        this._settings.onPendingBlocksVisibilityChanged();
+        realitybuilder.util.SETTINGS.onPendingBlocksVisibilityChanged();
     },
 
     realBlocksAreVisible: function () {
@@ -226,8 +215,9 @@ dojo.declare('realitybuilder.Main', null, {
     // updates controls.
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
-        this._settings.onDegreesOfFreedomChanged(); // may have changed
-        this._settings.onMovedOrRotated();
+        realitybuilder.util.SETTINGS.onDegreesOfFreedomChanged(); // may have
+                                                                  // changed
+        realitybuilder.util.SETTINGS.onMovedOrRotated();
     },
 
     // (Re-)renders blocks, but only if all necessary components have been
@@ -253,8 +243,8 @@ dojo.declare('realitybuilder.Main', null, {
             this._prerenderMode.isInitializedWithServerData()) {
 
             this._newBlock.updatePositionAndMovability();
-            this._settings.onDegreesOfFreedomChanged();
-            this._settings.onMovedOrRotated();
+            realitybuilder.util.SETTINGS.onDegreesOfFreedomChanged();
+            realitybuilder.util.SETTINGS.onMovedOrRotated();
         }
     },
 
@@ -263,14 +253,14 @@ dojo.declare('realitybuilder.Main', null, {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
         this._checkIfReady();
-        this._settings.onConstructionBlocksChanged();
+        realitybuilder.util.SETTINGS.onConstructionBlocksChanged();
     },
 
     // Called after the camera settings have changed.
     _onCameraChanged: function () {
         this._renderBlocksIfFullyInitialized();
         this._checkIfReady();
-        this._settings.onCameraChanged();
+        realitybuilder.util.SETTINGS.onCameraChanged();
     },
 
     // Called after the new block's position, rotation angle have been
@@ -308,7 +298,7 @@ dojo.declare('realitybuilder.Main', null, {
     _onPrerenderModeChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._checkIfReady();
-        this._settings.onPrerenderedBlockConfigurationChanged();
+        realitybuilder.util.SETTINGS.onPrerenderedBlockConfigurationChanged();
     },
 
     // Checks if the widget is ready to be used. If so, signals that by calling
@@ -320,7 +310,7 @@ dojo.declare('realitybuilder.Main', null, {
             this._constructionBlockProperties.isInitializedWithServerData() &&
             this._onReadyCalled === false) {
 
-            this._settings.onReady();
+            realitybuilder.util.SETTINGS.onReady();
             this._onReadyCalled = true;
         }
     },
@@ -379,9 +369,8 @@ dojo.declare('realitybuilder.Main', null, {
     // server. Only updates data where there is a new version. Fails silently
     // on error.
     _update: function () {
-        dojo.io.script.get({
+        realitybuilder.util.jsonpGet({
             url: realitybuilder.util.rootUrl() + "rpc/construction",
-            callbackParamName: "callback",
             content: {
                 "blocksDataVersion": 
                 this._constructionBlocks.versionOnServer(),
@@ -425,9 +414,8 @@ dojo.declare('realitybuilder.Main', null, {
             dojo.mixin(content, this._preparedCameraData(settings.cameraData));
         }
 
-        dojo.io.script.get({
+        realitybuilder.util.jsonpGet({
             url: realitybuilder.util.rootUrl() + "admin/rpc/update_settings",
-            callbackParamName: "callback",
             content: content,
             load: dojo.hitch(this, this._storeSettingsOnServerSucceeded)
         });
