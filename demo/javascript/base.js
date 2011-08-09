@@ -33,14 +33,9 @@ var realityBuilderDemo = (function () {
     realityBuilderIsReady = false;
     
     function forEachCoordinateButton(f) {
-        var type, deltaB;
-
-        for (type in coordinateButtonDeltaBs) {
-            if (coordinateButtonDeltaBs.hasOwnProperty(type)) {
-                deltaB = coordinateButtonDeltaBs[type];
-                f(type, deltaB);
-            }
-        }
+        $.each(coordinateButtonDeltaBs, function (type, deltaB) {
+            f(type, deltaB);
+        });
     }
 
     function onBrowserNotSupportedError() {

@@ -243,7 +243,7 @@ var realityBuilder = (function () {
         //   request, for example because the server was down.
         initialize: function (settings) {
             var defaultSettings = {
-                id: 'RealityBuilder',
+                id: 'realityBuilder',
                 jsonpTimeout: 0,
                 onServerCommunicationError: nop,
                 onBrowserNotSupportedError: nop,
