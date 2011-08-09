@@ -7,7 +7,7 @@
 # 
 # * GAE (production):
 # 
-#   a) Enter the directory of the Reality Builder
+#   a) Enter the directory of the Reality Builder.
 #
 #   b) Connect to the remote API shell.
 # 
@@ -53,18 +53,7 @@ for query in queries:
     for result in query:
         result.delete()
 
-# An external image is used because "dev_appserver.py" can only server
-# one requests at a time, as of May 2011. Therefore, according to
-# official documentation: "If your application makes URL fetch requests
-# to itself while processing a request, these requests will fail when
-# using the development web server." See: <url:http://code.google.com/a
-# ppengine/docs/python/tools/devserver.html#Using_URL_Fetch>
-image_url = ('http://realitybuilder.googlecode.com/hg/documentation/' +
-             'sample_scene/prerendered_0.jpg')
-
-# Creates the construction configuration. An image URL is not set to an
-# image on the same App Engine instance, since urlfetch doesn't seem to
-# like that.
+# Creates the construction configuration.
 construction = Construction(key_name = 'main')
 construction.update_interval_client = 2000
 construction.blocks_data_version = '0'
@@ -75,9 +64,6 @@ construction.camera_a_y = -0.46583
 construction.camera_a_z = 0.29
 construction.camera_fl = 40.
 construction.camera_sensor_resolution = 19.9
-construction.image_data_version = '0'
-construction.image_url = image_url
-construction.image_update_interval_server = 5.
 construction.put()
 
 # Deletes all prerender-mode entries:
@@ -120,9 +106,6 @@ prerenderMode.block_configurations = \
      '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
      '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0], ' +
      '[1, 1, 1, 3]]']
-prerenderMode.image_url_template = \
-    'http://realitybuilder.googlecode.com/hg/documentation/' + \
-    'sample_scene/prerendered_%d.jpg'
 prerenderMode.i = 0
 prerenderMode.put()
 
