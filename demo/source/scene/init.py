@@ -171,7 +171,7 @@ newBlock.move_space_2_b = [6, 6, 5]
 newBlock.build_space_1_b = [0, 0, 0]
 newBlock.build_space_2_b = [5, 5, 4]
 newBlock.color = 'red'
-newBlock.stopped_color = 'white'
+newBlock.color_when_frozen = 'white'
 newBlock.shadow_color = 'red'
 newBlock.shadow_alpha = 0.2
 newBlock.put()

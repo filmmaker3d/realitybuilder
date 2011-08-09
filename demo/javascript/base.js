@@ -119,7 +119,7 @@ var realityBuilderDemo = (function () {
 
     function updateControlPanelState() {
         updateNodeState($('#controlPanel'), 
-                        !realityBuilder.newBlock().isStopped());
+                        !realityBuilder.newBlock().isFrozen());
     }
 
     function onDegreesOfFreedomChanged() {

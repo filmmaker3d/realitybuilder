@@ -34,7 +34,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSONP response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -143,7 +143,7 @@ class NewBlock(db.Model):
 
     # Colors (CSS format) and alpha transparency of the block and its shadow:
     color = db.StringProperty()
-    stopped_color = db.StringProperty() # when it is stopped
+    color_when_frozen = db.StringProperty()
     shadow_color = db.StringProperty()
     shadow_alpha = db.FloatProperty()
 
@@ -470,7 +470,7 @@ class RPCConstruction(webapp.RequestHandler):
                          'buildSpace1B': new_block.build_space_1_b,
                          'buildSpace2B': new_block.build_space_2_b,
                          'color': new_block.color,
-                         'stoppedColor': new_block.stopped_color,
+                         'colorWhenFrozen': new_block.color_when_frozen,
                          'shadowColor': new_block.shadow_color,
                          'shadowAlpha': new_block.shadow_alpha})
         return data

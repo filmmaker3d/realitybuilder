@@ -35,12 +35,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // blocks:
     _constructionBlocks: null,
 
-    // True, iff real/pending blocks should be shown. By default, always
-    // enabled if the admin controls are shown. With only the user controls
-    // shown, by default disabled.
-    _showReal: null,
-    _showPending: null,
-
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
@@ -107,10 +101,10 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                        this, this._onNewBlockPositionAngleInitialized);
         dojo.subscribe('realityBuilder/NewBlock/buildOrMoveSpaceChanged', 
                        this, this._onMoveOrBuildSpaceChanged);
-        dojo.subscribe('realityBuilder/NewBlock/stopped', 
-                       this, this._onNewBlockStopped);
-        dojo.subscribe('realityBuilder/NewBlock/madeMovable', 
-                       this, this._onNewBlockMadeMovable);
+        dojo.subscribe('realityBuilder/NewBlock/frozen', 
+                       this, this._onNewBlockFrozen);
+        dojo.subscribe('realityBuilder/NewBlock/unfrozen', 
+                       this, this._onNewBlockUnfrozen);
         dojo.subscribe('realityBuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
         dojo.subscribe('realityBuilder/NewBlock/' + 
@@ -144,26 +138,18 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         return this._prerenderMode;
     },
 
-    showPending: function () {
-        return this._showPending;
-    },
-
-    showReal: function () {
-        return this._showReal;
-    },
-
     constructionBlocks: function () {
         return this._constructionBlocks;
     },
 
-    // Called after the new block has been stopped.
-    _onNewBlockStopped: function () {
+    // Called after the new block has been frozen.
+    _onNewBlockFrozen: function () {
         this._newBlock.render(); // color changes
         realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
 
-    // Called after the new block has been made movable.
-    _onNewBlockMadeMovable: function () {
+    // Called after the new block has been unfrozen.
+    _onNewBlockUnfrozen: function () {
         this._newBlock.render(); // color changes
         realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
@@ -211,8 +197,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         }
     },
 
-    // Called after the new block has been moved or rotated. Lets it redraw and
-    // updates controls.
+    // Called after the new block has been moved or rotated. Lets it redraw.
     _onNewBlockMovedOrRotated: function () {
         this._newBlock.render();
         realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged(); // may have
@@ -233,16 +218,16 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         }
     },
 
-    // Updates the state (including position) of the new block (and related
-    // controls), but only if all necessary components have been initialized,
-    // which is relevant only in the beginning.
+    // Updates the state (including position) of the new block, but only if all
+    // necessary components have been initialized, which is relevant only in
+    // the beginning.
     _updateNewBlockStateIfFullyInitialized: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
             this._prerenderMode.isInitializedWithServerData()) {
 
-            this._newBlock.updatePositionAndMovability();
+            realityBuilder._newBlock.updateState();
             realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
             realityBuilder.util.SETTINGS.onMovedOrRotated();
         }
@@ -281,8 +266,8 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     // Called after the block properties have changed.
     _onBlockPropertiesChanged: function () {
-        // Updates the state (and related controls) of the new block, because
-        // they depend on block properties such as collision settings:
+        // Updates the state of the new block, because they depend on block
+        // properties such as collision settings:
         this._updateNewBlockStateIfFullyInitialized();
 
         this._renderBlocksIfFullyInitialized();
@@ -319,7 +304,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     //
     // Updates client data with server data, but only where there have been
     // changes. Note that update of certain client data may trigger a redraw of
-    // blocks and/or controls.
+    // blocks.
     //
     // Finally, sets timeout after which a new check for an update is
     // performed.

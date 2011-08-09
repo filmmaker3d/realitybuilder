@@ -45,13 +45,13 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Colors (CSS format) and transparency of the block and its shadow:
     _color: null,
-    _stoppedColor: null, // when it is stopped
+    _colorWhenFrozen: null,
     _shadowColor: null,
     _shadowAlpha: null,
 
-    // Iff true, then the block is stopped, which means that it can neither be
+    // Iff true, then the block is frozen, which means that it can neither be
     // moved nor be rotated, nor be made real.
-    _isStopped: null,
+    _isFrozen: null,
 
     // Permament blocks in the construction, including real and pending blocks.
     // Needed for hidden lines removal and collision detection.
@@ -67,8 +67,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // coordinates.
     _lastPositionB: null,
 
-    // Whether the block was stopped or not when it was last rendered.
-    _lastIsStopped: null,
+    // Whether the block was frozen or not when it was last rendered.
+    _wasFrozenWhenLastRendered: null,
 
     // Version of the construction blocks when the shadow was last rendered.
     _lastConstructionBlocksVersion: null,
@@ -91,7 +91,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                            prerenderMode)
     {
         this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
-        this._isStopped = false;
+        this._isFrozen = false;
         this._constructionBlocks = constructionBlocks;
         this._shadow = new realityBuilder.Shadow(this, blockProperties, 
                                                      camera, 
@@ -130,7 +130,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             this._buildSpace2B = serverData.buildSpace2B;
             
             this._color = serverData.color;
-            this._stoppedColor = serverData.stoppedColor;
+            this._colorWhenFrozen = serverData.colorWhenFrozen;
             this._shadowColor = serverData.shadowColor;
             this._shadowAlpha = serverData.shadowAlpha;
 
@@ -152,7 +152,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Moves the block in block space, by "delta", unless the move would make
     // it go out of range.
     move: function (deltaB) {
-        if (!this.wouldGoOutOfRange(deltaB, 0)) {
+        if (!this._wouldGoOutOfRange(deltaB, 0)) {
             this._positionB = realityBuilder.util.addVectorsB(
                 this._positionB, deltaB);
             dojo.publish('realityBuilder/NewBlock/movedOrRotated');
@@ -163,7 +163,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // rotation would make it go out of range.
     rotate90: function () {
         var congruencyA = this._blockProperties.congruencyA();
-        if (!this.wouldGoOutOfRange([0, 0, 0], 1)) {
+        if (!this._wouldGoOutOfRange([0, 0, 0], 1)) {
             this._a = (this._a + 1) % congruencyA; // multiples of 90°
             dojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
@@ -173,41 +173,30 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // eventually have it made real.
     requestMakeReal: function () {
         if (this.canBeMadeReal()) {
-            this._stop();
+            this._freeze();
             this._createPendingOnServer();
             dojo.publish('realityBuilder/NewBlock/makeRealRequested');
         }
     },
 
-    isRotatable: function () {
-        return !this._isStopped;
+    isFrozen: function () {
+        return this._isFrozen;
     },
 
-    isMovable: function () {
-        return !this._isStopped;
+    _freeze: function () {
+        this._isFrozen = true;
+        dojo.publish('realityBuilder/NewBlock/frozen');
     },
 
-    isStopped: function () {
-        return this._isStopped;
+    _unfreeze: function () {
+        this._isFrozen = false;
+        dojo.publish('realityBuilder/NewBlock/unfrozen');
     },
 
-    _stop: function () {
-        this._isStopped = true;
-        dojo.publish('realityBuilder/NewBlock/stopped');
-    },
-
-    _go: function () {
-        this._isStopped = false;
-        dojo.publish('realityBuilder/NewBlock/madeMovable');
-    },
-
-    // Updates the position and state of this block to reflect changes in the
-    // construction. Depends on up to date lists of blocks and real blocks.
-    updatePositionAndMovability: function () {
+    _unfreezeIfMadeRealOrDeleted: function () {
         var positionB, state, constructionBlock;
 
-        // Makes the block movable again if certain conditions are met:
-        if (this.isStopped()) {
+        if (this.isFrozen()) {
             constructionBlock = 
                 this._constructionBlocks.blockAt(this.positionB());
             if (constructionBlock) {
@@ -218,21 +207,17 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                     // construction block real = make-real-request accepted,
                     // construction block deleted = request denied
 
-                    this._go(); // so that user can continue
+                    this._unfreeze(); // so that user can continue
                 } // else: pending or no data from the server
             }
         }
-
-        // Updates the position of the new block so that it doesn't conflict
-        // with any real block.
-        this._updatePositionB();
     },
 
     // Makes sure that this block does not intersect with any real block. If it
     // does, it is elevated step by step until it sits on top of another block.
     // Only updates the position of the block in block space. Does not update
     // any of the other coordinates.
-    _updatePositionB: function () {
+    _moveOutOfTheWay: function () {
         var 
         testBlock, cbs = this._constructionBlocks, 
         xB = this.xB(), yB = this.yB(), testZB;
@@ -249,6 +234,12 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         }
     },
 
+    // To be called after construction blocks have been changed.
+    updateState: function () {
+        this._unfreezeIfMadeRealOrDeleted();
+        this._moveOutOfTheWay();
+    },
+
     // Returns true, if this block would intersect with any real block if:
     //
     // * it was moved in block space by the vector "deltaB", and/or 
@@ -257,7 +248,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     //   multiples of 90°), or 
     //
     // * if it would be outside of the space where it is allowed to be moved.
-    wouldGoOutOfRange: function (deltaB, deltaA) {
+    _wouldGoOutOfRange: function (deltaB, deltaA) {
         var testPositionB, testBlock, testA, congruencyA;
 
         congruencyA = this._blockProperties.congruencyA();
@@ -274,11 +265,11 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     },
 
     canBeRotated90: function () {
-        return !this.wouldGoOutOfRange([0, 0, 0], 1) && !this._isStopped;
+        return !this._wouldGoOutOfRange([0, 0, 0], 1) && !this._isFrozen;
     },
 
     canBeMoved: function (deltaB) {
-        return !this.wouldGoOutOfRange(deltaB, 0) && !this._isStopped;
+        return !this._wouldGoOutOfRange(deltaB, 0) && !this._isFrozen;
     },
 
     // Returns true, if this block would be outside the move space, if it was
@@ -321,7 +312,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         return this._isInBuildSpace() && this._isAttachable() && 
             (!this._prerenderMode.isEnabled() ||
              this._isInPrerenderedBlockConfiguration()) &&
-            !this._isStopped;
+            !this._isFrozen;
     },
 
     // Returns true, iff the bounding box of the current block overlaps with
@@ -466,10 +457,10 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Updates the shadow, i.e. (re-)draws it or removes it.
     _renderShadow: function () {
-        if (this.isMovable()) {
-            this._shadow.render(this._shadowColor, this._shadowAlpha);
-        } else {
+        if (this.isFrozen()) {
             this._shadow.clear();
+        } else {
+            this._shadow.render(this._shadowColor, this._shadowAlpha);
         }
     },
 
@@ -478,7 +469,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     _needsToBeRendered: function () {
         var 
         coordinatesHaveChanged, constructionBlocksHaveChanged, 
-        isStoppedStateHasChanged;
+        isFrozenStateHasChanged;
 
         coordinatesHaveChanged = this._coordinatesChangedAfterLastRendering;
 
@@ -489,15 +480,16 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             (this._lastConstructionBlocksVersion !==
              this._constructionBlocks.versionOnServer());
 
-        isStoppedStateHasChanged = (this._lastIsStopped !== this._isStopped);
+        isFrozenStateHasChanged = (this._wasFrozenWhenLastRendered !== 
+                                   this._isFrozen);
 
         return coordinatesHaveChanged || constructionBlocksHaveChanged ||
-            isStoppedStateHasChanged;
+            isFrozenStateHasChanged;
     },
 
     _onRendered: function () {
         this._coordinatesChangedAfterLastRendering = false;
-        this._lastIsStopped = this._isStopped;
+        this._wasFrozenWhenLastRendered = this._isFrozen;
         this._lastConstructionBlocksVersion =
             this._constructionBlocks.versionOnServer();
     },
@@ -517,7 +509,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             canvas = this._camera.sensor().newBlockCanvas();
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
-                color = this.isMovable() ? this._color : this._stoppedColor;
+                color = this.isFrozen() ? this._colorWhenFrozen : this._color;
 
                 // Shadow does currently not work with FlashCanvas.
                 if (!realityBuilder.util.isFlashCanvasActive()) {
@@ -564,7 +556,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // configuration, then makes it real by loading the appropriate prerendered
     // block configuration.
     //
-    // Otherwise, just makes the block movable again.
+    // Otherwise, just unfreezes the block.
     _makeRealIfInPrerenderedBlockConfiguration: function () {
         var i, realBlocks;
 
@@ -576,7 +568,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         } else {
             // this block and the real block don't match a prerendered
             // configuration
-            this._go();
+            this._unfreeze();
         }
     }
 });

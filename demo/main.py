@@ -49,7 +49,7 @@ class Admin(webapp.RequestHandler):
             path = os.path.join(os.path.dirname(__file__), 'admin.html')
             self.response.out.write(template.render(path, template_values))
         else:
-            self.redirect(users.create_login_url("/admin"))
+            self.redirect(users.create_login_url("/demo/admin"))
             return
 
 application = webapp.WSGIApplication([
