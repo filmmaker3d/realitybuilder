@@ -46,6 +46,7 @@ from main import ConstructionBlockProperties
 from main import NewBlock
 from main import PendingBlockEmail
 from main import PrerenderMode
+from django.utils import simplejson
 
 # Deletes all construction entries:
 queries = [Construction.all()]
@@ -180,10 +181,7 @@ for query in queries:
         result.delete()
 
 # Creates block entries:
-cs = [
-    [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
-    [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
-    [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0]]
+cs = simplejson.loads(prerenderMode.block_configurations[0])
 for c in cs:
     x_b = c[0]
     y_b = c[1]
