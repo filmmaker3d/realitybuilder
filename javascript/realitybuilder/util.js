@@ -224,6 +224,14 @@ realityBuilder.util.addVectorsB = function (vector1B, vector2B) {
         vector1B[2] + vector2B[2]];
 };
 
+// Adds the vectors "vector1BXY" and "vector2BXY" in the block space x-y-plane
+// and returns the result.
+realityBuilder.util.addVectorsBXY = function (vector1BXY, vector2BXY) {
+    return [
+        vector1BXY[0] + vector2BXY[0], 
+        vector1BXY[1] + vector2BXY[1]];
+};
+
 // Subtracts the vectors "vector2B" from the vector "vector1B" in blocks space
 // and returns the result.
 realityBuilder.util.subtractVectorsB = function (vector1B, vector2B) {
