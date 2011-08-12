@@ -45,9 +45,6 @@ dojo.declare('realityBuilder.BlockProperties', null, {
 
     // Array with the outline rotated by 0°, 90°, ... around the cneter of
     // rotation, in block space:
-    //
-    // The list has "congruencyA" number of entries, corresponding to rotation
-    // about 0°, 90°, ...
     _rotatedOutlinesBXY: null,
 
     // Two blocks 1 and 2 are defined to collide, iff block 2 is offset against
@@ -101,10 +98,6 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         return this._versionOnServer !== '-1';
     },
 
-    congruencyA: function () {
-        return this._congruencyA;
-    },
-
     _rotateOutlineBXY: function (a) {
         var that = this;
 
@@ -119,7 +112,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         var a;
 
         this._rotatedOutlinesBXY = [];
-        for (a = 0; a < this._congruencyA; a += 1) { 
+        for (a = 0; a < 4; a += 1) { 
             this._rotatedOutlinesBXY.push(this._rotateOutlineBXY(a));
         }
     },
@@ -227,7 +220,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // Returns the outline, rotated by angle "a", in multiples of 90° CCW when
     // viewed from above.
     rotatedOutlineBXY: function (a) {
-        return this._rotatedOutlinesBXY[a % this._congruencyA];
+        return this._rotatedOutlinesBXY[a % 4];
     },
 
     // Returns the list of collision offsets, of block 2 relative to block 1.
@@ -237,8 +230,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         a1 = block1.a() % this._congruencyA;
         a2 = block2.a() % this._congruencyA;
 
-        collisionOffsetsListBXY = 
-            this._rotatedCollisionOffsetsListsBXY[a1];
+        collisionOffsetsListBXY = this._rotatedCollisionOffsetsListsBXY[a1];
 
         relative_a = (this._congruencyA + a2 - a1) % this._congruencyA;
 

@@ -178,7 +178,7 @@ dojo.declare('realityBuilder.Block', null, {
                              this.yB() + collisionOffsetBXY[1],
                              this.zB()];
             if (realityBuilder.util.pointsIdenticalB(block.positionB(),
-                                                         testPositionB)) {
+                                                     testPositionB)) {
                 return true;
             }
         }
