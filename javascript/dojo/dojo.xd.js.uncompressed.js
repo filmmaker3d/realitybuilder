@@ -12780,26 +12780,17 @@ dojo.declare('realityBuilder.BlockProperties', null, {
 
     // Array with the outline rotated by 0°, 90°, ... around the cneter of
     // rotation, in block space:
-    //
-    // The list has "congruencyA" number of entries, corresponding to rotation
-    // about 0°, 90°, ...
     _rotatedOutlinesBXY: null,
 
     // Two blocks 1 and 2 are defined to collide, iff block 2 is offset against
     // block 1 in the block space x-y-plane by any of the following values. The
     // rotation angles below are those of block 2 relative to block 1. The
     // offsets are stored as JSON arrays.
-    //
-    // The list has "congruencyA" number of entries, corresponding to rotation
-    // about 0°, 90°, ...
     _collisionOffsetsListBXY: null,
 
     // Array with the list of collision offsets rotated by 0°, 90°, ... CCW
     // (when viewed from above) around the center of rotation of block 1, in
     // block space:
-    //
-    // The list has "congruencyA" number of entries, corresponding to rotation
-    // about 0°, 90°, ...
     _rotatedCollisionOffsetsListsBXY: null,
 
     // Two blocks 1 and 2 are defined to be attachable, iff block 2 is offset
@@ -12836,17 +12827,13 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         return this._versionOnServer !== '-1';
     },
 
-    congruencyA: function () {
-        return this._congruencyA;
-    },
-
     _rotateOutlineBXY: function (a) {
         var that = this;
 
         return dojo.map(this._outlineBXY, function (pBXY) {
             return realityBuilder.util.rotatePointBXY(pBXY,
-                                                          that._rotCenterBXY,
-                                                          a);
+                                                      that._rotCenterBXY,
+                                                      a);
         });
     },
 
@@ -12854,9 +12841,61 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         var a;
 
         this._rotatedOutlinesBXY = [];
-        for (a = 0; a < this._congruencyA; a += 1) { 
+        for (a = 0; a < 4; a += 1) { 
             this._rotatedOutlinesBXY.push(this._rotateOutlineBXY(a));
         }
+    },
+
+    // Returns the congruency offset for the angle "a". That is the offset that
+    // makes two blocks congruent:
+    //
+    // * Block 1: rotated by angle "a"
+    //
+    // * Block 2: rotated by angle "a" and by congruency angle, and moved by
+    //   the congruency offset
+    _congruencyOffsetBXY: function (a) {
+        if (a === 0) { // 0°
+            return [1, 0]; // fixme: calculate
+        } else { // 90°
+            return [0, 1]; // fixme: calculate
+        }
+    },
+
+    // Adds the congruency offset for the angle "a" (in multiples of 90°) to
+    // every element in the given list of coordinates, and returns the
+    // resulting list. Does not modify the original list.
+    _withCongruencyOffsetsAddedBXY: function (coordinatesListBXY, a) {
+        var offsetBXY = this._congruencyOffsetBXY(a);
+
+        return dojo.map(coordinatesListBXY, function (coordinatesBXY) {
+            return realityBuilder.util.addVectorsBXY(coordinatesBXY, 
+                                                     offsetBXY);
+        });
+    },
+
+    // If the congruency angle is unequal 0°, then completes the list of
+    // collision offsets for the missing angles:
+    //
+    // * If the congruency angle is 180°, then there are already collision
+    //   offsets for 0° and 90°. And this function calculates the collision
+    //   offsets for 180° (based on 0°) and 270° (based on 90°), and adds them
+    //   to the list.
+    //
+    // * Similarly, if the congruency angle is 90°, then calculates the
+    //   collision offsets for 90°, 180°, and 270°, and adds them to the list.
+    //
+    // * If the congruency angle is 270°, then nothing happens, since that
+    //   angle doesn't make sense.
+    _completeCollisionOffsetsListBXY: function () {
+        var listBXY = this._collisionOffsetsListBXY;
+
+        // fixme: implement also for 90°
+
+        // 180°, from 0° + congruency offset:
+        listBXY.push(this._withCongruencyOffsetsAddedBXY(listBXY[0], 0));
+
+        // 270°, from 90° + congruency offset:
+        listBXY.push(this._withCongruencyOffsetsAddedBXY(listBXY[1], 1));
     },
 
     _rotateCollisionOffsetsBXY: function (collisionOffsetsBXY, a) {
@@ -12870,7 +12909,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     _rotateCollisionOffsetsListBXY: function (a1) {
         var a2, collisionOffsetsBXY, tmp = [];
 
-        for (a2 = 0; a2 < this._congruencyA; a2 += 1) {
+        for (a2 = 0; a2 < 4; a2 += 1) {
             collisionOffsetsBXY = this._collisionOffsetsListBXY[a2];
             tmp.push(this._rotateCollisionOffsetsBXY(collisionOffsetsBXY, a1));
         }
@@ -12883,7 +12922,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
 
         this._rotatedCollisionOffsetsListsBXY = [];
 
-        for (a1 = 0; a1 < this._congruencyA; a1 += 1) { 
+        for (a1 = 0; a1 < 4; a1 += 1) { 
             tmp = this._rotateCollisionOffsetsListBXY(a1);
             this._rotatedCollisionOffsetsListsBXY.push(tmp);
         }
@@ -12944,7 +12983,10 @@ dojo.declare('realityBuilder.BlockProperties', null, {
             this._backgroundAlpha = serverData.backgroundAlpha;
 
             this._updateRotatedOutlinesBXY();
+
+            this._completeCollisionOffsetsListBXY();
             this._updateRotatedCollisionOffsetsListsBXY();
+
             this._updateRotatedAttachmentOffsetsListsB();
 
             dojo.publish('realityBuilder/BlockProperties/changed');
@@ -12962,20 +13004,19 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // Returns the outline, rotated by angle "a", in multiples of 90° CCW when
     // viewed from above.
     rotatedOutlineBXY: function (a) {
-        return this._rotatedOutlinesBXY[a % this._congruencyA];
+        return this._rotatedOutlinesBXY[a % 4];
     },
 
     // Returns the list of collision offsets, of block 2 relative to block 1.
     rotatedCollisionOffsetsBXY: function (block1, block2) {
         var collisionOffsetsListBXY, relative_a, a1, a2;
 
-        a1 = block1.a() % this._congruencyA;
-        a2 = block2.a() % this._congruencyA;
+        a1 = block1.a() % 4;
+        a2 = block2.a() % 4;
 
-        collisionOffsetsListBXY = 
-            this._rotatedCollisionOffsetsListsBXY[a1];
+        collisionOffsetsListBXY = this._rotatedCollisionOffsetsListsBXY[a1];
 
-        relative_a = (this._congruencyA + a2 - a1) % this._congruencyA;
+        relative_a = (4 + a2 - a1) % 4;
 
         return collisionOffsetsListBXY[relative_a];
     },
@@ -13255,7 +13296,7 @@ dojo.declare('realityBuilder.Block', null, {
                              this.yB() + collisionOffsetBXY[1],
                              this.zB()];
             if (realityBuilder.util.pointsIdenticalB(block.positionB(),
-                                                         testPositionB)) {
+                                                     testPositionB)) {
                 return true;
             }
         }
@@ -14252,6 +14293,14 @@ realityBuilder.util.addVectorsB = function (vector1B, vector2B) {
         vector1B[0] + vector2B[0], 
         vector1B[1] + vector2B[1],
         vector1B[2] + vector2B[2]];
+};
+
+// Adds the vectors "vector1BXY" and "vector2BXY" in the block space x-y-plane
+// and returns the result.
+realityBuilder.util.addVectorsBXY = function (vector1BXY, vector2BXY) {
+    return [
+        vector1BXY[0] + vector2BXY[0], 
+        vector1BXY[1] + vector2BXY[1]];
 };
 
 // Subtracts the vectors "vector2B" from the vector "vector1B" in blocks space
@@ -15465,9 +15514,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Rotates the block by 90°, CCW when viewed from above, unless the
     // rotation would make it go out of range.
     rotate90: function () {
-        var congruencyA = this._blockProperties.congruencyA();
         if (!this._wouldGoOutOfRange([0, 0, 0], 1)) {
-            this._a = (this._a + 1) % congruencyA; // multiples of 90°
+            this._a = (this._a + 1) % 4; // multiples of 90°
             dojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
     },
@@ -15552,13 +15600,11 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     //
     // * if it would be outside of the space where it is allowed to be moved.
     _wouldGoOutOfRange: function (deltaB, deltaA) {
-        var testPositionB, testBlock, testA, congruencyA;
-
-        congruencyA = this._blockProperties.congruencyA();
+        var testPositionB, testBlock, testA;
 
         testPositionB = realityBuilder.util.addVectorsB(this.positionB(), 
                                                             deltaB);
-        testA = (this.a() + deltaA) % congruencyA;
+        testA = (this.a() + deltaA) % 4;
         testBlock = new realityBuilder.Block(this._blockProperties,
                                                  this._camera, 
                                                  testPositionB, testA);

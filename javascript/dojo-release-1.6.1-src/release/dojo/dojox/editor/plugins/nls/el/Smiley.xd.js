@@ -1,4 +1,4 @@
-realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.editor.plugins.nls.el.Smiley"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.el.Smiley");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "Smiley", "el", ({"emoticonLaughing":"Γέλιο","emoticonCool":"Άνετος","emoticonTongue":"Κοροϊδία","emoticonCrying":"Κλάμα","emoticonOops":"Έκπληξη","emoticonFrown":"Συνοφρυωμένος","emoticonAngry":"Θυμωμένος","emoticonShy":"Ντροπαλός","emoticonNo":"Όχι","emoticonAngel":"Αγγελούδι","smiley":"Εισαγωγή εικονιδίου συναισθήματος","emoticonIdea":"Ιδέα","emoticonEyebrow":"Σηκωμένο φρύδι","emoticonSmile":"Χαμόγελο","emoticonWink":"Κλείσιμο ματιού","emoticonYes":"Ναι","emoticonGrin":"Πλατύ χαμόγελο","emoticonGoofy":"Χαζόφατσα","emoticonHalf":"Μισό"})
 );

@@ -1,4 +1,4 @@
-realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.editor.plugins.nls.sl.AutoSave"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.sl.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "sl", ({"saveLabel":"Shrani","saveSettingdialogTitle":"Samodejno shranjevanje ","saveSettingdialogButtonOk":"Nastavi interval","saveMessageSuccess":"Shranjeno ob ${0}","saveSettingdialogButtonCancel":"Prekliči","saveSettingdialogDescription":"Podaj interval za samodejno shranjevanje ","saveSettingLabelOn":"Nastavi interval za samodejno shranjevanje ... ","saveSettingdialogParamLabel":"min","saveSettingdialogParamName":"Interval za samodejno shranjevanje ","saveMessageFail":"Shranjevanje ob ${0} ni uspelo ","saveSettingLabelOff":"Izključi samodejno shranjevanje "})
 );

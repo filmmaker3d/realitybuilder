@@ -112,8 +112,8 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         return true;
     },
 
-    // Returns true, iff the real blocks "realBlock" plus the block "newBlock"
-    // form the same block configuration as described in "blockConfigurations".
+    // Returns true, iff the real blocks "realBlocks" plus the block "newBlock"
+    // form the same block configuration as described in "blockConfiguration".
     _blockConfigurationMatches: function (blockConfiguration, 
                                           realBlocks, newBlock)
     {

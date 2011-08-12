@@ -5,4 +5,4 @@
 */
 
 
-realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.form._HasDropDown"],["require","dijit._HasDropDown"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.form._HasDropDown"]){_4._hasResource["dojox.form._HasDropDown"]=true;_4.deprecated("dojox.form._HasDropDown","Use dijit._HasDropDown instead","2.0");_4.provide("dojox.form._HasDropDown");_4.require("dijit._HasDropDown");_4.setObject("dojox.form._HasDropDown",_5._HasDropDown);}}};});
+realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.form._HasDropDown"],["require","dijit._HasDropDown"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.form._HasDropDown"]){_4._hasResource["dojox.form._HasDropDown"]=true;_4.deprecated("dojox.form._HasDropDown","Use dijit._HasDropDown instead","2.0");_4.provide("dojox.form._HasDropDown");_4.require("dijit._HasDropDown");_4.setObject("dojox.form._HasDropDown",_5._HasDropDown);}}};});

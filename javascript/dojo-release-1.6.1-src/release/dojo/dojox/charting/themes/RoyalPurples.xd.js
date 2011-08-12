@@ -5,4 +5,4 @@
 */
 
 
-realitybuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.charting.themes.RoyalPurples"],["require","dojox.charting.Theme"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.charting.themes.RoyalPurples"]){_4._hasResource["dojox.charting.themes.RoyalPurples"]=true;_4.provide("dojox.charting.themes.RoyalPurples");_4.require("dojox.charting.Theme");(function(){var _7=_6.charting;_7.themes.RoyalPurples=new _7.Theme({colors:["#473980","#685aa7","#7970b3","#231c3f","#7267ae"]});})();}}};});
+realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.charting.themes.RoyalPurples"],["require","dojox.charting.Theme"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.charting.themes.RoyalPurples"]){_4._hasResource["dojox.charting.themes.RoyalPurples"]=true;_4.provide("dojox.charting.themes.RoyalPurples");_4.require("dojox.charting.Theme");(function(){var _7=_6.charting;_7.themes.RoyalPurples=new _7.Theme({colors:["#473980","#685aa7","#7970b3","#231c3f","#7267ae"]});})();}}};});

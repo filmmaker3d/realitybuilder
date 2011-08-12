@@ -1,4 +1,4 @@
-realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.editor.plugins.nls.fi.AutoSave"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.fi.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "fi", ({"saveLabel":"Tallenna","saveSettingdialogTitle":"Automaattinen tallennus","saveSettingdialogButtonOk":"Aseta väli","saveMessageSuccess":"Tallennusaika ${0}","saveSettingdialogButtonCancel":"Peruuta","saveSettingdialogDescription":"Määritä automaattisen tallennuksen väli","saveSettingLabelOn":"Aseta automaattisen tallennuksen väli...","saveSettingdialogParamLabel":"min","saveSettingdialogParamName":"Automaattisen tallennuksen väli","saveMessageFail":"Tallennus epäonnistui ${0}","saveSettingLabelOff":"Ota automaattinen tallennus pois käytöstä"})
 );

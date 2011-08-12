@@ -1,4 +1,4 @@
-realitybuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
 return {depends: [["provide", "dojox.grid.enhanced.nls.fr.Pagination"]],
 defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.grid.enhanced.nls.fr.Pagination");dojo._xdLoadFlattenedBundle("dojox.grid.enhanced", "Pagination", "fr", ({"gotoButtonTitle":"Aller à une page donnée","prevTip":"Page précédente","pageCountIndication":" (${0} pages)","pageStepLabelTemplate":"Page ${0}","descTemplate":"${2} à ${3} sur ${1} ${0}","lastTip":"Dernière page","nextTip":"Page suivante","pageSizeLabelTemplate":"${0} éléments par page","dialogCancel":"Annuler","itemTitle":"éléments","dialogConfirm":"Aller","firstTip":"Première page","allItemsLabelTemplate":"Tous les éléments","dialogIndication":"Indiquer le numéro de page","dialogTitle":"Aller à la page"})
 );
