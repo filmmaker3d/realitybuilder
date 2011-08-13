@@ -209,36 +209,43 @@ realityBuilder.util.pointsIdenticalB = function (p1B, p2B) {
 // Subtracts the vectors "vector2" from the vector "vector1" in 3D and returns
 // the result.
 realityBuilder.util.subtractVectors3D = function (vector1, vector2) {
-    return [
-        vector1[0] - vector2[0], 
-        vector1[1] - vector2[1],
-        vector1[2] - vector2[2]];
+    return [vector1[0] - vector2[0], 
+            vector1[1] - vector2[1],
+            vector1[2] - vector2[2]];
 };
 
 // Adds the vectors "vector1B" and "vector2B" in blocks space and returns the
 // result.
 realityBuilder.util.addVectorsB = function (vector1B, vector2B) {
-    return [
-        vector1B[0] + vector2B[0], 
-        vector1B[1] + vector2B[1],
-        vector1B[2] + vector2B[2]];
+    return [vector1B[0] + vector2B[0], 
+            vector1B[1] + vector2B[1],
+            vector1B[2] + vector2B[2]];
 };
 
 // Adds the vectors "vector1BXY" and "vector2BXY" in the block space x-y-plane
 // and returns the result.
 realityBuilder.util.addVectorsBXY = function (vector1BXY, vector2BXY) {
-    return [
-        vector1BXY[0] + vector2BXY[0], 
-        vector1BXY[1] + vector2BXY[1]];
+    return [vector1BXY[0] + vector2BXY[0], 
+            vector1BXY[1] + vector2BXY[1]];
+};
+
+// Subtracts the vectors "vector1BXY" and "vector2BXY" in the block space
+// x-y-plane and returns the result.
+realityBuilder.util.subtractVectorsBXY = function (vector1BXY, vector2BXY) {
+    return [vector1BXY[0] - vector2BXY[0], 
+            vector1BXY[1] - vector2BXY[1]];
+};
+
+// Returns the specified vector, multiplied with the specified factor.
+realityBuilder.util.multiplyVectorBXY = function (factor, vectorBXY) {
+    return [factor * vectorBXY[0],
+            factor * vectorBXY[1]];
 };
 
 // Subtracts the vectors "vector2B" from the vector "vector1B" in blocks space
 // and returns the result.
 realityBuilder.util.subtractVectorsB = function (vector1B, vector2B) {
-    return [
-        vector1B[0] - vector2B[0], 
-        vector1B[1] - vector2B[1],
-        vector1B[2] - vector2B[2]];
+    return realityBuilder.util.subtractVectors3D(vector1B, vector2B);
 };
 
 // Removes duplicate points from the list of points "ps". Returns the resulting

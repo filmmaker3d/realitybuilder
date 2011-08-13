@@ -299,8 +299,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     _isInPrerenderedBlockConfiguration: function () {
         var realBlocks = this._constructionBlocks.realBlocksSorted();
-        return this._prerenderMode.matchingBlockConfiguration(realBlocks, 
-                                                              this) !== false;
+        return this._prerenderMode.matchingBlockConfigurationI(realBlocks, 
+                                                               this) !== false;
     },
 
     // Returns true, iff the new block can be made real in its current
@@ -558,7 +558,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         var i, realBlocks;
 
         realBlocks = this._constructionBlocks.realBlocksSorted();
-        i = this._prerenderMode.matchingBlockConfiguration(realBlocks, this);
+        i = this._prerenderMode.matchingBlockConfigurationI(realBlocks, this);
 
         if (i !== false) {
             this._prerenderMode.loadBlockConfigurationOnServer(i);

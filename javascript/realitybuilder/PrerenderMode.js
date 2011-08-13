@@ -32,7 +32,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     // "_blockConfigurations".
     _isEnabled: null,
     _makeRealAfter: null, // ms
-    _blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...
+    _blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...], ...], sorted!
 
     // Index of the currently and of the previously loaded prerendered block
     // configuration.
@@ -59,6 +59,8 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
             this._blockConfigurations = serverData.blockConfigurations;
             this._i = serverData.i;
             this._prevI = serverData.prevI;
+
+            this._sortBlockConfigurations(this._blockConfigurations);
             
             dojo.publish('realityBuilder/PrerenderMode/changed');
         }
@@ -80,31 +82,46 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         return this._makeRealAfter;
     },
 
-    _blockConfigurationSetKey: function (block) {
-        return block.xB() + ',' + block.yB() + ',' + block.zB() + ',' +
-            block.a();
+    _sortBlockConfiguration2: function (positionBAndA1, positionBAndA2) {
+        var a = positionBAndA1, b = positionBAndA2;
+
+        if (a[0] === b[0]) {
+            if (a[1] === b[1]) {
+                if (a[2] === b[2]) {
+                    if (a[3] === b[3]) {
+                        return 0;
+                    } else {
+                        return a[3] - b[3];
+                    }
+                } else {
+                    return a[2] - b[2];
+                }
+            } else {
+                return a[1] - b[1];
+            }
+        } else {
+            return a[0] - b[0];
+        }
     },
 
-    // Returns a set describing the block configuration comprised of the real
-    // blocks "realBlocks" and the block "newBlock". The keys in the set have
-    // the format "xB,yB,zB,a".
-    _blockConfigurationSet: function (realBlocks, newBlock) {
-        var set = {}, setKey = this._blockConfigurationSetKey;
+    _sortBlockConfiguration: function (blockConfiguration) {
+        blockConfiguration.sort(dojo.hitch(this, 
+                                           this._sortBlockConfiguration2));
+    },
 
-        dojo.forEach(realBlocks, function (realBlock) {
-            set[setKey(realBlock)] = true;
+    _sortBlockConfigurations: function (blockConfigurations) {
+        var that = this;
+
+        dojo.forEach(blockConfigurations, function (blockConfiguration) {
+            that._sortBlockConfiguration(blockConfiguration);
         });
-
-        set[setKey(newBlock)] = true;
-
-        return set;
     },
 
-    _setIsEmpty: function (set) {
-        var key;
+    _positionBAndAsMatch: function (positionBAndA1, positionBAndA2) {
+        var i;
 
-        for (key in set) {
-            if (set.hasOwnProperty(key)) {
+        for (i = 0; i < 4; i += 1) {
+            if (positionBAndA1[i] !== positionBAndA2[i]) {
                 return false;
             }
         }
@@ -112,27 +129,79 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         return true;
     },
 
-    // Returns true, iff the real blocks "realBlocks" plus the block "newBlock"
-    // form the same block configuration as described in "blockConfiguration".
-    _blockConfigurationMatches: function (blockConfiguration, 
-                                          realBlocks, newBlock)
+    // Returns true, iff specified block configurations match.
+    _blockConfigurationsMatch: function (blockConfiguration1, 
+                                         blockConfiguration2)
     {
-        var blockConfigurationSet, i, item, key;
+        var i;
 
-        blockConfigurationSet = this._blockConfigurationSet(realBlocks, 
-                                                            newBlock);
-
-        for (i = 0; i < blockConfiguration.length; i += 1) {
-            item = blockConfiguration[i];
-            key = item[0] + ',' + item[1] + ',' + item[2] + ',' + item[3];
-            if (typeof blockConfigurationSet[key] === 'undefined') {
-                return false;
-            } else {
-                delete blockConfigurationSet[key];
+        if (blockConfiguration1.length === blockConfiguration2.length) {
+            for (i = 0; i < blockConfiguration1.length; i += 1) {
+                if (!this._positionBAndAsMatch(blockConfiguration1[i],
+                                               blockConfiguration2[i])) {
+                    return false;
+                }
             }
+            return true;
+        } else {
+            return false;
+        }
+    },
+
+    // Returns the position in block space and the rotation angle of the block
+    // "block", in a simplified form:
+    //
+    // * If the block has two-fold symmetry:
+    //
+    //   If necessay, the values of the block will be adapted so that its
+    //   rotation angle is either 0° or 90°.
+    //
+    // * Otherwise: The native values of the block will be returned.
+    _simplifiedPositionBAndA: function (block) {
+        var positionBAndA, positionB, a;
+
+        positionB = block.positionB();
+        a = block.a();
+
+        if (block.congruencyA() === 2 && a >= 2) {
+            positionBAndA = 
+                realityBuilder.util.addVectorsB(positionB,
+                                                block.congruencyOffsetB());
+            positionBAndA.push(a % 2);
+        } else {
+            positionBAndA = dojo.clone(positionB);
+            positionBAndA.push(a);
         }
 
-        return this._setIsEmpty(blockConfigurationSet);
+        return positionBAndA;
+    },
+
+    // Returns an array created from positions and rotations angles of the real
+    // blocks and of the new block:
+    //
+    // [[x1B, y1B, z1B, a1],
+    //  [x2B, y2B, z2B, a2],
+    //  ...]
+    //
+    // If the blocks have two-fold symmetry, then alls blocks will be
+    // positioned in this array with an angle of 0° or 90°. Their coordinates
+    // will be adapted accordingly.
+    //
+    // The returned block configuration is sorted.
+    _currentBlockConfiguration: function (realBlocks, newBlock) {
+        var blockConfiguration = [], positionBAndA, that = this;
+
+        dojo.forEach(realBlocks, function (realBlock) {
+            positionBAndA = that._simplifiedPositionBAndA(realBlock);
+            blockConfiguration.push(positionBAndA);
+        });
+
+        positionBAndA = this._simplifiedPositionBAndA(newBlock);
+        blockConfiguration.push(positionBAndA);
+
+        this._sortBlockConfiguration(blockConfiguration);
+
+        return blockConfiguration;
     },
 
     // Iff there is a prerendered block configuration that matches the block
@@ -140,16 +209,20 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     // block "newBlock", then returns the index of that configuration.
     //
     // Otherwise returns false.
-    matchingBlockConfiguration: function (realBlocks, newBlock) {
-        var i, blockConfiguration;
+    matchingBlockConfigurationI: function (realBlocks, newBlock) {
+        var i, blockConfiguration, currentBlockConfiguration;
+
+        currentBlockConfiguration = 
+            this._currentBlockConfiguration(realBlocks, newBlock);
 
         for (i = 0; i < this._blockConfigurations.length; i += 1) {
             blockConfiguration = this._blockConfigurations[i];
-            if (this._blockConfigurationMatches(blockConfiguration, 
-                                                realBlocks, newBlock)) {
+            if (this._blockConfigurationsMatch(blockConfiguration, 
+                                               currentBlockConfiguration)) {
                 return i;
             }
-        }
+        }            
+
         return false; // no prerendered configuration matches
     },
 

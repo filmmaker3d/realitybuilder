@@ -126,6 +126,14 @@ dojo.declare('realityBuilder.Block', null, {
         return this._a;
     },
 
+    congruencyA: function () {
+        return this._blockProperties.congruencyA();
+    },
+
+    congruencyOffsetB: function () {
+        return this._blockProperties.congruencyOffsetB(this._a);
+    },
+
     // Returns the block's vertexes in screen space.
     _vertexesS: function () {
         return this._bottomVertexesS.concat(this._topVertexesS);
@@ -268,7 +276,7 @@ dojo.declare('realityBuilder.Block', null, {
         positionBHasChanged = 
             this._lastPositionB === null ||
             !realityBuilder.util.pointsIdenticalB(this._lastPositionB,
-                                                      this._positionB);
+                                                  this._positionB);
         aHasChanged = this._lastA !== this._a;
 
         return cameraHasChanged || blockPropertiesHaveChanged ||

@@ -73,8 +73,23 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // relative to the origin of the unrotated block.
     _rotCenterBXY: null,
 
+    // For blocks with two-fold rotational symmetry, remains congruent with
+    // itself, if rotated about the centroid:
+    _centroidBXY: null,
+
     // Alpha transparency of the block's background:
     _backgroundAlpha: null,
+
+    // The congruency offset for the angles "a" = 0°, 90°, ... 
+    //
+    // That is the offset that makes two blocks 1 and 2 congruent, if they have
+    // two-fold rotational symmetry:
+    //
+    // * Block 1: rotated by angle "a"
+    //
+    // * Block 2: rotated by angle "a" and by 180°, and moved by the congruency
+    //   offset
+    _congruencyOffsetsB: null,
 
     versionOnServer: function () {
         return this._versionOnServer;
@@ -84,6 +99,18 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // server data.
     isInitializedWithServerData: function () {
         return this._versionOnServer !== '-1';
+    },
+
+    _updateCentroidBXY: function () {
+        var i, pointBXY, totXB = 0, totYB = 0, len = this._outlineBXY.length;
+
+        for (i = 0; i < len; i += 1) {
+            pointBXY = this._outlineBXY[i];
+            totXB += pointBXY[0];
+            totYB += pointBXY[1];
+        }
+
+        this._centroidBXY = [totXB / len, totYB / len];
     },
 
     _rotateOutlineBXY: function (a) {
@@ -105,31 +132,41 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         }
     },
 
-    // Returns the congruency offset for the angle "a". That is the offset that
-    // makes two blocks congruent:
-    //
-    // * Block 1: rotated by angle "a"
-    //
-    // * Block 2: rotated by angle "a" and by congruency angle, and moved by
-    //   the congruency offset
-    _congruencyOffsetBXY: function (a) {
-        if (a === 0) { // 0°
-            return [1, 0]; // fixme: calculate
-        } else { // 90°
-            return [0, 1]; // fixme: calculate
+    // Only relevant for blocks with two-fold rotational symmetry.
+    _updateCongruencyOffsetB: function () {
+        var diffBXY, offsetBXY, a;
+
+        diffBXY = 
+            realityBuilder.util.multiplyVectorBXY(
+                2, 
+                realityBuilder.util.subtractVectorsBXY(this._centroidBXY, 
+                                                       this._rotCenterBXY));
+
+        this._congruencyOffsetsB = [];
+        for (a = 0; a < 4; a += 1) {
+            offsetBXY = realityBuilder.util.rotatePointBXY(diffBXY, [0, 0], a);
+            this._congruencyOffsetsB.push([offsetBXY[0], offsetBXY[1], 0]);
         }
+    },
+
+    congruencyOffsetB: function (a) {
+        return this._congruencyOffsetsB[a];
     },
 
     // Adds the congruency offset for the angle "a" (in multiples of 90°) to
     // every element in the given list of coordinates, and returns the
     // resulting list. Does not modify the original list.
     _withCongruencyOffsetsAddedBXY: function (coordinatesListBXY, a) {
-        var offsetBXY = this._congruencyOffsetBXY(a);
+        var offsetB = this.congruencyOffsetB(a);
 
         return dojo.map(coordinatesListBXY, function (coordinatesBXY) {
             return realityBuilder.util.addVectorsBXY(coordinatesBXY, 
-                                                     offsetBXY);
+                                                     offsetB);
         });
+    },
+
+    congruencyA: function () {
+        return this._congruencyA;
     },
 
     // If the congruency angle is 180°, then completes the list of offsets for
@@ -182,13 +219,10 @@ dojo.declare('realityBuilder.BlockProperties', null, {
 
     // See also: _withCongruencyOffsetsAddedBXY()
     _withCongruencyOffsetsAddedB: function (coordinatesListB, a) {
-        var offsetB = this._congruencyOffsetBXY(a);
+        var offsetB = this.congruencyOffsetB(a);
 
         return dojo.map(coordinatesListB, function (coordinatesB) {
-            return realityBuilder.util.addVectorsBXY(coordinatesB, 
-                                                     [offsetB[0],
-                                                      offsetB[1],
-                                                      0]);
+            return realityBuilder.util.addVectorsB(coordinatesB, offsetB);
         });
     },
 
@@ -255,6 +289,9 @@ dojo.declare('realityBuilder.BlockProperties', null, {
             this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
             this._rotCenterBXY = serverData.rotCenterBXY;
             this._backgroundAlpha = serverData.backgroundAlpha;
+
+            this._updateCentroidBXY();
+            this._updateCongruencyOffsetB();
 
             this._updateRotatedOutlinesBXY();
 
