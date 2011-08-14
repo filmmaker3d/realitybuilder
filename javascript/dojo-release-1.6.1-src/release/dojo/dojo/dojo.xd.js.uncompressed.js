@@ -15568,9 +15568,9 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     },
 
     // Moves the block in block space, by "delta", unless the move would make
-    // it go out of range.
+    // it go out of range, and unless the block is frozen.
     move: function (deltaB) {
-        if (!this._wouldGoOutOfRange(deltaB, 0)) {
+        if (!this._wouldGoOutOfRange(deltaB, 0) && !this._isFrozen) {
             this._positionB = realityBuilder.util.addVectorsB(
                 this._positionB, deltaB);
             dojo.publish('realityBuilder/NewBlock/movedOrRotated');
@@ -15578,9 +15578,9 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     },
 
     // Rotates the block by 90°, CCW when viewed from above, unless the
-    // rotation would make it go out of range.
+    // rotation would make it go out of range, and unless the block is frozen.
     rotate90: function () {
-        if (!this._wouldGoOutOfRange([0, 0, 0], 1)) {
+        if (!this._wouldGoOutOfRange([0, 0, 0], 1) && !this._isFrozen) {
             this._a = (this._a + 1) % 4; // multiples of 90°
             dojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
