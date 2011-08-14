@@ -33,6 +33,7 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 from django.utils import simplejson
+from datetime import datetime, timedelta
 
 # Whether debugging should be turned on:
 debug = True
@@ -113,9 +114,11 @@ class PrerenderMode(db.Model):
     make_real_after = db.IntegerProperty() # ms
     block_configurations = db.StringListProperty()
 
-    # If "reset_at" is non-null, then the current configuration is reset to the
+    # If "reset_at" is set, then the current configuration is reset to
     # prerendered block configuration number 0 at or after that time. When a
-    # reset is requested, then "reset_at" is set to now plus "reset_timeout".
+    # reset is requested, then - unless already set - "reset_at" is set to:
+    #
+    #   now plus "reset_timeout"
     reset_timeout = db.IntegerProperty() # ms
     reset_at = db.DateTimeProperty()
 
@@ -610,6 +613,39 @@ class RPCAdminMakeReal(webapp.RequestHandler):
         except Exception, e:
             logging.error('Could not make block real: ' + str(e))
 
+# Only has an effect if prerender-mode is enabled.
+#
+# Requests a reset of the block configuration to the prerendered block
+# configuration 0. The reset is scheduled to happen at or after: now plus
+# "reset_timeout". If a reset is already scheduled, then that schedule is not
+# changed.
+# 
+# Silently fails on error.
+class RPCScheduleReset(webapp.RequestHandler):
+    @classmethod
+    def transaction(cls):
+        construction = Construction.get_main()
+
+        prerender_mode = construction.prerender_mode()
+
+        if prerender_mode.is_enabled:
+            if prerender_mode.reset_at == None:
+                timeout = prerender_mode.reset_timeout
+                prerender_mode.reset_at = datetime.now() + timedelta(0, 0, 0, 
+                                                                     timeout)
+                prerender_mode.put()
+
+    # Only runs if prerender-mode is enabled.
+    def get(self):
+        try:
+            logging.error('fixmefixme:');
+            namespace_manager.set_namespace(self.request.get('namespace'))
+            callback = self.request.get('callback')
+            db.run_in_transaction(self.transaction)
+            dump_jsonp(self, {}, callback)
+        except Exception, e:
+            logging.error('Could not schedule reset: ' + str(e))
+
 # Loads the prerendered block configuration with the provided index.
 # 
 # Silently fails on error.
@@ -653,7 +689,7 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
         prerender_mode = construction.prerender_mode()
 
         if prerender_mode.is_enabled:
-            cls.updateBlocks (construction, prerender_mode, i)
+            cls.updateBlocks(construction, prerender_mode, i)
 
     # Only runs if prerender-mode is enabled.
     def get(self):
@@ -880,6 +916,7 @@ application = webapp.WSGIApplication([
     ('/admin/rpc/update_settings', RPCAdminUpdateSettings),
     ('/rpc/construction', RPCConstruction),
     ('/rpc/create_pending', RPCCreatePending),
+    ('/rpc/schedule_reset', RPCScheduleReset),
     ('/rpc/load_prerendered_block_configuration', 
      RPCLoadPrerenderedBlockConfiguration)],
     debug = debug)

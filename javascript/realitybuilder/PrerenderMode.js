@@ -258,5 +258,15 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         if (this.i() < this._blockConfigurations.length - 1) {
             this.loadBlockConfigurationOnServer(this.i() + 1);
         }
+    },
+
+    _scheduleResetOnServer: function () {
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "rpc/schedule_reset"
+        });
+    },
+
+    scheduleReset: function () {
+        this._scheduleResetOnServer();
     }
 });

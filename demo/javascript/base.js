@@ -149,12 +149,27 @@ var realityBuilderDemo = (function () {
                            });
     }
 
+    function scheduleReset() {
+        realityBuilder.prerenderMode().scheduleReset();
+    }
+
+    function onKeyPressed(event) {
+        if (event.which === 114) {
+            scheduleReset();
+        }
+    }
+
+    function setUpHandlingOfKeyPresses() {
+        $(document.documentElement).keypress(onKeyPressed);
+    }
+
     // Called when the Reality Builder is ready. Note that the background image
     // is separate and may still be in the process of being loaded.
     function onReady() {
         forEachCoordinateButton(setUpCoordinateButton);
         setUpRotate90Button();
         setUpRequestMakeRealButton();
+        setUpHandlingOfKeyPresses();
 
         realityBuilderIsReady = true;
 

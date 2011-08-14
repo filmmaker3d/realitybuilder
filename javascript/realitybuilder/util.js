@@ -375,9 +375,11 @@ realityBuilder.util.rootUrl = function () {
 
 // Performs a JSONP request, using some default settings.
 realityBuilder.util.jsonpGet = function (args) {
-    if (args.content !== 'undefined') {
-        args.content.namespace = realityBuilder.util.SETTINGS.namespace;
+    if (args.content === 'undefined') {
+        args.content = {};
     }
+
+    args.content.namespace = realityBuilder.util.SETTINGS.namespace;
 
     dojo.io.script.get(dojo.mixin({
         callbackParamName: 'callback',
