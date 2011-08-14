@@ -163,7 +163,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         positionB = block.positionB();
         a = block.a();
 
-        if (block.congruencyA() === 2 && a >= 2) {
+        if (block.has2FoldSymmetry() && a >= 2) {
             positionBAndA = 
                 realityBuilder.util.addVectorsB(positionB,
                                                 block.congruencyOffsetB());

@@ -12797,25 +12797,34 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // against block 1 in the block space by any of the following values. The
     // rotation angles below are those of block 2 relative to block 1. The
     // offsets are stored as JSON arrays.
-    //
-    // The list has "congruencyA" number of entries, corresponding to rotation
-    // about 0°, 90°, ...
     _attachmentOffsetsListB: null,
 
     // Array with the list of attachment offsets rotated by 0°, 90°, ... CCW
     // (when viewed from above) around the center of rotation of block 1, in
     // block space:
-    //
-    // The list has "congruencyA" number of entries, corresponding to rotation
-    // about 0°, 90°, ...
     _rotatedAttachmentOffsetsListsB: null,
 
     // Center of rotation, in the block space x-y-plane, with coordinates
     // relative to the origin of the unrotated block.
     _rotCenterBXY: null,
 
+    // For blocks with two-fold rotational symmetry, remains congruent with
+    // itself, if rotated about the centroid:
+    _centroidBXY: null,
+
     // Alpha transparency of the block's background:
     _backgroundAlpha: null,
+
+    // The congruency offset for the angles "a" = 0°, 90°, ... 
+    //
+    // That is the offset that makes two blocks 1 and 2 congruent, if they have
+    // two-fold rotational symmetry:
+    //
+    // * Block 1: rotated by angle "a"
+    //
+    // * Block 2: rotated by angle "a" and by 180°, and moved by the congruency
+    //   offset
+    _congruencyOffsetsB: null,
 
     versionOnServer: function () {
         return this._versionOnServer;
@@ -12825,6 +12834,18 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // server data.
     isInitializedWithServerData: function () {
         return this._versionOnServer !== '-1';
+    },
+
+    _updateCentroidBXY: function () {
+        var i, pointBXY, totXB = 0, totYB = 0, len = this._outlineBXY.length;
+
+        for (i = 0; i < len; i += 1) {
+            pointBXY = this._outlineBXY[i];
+            totXB += pointBXY[0];
+            totYB += pointBXY[1];
+        }
+
+        this._centroidBXY = [totXB / len, totYB / len];
     },
 
     _rotateOutlineBXY: function (a) {
@@ -12846,56 +12867,59 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         }
     },
 
-    // Returns the congruency offset for the angle "a". That is the offset that
-    // makes two blocks congruent:
-    //
-    // * Block 1: rotated by angle "a"
-    //
-    // * Block 2: rotated by angle "a" and by congruency angle, and moved by
-    //   the congruency offset
-    _congruencyOffsetBXY: function (a) {
-        if (a === 0) { // 0°
-            return [1, 0]; // fixme: calculate
-        } else { // 90°
-            return [0, 1]; // fixme: calculate
+    // Only relevant for blocks with two-fold rotational symmetry.
+    _updateCongruencyOffsetB: function () {
+        var diffBXY, offsetBXY, a;
+
+        diffBXY = 
+            realityBuilder.util.multiplyVectorBXY(
+                2, 
+                realityBuilder.util.subtractVectorsBXY(this._centroidBXY, 
+                                                       this._rotCenterBXY));
+
+        this._congruencyOffsetsB = [];
+        for (a = 0; a < 4; a += 1) {
+            offsetBXY = realityBuilder.util.rotatePointBXY(diffBXY, [0, 0], a);
+            this._congruencyOffsetsB.push([offsetBXY[0], offsetBXY[1], 0]);
         }
+    },
+
+    congruencyOffsetB: function (a) {
+        return this._congruencyOffsetsB[a];
     },
 
     // Adds the congruency offset for the angle "a" (in multiples of 90°) to
     // every element in the given list of coordinates, and returns the
     // resulting list. Does not modify the original list.
     _withCongruencyOffsetsAddedBXY: function (coordinatesListBXY, a) {
-        var offsetBXY = this._congruencyOffsetBXY(a);
+        var offsetB = this.congruencyOffsetB(a);
 
         return dojo.map(coordinatesListBXY, function (coordinatesBXY) {
             return realityBuilder.util.addVectorsBXY(coordinatesBXY, 
-                                                     offsetBXY);
+                                                     offsetB);
         });
     },
 
-    // If the congruency angle is unequal 0°, then completes the list of
-    // collision offsets for the missing angles:
+    congruencyA: function () {
+        return this._congruencyA;
+    },
+
+    // If the congruency angle is 180°, then completes the list of offsets for
+    // the missing angles, as follows:
     //
-    // * If the congruency angle is 180°, then there are already collision
-    //   offsets for 0° and 90°. And this function calculates the collision
-    //   offsets for 180° (based on 0°) and 270° (based on 90°), and adds them
-    //   to the list.
-    //
-    // * Similarly, if the congruency angle is 90°, then calculates the
-    //   collision offsets for 90°, 180°, and 270°, and adds them to the list.
-    //
-    // * If the congruency angle is 270°, then nothing happens, since that
-    //   angle doesn't make sense.
+    // There are already offsets for 0° and 90°. And this function calculates
+    // the offsets for 180° (based on 0°) and 270° (based on 90°), and adds
+    // them to the list.
     _completeCollisionOffsetsListBXY: function () {
         var listBXY = this._collisionOffsetsListBXY;
 
-        // fixme: implement also for 90°
+        if (this._congruencyA === 2) {
+            // 180°: from 0° + congruency offset:
+            listBXY.push(this._withCongruencyOffsetsAddedBXY(listBXY[0], 0));
 
-        // 180°, from 0° + congruency offset:
-        listBXY.push(this._withCongruencyOffsetsAddedBXY(listBXY[0], 0));
-
-        // 270°, from 90° + congruency offset:
-        listBXY.push(this._withCongruencyOffsetsAddedBXY(listBXY[1], 1));
+            // 270°: from 90° + congruency offset:
+            listBXY.push(this._withCongruencyOffsetsAddedBXY(listBXY[1], 1));
+        }
     },
 
     _rotateCollisionOffsetsBXY: function (collisionOffsetsBXY, a) {
@@ -12928,6 +12952,25 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         }
     },
 
+    // See also: _withCongruencyOffsetsAddedBXY()
+    _withCongruencyOffsetsAddedB: function (coordinatesListB, a) {
+        var offsetB = this.congruencyOffsetB(a);
+
+        return dojo.map(coordinatesListB, function (coordinatesB) {
+            return realityBuilder.util.addVectorsB(coordinatesB, offsetB);
+        });
+    },
+
+    // See also: _completeCollisionOffsetsListBXY()
+    _completeAttachmentOffsetsListB: function () {
+        var listB = this._attachmentOffsetsListB;
+
+        if (this._congruencyA === 2) {
+            listB.push(this._withCongruencyOffsetsAddedB(listB[0], 0));
+            listB.push(this._withCongruencyOffsetsAddedB(listB[1], 1));
+        }
+    },
+
     _rotateAttachmentOffsetB: function (attachmentOffsetB, a) {
         var pBXY, rotatedPBXY, rotatedPB, util;
 
@@ -12950,7 +12993,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     _rotateAttachmentOffsetsListB: function (a1) {
         var a2, attachmentOffsetsB, tmp = [];
 
-        for (a2 = 0; a2 < this._congruencyA; a2 += 1) {
+        for (a2 = 0; a2 < 4; a2 += 1) {
             attachmentOffsetsB = this._attachmentOffsetsListB[a2];
             tmp.push(this._rotateAttachmentOffsetsB(attachmentOffsetsB, a1));
         }
@@ -12962,7 +13005,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         var a1, tmp;
 
         this._rotatedAttachmentOffsetsListsB = [];
-        for (a1 = 0; a1 < this._congruencyA; a1 += 1) { 
+        for (a1 = 0; a1 < 4; a1 += 1) { 
             tmp = this._rotateAttachmentOffsetsListB(a1);
             this._rotatedAttachmentOffsetsListsB.push(tmp);
         }
@@ -12982,11 +13025,15 @@ dojo.declare('realityBuilder.BlockProperties', null, {
             this._rotCenterBXY = serverData.rotCenterBXY;
             this._backgroundAlpha = serverData.backgroundAlpha;
 
+            this._updateCentroidBXY();
+            this._updateCongruencyOffsetB();
+
             this._updateRotatedOutlinesBXY();
 
             this._completeCollisionOffsetsListBXY();
             this._updateRotatedCollisionOffsetsListsBXY();
 
+            this._completeAttachmentOffsetsListB();
             this._updateRotatedAttachmentOffsetsListsB();
 
             dojo.publish('realityBuilder/BlockProperties/changed');
@@ -13025,13 +13072,13 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     rotatedAttachmentOffsetsB: function (block1, block2) {
         var attachmentOffsetsListB, relative_a, a1, a2;
 
-        a1 = block1.a() % this._congruencyA;
-        a2 = block2.a() % this._congruencyA;
+        a1 = block1.a() % 4;
+        a2 = block2.a() % 4;
 
         attachmentOffsetsListB = 
             this._rotatedAttachmentOffsetsListsB[a1];
 
-        relative_a = (this._congruencyA + a2 - a1) % this._congruencyA;
+        relative_a = (4 + a2 - a1) % 4;
 
         return attachmentOffsetsListB[relative_a];
     },
@@ -13244,6 +13291,14 @@ dojo.declare('realityBuilder.Block', null, {
         return this._a;
     },
 
+    congruencyA: function () {
+        return this._blockProperties.congruencyA();
+    },
+
+    congruencyOffsetB: function () {
+        return this._blockProperties.congruencyOffsetB(this._a);
+    },
+
     // Returns the block's vertexes in screen space.
     _vertexesS: function () {
         return this._bottomVertexesS.concat(this._topVertexesS);
@@ -13386,7 +13441,7 @@ dojo.declare('realityBuilder.Block', null, {
         positionBHasChanged = 
             this._lastPositionB === null ||
             !realityBuilder.util.pointsIdenticalB(this._lastPositionB,
-                                                      this._positionB);
+                                                  this._positionB);
         aHasChanged = this._lastA !== this._a;
 
         return cameraHasChanged || blockPropertiesHaveChanged ||
@@ -14280,36 +14335,43 @@ realityBuilder.util.pointsIdenticalB = function (p1B, p2B) {
 // Subtracts the vectors "vector2" from the vector "vector1" in 3D and returns
 // the result.
 realityBuilder.util.subtractVectors3D = function (vector1, vector2) {
-    return [
-        vector1[0] - vector2[0], 
-        vector1[1] - vector2[1],
-        vector1[2] - vector2[2]];
+    return [vector1[0] - vector2[0], 
+            vector1[1] - vector2[1],
+            vector1[2] - vector2[2]];
 };
 
 // Adds the vectors "vector1B" and "vector2B" in blocks space and returns the
 // result.
 realityBuilder.util.addVectorsB = function (vector1B, vector2B) {
-    return [
-        vector1B[0] + vector2B[0], 
-        vector1B[1] + vector2B[1],
-        vector1B[2] + vector2B[2]];
+    return [vector1B[0] + vector2B[0], 
+            vector1B[1] + vector2B[1],
+            vector1B[2] + vector2B[2]];
 };
 
 // Adds the vectors "vector1BXY" and "vector2BXY" in the block space x-y-plane
 // and returns the result.
 realityBuilder.util.addVectorsBXY = function (vector1BXY, vector2BXY) {
-    return [
-        vector1BXY[0] + vector2BXY[0], 
-        vector1BXY[1] + vector2BXY[1]];
+    return [vector1BXY[0] + vector2BXY[0], 
+            vector1BXY[1] + vector2BXY[1]];
+};
+
+// Subtracts the vectors "vector1BXY" and "vector2BXY" in the block space
+// x-y-plane and returns the result.
+realityBuilder.util.subtractVectorsBXY = function (vector1BXY, vector2BXY) {
+    return [vector1BXY[0] - vector2BXY[0], 
+            vector1BXY[1] - vector2BXY[1]];
+};
+
+// Returns the specified vector, multiplied with the specified factor.
+realityBuilder.util.multiplyVectorBXY = function (factor, vectorBXY) {
+    return [factor * vectorBXY[0],
+            factor * vectorBXY[1]];
 };
 
 // Subtracts the vectors "vector2B" from the vector "vector1B" in blocks space
 // and returns the result.
 realityBuilder.util.subtractVectorsB = function (vector1B, vector2B) {
-    return [
-        vector1B[0] - vector2B[0], 
-        vector1B[1] - vector2B[1],
-        vector1B[2] - vector2B[2]];
+    return realityBuilder.util.subtractVectors3D(vector1B, vector2B);
 };
 
 // Removes duplicate points from the list of points "ps". Returns the resulting
@@ -15651,8 +15713,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     _isInPrerenderedBlockConfiguration: function () {
         var realBlocks = this._constructionBlocks.realBlocksSorted();
-        return this._prerenderMode.matchingBlockConfiguration(realBlocks, 
-                                                              this) !== false;
+        return this._prerenderMode.matchingBlockConfigurationI(realBlocks, 
+                                                               this) !== false;
     },
 
     // Returns true, iff the new block can be made real in its current
@@ -15910,7 +15972,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         var i, realBlocks;
 
         realBlocks = this._constructionBlocks.realBlocksSorted();
-        i = this._prerenderMode.matchingBlockConfiguration(realBlocks, this);
+        i = this._prerenderMode.matchingBlockConfigurationI(realBlocks, this);
 
         if (i !== false) {
             this._prerenderMode.loadBlockConfigurationOnServer(i);
@@ -16351,7 +16413,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     // "_blockConfigurations".
     _isEnabled: null,
     _makeRealAfter: null, // ms
-    _blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...
+    _blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...], ...], sorted!
 
     // Index of the currently and of the previously loaded prerendered block
     // configuration.
@@ -16378,6 +16440,8 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
             this._blockConfigurations = serverData.blockConfigurations;
             this._i = serverData.i;
             this._prevI = serverData.prevI;
+
+            this._sortBlockConfigurations(this._blockConfigurations);
             
             dojo.publish('realityBuilder/PrerenderMode/changed');
         }
@@ -16399,31 +16463,46 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         return this._makeRealAfter;
     },
 
-    _blockConfigurationSetKey: function (block) {
-        return block.xB() + ',' + block.yB() + ',' + block.zB() + ',' +
-            block.a();
+    _sortBlockConfiguration2: function (positionBAndA1, positionBAndA2) {
+        var a = positionBAndA1, b = positionBAndA2;
+
+        if (a[0] === b[0]) {
+            if (a[1] === b[1]) {
+                if (a[2] === b[2]) {
+                    if (a[3] === b[3]) {
+                        return 0;
+                    } else {
+                        return a[3] - b[3];
+                    }
+                } else {
+                    return a[2] - b[2];
+                }
+            } else {
+                return a[1] - b[1];
+            }
+        } else {
+            return a[0] - b[0];
+        }
     },
 
-    // Returns a set describing the block configuration comprised of the real
-    // blocks "realBlocks" and the block "newBlock". The keys in the set have
-    // the format "xB,yB,zB,a".
-    _blockConfigurationSet: function (realBlocks, newBlock) {
-        var set = {}, setKey = this._blockConfigurationSetKey;
+    _sortBlockConfiguration: function (blockConfiguration) {
+        blockConfiguration.sort(dojo.hitch(this, 
+                                           this._sortBlockConfiguration2));
+    },
 
-        dojo.forEach(realBlocks, function (realBlock) {
-            set[setKey(realBlock)] = true;
+    _sortBlockConfigurations: function (blockConfigurations) {
+        var that = this;
+
+        dojo.forEach(blockConfigurations, function (blockConfiguration) {
+            that._sortBlockConfiguration(blockConfiguration);
         });
-
-        set[setKey(newBlock)] = true;
-
-        return set;
     },
 
-    _setIsEmpty: function (set) {
-        var key;
+    _positionBAndAsMatch: function (positionBAndA1, positionBAndA2) {
+        var i;
 
-        for (key in set) {
-            if (set.hasOwnProperty(key)) {
+        for (i = 0; i < 4; i += 1) {
+            if (positionBAndA1[i] !== positionBAndA2[i]) {
                 return false;
             }
         }
@@ -16431,27 +16510,79 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         return true;
     },
 
-    // Returns true, iff the real blocks "realBlock" plus the block "newBlock"
-    // form the same block configuration as described in "blockConfigurations".
-    _blockConfigurationMatches: function (blockConfiguration, 
-                                          realBlocks, newBlock)
+    // Returns true, iff specified block configurations match.
+    _blockConfigurationsMatch: function (blockConfiguration1, 
+                                         blockConfiguration2)
     {
-        var blockConfigurationSet, i, item, key;
+        var i;
 
-        blockConfigurationSet = this._blockConfigurationSet(realBlocks, 
-                                                            newBlock);
-
-        for (i = 0; i < blockConfiguration.length; i += 1) {
-            item = blockConfiguration[i];
-            key = item[0] + ',' + item[1] + ',' + item[2] + ',' + item[3];
-            if (typeof blockConfigurationSet[key] === 'undefined') {
-                return false;
-            } else {
-                delete blockConfigurationSet[key];
+        if (blockConfiguration1.length === blockConfiguration2.length) {
+            for (i = 0; i < blockConfiguration1.length; i += 1) {
+                if (!this._positionBAndAsMatch(blockConfiguration1[i],
+                                               blockConfiguration2[i])) {
+                    return false;
+                }
             }
+            return true;
+        } else {
+            return false;
+        }
+    },
+
+    // Returns the position in block space and the rotation angle of the block
+    // "block", in a simplified form:
+    //
+    // * If the block has two-fold symmetry:
+    //
+    //   If necessay, the values of the block will be adapted so that its
+    //   rotation angle is either 0° or 90°.
+    //
+    // * Otherwise: The native values of the block will be returned.
+    _simplifiedPositionBAndA: function (block) {
+        var positionBAndA, positionB, a;
+
+        positionB = block.positionB();
+        a = block.a();
+
+        if (block.congruencyA() === 2 && a >= 2) {
+            positionBAndA = 
+                realityBuilder.util.addVectorsB(positionB,
+                                                block.congruencyOffsetB());
+            positionBAndA.push(a % 2);
+        } else {
+            positionBAndA = dojo.clone(positionB);
+            positionBAndA.push(a);
         }
 
-        return this._setIsEmpty(blockConfigurationSet);
+        return positionBAndA;
+    },
+
+    // Returns an array created from positions and rotations angles of the real
+    // blocks and of the new block:
+    //
+    // [[x1B, y1B, z1B, a1],
+    //  [x2B, y2B, z2B, a2],
+    //  ...]
+    //
+    // If the blocks have two-fold symmetry, then alls blocks will be
+    // positioned in this array with an angle of 0° or 90°. Their coordinates
+    // will be adapted accordingly.
+    //
+    // The returned block configuration is sorted.
+    _currentBlockConfiguration: function (realBlocks, newBlock) {
+        var blockConfiguration = [], positionBAndA, that = this;
+
+        dojo.forEach(realBlocks, function (realBlock) {
+            positionBAndA = that._simplifiedPositionBAndA(realBlock);
+            blockConfiguration.push(positionBAndA);
+        });
+
+        positionBAndA = this._simplifiedPositionBAndA(newBlock);
+        blockConfiguration.push(positionBAndA);
+
+        this._sortBlockConfiguration(blockConfiguration);
+
+        return blockConfiguration;
     },
 
     // Iff there is a prerendered block configuration that matches the block
@@ -16459,16 +16590,20 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     // block "newBlock", then returns the index of that configuration.
     //
     // Otherwise returns false.
-    matchingBlockConfiguration: function (realBlocks, newBlock) {
-        var i, blockConfiguration;
+    matchingBlockConfigurationI: function (realBlocks, newBlock) {
+        var i, blockConfiguration, currentBlockConfiguration;
+
+        currentBlockConfiguration = 
+            this._currentBlockConfiguration(realBlocks, newBlock);
 
         for (i = 0; i < this._blockConfigurations.length; i += 1) {
             blockConfiguration = this._blockConfigurations[i];
-            if (this._blockConfigurationMatches(blockConfiguration, 
-                                                realBlocks, newBlock)) {
+            if (this._blockConfigurationsMatch(blockConfiguration, 
+                                               currentBlockConfiguration)) {
                 return i;
             }
-        }
+        }            
+
         return false; // no prerendered configuration matches
     },
 

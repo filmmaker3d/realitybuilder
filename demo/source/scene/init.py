@@ -14,7 +14,7 @@
 #     On Windows XP's "cmd.exe" (substitute %-placeholders):
 #
 #       %PYTHON_PATH%\python.exe %GAE_PATH%\remote_api_shell.py -s ^
-#       %VERSION%.%APPLICATION%.appspot.com
+#       %APPLICATION%.appspot.com
 #
 #   c) Paste the code. It will execute automatically.
 
@@ -121,7 +121,7 @@ for query in queries:
 # which is necessary when doing transactions):
 blockProperties = BlockProperties(parent=construction)
 blockProperties.data_version = '0'
-blockProperties.congruency_a = 4
+blockProperties.has_2_fold_symmetry = False
 blockProperties.position_spacing_xy = 20.
 blockProperties.position_spacing_z = 10.
 blockProperties.outline_bxy = '[[0, 0], [1, 0], [2, 1], [0, 1]]'

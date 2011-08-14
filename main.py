@@ -274,9 +274,9 @@ class BlockProperties(db.Model):
     # uses this data to determine when to update the display.
     data_version = db.StringProperty()
 
-    # If the block is rotated by that angle, then it is congruent with it not
-    # being rotated.
-    congruency_a = db.IntegerProperty() # 90°
+    # True if the block has two-fold rotational symmetry, when viewed from
+    # above. Note that this setting is irrespective of the center of rotation.
+    has_2_fold_symmetry = db.BooleanProperty()
 
     # Block dimensions in world space. The side length of a block is
     # approximately two times the grid spacing in the respective direction.
@@ -292,8 +292,8 @@ class BlockProperties(db.Model):
     # rotation angles below are those of block 2 relative to block 1. The
     # offsets are stored as JSON arrays.
     #
-    # The list has "congruency_a" number of entries, corresponding to rotation
-    # about 0°, 90°, ...
+    # If the block has 2-fold rotational symmetry, then the list has two
+    # entries, for 0° and 90°. Otherwise it has four entries.
     collision_offsets_list_bxy = db.StringListProperty()
 
     # A block 2 is defined to be attachable to a block 1, if it is offset
@@ -301,8 +301,8 @@ class BlockProperties(db.Model):
     # rotation angles below are those of block 2 relative to block 1. The
     # offsets are stored as JSON arrays.
     #
-    # The list has "congruency_a" number of entries, corresponding to rotation
-    # about 0°, 90°, ...
+    # If the block has 2-fold rotational symmetry, then the list has two
+    # entries, for 0° and 90°. Otherwise it has four entries.
     attachment_offsets_list_b = db.StringListProperty()
 
     # Center of rotation, with coordinates in block space, relative to the
@@ -402,7 +402,8 @@ class RPCConstruction(webapp.RequestHandler):
         if block_properties_data_changed:
             # Block properties data version on server not the same as on
             # client. => Deliver all the data.
-            data.update({'congruencyA': block_properties.congruency_a,
+            data.update({'has2FoldSymmetry': 
+                         block_properties.has_2_fold_symmetry,
                          'positionSpacingXY': 
                          block_properties.position_spacing_xy,
                          'positionSpacingZ': 

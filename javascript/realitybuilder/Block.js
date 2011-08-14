@@ -126,8 +126,8 @@ dojo.declare('realityBuilder.Block', null, {
         return this._a;
     },
 
-    congruencyA: function () {
-        return this._blockProperties.congruencyA();
+    has2FoldSymmetry: function () {
+        return this._blockProperties.has2FoldSymmetry();
     },
 
     congruencyOffsetB: function () {
