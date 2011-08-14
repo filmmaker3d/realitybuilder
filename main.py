@@ -35,7 +35,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = True
+debug = False
 
 # Dumps the data "data" as JSONP response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -112,6 +112,12 @@ class PrerenderMode(db.Model):
     is_enabled = db.BooleanProperty()
     make_real_after = db.IntegerProperty() # ms
     block_configurations = db.StringListProperty()
+
+    # If "reset_at" is non-null, then the current configuration is reset to the
+    # prerendered block configuration number 0 at or after that time. When a
+    # reset is requested, then "reset_at" is set to now plus "reset_timeout".
+    reset_timeout = db.IntegerProperty() # ms
+    reset_at = db.DateTimeProperty()
 
     # Index of the currently loaded prerendered block configuration, and of the
     # previously loaded one:
@@ -653,7 +659,6 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
     def get(self):
         try:
             namespace_manager.set_namespace(self.request.get('namespace'))
-
             i = int(self.request.get('i'))
             callback = self.request.get('callback')
             db.run_in_transaction(self.transaction, i)
