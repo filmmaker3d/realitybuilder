@@ -1,4 +1,1 @@
-({
-	"preview": "Náhľad"
-})
-
+({"preview":"Náhľad"})

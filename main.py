@@ -34,7 +34,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = True
+debug = False
 
 # Dumps the data "data" as JSONP response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -104,6 +104,10 @@ class PrerenderMode(db.Model):
     # "make_real_after" milliseconds, and if the total construction would
     # afterwards match one of the block configurations in the list
     # "block_configurations".
+    #
+    # If the block has 2-fold rotational symmetry, then the prerendered block
+    # configurations are only allowed to contain blocks rotated by angles 0°
+    # and 90°!
     is_enabled = db.BooleanProperty()
     make_real_after = db.IntegerProperty() # ms
     block_configurations = db.StringListProperty()

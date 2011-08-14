@@ -12764,10 +12764,10 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
-
-    // If the block is rotated by that angle, then it is congruent with it not
-    // being rotated.
-    _congruencyA: null,
+    
+    // True if the block has two-fold rotational symmetry, when viewed from
+    // above. Note that this setting is irrespective of the center of rotation.
+    _has2FoldSymmetry: null,
 
     // Block dimensions in world space. The side length of a block is
     // approximately two times the grid spacing in the respective direction.
@@ -12808,8 +12808,8 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // relative to the origin of the unrotated block.
     _rotCenterBXY: null,
 
-    // For blocks with two-fold rotational symmetry, remains congruent with
-    // itself, if rotated about the centroid:
+    // A block with two-fold rotational symmetry, remains congruent with
+    // itself, if rotated by 180° about the centroid:
     _centroidBXY: null,
 
     // Alpha transparency of the block's background:
@@ -12900,12 +12900,12 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         });
     },
 
-    congruencyA: function () {
-        return this._congruencyA;
+    has2FoldSymmetry: function () {
+        return this._has2FoldSymmetry;
     },
 
-    // If the congruency angle is 180°, then completes the list of offsets for
-    // the missing angles, as follows:
+    // If the block has two-fold rotational symmetry, then completes the list
+    // of offsets for the missing angles, as follows:
     //
     // There are already offsets for 0° and 90°. And this function calculates
     // the offsets for 180° (based on 0°) and 270° (based on 90°), and adds
@@ -12913,7 +12913,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     _completeCollisionOffsetsListBXY: function () {
         var listBXY = this._collisionOffsetsListBXY;
 
-        if (this._congruencyA === 2) {
+        if (this._has2FoldSymmetry) {
             // 180°: from 0° + congruency offset:
             listBXY.push(this._withCongruencyOffsetsAddedBXY(listBXY[0], 0));
 
@@ -12965,7 +12965,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     _completeAttachmentOffsetsListB: function () {
         var listB = this._attachmentOffsetsListB;
 
-        if (this._congruencyA === 2) {
+        if (this._has2FoldSymmetry) {
             listB.push(this._withCongruencyOffsetsAddedB(listB[0], 0));
             listB.push(this._withCongruencyOffsetsAddedB(listB[1], 1));
         }
@@ -13016,7 +13016,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     updateWithServerData: function (serverData) {
         if (this._versionOnServer !== serverData.version) {
             this._versionOnServer = serverData.version;
-            this._congruencyA = serverData.congruencyA;
+            this._has2FoldSymmetry = serverData.has2FoldSymmetry;
             this._positionSpacingXY = serverData.positionSpacingXY;
             this._positionSpacingZ = serverData.positionSpacingZ;
             this._outlineBXY = serverData.outlineBXY;
@@ -13291,8 +13291,8 @@ dojo.declare('realityBuilder.Block', null, {
         return this._a;
     },
 
-    congruencyA: function () {
-        return this._blockProperties.congruencyA();
+    has2FoldSymmetry: function () {
+        return this._blockProperties.has2FoldSymmetry();
     },
 
     congruencyOffsetB: function () {
@@ -16544,7 +16544,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         positionB = block.positionB();
         a = block.a();
 
-        if (block.congruencyA() === 2 && a >= 2) {
+        if (block.has2FoldSymmetry() && a >= 2) {
             positionBAndA = 
                 realityBuilder.util.addVectorsB(positionB,
                                                 block.congruencyOffsetB());
