@@ -192,24 +192,38 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         dojo.publish('realityBuilder/NewBlock/unfrozen');
     },
 
-    _unfreezeIfMadeRealOrDeleted: function () {
-        var positionB, state, constructionBlock;
+    // Returns true, iff this block equals a construction block that has been
+    // marked deleted.
+    _turnedIntoDeletedConstructionBlock: function () {
+        var positionB, constructionBlock;
 
         if (this.isFrozen()) {
-            constructionBlock = 
-                this._constructionBlocks.blockAt(this.positionB());
-            if (constructionBlock) {
-                // Construction block in same position as new block.
+            // The block is currently in the state "requested to be made real".
+            
+            if (this._prerenderMode.isEnabled()) {
+                // With prerender-mode enabled it never happens that a "make
+                // real" request is answered with turning the block into a
+                // deleted construction block.
+                //
+                // Furthermore, the check below may fail in the case of
+                // two-fold rotational symmetry, where it could happen that the
+                // "make real" request is answered with a congruent block, is
+                // rotated by 180°. This, on the other hand, does not happen
+                // with prerender-mode disabled.
+                return false;
+            } else {
+                constructionBlock = 
+                    this._constructionBlocks.blockAt(this.positionB()); // fixme: also respect angle
+                if (constructionBlock) {
+                    // Construction block in same position as new block.
 
-                if (constructionBlock.isDeleted() ||  
-                    constructionBlock.isReal()) {
-                    // construction block real = make-real-request accepted,
-                    // construction block deleted = request denied
-
-                    this._unfreeze(); // so that user can continue
-                } // else: pending or no data from the server
+                    if (constructionBlock.isDeleted()) {
+                        return true;
+                    }
+                }
             }
         }
+
     },
 
     // Makes sure that this block does not intersect with any real block. If it
@@ -235,8 +249,18 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // To be called after construction blocks have been changed.
     updateState: function () {
-        this._unfreezeIfMadeRealOrDeleted();
-        this._moveOutOfTheWay();
+        var turnedIntoDeletedConstructionBlock, hasBeenMovedOutOfTheWay;
+
+        // Has to be called before possibly moving the block out of the way:
+        turnedIntoDeletedConstructionBlock = 
+            this._turnedIntoDeletedConstructionBlock();
+
+        hasBeenMovedOutOfTheWay = this._moveOutOfTheWay();
+
+        if (this.isFrozen() && (hasBeenMovedOutOfTheWay || 
+                                turnedIntoDeletedConstructionBlock)) {
+            this.unfreeze();
+        }
     },
 
     // Returns true, if this block would intersect with any real block if:
