@@ -166,6 +166,7 @@ var realityBuilderDemo = (function () {
             return {
                 width: 640,
                 height: 480,
+                namespace: 'demo',
                 onReady: onReady,
                 onBrowserNotSupportedError: onBrowserNotSupportedError,
                 onPrerenderedBlockConfigurationChanged: 

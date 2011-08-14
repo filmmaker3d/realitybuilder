@@ -25,6 +25,7 @@ import time
 import sys
 import exceptions
 import google.appengine.ext.db
+from google.appengine.api import namespace_manager
 from google.appengine.api import mail
 from google.appengine.api import users
 from google.appengine.ext.webapp import template
@@ -34,7 +35,7 @@ from google.appengine.ext import db
 from django.utils import simplejson
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSONP response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -540,6 +541,8 @@ class RPCConstruction(webapp.RequestHandler):
 
     def get(self):
         try:
+            namespace_manager.set_namespace(self.request.get('namespace'))
+
             blocks_data_version_client = \
                 self.request.get('blocksDataVersion')
             camera_data_version_client = \
@@ -588,6 +591,8 @@ class RPCAdminMakeReal(webapp.RequestHandler):
 
     def get(self):
         try:
+            namespace_manager.set_namespace(self.request.get('namespace'))
+
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
@@ -647,6 +652,8 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
     # Only runs if prerender-mode is enabled.
     def get(self):
         try:
+            namespace_manager.set_namespace(self.request.get('namespace'))
+
             i = int(self.request.get('i'))
             callback = self.request.get('callback')
             db.run_in_transaction(self.transaction, i)
@@ -657,7 +664,7 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
 
 # Sets the state of the block at the provided position to deleted.
 #
-# The post request fails silently on error.
+# The request fails silently on error.
 class RPCAdminDelete(webapp.RequestHandler):
     # Tries to delete the block at position "x_b", "y_b", "z_b", and rotated by
     # the angle "a".
@@ -672,6 +679,8 @@ class RPCAdminDelete(webapp.RequestHandler):
 
     def get(self):
         try:
+            namespace_manager.set_namespace(self.request.get('namespace'))
+
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
@@ -697,7 +706,7 @@ class RPCAdminDelete(webapp.RequestHandler):
 # non-pending block has been changed to pending, then an email is sent to the
 # configured email address.
 #
-# The post request fails silently on error.
+# The request fails silently on error.
 class RPCCreatePending(webapp.RequestHandler):
     # Tries to send an email, informing that a pending block has been created,
     # or the state of an existing block has been changed to pending. The
@@ -751,6 +760,8 @@ Angle: %d
 
     def get(self):
         try:
+            namespace_manager.set_namespace(self.request.get('namespace'))
+
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
@@ -767,7 +778,7 @@ Angle: %d
 # position or if it is already pending, then nothing is done. If the block
 # intersects with a real block, then it is deleted.
 #
-# The post request fails silently on error.
+# The request fails silently on error.
 class RPCAdminMakePending(webapp.RequestHandler):
     # Tries to turn the block at the block position "x_b", "y_b", "z_b" and
     # rotated by the angle "a" into a pending block, or sets its state to
@@ -792,6 +803,8 @@ class RPCAdminMakePending(webapp.RequestHandler):
 
     def get(self):
         try:
+            namespace_manager.set_namespace(self.request.get('namespace'))
+
             x_b = int(self.request.get('xB'))
             y_b = int(self.request.get('yB'))
             z_b = int(self.request.get('zB'))
@@ -804,7 +817,7 @@ class RPCAdminMakePending(webapp.RequestHandler):
 
 # Updates the camera settings and increases the camera version number.
 #
-# The post request fails silently on error.
+# The request fails silently on error.
 class RPCAdminUpdateSettings(webapp.RequestHandler):
     # Tries to update camera settings. Ignores values that cannot be assigned.
     @classmethod
@@ -824,6 +837,8 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
 
     def get(self):
         try:
+            namespace_manager.set_namespace(self.request.get('namespace'))
+
             data = {
                 'camera_position': [float(self.request.get('camera.x')),
                                     float(self.request.get('camera.y')),

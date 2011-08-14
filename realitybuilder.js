@@ -192,6 +192,8 @@ var realityBuilder = (function () {
         //
         // * "id": ID of HTML element into which to insert the Reality Builder.
         //
+        // * "namespace": Namespace used when accessing the data store.
+        //
         // * "onReady": Function that is called when the Reality Builder is
         //   ready to use, i.e. after it has downloaded the required resources,
         //   rendered itself, etc.
@@ -244,6 +246,7 @@ var realityBuilder = (function () {
         initialize: function (settings) {
             var defaultSettings = {
                 id: 'realityBuilder',
+                namespace: 'default',
                 jsonpTimeout: 0,
                 onServerCommunicationError: nop,
                 onBrowserNotSupportedError: nop,

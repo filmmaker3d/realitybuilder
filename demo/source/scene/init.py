@@ -48,6 +48,9 @@ from main import PendingBlockEmail
 from main import PrerenderMode
 from django.utils import simplejson
 
+from google.appengine.api import namespace_manager
+namespace_manager.set_namespace('demo')
+
 # Deletes all construction entries:
 queries = [Construction.all()]
 for query in queries:
