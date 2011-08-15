@@ -163,6 +163,10 @@ var realityBuilderDemo = (function () {
         $(document.documentElement).keypress(onKeyPressed);
     }
 
+    function updateResetDelay() {
+        $('#resetDelay').text(realityBuilder.prerenderMode().resetDelay());
+    }
+
     // Called when the Reality Builder is ready. Note that the background image
     // is separate and may still be in the process of being loaded.
     function onReady() {
@@ -170,6 +174,7 @@ var realityBuilderDemo = (function () {
         setUpRotate90Button();
         setUpRequestMakeRealButton();
         setUpHandlingOfKeyPresses();
+        updateResetDelay();
 
         realityBuilderIsReady = true;
 

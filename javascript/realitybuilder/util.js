@@ -375,7 +375,7 @@ realityBuilder.util.rootUrl = function () {
 
 // Performs a JSONP request, using some default settings.
 realityBuilder.util.jsonpGet = function (args) {
-    if (args.content === 'undefined') {
+    if (typeof args.content === 'undefined') {
         args.content = {};
     }
 

@@ -13611,7 +13611,7 @@ realityBuilder.util.rootUrl = function () {
 
 // Performs a JSONP request, using some default settings.
 realityBuilder.util.jsonpGet = function (args) {
-    if (args.content === 'undefined') {
+    if (typeof args.content === 'undefined') {
         args.content = {};
     }
 
@@ -15562,6 +15562,9 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     _makeRealAfter: null, // ms
     _blockConfigurations: null, // [[xB, yB, zB, a], [xB, ...], ...], sorted!
 
+    // How much a reset should be delayed:
+    _resetDelay: null, // ms
+
     // Index of the currently and of the previously loaded prerendered block
     // configuration.
     _i: null,
@@ -15577,6 +15580,10 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         return this._versionOnServer !== '-1';
     },
 
+    resetDelay: function () {
+        return this._resetDelay;
+    },
+
     // Updates the settings of the camera to the version on the server, which
     // is described by "serverData".
     updateWithServerData: function (serverData) {
@@ -15587,6 +15594,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
             this._blockConfigurations = serverData.blockConfigurations;
             this._i = serverData.i;
             this._prevI = serverData.prevI;
+            this._resetDelay = serverData.resetDelay;
 
             this._sortBlockConfigurations(this._blockConfigurations);
             

@@ -111,8 +111,7 @@ prerenderMode.block_configurations = \
      '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0], ' +
      '[1, 1, 1, 3]]']
 prerenderMode.i = 0
-prerenderMode.reset_timeout = 10
-prerenderMode.reset_at = None
+prerenderMode.reset_delay = 5000
 prerenderMode.put()
 
 # Deletes all block properties entries:

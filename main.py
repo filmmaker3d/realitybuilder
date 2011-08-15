@@ -118,9 +118,9 @@ class PrerenderMode(db.Model):
     # prerendered block configuration number 0 at or after that time. When a
     # reset is requested, then - unless already set - "reset_at" is set to:
     #
-    #   now plus "reset_timeout"
-    reset_timeout = db.IntegerProperty() # ms
-    reset_at = db.DateTimeProperty()
+    #   now plus "reset_delay"
+    reset_delay = db.IntegerProperty() # ms
+    reset_at = db.DateTimeProperty(None)
 
     # Index of the currently loaded prerendered block configuration, and of the
     # previously loaded one:
@@ -131,6 +131,46 @@ class PrerenderMode(db.Model):
     def increase_data_version(self):
         self.data_version = str(int(self.data_version) + 1)
         self.put()
+
+    def reset_should_happen(self):
+        return self.reset_at != None and datetime.now() >= self.reset_at
+
+    def unschedule_reset(self):
+        self.reset_at = None
+        self.put()
+
+    # Replaces all construction blocks with those in the prerendered block
+    # configuration number "i". Should be run in a transaction.
+    def load_block_configuration(self, i):
+        construction = self.parent()
+
+        block_configurations = self.block_configurations
+
+        if i < len(block_configurations):
+            # Deletes all block entries:
+            queries = [Block.all().ancestor(construction)]
+            for query in queries:
+                for result in query:
+                    result.delete()
+
+            # Inserts blocks:
+            blocks = simplejson.loads(block_configurations[i])
+            for block in blocks:
+                x_b = block[0]
+                y_b = block[1]
+                z_b = block[2]
+                a = block[3]
+                block = Block.insert_at(construction, [x_b, y_b, z_b], a)
+                block.state = 2
+                block.put()
+
+            construction.increase_blocks_data_version()
+
+            self.prev_i = self.i
+            self.i = i
+            self.increase_data_version()
+        else:
+            raise Exception('Index out of bounds')
 
 # Data specific to the new block.
 class NewBlock(db.Model):
@@ -190,7 +230,7 @@ class Block(db.Model):
     @classmethod
     def get_at(cls, construction, position_b, a):
         return cls.get_by_key_name(cls.build_key_name(position_b, a), 
-                                   parent=construction)
+                                   parent = construction)
 
     # Inserts a block at the block space position "position_b" in the
     # construction "construction", with the initial state deleted. The block is
@@ -514,8 +554,20 @@ class RPCConstruction(webapp.RequestHandler):
                              cls.json_decode_list \
                              (prerender_mode.block_configurations),
                          'i': prerender_mode.i,
-                         'prevI': prerender_mode.prev_i})
+                         'prevI': prerender_mode.prev_i,
+                         'resetDelay': prerender_mode.reset_delay})
         return data
+
+    # Only has an effect in prerender-mode.
+    #
+    # If behind or on schedule, resets the current block configuration to
+    # prerendered block configuration number 0.
+    @classmethod
+    def reset_if_scheduled(cls, construction):
+        prerender_mode = construction.prerender_mode()
+        if prerender_mode.is_enabled and prerender_mode.reset_should_happen():
+            prerender_mode.load_block_configuration(0)
+            prerender_mode.unschedule_reset()
 
     # A transaction may not be necessary, but it ensures data integrity for
     # example if there is a transaction missing somewhere else.
@@ -528,6 +580,9 @@ class RPCConstruction(webapp.RequestHandler):
                     new_block_data_version_client,
                     prerender_mode_data_version_client):
         construction = Construction.get_main()
+
+        cls.reset_if_scheduled(construction)
+
         data = {
             'updateIntervalClient': construction.update_interval_client,
             'blocksData':
@@ -617,7 +672,7 @@ class RPCAdminMakeReal(webapp.RequestHandler):
 #
 # Requests a reset of the block configuration to the prerendered block
 # configuration 0. The reset is scheduled to happen at or after: now plus
-# "reset_timeout". If a reset is already scheduled, then that schedule is not
+# "reset_delay". If a reset is already scheduled, then that schedule is not
 # changed.
 # 
 # Silently fails on error.
@@ -630,15 +685,14 @@ class RPCScheduleReset(webapp.RequestHandler):
 
         if prerender_mode.is_enabled:
             if prerender_mode.reset_at == None:
-                timeout = prerender_mode.reset_timeout
+                delay = prerender_mode.reset_delay
                 prerender_mode.reset_at = datetime.now() + timedelta(0, 0, 0, 
-                                                                     timeout)
+                                                                     delay)
                 prerender_mode.put()
 
     # Only runs if prerender-mode is enabled.
     def get(self):
         try:
-            logging.error('fixmefixme:');
             namespace_manager.set_namespace(self.request.get('namespace'))
             callback = self.request.get('callback')
             db.run_in_transaction(self.transaction)
@@ -650,36 +704,6 @@ class RPCScheduleReset(webapp.RequestHandler):
 # 
 # Silently fails on error.
 class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
-    @classmethod
-    def updateBlocks(cls, construction, prerender_mode, i):
-        block_configurations = prerender_mode.block_configurations
-
-        if i < len(block_configurations):
-            # Deletes all block entries:
-            queries = [Block.all().ancestor(construction)]
-            for query in queries:
-                for result in query:
-                    result.delete()
-
-            # Inserts blocks:
-            blocks = simplejson.loads(block_configurations[i])
-            for block in blocks:
-                x_b = block[0]
-                y_b = block[1]
-                z_b = block[2]
-                a = block[3]
-                block = Block.insert_at(construction, [x_b, y_b, z_b], a)
-                block.state = 2
-                block.put()
-
-            construction.increase_blocks_data_version()
-
-            prerender_mode.prev_i = prerender_mode.i
-            prerender_mode.i = i
-            prerender_mode.increase_data_version()
-        else:
-            raise Exception('Index out of bounds')
-
     # If prerender-mode is enabled, then replaces all blocks with the blocks in
     # the prerendered block configuration with index "i".
     @classmethod
@@ -689,7 +713,7 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
         prerender_mode = construction.prerender_mode()
 
         if prerender_mode.is_enabled:
-            cls.updateBlocks(construction, prerender_mode, i)
+            prerender_mode.load_block_configuration(i)
 
     # Only runs if prerender-mode is enabled.
     def get(self):
