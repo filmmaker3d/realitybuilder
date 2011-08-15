@@ -304,7 +304,7 @@ var realityBuilderAdminDemo = (function () {
                     settings.onPrerenderedBlockConfigurationChanged();
                     updatePrerenderModeControls();
                 },
-                jsonpTimeout: 5000,
+                jsonpTimeout: 20000,
                 onJsonpError: onJsonpError,
                 onRealBlocksVisibilityChanged: 
                 updateRealBlocksVisibilityButton,

@@ -165,13 +165,14 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     },
 
     // Returns the construction block at the block space position "positionB",
-    // or false if there is none.
-    blockAt: function (positionB) {
+    // and rotated by the angle "a", or false if there is none.
+    blockAt: function (positionB, a) {
         var blocks = this.blocks(), block, i;
         for (i = 0; i < blocks.length; i += 1) {
             block = blocks[i];
-            if (realityBuilder.util.pointsIdenticalB(
-                positionB, block.positionB())) {
+            if (realityBuilder.util.pointsIdenticalB(positionB, 
+                                                     block.positionB()) &&
+                a === block.a()) {
                 return block;
             }
         }

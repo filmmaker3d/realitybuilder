@@ -213,7 +213,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                 return false;
             } else {
                 constructionBlock = 
-                    this._constructionBlocks.blockAt(this.positionB()); // fixme: also respect angle
+                    this._constructionBlocks.blockAt(this.positionB(),
+                                                     this.a());
                 if (constructionBlock) {
                     // Construction block in same position as new block.
 
@@ -230,6 +231,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // does, it is elevated step by step until it sits on top of another block.
     // Only updates the position of the block in block space. Does not update
     // any of the other coordinates.
+    //
+    // Returns true, iff the block has been elevated.
     _moveOutOfTheWay: function () {
         var 
         testBlock, cbs = this._constructionBlocks, 
@@ -244,7 +247,10 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                                                          this.a());
             } while (cbs.realBlocksCollideWith(testBlock));
             this._positionB[2] = testZB;
+            return true;
         }
+
+        return false;
     },
 
     // To be called after construction blocks have been changed.
@@ -259,7 +265,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
         if (this.isFrozen() && (hasBeenMovedOutOfTheWay || 
                                 turnedIntoDeletedConstructionBlock)) {
-            this.unfreeze();
+            this._unfreeze();
         }
     },
 
