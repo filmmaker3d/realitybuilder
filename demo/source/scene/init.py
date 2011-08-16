@@ -42,7 +42,6 @@ use_library('django', '0.96')
 from main import Construction
 from main import Block
 from main import BlockProperties
-from main import ConstructionBlockProperties
 from main import NewBlock
 from main import PendingBlockEmail
 from main import PrerenderMode
@@ -158,25 +157,7 @@ newBlock.move_space_1_b = [-1, -1, 0]
 newBlock.move_space_2_b = [6, 6, 5]
 newBlock.build_space_1_b = [0, 0, 0]
 newBlock.build_space_2_b = [5, 5, 4]
-newBlock.color = 'red'
-newBlock.color_when_frozen = 'white'
-newBlock.shadow_color = 'red'
-newBlock.shadow_alpha = 0.2
 newBlock.put()
-
-# Deletes all construction block properties entries:
-queries = [ConstructionBlockProperties.all()]
-for query in queries:
-    for result in query:
-        result.delete()
-
-# Sets up the construction block properties:
-constructionBlockProperties = \
-    ConstructionBlockProperties(parent=construction)
-constructionBlockProperties.data_version = '0'
-constructionBlockProperties.pending_color = 'white'
-constructionBlockProperties.real_color = 'green'
-constructionBlockProperties.put()
 
 # Deletes all block entries:
 queries = [Block.all()]

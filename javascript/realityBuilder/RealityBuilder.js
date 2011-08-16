@@ -22,7 +22,6 @@
 dojo.provide('realityBuilder.RealityBuilder');
 
 dojo.require('realityBuilder.BlockProperties');
-dojo.require('realityBuilder.ConstructionBlockProperties');
 dojo.require('realityBuilder.ConstructionBlocks');
 dojo.require('realityBuilder.ConstructionBlock');
 dojo.require('realityBuilder.NewBlock');
@@ -37,9 +36,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
-
-    // Properties of a construction block:
-    _constructionBlockProperties: null,
 
     // Prerender-mode:
     _prerenderMode: null,
@@ -73,15 +69,11 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         this._onReadyCalled = false;
 
         this._blockProperties = new rb.BlockProperties();
-        this._constructionBlockProperties = 
-            new rb.ConstructionBlockProperties();
         this._camera = new rb.Camera(this._blockProperties, 
                                      settings.width, settings.height,
                                      dojo.byId(settings.id));
         this._constructionBlocks = 
-            new rb.ConstructionBlocks(this._blockProperties,
-                                      this._constructionBlockProperties,
-                                      this._camera);
+            new rb.ConstructionBlocks(this._blockProperties, this._camera);
         this._prerenderMode = new rb.PrerenderMode();
         this._newBlock = 
             new rb.NewBlock(this._blockProperties,
@@ -116,8 +108,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                        this, this._onCameraChanged);
         dojo.subscribe('realityBuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
-        dojo.subscribe('realityBuilder/ConstructionBlockProperties/changed',
-                       this, this._onConstructionBlockPropertiesChanged);
         dojo.subscribe('realityBuilder/PrerenderMode/changed',
                        this, this._onPrerenderModeChanged);
 
@@ -211,8 +201,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData() &&
-            this._constructionBlockProperties.isInitializedWithServerData()) {
+            this._blockProperties.isInitializedWithServerData()) {
             this._constructionBlocks.renderIfVisible();
             this._newBlock.render();
         }
@@ -274,12 +263,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         this._checkIfReady();
     },
 
-    // Called after the block properties have changed.
-    _onConstructionBlockPropertiesChanged: function () {
-        this._renderBlocksIfFullyInitialized();
-        this._checkIfReady();
-    },
-
     _onPrerenderModeChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._checkIfReady();
@@ -292,7 +275,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
-            this._constructionBlockProperties.isInitializedWithServerData() &&
             this._onReadyCalled === false) {
 
             realityBuilder.util.SETTINGS.onReady();
@@ -328,11 +310,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                 updateWithServerData(data.blockPropertiesData);
         }
 
-        if (data.constructionBlockPropertiesData.changed) {
-            this._constructionBlockProperties.
-                updateWithServerData(data.constructionBlockPropertiesData);
-        }
-
         if (data.newBlockData.changed) {
             this._newBlock.updateWithServerData(data.newBlockData);
         }
@@ -362,8 +339,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                 "cameraDataVersion": this._camera.versionOnServer(),
                 "blockPropertiesDataVersion": 
                 this._blockProperties.versionOnServer(),
-                "constructionBlockPropertiesDataVersion": 
-                this._constructionBlockProperties.versionOnServer(),
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
                 "prerenderModeDataVersion": 
                 this._prerenderMode.versionOnServer()

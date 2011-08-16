@@ -243,6 +243,14 @@ var realityBuilder = (function () {
         //
         // * "onServerError": Called when the server could not process are
         //   request, for example because the server was down.
+        //
+        // * "lineWidthOfBlock": line width of block (px)
+        //
+        // * "colorOfPendingBlock", "colorOfRealBlock", "colorOfNewBlock",
+        //   "colorOfFrozenNewBlock", "colorOfNewBlockShadow",
+        //   "alphaOfNewBlockShadow":
+        //
+        //   Colors (CSS format) and alpha transparency of blocks, shadow.
         initialize: function (settings) {
             var defaultSettings = {
                 id: 'realityBuilder',
@@ -258,7 +266,14 @@ var realityBuilder = (function () {
                 onCameraChanged: nop,
                 onMovedOrRotated: nop,
                 onConstructionBlocksChanged: nop,
-                onServerError: nop
+                onServerError: nop,
+                lineWidthOfBlock: 1,
+                colorOfPendingBlock: 'white',
+                colorOfRealBlock: 'green',
+                colorOfNewBlock: 'red',
+                colorOfFrozenNewBlock: 'white',
+                colorOfNewBlockShadow: 'red',
+                alphaOfNewBlockShadow: 0.2
             };
 
             if (!w3cDomIsSupported()) {

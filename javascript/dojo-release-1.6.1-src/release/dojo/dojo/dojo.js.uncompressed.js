@@ -12200,77 +12200,6 @@ dojo.declare('realityBuilder.BlockProperties', null, {
 
 }
 
-if(!dojo._hasResource['realityBuilder.ConstructionBlockProperties']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
-dojo._hasResource['realityBuilder.ConstructionBlockProperties'] = true;
-// Describes the properties of a construction block.
-
-// Sometimes the term "full shadow" is used, which refers to the shadow how it
-// would look if the all blocks in the layer would form an infinite plane
-// without holes.
-
-// Copyright 2011 Felix E. Klee <felix.klee@inka.de>
-//
-// Licensed under the Apache License, Version 2.0 (the "License"); you may not
-// use this file except in compliance with the License. You may obtain a copy
-// of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-// License for the specific language governing permissions and limitations
-// under the License.
-
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
-
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
-
-dojo.provide('realityBuilder.ConstructionBlockProperties');
-
-dojo.declare('realityBuilder.ConstructionBlockProperties', null, {
-    // Version of data last retrieved from the server, or "-1" initially. Is a
-    // string in order to be able to contain very large integers.
-    _versionOnServer: '-1',
-
-    // Color (CSS format) of the block, if pending or real:
-    _pendingColor: null,
-    _realColor: null,
-
-    versionOnServer: function () {
-        return this._versionOnServer;
-    },
-
-    // Returns false when the object is new and has not yet been updated with
-    // server data.
-    isInitializedWithServerData: function () {
-        return this._versionOnServer !== '-1';
-    },
-
-    // Updates the block properties to the version on the server, which is
-    // described by "serverData".
-    updateWithServerData: function (serverData) {
-        if (this._versionOnServer !== serverData.version) {
-            this._versionOnServer = serverData.version;
-            this._pendingColor = serverData.pendingColor;
-            this._realColor = serverData.realColor;
-
-            dojo.publish('realityBuilder/ConstructionBlockProperties/changed');
-        }
-    },
-
-    pendingColor: function () {
-        return this._pendingColor;
-    },
-
-    realColor: function () {
-        return this._realColor;
-    }
-});
-
-}
-
 if(!dojo._hasResource['realityBuilder.Block']){ //_hasResource checks added by build. Do not use _hasResource directly in your code.
 dojo._hasResource['realityBuilder.Block'] = true;
 // A building block.
@@ -12851,6 +12780,7 @@ dojo.declare('realityBuilder.Block', null, {
         this._updateCoordinates();
 
         context.strokeStyle = color;
+        context.lineWidth = realityBuilder.util.SETTINGS.lineWidthOfBlock;
         this._renderForeground(context);
         this._renderBackground(context);
     }
@@ -12896,22 +12826,15 @@ dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
     // change.
     _timeStamp: null,
 
-    // Properties of a construction block:
-    _constructionBlockProperties: null,
-
     // Creates a block at the position in block space ("xB", "yB", "zB") =
     // "positionB", and rotated about its center of rotation by "a" (° CCW,
     // when viewed from above). When the block is rendered, it is as seen by
     // the sensor of the camera "camera". A time stamp - in seconds since the
     // epoch - of the date-time when the bocks status was last changed is
     // "timeStamp".
-    //
-    // The block's properties, such as shape and size, are described by
-    // "blockProperties" and "constructionBlockProperties".
     constructor: function (blockProperties, camera, positionB, a, 
-                           constructionBlockProperties, state, timeStamp)
+                           state, timeStamp)
     {
-        this._constructionBlockProperties = constructionBlockProperties;
         this._state = state;
         this._timeStamp = timeStamp;
     },
@@ -12943,10 +12866,9 @@ dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
         var color, properties;
 
         if (!this.isDeleted()) {
-            properties = this._constructionBlockProperties;
             color = this.isReal() ? 
-                properties.realColor() : 
-                properties.pendingColor();
+                realityBuilder.util.SETTINGS.colorOfRealBlock :
+                realityBuilder.util.SETTINGS.colorOfPendingBlock;
             this.inherited(arguments, [arguments[0], color]);
         }
     },
@@ -13668,9 +13590,6 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
-    // Properties of a construction block:
-    _constructionBlockProperties: null,
-
     // The blocks.
     _blocks: null,
 
@@ -13682,11 +13601,8 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Creates a container for the blocks associated with the construction
     // "construction".
-    constructor: function (blockProperties, constructionBlockProperties, 
-                           camera)
-    {
+    constructor: function (blockProperties, camera) {
         this._blockProperties = blockProperties;
-        this._constructionBlockProperties = constructionBlockProperties;
         this._blocks = [];
         this._realBlocksSorted = [];
         this._camera = camera;
@@ -13745,7 +13661,6 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         return new rb.ConstructionBlock(this._blockProperties,
                                         camera, 
                                         serverData.positionB, serverData.a,
-                                        this._constructionBlockProperties,
                                         serverData.state,
                                         serverData.timeStamp);
     },
@@ -14574,12 +14489,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     _buildSpace1B: null,
     _buildSpace2B: null,
 
-    // Colors (CSS format) and transparency of the block and its shadow:
-    _color: null,
-    _colorWhenFrozen: null,
-    _shadowColor: null,
-    _shadowAlpha: null,
-
     // Iff true, then the block is frozen, which means that it can neither be
     // moved nor be rotated, nor be made real.
     _isFrozen: null,
@@ -14659,11 +14568,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             this._moveSpace2B = serverData.moveSpace2B;
             this._buildSpace1B = serverData.buildSpace1B;
             this._buildSpace2B = serverData.buildSpace2B;
-            
-            this._color = serverData.color;
-            this._colorWhenFrozen = serverData.colorWhenFrozen;
-            this._shadowColor = serverData.shadowColor;
-            this._shadowAlpha = serverData.shadowAlpha;
 
             this._versionOnServer = serverData.version;
 
@@ -15015,10 +14919,14 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Updates the shadow, i.e. (re-)draws it or removes it.
     _renderShadow: function () {
+        var color, alpha;
+
         if (this.isFrozen()) {
             this._shadow.clear();
         } else {
-            this._shadow.render(this._shadowColor, this._shadowAlpha);
+            color = realityBuilder.util.SETTINGS.colorOfNewBlockShadow;
+            alpha = realityBuilder.util.SETTINGS.alphaOfNewBlockShadow;
+            this._shadow.render(color, alpha);
         }
     },
 
@@ -15067,7 +14975,9 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             canvas = this._camera.sensor().newBlockCanvas();
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
-                color = this.isFrozen() ? this._colorWhenFrozen : this._color;
+                color = this.isFrozen() ? 
+                    realityBuilder.util.SETTINGS.colorOfFrozenNewBlock : 
+                    realityBuilder.util.SETTINGS.colorOfNewBlock;
 
                 // Shadow does currently not work with FlashCanvas.
                 if (!realityBuilder.util.isFlashCanvasActive()) {
@@ -15842,7 +15752,6 @@ dojo.provide('realityBuilder.RealityBuilder');
 
 
 
-
 dojo.declare('realityBuilder.RealityBuilder', null, {
     // All blocks, permanently in the construction, including real and pending
     // blocks:
@@ -15850,9 +15759,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
-
-    // Properties of a construction block:
-    _constructionBlockProperties: null,
 
     // Prerender-mode:
     _prerenderMode: null,
@@ -15886,15 +15792,11 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         this._onReadyCalled = false;
 
         this._blockProperties = new rb.BlockProperties();
-        this._constructionBlockProperties = 
-            new rb.ConstructionBlockProperties();
         this._camera = new rb.Camera(this._blockProperties, 
                                      settings.width, settings.height,
                                      dojo.byId(settings.id));
         this._constructionBlocks = 
-            new rb.ConstructionBlocks(this._blockProperties,
-                                      this._constructionBlockProperties,
-                                      this._camera);
+            new rb.ConstructionBlocks(this._blockProperties, this._camera);
         this._prerenderMode = new rb.PrerenderMode();
         this._newBlock = 
             new rb.NewBlock(this._blockProperties,
@@ -15929,8 +15831,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                        this, this._onCameraChanged);
         dojo.subscribe('realityBuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
-        dojo.subscribe('realityBuilder/ConstructionBlockProperties/changed',
-                       this, this._onConstructionBlockPropertiesChanged);
         dojo.subscribe('realityBuilder/PrerenderMode/changed',
                        this, this._onPrerenderModeChanged);
 
@@ -16024,8 +15924,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData() &&
-            this._constructionBlockProperties.isInitializedWithServerData()) {
+            this._blockProperties.isInitializedWithServerData()) {
             this._constructionBlocks.renderIfVisible();
             this._newBlock.render();
         }
@@ -16087,12 +15986,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         this._checkIfReady();
     },
 
-    // Called after the block properties have changed.
-    _onConstructionBlockPropertiesChanged: function () {
-        this._renderBlocksIfFullyInitialized();
-        this._checkIfReady();
-    },
-
     _onPrerenderModeChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._checkIfReady();
@@ -16105,7 +15998,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._camera.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
-            this._constructionBlockProperties.isInitializedWithServerData() &&
             this._onReadyCalled === false) {
 
             realityBuilder.util.SETTINGS.onReady();
@@ -16141,11 +16033,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                 updateWithServerData(data.blockPropertiesData);
         }
 
-        if (data.constructionBlockPropertiesData.changed) {
-            this._constructionBlockProperties.
-                updateWithServerData(data.constructionBlockPropertiesData);
-        }
-
         if (data.newBlockData.changed) {
             this._newBlock.updateWithServerData(data.newBlockData);
         }
@@ -16175,8 +16062,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                 "cameraDataVersion": this._camera.versionOnServer(),
                 "blockPropertiesDataVersion": 
                 this._blockProperties.versionOnServer(),
-                "constructionBlockPropertiesDataVersion": 
-                this._constructionBlockProperties.versionOnServer(),
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
                 "prerenderModeDataVersion": 
                 this._prerenderMode.versionOnServer()

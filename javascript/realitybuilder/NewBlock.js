@@ -43,12 +43,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     _buildSpace1B: null,
     _buildSpace2B: null,
 
-    // Colors (CSS format) and transparency of the block and its shadow:
-    _color: null,
-    _colorWhenFrozen: null,
-    _shadowColor: null,
-    _shadowAlpha: null,
-
     // Iff true, then the block is frozen, which means that it can neither be
     // moved nor be rotated, nor be made real.
     _isFrozen: null,
@@ -128,11 +122,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             this._moveSpace2B = serverData.moveSpace2B;
             this._buildSpace1B = serverData.buildSpace1B;
             this._buildSpace2B = serverData.buildSpace2B;
-            
-            this._color = serverData.color;
-            this._colorWhenFrozen = serverData.colorWhenFrozen;
-            this._shadowColor = serverData.shadowColor;
-            this._shadowAlpha = serverData.shadowAlpha;
 
             this._versionOnServer = serverData.version;
 
@@ -484,10 +473,14 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Updates the shadow, i.e. (re-)draws it or removes it.
     _renderShadow: function () {
+        var color, alpha;
+
         if (this.isFrozen()) {
             this._shadow.clear();
         } else {
-            this._shadow.render(this._shadowColor, this._shadowAlpha);
+            color = realityBuilder.util.SETTINGS.colorOfNewBlockShadow;
+            alpha = realityBuilder.util.SETTINGS.alphaOfNewBlockShadow;
+            this._shadow.render(color, alpha);
         }
     },
 
@@ -536,7 +529,9 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             canvas = this._camera.sensor().newBlockCanvas();
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
-                color = this.isFrozen() ? this._colorWhenFrozen : this._color;
+                color = this.isFrozen() ? 
+                    realityBuilder.util.SETTINGS.colorOfFrozenNewBlock : 
+                    realityBuilder.util.SETTINGS.colorOfNewBlock;
 
                 // Shadow does currently not work with FlashCanvas.
                 if (!realityBuilder.util.isFlashCanvasActive()) {

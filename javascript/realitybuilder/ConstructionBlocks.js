@@ -38,9 +38,6 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
 
-    // Properties of a construction block:
-    _constructionBlockProperties: null,
-
     // The blocks.
     _blocks: null,
 
@@ -52,11 +49,8 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Creates a container for the blocks associated with the construction
     // "construction".
-    constructor: function (blockProperties, constructionBlockProperties, 
-                           camera)
-    {
+    constructor: function (blockProperties, camera) {
         this._blockProperties = blockProperties;
-        this._constructionBlockProperties = constructionBlockProperties;
         this._blocks = [];
         this._realBlocksSorted = [];
         this._camera = camera;
@@ -115,7 +109,6 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         return new rb.ConstructionBlock(this._blockProperties,
                                         camera, 
                                         serverData.positionB, serverData.a,
-                                        this._constructionBlockProperties,
                                         serverData.state,
                                         serverData.timeStamp);
     },

@@ -34,22 +34,15 @@ dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
     // change.
     _timeStamp: null,
 
-    // Properties of a construction block:
-    _constructionBlockProperties: null,
-
     // Creates a block at the position in block space ("xB", "yB", "zB") =
     // "positionB", and rotated about its center of rotation by "a" (° CCW,
     // when viewed from above). When the block is rendered, it is as seen by
     // the sensor of the camera "camera". A time stamp - in seconds since the
     // epoch - of the date-time when the bocks status was last changed is
     // "timeStamp".
-    //
-    // The block's properties, such as shape and size, are described by
-    // "blockProperties" and "constructionBlockProperties".
     constructor: function (blockProperties, camera, positionB, a, 
-                           constructionBlockProperties, state, timeStamp)
+                           state, timeStamp)
     {
-        this._constructionBlockProperties = constructionBlockProperties;
         this._state = state;
         this._timeStamp = timeStamp;
     },
@@ -81,10 +74,9 @@ dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
         var color, properties;
 
         if (!this.isDeleted()) {
-            properties = this._constructionBlockProperties;
             color = this.isReal() ? 
-                properties.realColor() : 
-                properties.pendingColor();
+                realityBuilder.util.SETTINGS.colorOfRealBlock :
+                realityBuilder.util.SETTINGS.colorOfPendingBlock;
             this.inherited(arguments, [arguments[0], color]);
         }
     },

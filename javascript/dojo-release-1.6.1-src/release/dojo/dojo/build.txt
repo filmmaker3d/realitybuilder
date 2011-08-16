@@ -25,7 +25,6 @@ dojo.js:
 ./../../release/dojo/dojox/math.js
 ./../../release/dojo/dojox/math/matrix.js
 ./../../release/dojo/realityBuilder/BlockProperties.js
-./../../release/dojo/realityBuilder/ConstructionBlockProperties.js
 ./../../release/dojo/realityBuilder/Block.js
 ./../../release/dojo/realityBuilder/ConstructionBlock.js
 ./../../release/dojo/dojo/io/script.js
@@ -68,7 +67,6 @@ dojo.xd.js:
 ./../../release/dojo/dojox/math.js
 ./../../release/dojo/dojox/math/matrix.js
 ./../../release/dojo/realityBuilder/BlockProperties.js
-./../../release/dojo/realityBuilder/ConstructionBlockProperties.js
 ./../../release/dojo/realityBuilder/Block.js
 ./../../release/dojo/realityBuilder/ConstructionBlock.js
 ./../../release/dojo/dojo/io/script.js

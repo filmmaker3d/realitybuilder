@@ -576,6 +576,7 @@ dojo.declare('realityBuilder.Block', null, {
         this._updateCoordinates();
 
         context.strokeStyle = color;
+        context.lineWidth = realityBuilder.util.SETTINGS.lineWidthOfBlock;
         this._renderForeground(context);
         this._renderBackground(context);
     }
