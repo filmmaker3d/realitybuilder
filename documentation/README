@@ -38,10 +38,10 @@ distribution of the Reality Builder. If desired, install it as follows:
 
 2. Place FlashCanvas Pro into:
 
-    /proprietary/FlashCanvasPro
+    /separate/FlashCanvasPro
 
-  The directory "proprietary" is for proprietary software components that
-  should not be redistributed as part of the Reality Builder source code.
+  The directory "separate" is components that should not be redistributed as
+  part of the Reality Builder source code.
 
 
 How to enable debugging
