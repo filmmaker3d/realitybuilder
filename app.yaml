@@ -26,9 +26,9 @@ handlers:
   static_files: index.html
   upload: index.html
 
-# For proprietary components such as FlashCanvas:
-- url: /proprietary
-  static_dir: proprietary
+# For components not included in the source code distribution:
+- url: /separate
+  static_dir: separate
 
 - url: /documentation
   static_dir: documentation
