@@ -14,7 +14,10 @@
 #     On Windows XP's "cmd.exe" (substitute %-placeholders):
 #
 #       %PYTHON_PATH%\python.exe %GAE_PATH%\remote_api_shell.py -s ^
-#       %APPLICATION%.appspot.com
+#       %VERSION%.%APPLICATION%.appspot.com
+#
+#     Note that, despite specifying a version above, the same datastore as for
+#     all other versions is used: There is only one.
 #
 #   c) Paste the code. It will execute automatically.
 
