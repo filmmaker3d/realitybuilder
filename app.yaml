@@ -89,6 +89,7 @@ skip_files:
 - ^javascript/realityBuilder
 - ^javascript/realityBuilder.profile.js
 - ^demo/source$
+- ^demo/scene$
 - ^documentation$
 - ^LICENSE$
 - ^NOTICE$
