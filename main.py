@@ -36,7 +36,7 @@ from django.utils import simplejson
 from datetime import datetime, timedelta
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSONP response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
