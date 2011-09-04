@@ -1,8 +1,0 @@
-/*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
-	Available via Academic Free License >= 2.1 OR the modified BSD license.
-	see: http://dojotoolkit.org/license for details
-*/
-
-
-realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.charting.themes.IndigoNation"],["require","dojox.charting.Theme"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.charting.themes.IndigoNation"]){_4._hasResource["dojox.charting.themes.IndigoNation"]=true;_4.provide("dojox.charting.themes.IndigoNation");_4.require("dojox.charting.Theme");(function(){var _7=_6.charting;_7.themes.IndigoNation=new _7.Theme({colors:["#93a4d0","#3b4152","#687291","#9faed9","#8290b8"]});})();}}};});

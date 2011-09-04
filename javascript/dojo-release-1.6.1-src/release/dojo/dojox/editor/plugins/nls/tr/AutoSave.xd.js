@@ -1,5 +1,0 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
-return {depends: [["provide", "dojox.editor.plugins.nls.tr.AutoSave"]],
-defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.tr.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "tr", ({"saveLabel":"Kaydet","saveSettingdialogTitle":"Otomatik Kaydet","saveSettingdialogButtonOk":"Aralığı Ayarla","saveMessageSuccess":"${0} konumuna kaydedildi","saveSettingdialogButtonCancel":"İptal","saveSettingdialogDescription":"Otomatik Kaydetme Aralığını Belirt","saveSettingLabelOn":"Otomatik Kaydetme Aralığını Ayarla...","saveSettingdialogParamLabel":"dak","saveSettingdialogParamName":"Otomatik Kaydetme Aralığı","saveMessageFail":"${0} konumuna kaydedilemedi","saveSettingLabelOff":"Otomatik Kaydetmeyi Kapat"})
-);
-}};});

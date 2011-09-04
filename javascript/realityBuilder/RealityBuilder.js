@@ -210,7 +210,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // Updates the state (including position) of the new block, but only if all
     // necessary components have been initialized, which is relevant only in
     // the beginning.
-    _updateNewBlockStateIfFullyInitialized: function () {
+    _updateNewBlockStateIfFullyInitialized: function (unfreeze) {
         if (this._constructionBlocks.isInitializedWithServerData() &&
             this._newBlock.isInitializedWithServerData() &&
             this._blockProperties.isInitializedWithServerData() &&
@@ -264,7 +264,10 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     },
 
     _onPrerenderModeChanged: function () {
-        // New block state may change if the prerendered configurations change:
+        // New block state may change if the prerendered configurations change.
+        // For example it may now be possible to make the block real, where
+        // before it wasn't due to lack of a matching prerendered block
+        // configuration.
         this._updateNewBlockStateIfFullyInitialized();
 
         this._checkIfReady();

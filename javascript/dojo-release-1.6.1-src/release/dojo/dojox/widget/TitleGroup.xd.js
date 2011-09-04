@@ -1,8 +1,0 @@
-/*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
-	Available via Academic Free License >= 2.1 OR the modified BSD license.
-	see: http://dojotoolkit.org/license for details
-*/
-
-
-realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.widget.TitleGroup"],["require","dijit._Widget"],["require","dijit.TitlePane"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.widget.TitleGroup"]){_4._hasResource["dojox.widget.TitleGroup"]=true;_4.provide("dojox.widget.TitleGroup");_4.require("dijit._Widget");_4.require("dijit.TitlePane");(function(d){var tp=_5.TitlePane.prototype,_7=function(){var _8=this._dxfindParent&&this._dxfindParent();_8&&_8.selectChild(this);};tp._dxfindParent=function(){var n=this.domNode.parentNode;if(n){n=_5.getEnclosingWidget(n);return n&&n instanceof _6.widget.TitleGroup&&n;}return n;};d.connect(tp,"_onTitleClick",_7);d.connect(tp,"_onTitleKey",function(e){if(!(e&&e.type&&e.type=="keypress"&&e.charOrCode==d.keys.TAB)){_7.apply(this,arguments);}});d.declare("dojox.widget.TitleGroup",_5._Widget,{"class":"dojoxTitleGroup",addChild:function(_9,_a){return _9.placeAt(this.domNode,_a);},removeChild:function(_b){this.domNode.removeChild(_b.domNode);return _b;},selectChild:function(_c){_c&&_4.query("> .dijitTitlePane",this.domNode).forEach(function(n){var tp=_5.getEnclosingWidget(n);tp&&tp!==_c&&tp.open&&tp.set("open",false);});return _c;}});})(_4);}}};});

@@ -1,5 +1,0 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
-return {depends: [["provide", "dojox.editor.plugins.nls.he.FindReplace"]],
-defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.he.FindReplace");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "FindReplace", "he", ({"replaceDialogText":"הוחלפו ${0} מופעים ","eofDialogTextFind":"נמצאו","eofDialogText":"המופע האחרון ${0}","backwards":"אחורה ","replaceButton":"החלפה ","replaceLabel":"החלפה עם: ","matchCase":"התאמת רישיות ","findTooltip":"ציינו תמליל לחיפוש","replaceTooltip":"ציינו תמליל להחלפה","replaceAllButton":"החלפת הכל ","eofDialogTextReplace":"הוחלפו ","findReplace":"חיפוש והחלפה ","backwardsTooltip":"חיפוש תמליל אחורה ","replaceAllButtonTooltip":"החלפת כל התמליל ","replaceButtonTooltip":"החלפת התמליל","findLabel":"חיפוש: ","findButton":"חיפוש","matchCaseTooltip":"התאמת רישיות","findButtonTooltip":"חיפוש התמליל","replaceAll":"כל המופעים "})
-);
-}};});

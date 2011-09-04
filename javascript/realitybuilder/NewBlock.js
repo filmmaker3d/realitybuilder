@@ -242,6 +242,18 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         return false;
     },
 
+    _shouldBeUnfrozen: function (turnedIntoDeletedConstructionBlock, 
+                                 hasBeenMovedOutOfTheWay)
+    {
+        // In prerender mode it does not make sense that the new block remains
+        // frozen when the construction blocks change (a change which may be
+        // triggered by another having requested a block to be made real).
+        
+        return (hasBeenMovedOutOfTheWay || 
+                turnedIntoDeletedConstructionBlock ||
+                this._prerenderMode.isEnabled());
+    },
+
     // To be called after construction blocks have been changed.
     updateState: function () {
         var turnedIntoDeletedConstructionBlock, hasBeenMovedOutOfTheWay;
@@ -252,8 +264,9 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
         hasBeenMovedOutOfTheWay = this._moveOutOfTheWay();
 
-        if (this.isFrozen() && (hasBeenMovedOutOfTheWay || 
-                                turnedIntoDeletedConstructionBlock)) {
+        if (this.isFrozen() && 
+            this._shouldBeUnfrozen(turnedIntoDeletedConstructionBlock, 
+                                   hasBeenMovedOutOfTheWay)) {
             this._unfreeze();
         }
     },
