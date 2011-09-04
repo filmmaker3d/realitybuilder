@@ -13085,6 +13085,10 @@ dojo.declare('realityBuilder.BlockProperties', null, {
 
     backgroundAlpha: function () {
         return this._backgroundAlpha;
+    },
+
+    rotCenterBXY: function () {
+        return this._rotCenterBXY;
     }
 });
 
@@ -13140,6 +13144,17 @@ dojo.declare('realityBuilder.Block', null, {
     _topVertexes: null,
     _topVertexesV: null,
     _topVertexesS: null,
+
+    // Coordinates of the block's center of rotation in block space, world
+    // space, view space, and sensor space:
+    _bottomRotCenterB: null,
+    _bottomRotCenter: null,
+    _bottomRotCenterV: null,
+    _bottomRotCenterS: null,
+    _topRotCenterB: null,
+    _topRotCenter: null,
+    _topRotCenterV: null,
+    _topRotCenterS: null,
 
     // The vertexes of the block projected to the view space x-z-plane.
     // 
@@ -13309,13 +13324,15 @@ dojo.declare('realityBuilder.Block', null, {
         return false;
     },
 
-    // Updates the vertexes of the block in block space.
+    // Updates the vertexes of the block and its center of rotation in block
+    // space.
     _updateBlockSpaceCoordinates: function () {
         var 
         xB = this.positionB()[0],
         yB = this.positionB()[1],
         zB = this.positionB()[2],
         blockOutlineBXY = this._blockProperties.rotatedOutlineBXY(this.a()),
+        rotCenterBXY = this._blockProperties.rotCenterBXY(),
         that = this;
 
         this._bottomVertexesB = [];
@@ -13330,6 +13347,13 @@ dojo.declare('realityBuilder.Block', null, {
                                      yB + vertexBXY[1], 
                                      zB + 1]);
         });
+
+        this._bottomRotCenterB = [xB + rotCenterBXY[0],
+                                  yB + rotCenterBXY[1],
+                                  zB];
+        this._topRotCenterB = [xB + rotCenterBXY[0],
+                               yB + rotCenterBXY[1],
+                               zB + 1];
     },
 
     _blockToWorld: function (pB) {
@@ -13337,15 +13361,22 @@ dojo.declare('realityBuilder.Block', null, {
                                                     this._blockProperties);
     },
 
-    // Updates the vertexes of the block in world space.
+    // Updates the vertexes of the block and its center of rotation in world
+    // space.
+    //
+    // Depends of up to date block space coordinates.
     _updateWorldSpaceCoordinates: function () {
         this._bottomVertexes = dojo.map(this._bottomVertexesB, 
                                         dojo.hitch(this, this._blockToWorld));
         this._topVertexes = dojo.map(this._topVertexesB, 
                                      dojo.hitch(this, this._blockToWorld));
+
+        this._bottomRotCenter = this._blockToWorld(this._bottomRotCenterB);
+        this._topRotCenter = this._blockToWorld(this._topRotCenterB);
     },
 
-    // Calculates the vertexes of the block in view space.
+    // Calculates the vertexes of the block and its center of rotation in view
+    // space.
     //
     // Depends on up to date world space coordinates.
     _updateViewSpaceCoordinates: function () {
@@ -13355,6 +13386,11 @@ dojo.declare('realityBuilder.Block', null, {
         this._topVertexesV = 
             dojo.map(this._topVertexes, 
                      dojo.hitch(this._camera, this._camera.worldToView));
+
+        this._bottomRotCenterV = 
+            this._camera.worldToView(this._bottomRotCenter);
+        this._topRotCenterV = 
+            this._camera.worldToView(this._topRotCenter);
     },
 
     // Returns true, iff coordinates need to be updated.
@@ -13471,8 +13507,8 @@ dojo.declare('realityBuilder.Block', null, {
         this._boundingBoxS = [[minX, minY], [maxX, maxY]];
     },
 
-    // Calculates the vertexes of the block in sensor space. The camera is
-    // positioned in the center of the sensor.
+    // Calculates the vertexes of the block and its center of rotation in
+    // sensor space. The camera is positioned in the center of the sensor.
     //
     // Depends on up to date view space coordinates.
     _updateSensorSpaceCoordinates: function () {
@@ -13482,6 +13518,10 @@ dojo.declare('realityBuilder.Block', null, {
                                          dojo.hitch(cam, cam.viewToSensor));
         this._topVertexesS = dojo.map(this._topVertexesV,
                                       dojo.hitch(cam, cam.viewToSensor));
+
+        this._bottomRotCenterS = cam.viewToSensor(this._bottomRotCenterV);
+        this._topRotCenterS = cam.viewToSensor(this._topRotCenterV);
+
         this._updateProjectedVertexesVXZS();
         this._updateHorizontalExtentsInSensorSpace();
         this._updateSensorSpaceBoundingBox();
@@ -13583,6 +13623,7 @@ dojo.declare('realityBuilder.Block', null, {
         var
         topVertexesS = this._topVertexesS,
         bottomVertexesS = this._bottomVertexesS,
+        topRotCenterS = this._topRotCenterS,
         len = topVertexesS.length, // same for top and bottom
         vertexS, firstVertexS, i, 
         ilv = this._indexOfLeftmostVertex,
@@ -13623,6 +13664,12 @@ dojo.declare('realityBuilder.Block', null, {
             context.lineTo(vertexS[0], vertexS[1]);
             context.stroke();
         }
+
+        // rotation center dot on top:
+        context.beginPath();
+        context.arc(topRotCenterS[0], topRotCenterS[1], 
+                    context.lineWidth, 0, 2 * Math.PI, false);
+        context.fill();
     },
 
     // Renders the background of the block, i.e. the part of that block that
@@ -13631,6 +13678,8 @@ dojo.declare('realityBuilder.Block', null, {
         var
         bottomVertexesS = this._bottomVertexesS,
         topVertexesS = this._topVertexesS,
+        bottomRotCenterS = this._bottomRotCenterS,
+        topRotCenterS = this._topRotCenterS,
         len = topVertexesS.length, // same for top and bottom
         vertexS, i, 
         ilv = this._indexOfLeftmostVertex,
@@ -13661,6 +13710,12 @@ dojo.declare('realityBuilder.Block', null, {
             context.stroke();
         }
 
+        // vertical line indicating axis of rotation:
+        context.beginPath();
+        context.moveTo(bottomRotCenterS[0], bottomRotCenterS[1]);
+        context.lineTo(topRotCenterS[0], topRotCenterS[1]);
+        context.stroke();
+
         context.globalAlpha = 1;
     },
 
@@ -13670,6 +13725,7 @@ dojo.declare('realityBuilder.Block', null, {
         this._updateCoordinates();
 
         context.strokeStyle = color;
+        context.fillStyle = color;
         context.lineWidth = realityBuilder.util.SETTINGS.lineWidthOfBlock;
         this._renderForeground(context);
         this._renderBackground(context);
@@ -15606,11 +15662,11 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         var testPositionB, testBlock, testA;
 
         testPositionB = realityBuilder.util.addVectorsB(this.positionB(), 
-                                                            deltaB);
+                                                        deltaB);
         testA = (this.a() + deltaA) % 4;
         testBlock = new realityBuilder.Block(this._blockProperties,
-                                                 this._camera, 
-                                                 testPositionB, testA);
+                                             this._camera, 
+                                             testPositionB, testA);
 
         return (this._constructionBlocks.realBlocksCollideWith(testBlock) ||
                 !this._wouldBeInMoveSpace(testPositionB));
@@ -16392,7 +16448,12 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
             this._isEnabled = serverData.isEnabled;
             this._makeRealAfter = serverData.makeRealAfter;
             this._blockConfigurations = serverData.blockConfigurations;
+
+            // Updates only the index of the current prerendered block
+            // configuration. The construction blocks themselves are not
+            // updated here!
             this._i = serverData.i;
+
             this._prevI = serverData.prevI;
             this._resetDelay = serverData.resetDelay;
 
@@ -16877,7 +16938,9 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     },
 
     _onPrerenderModeChanged: function () {
+        // New block state may change if the prerendered configurations change:
         this._updateNewBlockStateIfFullyInitialized();
+
         this._checkIfReady();
         realityBuilder.util.SETTINGS.onPrerenderedBlockConfigurationChanged();
     },

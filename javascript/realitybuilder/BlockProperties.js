@@ -350,5 +350,9 @@ dojo.declare('realityBuilder.BlockProperties', null, {
 
     backgroundAlpha: function () {
         return this._backgroundAlpha;
+    },
+
+    rotCenterBXY: function () {
+        return this._rotCenterBXY;
     }
 });

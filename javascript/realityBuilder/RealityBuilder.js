@@ -264,7 +264,9 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     },
 
     _onPrerenderModeChanged: function () {
+        // New block state may change if the prerendered configurations change:
         this._updateNewBlockStateIfFullyInitialized();
+
         this._checkIfReady();
         realityBuilder.util.SETTINGS.onPrerenderedBlockConfigurationChanged();
     },

@@ -64,7 +64,12 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
             this._isEnabled = serverData.isEnabled;
             this._makeRealAfter = serverData.makeRealAfter;
             this._blockConfigurations = serverData.blockConfigurations;
+
+            // Updates only the index of the current prerendered block
+            // configuration. The construction blocks themselves are not
+            // updated here!
             this._i = serverData.i;
+
             this._prevI = serverData.prevI;
             this._resetDelay = serverData.resetDelay;
 

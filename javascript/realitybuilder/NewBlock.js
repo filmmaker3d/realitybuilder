@@ -270,11 +270,11 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         var testPositionB, testBlock, testA;
 
         testPositionB = realityBuilder.util.addVectorsB(this.positionB(), 
-                                                            deltaB);
+                                                        deltaB);
         testA = (this.a() + deltaA) % 4;
         testBlock = new realityBuilder.Block(this._blockProperties,
-                                                 this._camera, 
-                                                 testPositionB, testA);
+                                             this._camera, 
+                                             testPositionB, testA);
 
         return (this._constructionBlocks.realBlocksCollideWith(testBlock) ||
                 !this._wouldBeInMoveSpace(testPositionB));
