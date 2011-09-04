@@ -239,6 +239,24 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         return false; // no prerendered configuration matches
     },
 
+    // Returns true, iff the block configuration described by the blocks
+    // "blocks" matches the currently selected prerendered block configuration.
+    blockConfigurationMatches: function () {
+        var blockConfiguration = [], positionBAndA, that = this;
+
+        dojo.forEach(realBlocks, function (realBlock) {
+            positionBAndA = that._simplifiedPositionBAndA(realBlock);
+            blockConfiguration.push(positionBAndA);
+        });
+
+        positionBAndA = this._simplifiedPositionBAndA(newBlock);
+        blockConfiguration.push(positionBAndA);
+
+        this._sortBlockConfiguration(blockConfiguration);
+
+        return blockConfiguration;
+    },
+
     _loadBlockConfigurationOnServerSucceeded: function () {
         dojo.publish('realityBuilder/PrerenderMode/' + 
                      'loadedBlockConfigurationOnServer');

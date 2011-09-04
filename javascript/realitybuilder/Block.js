@@ -137,6 +137,10 @@ dojo.declare('realityBuilder.Block', null, {
         return this._a;
     },
 
+    positionBAndA: function () {
+        return [this.xB(), this.yB(), this.zB(), this.a()];
+    },
+
     has2FoldSymmetry: function () {
         return this._blockProperties.has2FoldSymmetry();
     },

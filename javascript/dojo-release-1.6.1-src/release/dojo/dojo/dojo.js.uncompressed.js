@@ -12345,6 +12345,10 @@ dojo.declare('realityBuilder.Block', null, {
         return this._a;
     },
 
+    positionBAndA: function () {
+        return [this.xB(), this.yB(), this.zB(), this.a()];
+    },
+
     has2FoldSymmetry: function () {
         return this._blockProperties.has2FoldSymmetry();
     },
@@ -15731,6 +15735,12 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         }            
 
         return false; // no prerendered configuration matches
+    },
+
+    // Returns true, iff the construction blocks match the currently selected
+    // prerendered block configuration.
+    constructionBlocksMatch: function () {
+        
     },
 
     _loadBlockConfigurationOnServerSucceeded: function () {
