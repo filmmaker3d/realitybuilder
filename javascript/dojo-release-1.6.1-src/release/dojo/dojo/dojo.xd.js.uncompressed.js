@@ -16627,10 +16627,24 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         return false; // no prerendered configuration matches
     },
 
-    // Returns true, iff the construction blocks match the currently selected
-    // prerendered block configuration.
-    constructionBlocksMatch: function () {
-        
+    // Returns true, iff the block configuration described by the blocks
+    // "blocks" matches the currently selected prerendered block configuration.
+    blockConfigurationMatches: function (blocks) {
+        var blockConfiguration1, blockConfiguration2, positionBAndA, 
+        that = this;
+
+        blockConfiguration1 = [];
+        dojo.forEach(blocks, function (block) {
+            positionBAndA = that._simplifiedPositionBAndA(block);
+            blockConfiguration1.push(positionBAndA);
+        });
+        this._sortBlockConfiguration(blockConfiguration1);
+
+        blockConfiguration2 = this._blockConfigurations[this.i()]; // already
+                                                                   // sorted
+
+        return this._blockConfigurationsMatch(blockConfiguration1,
+                                              blockConfiguration2);
     },
 
     _loadBlockConfigurationOnServerSucceeded: function () {
