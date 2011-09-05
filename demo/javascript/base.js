@@ -98,23 +98,40 @@ var realityBuilderDemo = (function () {
     }
 
     function updateCoordinateButtonState(type, deltaB) {
-        updateControlButtonState(type, 
-                                 realityBuilder.newBlock().canBeMoved(deltaB));
+        var newBlock;
+
+        if (realityBuilderIsReady) {
+            newBlock = realityBuilder.newBlock();
+            updateControlButtonState(type, newBlock.canBeMoved(deltaB));
+        }
     }
 
     function updateRotate90ButtonState() {
-        updateControlButtonState('rotate90', 
-                                 realityBuilder.newBlock().canBeRotated90());
+        var newBlock;
+
+        if (realityBuilderIsReady) {
+            newBlock = realityBuilder.newBlock();
+            updateControlButtonState('rotate90', newBlock.canBeRotated90());
+        }
     }
 
     function updateMakeRealButtonState() {
-        updateControlButtonState('requestMakeReal', 
-                                 realityBuilder.newBlock().canBeMadeReal());
+        var newBlock;
+
+        if (realityBuilderIsReady) {
+            newBlock = realityBuilder.newBlock();
+            updateControlButtonState('requestMakeReal', 
+                                     newBlock.canBeMadeReal());
+        }
     }
 
     function updateControlPanelState() {
-        updateNodeState($('#controlPanel'), 
-                        !realityBuilder.newBlock().isFrozen());
+        var newBlock;
+
+        if (realityBuilderIsReady) {
+            newBlock = realityBuilder.newBlock();
+            updateNodeState($('#controlPanel'), !newBlock.isFrozen());
+        }
     }
 
     function onDegreesOfFreedomChanged() {
