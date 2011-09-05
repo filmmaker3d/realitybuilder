@@ -270,6 +270,14 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         // configuration.
         this._updateNewBlockStateIfFullyInitialized();
 
+        // New block is always unfrozen here. This is necessary e.g. in the
+        // following scenario: A new prerendered block configuration is loaded,
+        // and the associated construction blocks do *not* intersect with the
+        // new block. As the new block is not moved, it would not be unfrozen,
+        // and the demo application would just hang, from the point of view of
+        // the user.
+        this._newBlock.unfreeze();
+
         this._checkIfReady();
         realityBuilder.util.SETTINGS.onPrerenderedBlockConfigurationChanged();
     },

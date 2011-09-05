@@ -1,0 +1,5 @@
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.editor.plugins.nls.pt.TextColor"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.pt.TextColor");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "TextColor", "pt", ({"setButtonText":"Definir","cancelButtonText":"Cancelar"})
+);
+}};});

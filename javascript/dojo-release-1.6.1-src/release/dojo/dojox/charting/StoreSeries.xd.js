@@ -1,0 +1,8 @@
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
+
+
+realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.charting.StoreSeries"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.charting.StoreSeries"]){_4._hasResource["dojox.charting.StoreSeries"]=true;_4.provide("dojox.charting.StoreSeries");_4.declare("dojox.charting.StoreSeries",null,{constructor:function(_7,_8,_9){this.store=_7;this.kwArgs=_8;if(_9){if(typeof _9=="function"){this.value=_9;}else{if(typeof _9=="object"){this.value=function(_a){var o={};for(var _b in _9){o[_b]=_a[_9[_b]];}return o;};}else{this.value=function(_c){return _c[_9];};}}}else{this.value=function(_d){return _d.value;};}this.data=[];this.fetch();},destroy:function(){if(this.observeHandle){this.observeHandle.dismiss();}},setSeriesObject:function(_e){this.series=_e;},fetch:function(){var _f=this.objects=[];var _10=this;if(this.observeHandle){this.observeHandle.dismiss();}var _11=this.store.query(this.kwArgs.query,this.kwArgs);_4.when(_11,function(_12){_10.objects=_12;_13();});if(_11.observe){this.observeHandle=_11.observe(_13,true);}function _13(){_10.data=_4.map(_10.objects,function(_14){return _10.value(_14,_10.store);});_10._pushDataChanges();};},_pushDataChanges:function(){if(this.series){this.series.chart.updateSeries(this.series.name,this);this.series.chart.delayedRender();}}});}}};});

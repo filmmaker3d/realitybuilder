@@ -1,0 +1,5 @@
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.grid.enhanced.nls.hu.Pagination"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.grid.enhanced.nls.hu.Pagination");dojo._xdLoadFlattenedBundle("dojox.grid.enhanced", "Pagination", "hu", ({"gotoButtonTitle":"Ugrás adott oldalra","prevTip":"Előző oldal","pageCountIndication":" (${0} oldal)","pageStepLabelTemplate":"${0}. oldal","descTemplate":"${2} - ${3} / ${1} ${0}","lastTip":"Utolsó oldal","nextTip":"Következő oldal","pageSizeLabelTemplate":"${0} elem oldalanként","dialogCancel":"Mégse","itemTitle":"elemek","dialogConfirm":"Mehet","firstTip":"Első oldal","allItemsLabelTemplate":"Összes elem","dialogIndication":"Adja meg az oldalszámot","dialogTitle":"Ugrás adott oldalra"})
+);
+}};});

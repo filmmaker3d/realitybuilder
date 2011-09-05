@@ -1,0 +1,8 @@
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
+
+
+realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","realityBuilder.ConstructionBlock"],["require","realityBuilder.Block"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["realityBuilder.ConstructionBlock"]){_4._hasResource["realityBuilder.ConstructionBlock"]=true;_4.provide("realityBuilder.ConstructionBlock");_4.require("realityBuilder.Block");_4.declare("realityBuilder.ConstructionBlock",realityBuilder.Block,{_state:null,_timeStamp:null,constructor:function(_7,_8,_9,a,_a,_b){this._state=_a;this._timeStamp=_b;},timeStamp:function(){return this._timeStamp;},isDeleted:function(){return this._state===0;},isPending:function(){return this._state===1;},isReal:function(){return this._state===2;},state:function(){return this._state;},render:function(_c){var _d,_e;if(!this.isDeleted()){_d=this.isReal()?realityBuilder.util.SETTINGS.colorOfRealBlock:realityBuilder.util.SETTINGS.colorOfPendingBlock;this.inherited(arguments,[arguments[0],_d]);}},renderSolidTop:function(_f){var _10,_11,i;this._updateCoordinates();_10=this._topVertexesS;_11=_10[0];_f.beginPath();_f.moveTo(_11[0],_11[1]);for(i=1;i<_10.length;i+=1){_11=_10[i];_f.lineTo(_11[0],_11[1]);}_f.closePath();_f.fill();}});}}};});

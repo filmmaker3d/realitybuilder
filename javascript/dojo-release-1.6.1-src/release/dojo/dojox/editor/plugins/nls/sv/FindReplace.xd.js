@@ -1,0 +1,5 @@
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.editor.plugins.nls.sv.FindReplace"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.sv.FindReplace");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "FindReplace", "sv", ({"replaceDialogText":"${0} förekomster ersattes.","eofDialogTextFind":"hittades","eofDialogText":"Senaste förekomst${0}","backwards":"Bakåt","replaceButton":"Ersätt","replaceLabel":"Ersätt med:","matchCase":"Matcha skiftläge","findTooltip":"Ange den text du vill söka efter","replaceTooltip":"Ange den text du vill ersätta med","replaceAllButton":"Ersätt alla","eofDialogTextReplace":"ersattes","findReplace":"Sök och ersätt","backwardsTooltip":"Sök bakåt efter text","replaceAllButtonTooltip":"Ersätt all text","replaceButtonTooltip":"Ersätt texten","findLabel":"Sök:","findButton":"Sök","matchCaseTooltip":"Matcha skiftläge","findButtonTooltip":"Sök efter texten","replaceAll":"Alla förekomster"})
+);
+}};});

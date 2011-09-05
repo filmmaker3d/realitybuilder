@@ -74,7 +74,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
             this._resetDelay = serverData.resetDelay;
 
             this._sortBlockConfigurations(this._blockConfigurations);
-            
+
             dojo.publish('realityBuilder/PrerenderMode/changed');
         }
     },

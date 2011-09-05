@@ -1,0 +1,5 @@
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.editor.plugins.nls.pl.AutoSave"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.pl.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "pl", ({"saveLabel":"Zapisz","saveSettingdialogTitle":"Automatyczne zapisywanie","saveSettingdialogButtonOk":"Ustaw odstęp czasu","saveMessageSuccess":"Zapisano: ${0}","saveSettingdialogButtonCancel":"Anuluj","saveSettingdialogDescription":"Określ odstęp czasu automatycznego zapisywania","saveSettingLabelOn":"Ustaw odstęp czasu automatycznego zapisywania...","saveSettingdialogParamLabel":"min","saveSettingdialogParamName":"Odstęp czasu automatycznego zapisywania","saveMessageFail":"Zapisanie nie powiodło się: ${0}","saveSettingLabelOff":"Wyłącz automatyczne zapisywanie"})
+);
+}};});

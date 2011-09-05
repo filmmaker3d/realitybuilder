@@ -1,0 +1,5 @@
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.editor.plugins.nls.cs.AutoSave"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.cs.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "cs", ({"saveLabel":"Uložit","saveSettingdialogTitle":"Automatické uložení","saveSettingdialogButtonOk":"Nastavit interval","saveMessageSuccess":"Uloženo v ${0}","saveSettingdialogButtonCancel":"Storno","saveSettingdialogDescription":"Určit interval pro automatické uložení","saveSettingLabelOn":"Nastavit interval pro automatické uložení","saveSettingdialogParamLabel":"min","saveSettingdialogParamName":"Interval pro automatické uložení","saveMessageFail":"Selhalo uložení v ${0}","saveSettingLabelOff":"Vypnout automatické uložení"})
+);
+}};});

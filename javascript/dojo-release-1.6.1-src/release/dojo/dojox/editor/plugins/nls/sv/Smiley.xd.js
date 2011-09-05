@@ -1,0 +1,5 @@
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.editor.plugins.nls.sv.Smiley"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.sv.Smiley");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "Smiley", "sv", ({"emoticonLaughing":"skrattar","emoticonCool":"cool","emoticonTongue":"räcker ut tungan","emoticonCrying":"gråter","emoticonOops":"hoppsan","emoticonFrown":"rynkar pannan","emoticonAngry":"arg","emoticonShy":"blyg","emoticonNo":"nej","emoticonAngel":"ängel","smiley":"Infoga känslolägesikon","emoticonIdea":"idé","emoticonEyebrow":"lyfter på ena ögonbrynet","emoticonSmile":"ler","emoticonWink":"blinkar med ena ögat","emoticonYes":"ja","emoticonGrin":"ler stort","emoticonGoofy":"knasig","emoticonHalf":"halvt leende"})
+);
+}};});

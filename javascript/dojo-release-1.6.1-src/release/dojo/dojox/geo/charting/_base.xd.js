@@ -1,0 +1,8 @@
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
+
+
+realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.geo.charting._base"],["require","dojo.NodeList-traverse"],["require","dojox.gfx.matrix"],["require","dijit.Tooltip"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.geo.charting._base"]){_4._hasResource["dojox.geo.charting._base"]=true;_4.provide("dojox.geo.charting._base");_4.require("dojo.NodeList-traverse");_4.require("dojox.gfx.matrix");_4.require("dijit.Tooltip");(function(){var _7=_6.geo.charting;_7.showTooltip=function(_8,_9,_a){var _b=_7._normalizeArround(_9);return _5.showTooltip(_8,_b,_a);};_7.hideTooltip=function(_c){return _5.hideTooltip(_c);};_7._normalizeArround=function(_d){var _e=_7._getRealBBox(_d);var _f=_d._getRealMatrix()||{xx:1,xy:0,yx:0,yy:1,dx:0,dy:0};var _10=_6.gfx.matrix.multiplyPoint(_f,_e.x,_e.y);var _11=_4.coords(_7._getGfxContainer(_d));_d.x=_4.coords(_11,true).x+_10.x,_d.y=_4.coords(_11,true).y+_10.y,_d.width=_e.width*_f.xx,_d.height=_e.height*_f.yy;return _d;};_7._getGfxContainer=function(_12){return (new _4.NodeList(_12.rawNode)).parents("div")[0];};_7._getRealBBox=function(_13){var _14=_13.getBoundingBox();if(!_14){var _15=_13.children;var _14=_4.clone(_7._getRealBBox(_15[0]));_4.forEach(_15,function(_16){var _17=_7._getRealBBox(_16);_14.x=Math.min(_14.x,_17.x);_14.y=Math.min(_14.y,_17.y);_14.endX=Math.max(_14.x+_14.width,_17.x+_17.width);_14.endY=Math.max(_14.y+_14.height,_17.y+_17.height);});_14.width=_14.endX-_14.x;_14.height=_14.endY-_14.y;}return _14;};})();}}};});

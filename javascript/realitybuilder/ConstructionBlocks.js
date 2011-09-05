@@ -142,7 +142,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     },
 
     // Finds all real blocks and stores them.
-    _updateRealBlocksSorted: function (serverData) {
+    _updateRealBlocksSorted: function () {
         var tmp = dojo.filter(this._blocks, function (block) {
             return block.isReal();
         });
@@ -151,7 +151,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     },
 
     // Finds all pending blocks and stores them.
-    _updatePendingBlocks: function (serverData) {
+    _updatePendingBlocks: function () {
         this._pendingBlocks = dojo.filter(this._blocks, function (block) {
             return block.isPending();
         });

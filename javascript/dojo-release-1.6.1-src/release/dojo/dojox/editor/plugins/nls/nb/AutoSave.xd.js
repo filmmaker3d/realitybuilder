@@ -1,0 +1,5 @@
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.editor.plugins.nls.nb.AutoSave"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.nb.AutoSave");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "AutoSave", "nb", ({"saveLabel":"Lagre","saveSettingdialogTitle":"Automatisk lagring","saveSettingdialogButtonOk":"Angi intervall","saveMessageSuccess":"Lagret klokken ${0}","saveSettingdialogButtonCancel":"Avbryt","saveSettingdialogDescription":"Definer intervall for automatisk lagring","saveSettingLabelOn":"Angi intervall for automatisk lagring...","saveSettingdialogParamLabel":"min","saveSettingdialogParamName":"Intervall for automatisk lagring","saveMessageFail":"Mislykket lagring klokken ${0}","saveSettingLabelOff":"Slå av automatisk lagring"})
+);
+}};});

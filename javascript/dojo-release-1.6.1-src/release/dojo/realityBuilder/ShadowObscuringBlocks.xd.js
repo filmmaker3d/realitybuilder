@@ -1,0 +1,8 @@
+/*
+	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
+	Available via Academic Free License >= 2.1 OR the modified BSD license.
+	see: http://dojotoolkit.org/license for details
+*/
+
+
+realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","realityBuilder.ShadowObscuringBlocks"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["realityBuilder.ShadowObscuringBlocks"]){_4._hasResource["realityBuilder.ShadowObscuringBlocks"]=true;_4.provide("realityBuilder.ShadowObscuringBlocks");_4.declare("realityBuilder.ShadowObscuringBlocks",null,{_blocksSorted:null,_newBlock:null,_camera:null,_blockProperties:null,_constructionBlocks:null,constructor:function(_7,_8,_9,_a){this._newBlock=_7;this._blockProperties=_8;this._camera=_9;this._constructionBlocks=_a;},_copyBlocksToLayer:function(_b,_c){var _d=[],_e=this._camera,_f=this;_4.forEach(_b,function(_10){var _11,_12;_12=[_10.xB(),_10.yB(),_c];_11=new realityBuilder.Block(_f._blockProperties,_e,_12,_10.a());_11.onlySubtractBottom();_d.push(_11);});return _d;},update:function(){var zB,_13=this._newBlock,cbs=this._constructionBlocks,_14=[],_15,_16=[],_17;for(zB=cbs.highestRealBlocksZB();zB>=0;zB-=1){_15=cbs.realBlocksInLayer(zB);if(zB<_13.zB()){_17=this._copyBlocksToLayer(_16,zB);_15=_15.concat(_15,_17);}_14=_14.concat(_15);_16=_15;}this._blocksSorted=_14;},_blocksInLayer:function(zB){var _18,_19,i,_1a=[];_18=this._blocksSorted;for(i=0;i<_18.length;i+=1){_19=_18[i];if(_19.zB()===zB){_1a.push(_19);}else{if(_19.zB()<zB){break;}}}return _1a;},subtract:function(_1b,zB){var _1c=this._blocksInLayer(zB);_4.forEach(_1c,function(_1d){_1d.subtract(_1b);});}});}}};});

@@ -1,0 +1,5 @@
+realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
+return {depends: [["provide", "dojox.editor.plugins.nls.pt.Smiley"]],
+defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.pt.Smiley");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "Smiley", "pt", ({"emoticonLaughing":"gargalhando","emoticonCool":"legal","emoticonTongue":"mostrando a língua","emoticonCrying":"chorando","emoticonOops":"surpreso","emoticonFrown":"sobrancelhas franzidas","emoticonAngry":"bravo","emoticonShy":"envergonhado","emoticonNo":"não","emoticonAngel":"angelical","smiley":"Inserir Emoticon","emoticonIdea":"ideia","emoticonEyebrow":"sarcástico","emoticonSmile":"sorriso","emoticonWink":"piscando","emoticonYes":"sim","emoticonGrin":"sorriso largo","emoticonGoofy":"tonto","emoticonHalf":"confuso"})
+);
+}};});
