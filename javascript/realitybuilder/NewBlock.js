@@ -254,7 +254,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
         if (this.isFrozen() && (hasBeenMovedOutOfTheWay || 
                                 turnedIntoDeletedConstructionBlock)) {
-            this._unfreeze();
+            this.unfreeze();
         }
     },
 
@@ -590,7 +590,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         } else {
             // this block and the real block don't match a prerendered
             // configuration
-            this._unfreeze();
+            this.unfreeze();
         }
     }
 });

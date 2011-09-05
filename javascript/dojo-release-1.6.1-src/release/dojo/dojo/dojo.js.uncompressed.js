@@ -14760,7 +14760,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
         if (this.isFrozen() && (hasBeenMovedOutOfTheWay || 
                                 turnedIntoDeletedConstructionBlock)) {
-            this._unfreeze();
+            this.unfreeze();
         }
     },
 
@@ -15096,7 +15096,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         } else {
             // this block and the real block don't match a prerendered
             // configuration
-            this._unfreeze();
+            this.unfreeze();
         }
     }
 });
@@ -15942,13 +15942,13 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     // Called after the new block has been frozen.
     _onNewBlockFrozen: function () {
-        this._newBlock.render(); // color changes
+        this._renderNewBlockIfFullyInitialized(); // color changes
         realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
 
     // Called after the new block has been unfrozen.
     _onNewBlockUnfrozen: function () {
-        this._newBlock.render(); // color changes
+        this._renderNewBlockIfFullyInitialized(); // color changes
         realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
     },
 
@@ -16003,16 +16003,36 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         realityBuilder.util.SETTINGS.onMovedOrRotated();
     },
 
+    _blocksAreFullyInitialized: function () {
+        return (this._constructionBlocks.isInitializedWithServerData() &&
+                this._newBlock.isInitializedWithServerData() &&
+                this._camera.isInitializedWithServerData() &&
+                this._blockProperties.isInitializedWithServerData());
+    },
+
     // (Re-)renders blocks, but only if all necessary components have been
     // initialized, which is relevant only in the beginning.
-    _renderBlocksIfFullyInitialized: function () {
-        if (this._constructionBlocks.isInitializedWithServerData() &&
-            this._newBlock.isInitializedWithServerData() &&
-            this._camera.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData()) {
+    _renderConstructionBlocksIfFullyInitialized: function (
+        renderConstructionBlocks)
+    {
+        if (this._blocksAreFullyInitialized()) {
             this._constructionBlocks.renderIfVisible();
+        }
+    },
+
+    // (Re-)renders new block, but only if all necessary components have been
+    // initialized, which is relevant only in the beginning.
+    _renderNewBlockIfFullyInitialized: function () {
+        // Note that construction blocks are needed also for rendering the new
+        // block, e.g. to know which parts of it are obscured.
+        if (this._blocksAreFullyInitialized()) {
             this._newBlock.render();
         }
+    },
+
+    _renderBlocksIfFullyInitialized: function () {
+        this._renderConstructionBlocksIfFullyInitialized();
+        this._renderNewBlockIfFullyInitialized();
     },
 
     // Updates the state (including position) of the new block, but only if all
