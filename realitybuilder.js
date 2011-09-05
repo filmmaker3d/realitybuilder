@@ -17,7 +17,8 @@
 /*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
   regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
 
-/*global realityBuilderDojo, acme, window, LazyLoad */
+/*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, window, 
+  LazyLoad */
 
 var realityBuilder = (function () {
     var
@@ -151,14 +152,17 @@ var realityBuilder = (function () {
         requestLoadScript(scriptUrl);
     }
 
+    function releaseScriptPostfix() {
+        return (typeof realityBuilderDojoUncompressed !== 'undefined' &&
+                realityBuilderDojoUncompressed) ? '.uncompressed.js' : '';
+    }
+
     // Loads the Dojo JavaScript that is used for release mode. Almost all
     // functionality is built into one file.
     function requestLoadReleaseScript() {
         var host = '{{ host }}';
         requestLoadScript('http://' + host + '/javascript/dojo/dojo.xd.js' +
-                          (settings.loadUncompressed ? 
-                           '.uncompressed.js' : 
-                           ''));
+                          releaseScriptPostfix());
     }
 
     function mergeIntoSettings(newSettings) {
@@ -254,9 +258,6 @@ var realityBuilder = (function () {
         //   "alphaOfNewBlockShadow":
         //
         //   Colors (CSS format) and alpha transparency of blocks, shadow.
-        //
-        // * "loadUncompressed": If true, loads the JavaScript code
-        //   uncompressed. This is useful for debugging.
         initialize: function (settings) {
             var defaultSettings = {
                 id: 'realityBuilder',
@@ -279,8 +280,7 @@ var realityBuilder = (function () {
                 colorOfNewBlock: 'red',
                 colorOfFrozenNewBlock: 'white',
                 colorOfNewBlockShadow: 'red',
-                alphaOfNewBlockShadow: 0.2,
-                loadUncompressed: false
+                alphaOfNewBlockShadow: 0.2
             };
 
             if (!w3cDomIsSupported()) {

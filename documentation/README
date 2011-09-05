@@ -68,8 +68,8 @@ See the demo for more information.
 
 Notes:
 
-* With debug mode enabled, the web page and the Reality Builder must be hosted
-  on the same domain.
+* With debug mode enabled, the web page and the Reality Builder have to be
+  hosted on the same domain.
 
 * The RealityBuilder is created using the Dojo Toolkit. Other versions of Dojo
   can be used on the same page, if precautions are taken:
@@ -98,6 +98,10 @@ Notes:
   - acme: due to a bug in Dojo 1.6
 
   - djConfig: see above
+
+  - realityBuilderDojoUncompressed: Useful for debugging. If set to true before
+    "realitybuilder.js" is run, then the Reality Builder Dojo build is loaded
+    uncompressed.
 
 
 Unit tests
