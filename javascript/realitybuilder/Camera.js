@@ -45,7 +45,7 @@ dojo.declare('realityBuilder.Camera', null, {
     _blockProperties: null,
 
     // Position of the camera in world space (mm):
-    _position: null,
+    _pos: null,
 
     // Angles defining orientation (rad):
     _aX: 0,
@@ -76,7 +76,7 @@ dojo.declare('realityBuilder.Camera', null, {
 
     constructor: function (blockProperties, sensorWidth, sensorHeight, node) {
         this._blockProperties = blockProperties;
-        this._position = [0, 0, 1];
+        this._pos = [0, 0, 1];
         this._sensor = 
             new realityBuilder.Sensor(sensorWidth, sensorHeight, node);
         this._updateRotationMatrices();
@@ -101,8 +101,8 @@ dojo.declare('realityBuilder.Camera', null, {
         return this._versionOnServer !== '-1';
     },
 
-    position: function () {
-        return this._position;
+    pos: function () {
+        return this._pos;
     },
 
     aX: function () {
@@ -132,7 +132,7 @@ dojo.declare('realityBuilder.Camera', null, {
     // Updates the settings of the camera using the "data" which is a subset of
     // the data that also the server delivers.
     update: function (data) {
-        this._position = data.position;
+        this._pos = data.pos;
         this._aX = data.aX;
         this._aY = data.aY;
         this._aZ = data.aZ;
@@ -180,7 +180,7 @@ dojo.declare('realityBuilder.Camera', null, {
     // Returns the coordinates of the world space point "point" in view space.
     worldToView: function (point) {
         var tmp = realityBuilder.util.subtractVectors3D(point, 
-                                                        this._position);
+                                                        this._pos);
 
         // Rotation matrices are applied to the vector tmp, from the left side:
         tmp = dojox.math.matrix.transpose([tmp]);

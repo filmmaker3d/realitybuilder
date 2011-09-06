@@ -60,7 +60,7 @@ class Construction(db.Model):
     # version is the version of the data below. It is increased every time the
     # data is changed. See also the description of the blocks version.
     camera_data_version = db.StringProperty()
-    camera_position = db.ListProperty(float) # position in world space
+    camera_pos = db.ListProperty(float) # position in world space
     camera_a_x = db.FloatProperty(default=0.) # angle of rotation about x
     camera_a_y = db.FloatProperty(default=0.) # angle of rotation about y
     camera_a_z = db.FloatProperty(default=0.) # angle of rotation about z
@@ -409,7 +409,7 @@ class RPCConstruction(webapp.RequestHandler):
             # Camera version on server not the same as on client. =>
             # Deliver all the data.
             data.update({
-                    'position': construction.camera_position,
+                    'pos': construction.camera_pos,
                     'aX': construction.camera_a_x,
                     'aY': construction.camera_a_y,
                     'aZ': construction.camera_a_z,
@@ -850,9 +850,9 @@ class RPCAdminUpdateSettings(webapp.RequestHandler):
             namespace_manager.set_namespace(self.request.get('namespace'))
 
             data = {
-                'camera_position': [float(self.request.get('camera.x')),
-                                    float(self.request.get('camera.y')),
-                                    float(self.request.get('camera.z'))],
+                'camera_pos': [float(self.request.get('camera.x')),
+                               float(self.request.get('camera.y')),
+                               float(self.request.get('camera.z'))],
                 'camera_a_x': float(self.request.get('camera.aX')),
                 'camera_a_y': float(self.request.get('camera.aY')),
                 'camera_a_z': float(self.request.get('camera.aZ')),

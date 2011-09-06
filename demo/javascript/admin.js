@@ -103,13 +103,13 @@ var realityBuilderAdminDemo = (function () {
 
     // Updates controls defining the camera "camera".
     function updateCameraControls() {
-        var camera, position;
+        var camera, pos;
 
         camera = realityBuilder.camera();
-        position = camera.position();
-        $('#cameraXTextField').val(position[0]);
-        $('#cameraYTextField').val(position[1]);
-        $('#cameraZTextField').val(position[2]);
+        pos = camera.pos();
+        $('#cameraXTextField').val(pos[0]);
+        $('#cameraYTextField').val(pos[1]);
+        $('#cameraZTextField').val(pos[2]);
         $('#cameraAXTextField').val(camera.aX());
         $('#cameraAYTextField').val(camera.aY());
         $('#cameraAZTextField').val(camera.aZ());
@@ -147,7 +147,7 @@ var realityBuilderAdminDemo = (function () {
         });
     }
 
-    function updatePositionAndAngleDisplay() {
+    function updatePosAndADisplay() {
         var newBlock = realityBuilder.newBlock();
 
         $('#newBlockXB').text(newBlock.xB());
@@ -282,7 +282,7 @@ var realityBuilderAdminDemo = (function () {
         updateRealBlocksVisibilityButton();
 
         updatePendingBlocksVisibilityButton();
-        updatePositionAndAngleDisplay();
+        updatePosAndADisplay();
     }
 
     publicInterface = {
@@ -312,7 +312,7 @@ var realityBuilderAdminDemo = (function () {
                 updatePendingBlocksVisibilityButton,
                 onCameraChanged: updateCameraControls,
                 onConstructionBlocksChanged: updateBlocksTable,
-                onMovedOrRotated: updatePositionAndAngleDisplay
+                onMovedOrRotated: updatePosAndADisplay
             });
         }
     };
