@@ -15654,8 +15654,8 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         }
     },
 
-    // Returns the position in block space and the rotation angle of the block
-    // "block", in a simplified form:
+    // Returns the position in block space and the rotation angle in a
+    // simplified form:
     //
     // * If the block has two-fold symmetry:
     //
@@ -15663,23 +15663,27 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     //   rotation angle is either 0° or 90°.
     //
     // * Otherwise: The native values of the block will be returned.
-    _simplifiedPosBAndA: function (block) {
-        var posBAndA, posB, a;
+    simplifiedPosBAndA: function (posBAndA, blockProperties) {
+        var simplifiedPosBAndA, posB, a, congruencyOffsetB;
 
-        posB = block.posB();
-        a = block.a();
+        posB = posBAndA;
+        a = posBAndA[3];
 
-        if (block.has2FoldSymmetry() && a >= 2) {
-            posBAndA = 
+        if (blockProperties.has2FoldSymmetry() && a >= 2) {
+            congruencyOffsetB = blockProperties.congruencyOffsetB(a);
+            simplifiedPosBAndA = 
                 realityBuilder.util.addVectorsB(posB,
-                                                block.congruencyOffsetB());
-            posBAndA.push(a % 2);
+                                                congruencyOffsetB);
+            simplifiedPosBAndA.push(a % 2);
         } else {
-            posBAndA = dojo.clone(posB);
-            posBAndA.push(a);
+            simplifiedPosBAndA = dojo.clone(posBAndA);
         }
 
-        return posBAndA;
+        return simplifiedPosBAndA;
+    },
+
+    _simplifiedPosBAndAOfBlock: function (block) {
+        return this._simplifiedPosBAndA(block.posBAndA());
     },
 
     // Returns an array created from positions and rotations angles of the real
@@ -15698,11 +15702,11 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         var blockConfiguration = [], posBAndA, that = this;
 
         dojo.forEach(realBlocks, function (realBlock) {
-            posBAndA = that._simplifiedPosBAndA(realBlock);
+            posBAndA = that._simplifiedPosBAndAOfBlock(realBlock);
             blockConfiguration.push(posBAndA);
         });
 
-        posBAndA = this._simplifiedPosBAndA(newBlock);
+        posBAndA = this._simplifiedPosBAndAOfBlock(newBlock);
         blockConfiguration.push(posBAndA);
 
         this._sortBlockConfiguration(blockConfiguration);
@@ -15740,7 +15744,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
 
         blockConfiguration1 = [];
         dojo.forEach(blocks, function (block) {
-            posBAndA = that._simplifiedPosBAndA(block);
+            posBAndA = that._simplifiedPosBAndAOfBlock(block);
             blockConfiguration1.push(posBAndA);
         });
         this._sortBlockConfiguration(blockConfiguration1);
