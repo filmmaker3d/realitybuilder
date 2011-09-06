@@ -31,7 +31,7 @@ var realityBuilderDemo = (function () {
     },
     backgroundImageIsLoaded = false, // initially only a placeholder is loaded
     realityBuilderIsReady = false,
-    appVersion;
+    realityBuilderVersion;
     
     function forEachCoordinateButton(f) {
         $.each(coordinateButtonDeltaBs, function (type, deltaB) {
@@ -200,15 +200,15 @@ var realityBuilderDemo = (function () {
     }
 
     publicInterface = {
-        setAppVersion: function (x) {
-            appVersion = x;
+        setRealityBuilderVersion: function (x) {
+            realityBuilderVersion = x;
         },
 
         settings: function () {
             return {
                 width: 640,
                 height: 480,
-                namespace: 'demo_' + appVersion,
+                namespace: realityBuilderVersion + '_demo',
                 onReady: onReady,
                 onBrowserNotSupportedError: onBrowserNotSupportedError,
                 onPrerenderedBlockConfigurationChanged: 

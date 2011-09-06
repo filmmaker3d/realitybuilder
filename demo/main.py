@@ -32,12 +32,12 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext import db
 
-app_version = os.environ['CURRENT_VERSION_ID'].split('.')[0]
+reality_builder_version = os.environ['CURRENT_VERSION_ID'].split('.')[0]
 
 class Index(webapp.RequestHandler):
     def get(self):
         template_values = {
-            'app_version': app_version}
+            'reality_builder_version': reality_builder_version}
         
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, template_values))
@@ -47,7 +47,7 @@ class Admin(webapp.RequestHandler):
         user = users.get_current_user()
         if user and users.is_current_user_admin():
             template_values = {
-                'app_version': app_version,
+                'reality_builder_version': reality_builder_version,
                 'logout_url': users.create_logout_url("/demo/admin")}
 
             path = os.path.join(os.path.dirname(__file__), 'admin.html')
