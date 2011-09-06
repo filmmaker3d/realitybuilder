@@ -116,6 +116,7 @@
 {% block scripts %}
   <script type="text/javascript" src="/demo/javascript/admin.js"></script>
   <script type="text/javascript">
+    realityBuilderDemo.setAppVersion('{{ app_version }}');
     realityBuilderAdminDemo.setLogoutUrl('{{ logout_url }}');
   </script>
 {% endblock %}

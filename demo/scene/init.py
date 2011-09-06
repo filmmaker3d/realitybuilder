@@ -51,7 +51,8 @@ from main import PrerenderMode
 from django.utils import simplejson
 
 from google.appengine.api import namespace_manager
-namespace_manager.set_namespace('demo')
+app_version = os.environ['CURRENT_VERSION_ID'].split('.')[0]
+namespace_manager.set_namespace('demo_' + app_version)
 
 # Deletes all construction entries:
 queries = [Construction.all()]
