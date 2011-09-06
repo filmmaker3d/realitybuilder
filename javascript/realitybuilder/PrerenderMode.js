@@ -95,8 +95,8 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         return this._makeRealAfter;
     },
 
-    _sortBlockConfiguration2: function (positionBAndA1, positionBAndA2) {
-        var a = positionBAndA1, b = positionBAndA2;
+    _sortBlockConfiguration2: function (posBAndA1, posBAndA2) {
+        var a = posBAndA1, b = posBAndA2;
 
         if (a[0] === b[0]) {
             if (a[1] === b[1]) {
@@ -130,11 +130,11 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         });
     },
 
-    _positionBAndAsMatch: function (positionBAndA1, positionBAndA2) {
+    _posBAndAsMatch: function (posBAndA1, posBAndA2) {
         var i;
 
         for (i = 0; i < 4; i += 1) {
-            if (positionBAndA1[i] !== positionBAndA2[i]) {
+            if (posBAndA1[i] !== posBAndA2[i]) {
                 return false;
             }
         }
@@ -150,7 +150,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
 
         if (blockConfiguration1.length === blockConfiguration2.length) {
             for (i = 0; i < blockConfiguration1.length; i += 1) {
-                if (!this._positionBAndAsMatch(blockConfiguration1[i],
+                if (!this._posBAndAsMatch(blockConfiguration1[i],
                                                blockConfiguration2[i])) {
                     return false;
                 }
@@ -170,23 +170,23 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     //   rotation angle is either 0° or 90°.
     //
     // * Otherwise: The native values of the block will be returned.
-    _simplifiedPositionBAndA: function (block) {
-        var positionBAndA, positionB, a;
+    _simplifiedPosBAndA: function (block) {
+        var posBAndA, posB, a;
 
-        positionB = block.positionB();
+        posB = block.posB();
         a = block.a();
 
         if (block.has2FoldSymmetry() && a >= 2) {
-            positionBAndA = 
-                realityBuilder.util.addVectorsB(positionB,
+            posBAndA = 
+                realityBuilder.util.addVectorsB(posB,
                                                 block.congruencyOffsetB());
-            positionBAndA.push(a % 2);
+            posBAndA.push(a % 2);
         } else {
-            positionBAndA = dojo.clone(positionB);
-            positionBAndA.push(a);
+            posBAndA = dojo.clone(posB);
+            posBAndA.push(a);
         }
 
-        return positionBAndA;
+        return posBAndA;
     },
 
     // Returns an array created from positions and rotations angles of the real
@@ -202,15 +202,15 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     //
     // The returned block configuration is sorted.
     _currentBlockConfiguration: function (realBlocks, newBlock) {
-        var blockConfiguration = [], positionBAndA, that = this;
+        var blockConfiguration = [], posBAndA, that = this;
 
         dojo.forEach(realBlocks, function (realBlock) {
-            positionBAndA = that._simplifiedPositionBAndA(realBlock);
-            blockConfiguration.push(positionBAndA);
+            posBAndA = that._simplifiedPosBAndA(realBlock);
+            blockConfiguration.push(posBAndA);
         });
 
-        positionBAndA = this._simplifiedPositionBAndA(newBlock);
-        blockConfiguration.push(positionBAndA);
+        posBAndA = this._simplifiedPosBAndA(newBlock);
+        blockConfiguration.push(posBAndA);
 
         this._sortBlockConfiguration(blockConfiguration);
 
@@ -242,13 +242,13 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     // Returns true, iff the block configuration described by the blocks
     // "blocks" matches the currently selected prerendered block configuration.
     blockConfigurationMatches: function (blocks) {
-        var blockConfiguration1, blockConfiguration2, positionBAndA, 
+        var blockConfiguration1, blockConfiguration2, posBAndA, 
         that = this;
 
         blockConfiguration1 = [];
         dojo.forEach(blocks, function (block) {
-            positionBAndA = that._simplifiedPositionBAndA(block);
-            blockConfiguration1.push(positionBAndA);
+            posBAndA = that._simplifiedPosBAndA(block);
+            blockConfiguration1.push(posBAndA);
         });
         this._sortBlockConfiguration(blockConfiguration1);
 

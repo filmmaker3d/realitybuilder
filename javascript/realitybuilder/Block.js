@@ -24,7 +24,7 @@ dojo.provide('realityBuilder.Block');
 dojo.declare('realityBuilder.Block', null, {
     // Position of the block in block space. From the position the block
     // extends in positive direction along the x-, y-, and z-axis.
-    _positionB: null,
+    _posB: null,
 
     // Rotation angle, about center of rotation:
     _a: null, // mulitples of 90°, CCW when viewed from above
@@ -82,7 +82,7 @@ dojo.declare('realityBuilder.Block', null, {
     // updating coordinates:
     _lastCameraId: null,
     _lastBlockPropertiesVersionOnServer: null,
-    _lastPositionB: null,
+    _lastPosB: null,
     _lastA: null,
 
     // True, if the coordinates changed after the last rendering:
@@ -102,14 +102,14 @@ dojo.declare('realityBuilder.Block', null, {
     _onlySubtractBottom: false,
 
     // Creates a block at the position in block space ("xB", "yB", "zB") =
-    // "positionB", and rotated about its center of rotation by "a" (° CCW,
+    // "posB", and rotated about its center of rotation by "a" (° CCW,
     // when viewed from above). When the block is rendered, it is as seen by
     // the sensor of the camera "camera".
     //
     // The block's properties, such as shape and size, are described by
     // "blockProperties".
-    constructor: function (blockProperties, camera, positionB, a) {
-        this._positionB = positionB;
+    constructor: function (blockProperties, camera, posB, a) {
+        this._posB = posB;
         this._a = a;
         this._blockProperties = blockProperties;
         this._camera = camera;
@@ -117,27 +117,27 @@ dojo.declare('realityBuilder.Block', null, {
 
     // Returns the block's position in block space. From the position the block
     // extends in positive direction along the x-, y-, and z-axis.
-    positionB: function () {
-        return this._positionB;
+    posB: function () {
+        return this._posB;
     },
 
     xB: function () {
-        return this._positionB[0];
+        return this._posB[0];
     },
 
     yB: function () {
-        return this._positionB[1];
+        return this._posB[1];
     },
 
     zB: function () {
-        return this._positionB[2];
+        return this._posB[2];
     },
 
     a: function () {
         return this._a;
     },
 
-    positionBAndA: function () {
+    posBAndA: function () {
         return [this.xB(), this.yB(), this.zB(), this.a()];
     },
 
@@ -190,18 +190,18 @@ dojo.declare('realityBuilder.Block', null, {
 
     // Returns true, iff the current block collides with the block "block".
     collidesWith: function (block) {
-        var testPositionB, collisionOffsetsBXY, collisionOffsetBXY, i;
+        var testPosB, collisionOffsetsBXY, collisionOffsetBXY, i;
 
         collisionOffsetsBXY = 
             this._blockProperties.rotatedCollisionOffsetsBXY(this, block);
 
         for (i = 0; i < collisionOffsetsBXY.length; i += 1) {
             collisionOffsetBXY = collisionOffsetsBXY[i];
-            testPositionB = [this.xB() + collisionOffsetBXY[0],
+            testPosB = [this.xB() + collisionOffsetBXY[0],
                              this.yB() + collisionOffsetBXY[1],
                              this.zB()];
-            if (realityBuilder.util.pointsIdenticalB(block.positionB(),
-                                                     testPositionB)) {
+            if (realityBuilder.util.pointsIdenticalB(block.posB(),
+                                                     testPosB)) {
                 return true;
             }
         }
@@ -211,18 +211,18 @@ dojo.declare('realityBuilder.Block', null, {
 
     // Returns true, iff the current block is attachable to the block "block".
     attachableTo: function (block) {
-        var testPositionB, attachmentOffsetsB, attachmentOffsetB, i;
+        var testPosB, attachmentOffsetsB, attachmentOffsetB, i;
 
         attachmentOffsetsB = 
             this._blockProperties.rotatedAttachmentOffsetsB(this, block);
 
         for (i = 0; i < attachmentOffsetsB.length; i += 1) {
             attachmentOffsetB = attachmentOffsetsB[i];
-            testPositionB = 
-                realityBuilder.util.addVectorsB(this.positionB(),
+            testPosB = 
+                realityBuilder.util.addVectorsB(this.posB(),
                                                     attachmentOffsetB);
-            if (realityBuilder.util.pointsIdenticalB(block.positionB(),
-                                                         testPositionB)) {
+            if (realityBuilder.util.pointsIdenticalB(block.posB(),
+                                                         testPosB)) {
                 return true;
             }
         }
@@ -234,9 +234,9 @@ dojo.declare('realityBuilder.Block', null, {
     // space.
     _updateBlockSpaceCoordinates: function () {
         var 
-        xB = this.positionB()[0],
-        yB = this.positionB()[1],
-        zB = this.positionB()[2],
+        xB = this.posB()[0],
+        yB = this.posB()[1],
+        zB = this.posB()[2],
         blockOutlineBXY = this._blockProperties.rotatedOutlineBXY(this.a()),
         rotCenterBXY = this._blockProperties.rotCenterBXY(),
         that = this;
@@ -302,21 +302,21 @@ dojo.declare('realityBuilder.Block', null, {
     // Returns true, iff coordinates need to be updated.
     _coordinatesNeedToBeUpdated: function () {
         var 
-        cameraHasChanged, blockPropertiesHaveChanged, positionBHasChanged,
+        cameraHasChanged, blockPropertiesHaveChanged, posBHasChanged,
         aHasChanged;
 
         cameraHasChanged = this._lastCameraId !== this._camera.id();
         blockPropertiesHaveChanged = 
             this._lastBlockPropertiesVersionOnServer !== 
             this._blockProperties.versionOnServer();
-        positionBHasChanged = 
-            this._lastPositionB === null ||
-            !realityBuilder.util.pointsIdenticalB(this._lastPositionB,
-                                                  this._positionB);
+        posBHasChanged = 
+            this._lastPosB === null ||
+            !realityBuilder.util.pointsIdenticalB(this._lastPosB,
+                                                  this._posB);
         aHasChanged = this._lastA !== this._a;
 
         return cameraHasChanged || blockPropertiesHaveChanged ||
-            positionBHasChanged || aHasChanged;
+            posBHasChanged || aHasChanged;
     },
 
     // Called after the coordinates have been updated.
@@ -324,9 +324,9 @@ dojo.declare('realityBuilder.Block', null, {
         this._lastBlockPropertiesVersionOnServer = 
             this._blockProperties.versionOnServer();
         this._lastCameraId = this._camera.id();
-        this._lastPositionB = [this._positionB[0],
-                               this._positionB[1],
-                               this._positionB[2]]; // deep copy necessary
+        this._lastPosB = [this._posB[0],
+                               this._posB[1],
+                               this._posB[2]]; // deep copy necessary
         this._lastA = this._a;
         this._coordinatesChangedAfterLastRendering = true;
     },

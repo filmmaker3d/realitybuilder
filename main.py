@@ -36,7 +36,7 @@ from django.utils import simplejson
 from datetime import datetime, timedelta
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSONP response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -179,7 +179,7 @@ class NewBlock(db.Model):
     data_version = db.StringProperty()
 
     # Initial position, in block space:
-    init_position_b = db.ListProperty(int)
+    init_pos_b = db.ListProperty(int)
 
     # Initial rotation angle:
     init_a = db.IntegerProperty() # multiples of 90°, CCW when viewed from
@@ -197,7 +197,7 @@ class NewBlock(db.Model):
 
 class Block(db.Model):
     # Position, in block space:
-    position_b = db.ListProperty(int)
+    pos_b = db.ListProperty(int)
 
     # Rotation angle:
     a = db.IntegerProperty() # ° CCW when viewed from above
@@ -212,37 +212,37 @@ class Block(db.Model):
     # Returns the datastore key name of a block at "x_b", "y_b", "z_b", rotated
     # by "a".
     @classmethod
-    def build_key_name(cls, position_b, a):
-        x_b = position_b[0]
-        y_b = position_b[1]
-        z_b = position_b[2]
+    def build_key_name(cls, pos_b, a):
+        x_b = pos_b[0]
+        y_b = pos_b[1]
+        z_b = pos_b[2]
         return str(x_b) + ',' + str(y_b) + ',' + str(z_b) + ',' + str(a)
 
-    # Returns the block at the block space position "position_b", rotated by
+    # Returns the block at the block space position "pos_b", rotated by
     # the angle "a", in the construction "construction", or "None", if the
     # block cannot be found. Also returns blocks in state deleted.
     @classmethod
-    def get_at(cls, construction, position_b, a):
-        return cls.get_by_key_name(cls.build_key_name(position_b, a), 
+    def get_at(cls, construction, pos_b, a):
+        return cls.get_by_key_name(cls.build_key_name(pos_b, a), 
                                    parent = construction)
 
-    # Inserts a block at the block space position "position_b" in the
+    # Inserts a block at the block space position "pos_b" in the
     # construction "construction", with the initial state deleted. The block is
     # rotated by "a", CCW when viewed from above. Raises an exception on
     # failure. Returns the block.
     @classmethod
-    def insert_at(cls, construction, position_b, a):
+    def insert_at(cls, construction, pos_b, a):
         return Block(parent = construction, 
-                     key_name = cls.build_key_name(position_b, a),
-                     position_b = position_b, a = a,
+                     key_name = cls.build_key_name(pos_b, a),
+                     pos_b = pos_b, a = a,
                      time_stamp = long(time.time()))
 
-    # If there is a block at "position_b", rotated by "a", in the state "state"
+    # If there is a block at "pos_b", rotated by "a", in the state "state"
     # in the construction associated with the current block, returns that
     # block. Otherwise returns "None".
-    def get_at_with_state(self, position_b, a, state):
+    def get_at_with_state(self, pos_b, a, state):
         construction = self.parent()
-        block = self.get_at(construction, position_b, a)
+        block = self.get_at(construction, pos_b, a)
         if block and block.state == state:
             return block
         else:
@@ -258,13 +258,13 @@ class Block(db.Model):
         (1, -1), (0, -1), (-1, -1)]
 
     def x_b(self):
-        return self.position_b[0]
+        return self.pos_b[0]
 
     def y_b(self):
-        return self.position_b[1]
+        return self.pos_b[1]
 
     def z_b(self):
-        return self.position_b[2]
+        return self.pos_b[2]
 
     # Returns True, iff the block "block" intersects with any real block. Self
     # intersection does not count as intersection.
@@ -274,9 +274,9 @@ class Block(db.Model):
     # Deletes any pending blocks intersecting with the current block, aside
     # from the block itself.
     def delete_intersecting_pending_blocks(self):
-        for relative_xy_positionB in self.intersecting_relative_xy_positionsB:
-            testXB = self.x_b() + relative_xy_positionB[0]
-            testYB = self.y_b() + relative_xy_positionB[1]
+        for relative_xy_posB in self.intersecting_relative_xy_positionsB:
+            testXB = self.x_b() + relative_xy_posB[0]
+            testYB = self.y_b() + relative_xy_posB[1]
             testZB = self.z_b()
             testA = self.a
             testBlock = self.get_at_with_state([testXB, testYB, testZB], 
@@ -374,7 +374,7 @@ class RPCConstruction(webapp.RequestHandler):
         blocks = []
         for block in query:
             blocks.append({
-                    'positionB': block.position_b, 
+                    'posB': block.pos_b, 
                     'a': block.a,
                     'state': block.state,
                     'timeStamp': block.time_stamp})
@@ -475,7 +475,7 @@ class RPCConstruction(webapp.RequestHandler):
         if new_block_data_changed:
             # New block data version on server not the same as on client. =>
             # Deliver all the data.
-            data.update({'initPositionB': new_block.init_position_b,
+            data.update({'initPosB': new_block.init_pos_b,
                          'initA': new_block.init_a,
                          'moveSpace1B': new_block.move_space_1_b,
                          'moveSpace2B': new_block.move_space_2_b,
@@ -720,9 +720,9 @@ class RPCAdminDelete(webapp.RequestHandler):
 class RPCCreatePending(webapp.RequestHandler):
     # Tries to send an email, informing that a pending block has been created,
     # or the state of an existing block has been changed to pending. The
-    # position of the block: "position_b" Its rotation angle: "a"
+    # position of the block: "pos_b" Its rotation angle: "a"
     @classmethod
-    def send_info_email(cls, construction, position_b, a):
+    def send_info_email(cls, construction, pos_b, a):
         query = PendingBlockEmail.all().ancestor(construction)
         pending_block_email = query.get()
         if pending_block_email is None:
@@ -734,7 +734,7 @@ class RPCCreatePending(webapp.RequestHandler):
         body = """
 Position: %d, %d, %d
 Angle: %d
-""" % (position_b[0], position_b[1], position_b[2], a)
+""" % (pos_b[0], pos_b[1], pos_b[2], a)
 
         try:
             mail.send_mail(sender_address, recipient_address, subject, body)

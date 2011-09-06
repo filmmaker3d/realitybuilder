@@ -108,7 +108,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         var camera = this._camera, rb = realityBuilder;
         return new rb.ConstructionBlock(this._blockProperties,
                                         camera, 
-                                        serverData.positionB, serverData.a,
+                                        serverData.posB, serverData.a,
                                         serverData.state,
                                         serverData.timeStamp);
     },
@@ -157,14 +157,14 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         });
     },
 
-    // Returns the construction block at the block space position "positionB",
+    // Returns the construction block at the block space position "posB",
     // and rotated by the angle "a", or false if there is none.
-    blockAt: function (positionB, a) {
+    blockAt: function (posB, a) {
         var blocks = this.blocks(), block, i;
         for (i = 0; i < blocks.length; i += 1) {
             block = blocks[i];
-            if (realityBuilder.util.pointsIdenticalB(positionB, 
-                                                     block.positionB()) &&
+            if (realityBuilder.util.pointsIdenticalB(posB, 
+                                                     block.posB()) &&
                 a === block.a()) {
                 return block;
             }
@@ -214,16 +214,16 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     },
 
     // Triggers setting the state of the construction block at the position
-    // "positionB" and with rotation angle "a" to pending: on the client and on
+    // "posB" and with rotation angle "a" to pending: on the client and on
     // the server. Once the server has completed the request, the list of
     // blocks is updated.
-    makePendingOnServer: function (positionB, a) {
+    makePendingOnServer: function (posB, a) {
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "admin/rpc/make_pending",
             content: {
-                "xB": positionB[0],
-                "yB": positionB[1],
-                "zB": positionB[2],
+                "xB": posB[0],
+                "yB": posB[1],
+                "zB": posB[2],
                 "a": a
             },
             load: dojo.hitch(this, this._makePendingOnServerSucceeded)
@@ -235,15 +235,15 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
-    // Deletes the block positioned at the block space position "positionB" and
+    // Deletes the block positioned at the block space position "posB" and
     // rotated by the angle "a", on the client and on the server.
-    deleteOnServer: function (positionB, a) {
+    deleteOnServer: function (posB, a) {
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "admin/rpc/delete",
             content: {
-                "xB": positionB[0],
-                "yB": positionB[1],
-                "zB": positionB[2],
+                "xB": posB[0],
+                "yB": posB[1],
+                "zB": posB[2],
                 "a": a
             },
             load: dojo.hitch(this, this._deleteOnServerSucceeded)
@@ -262,15 +262,15 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     },
 
     // Triggers setting the state of the block at the block space position
-    // "positionB" and rotated by the angle "a" to real: on the client and on
+    // "posB" and rotated by the angle "a" to real: on the client and on
     // the server.
-    makeRealOnServer: function (positionB, a) {
+    makeRealOnServer: function (posB, a) {
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "admin/rpc/make_real",
             content: {
-                "xB": positionB[0],
-                "yB": positionB[1],
-                "zB": positionB[2],
+                "xB": posB[0],
+                "yB": posB[1],
+                "zB": posB[2],
                 "a": a
             },
             load: dojo.hitch(this, this._makeRealOnServerSucceeded)
@@ -278,18 +278,18 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     },
 
     // Triggers setting of the state of the block at the block space position
-    // "positionB" and rotated by the angle "a" to the state "state" on the
+    // "posB" and rotated by the angle "a" to the state "state" on the
     // server.
-    setBlockStateOnServer: function (positionB, a, state) {
+    setBlockStateOnServer: function (posB, a, state) {
         switch (state) {
         case 0:
-            this.deleteOnServer(positionB, a);
+            this.deleteOnServer(posB, a);
             break;
         case 1:
-            this.makePendingOnServer(positionB, a);
+            this.makePendingOnServer(posB, a);
             break;
         case 2:
-            this.makeRealOnServer(positionB, a);
+            this.makeRealOnServer(posB, a);
             break;
         }
     },

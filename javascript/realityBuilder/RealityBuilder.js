@@ -132,6 +132,10 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         return this._constructionBlocks;
     },
 
+    blockProperties: function () {
+        return this._blockProperties;
+    },
+
     // Called after the new block has been frozen.
     _onNewBlockFrozen: function () {
         this._renderNewBlockIfFullyInitialized(); // color changes
@@ -182,7 +186,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
             // the list of construction blocks, and if the user is logged in as
             // administrator.
             constructionBlocks = this._constructionBlocks;
-            constructionBlocks.setBlockStateOnServer(newBlock.positionB(), 
+            constructionBlocks.setBlockStateOnServer(newBlock.posB(), 
                                                      newBlock.a(), 2);
         }
     },

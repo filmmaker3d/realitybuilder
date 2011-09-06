@@ -59,7 +59,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Block space position used when last calculating the sensor space
     // coordinates.
-    _lastPositionB: null,
+    _lastPosB: null,
 
     // Whether the block was frozen or not when it was last rendered.
     _wasFrozenWhenLastRendered: null,
@@ -111,7 +111,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
         if (this._versionOnServer !== serverData.version) {
             if (!this.isInitializedWithServerData()) {
-                this._positionB = serverData.initPositionB;
+                this._posB = serverData.initPosB;
                 this._a = serverData.initA;
                 positionAngleWereInitialized = true;
             } else {
@@ -142,8 +142,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // it go out of range, and unless the block is frozen.
     move: function (deltaB) {
         if (!this._wouldGoOutOfRange(deltaB, 0) && !this._isFrozen) {
-            this._positionB = realityBuilder.util.addVectorsB(
-                this._positionB, deltaB);
+            this._posB = realityBuilder.util.addVectorsB(
+                this._posB, deltaB);
             dojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
     },
@@ -184,7 +184,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Returns true, iff this block equals a construction block that has been
     // marked deleted.
     _turnedIntoDeletedConstructionBlock: function () {
-        var positionB, constructionBlock;
+        var posB, constructionBlock;
 
         if (this.isFrozen()) {
             // The block is currently in the state "requested to be made real".
@@ -202,7 +202,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                 return false;
             } else {
                 constructionBlock = 
-                    this._constructionBlocks.blockAt(this.positionB(),
+                    this._constructionBlocks.blockAt(this.posB(),
                                                      this.a());
                 if (constructionBlock) {
                     // Construction block in same position as new block.
@@ -235,7 +235,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                                                          [xB, yB, testZB],
                                                          this.a());
             } while (cbs.realBlocksCollideWith(testBlock));
-            this._positionB[2] = testZB;
+            this._posB[2] = testZB;
             return true;
         }
 
@@ -267,17 +267,17 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     //
     // * if it would be outside of the space where it is allowed to be moved.
     _wouldGoOutOfRange: function (deltaB, deltaA) {
-        var testPositionB, testBlock, testA;
+        var testPosB, testBlock, testA;
 
-        testPositionB = realityBuilder.util.addVectorsB(this.positionB(), 
+        testPosB = realityBuilder.util.addVectorsB(this.posB(), 
                                                         deltaB);
         testA = (this.a() + deltaA) % 4;
         testBlock = new realityBuilder.Block(this._blockProperties,
                                              this._camera, 
-                                             testPositionB, testA);
+                                             testPosB, testA);
 
         return (this._constructionBlocks.realBlocksCollideWith(testBlock) ||
-                !this._wouldBeInMoveSpace(testPositionB));
+                !this._wouldBeInMoveSpace(testPosB));
     },
 
     canBeRotated90: function () {
@@ -300,9 +300,9 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Returns true, iff this block is in the space where blocks may be build.
     _isInBuildSpace: function () {
-        var xB = this._positionB[0],
-            yB = this._positionB[1],
-            zB = this._positionB[2],
+        var xB = this._posB[0],
+            yB = this._posB[1],
+            zB = this._posB[2],
             b1B = this._buildSpace1B, b2B = this._buildSpace2B;
         return (xB >= b1B[0] && xB <= b2B[0] &&
                 yB >= b1B[1] && yB <= b2B[1] &&

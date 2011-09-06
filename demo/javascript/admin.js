@@ -188,7 +188,7 @@ var realityBuilderAdminDemo = (function () {
     // block "block" and triggers setting of the state.
     function applyStateFromStateSelector(selectNode, block) {
         realityBuilder.constructionBlocks().
-            setBlockStateOnServer(block.positionB(), block.a(),
+            setBlockStateOnServer(block.posB(), block.a(),
                                   parseInt(selectNode.val(), 10));
     }
 

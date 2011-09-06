@@ -154,7 +154,7 @@ for query in queries:
 # Sets up the new block:
 newBlock = NewBlock(parent=construction)
 newBlock.data_version = '0'
-newBlock.init_position_b = [4, 0, 4]
+newBlock.init_pos_b = [4, 0, 4]
 newBlock.init_a = 0
 newBlock.move_space_1_b = [-1, -1, 0]
 newBlock.move_space_2_b = [6, 6, 5]
