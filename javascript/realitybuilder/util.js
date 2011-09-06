@@ -39,9 +39,9 @@ realityBuilder.util.SETTINGS = null;
 // Returns the coordinates of the block space point "pB" in world space.
 realityBuilder.util.blockToWorld = function (pB, blockProperties) {
     var 
-    factorX = blockProperties.positionSpacingXY(),
-    factorY = blockProperties.positionSpacingXY(),
-    factorZ = blockProperties.positionSpacingZ();
+    factorX = blockProperties.posSpacingXY(),
+    factorY = blockProperties.posSpacingXY(),
+    factorZ = blockProperties.posSpacingZ();
     return [pB[0] * factorX, pB[1] * factorY, pB[2] * factorZ];
 };
 

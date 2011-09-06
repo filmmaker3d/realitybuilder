@@ -34,11 +34,6 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // above. Note that this setting is irrespective of the center of rotation.
     _has2FoldSymmetry: null,
 
-    // Block dimensions in world space. The side length of a block is
-    // approximately two times the grid spacing in the respective direction.
-    _blockPositionSpacingXY: null, // mm
-    _blockPositionSpacingZ: null, // mm
-
     // Outline of the block in the xy plane, with coordinates in block space,
     // counterclockwise:
     _outlineBXY: null,
@@ -282,8 +277,8 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         if (this._versionOnServer !== serverData.version) {
             this._versionOnServer = serverData.version;
             this._has2FoldSymmetry = serverData.has2FoldSymmetry;
-            this._positionSpacingXY = serverData.positionSpacingXY;
-            this._positionSpacingZ = serverData.positionSpacingZ;
+            this._posSpacingXY = serverData.posSpacingXY;
+            this._posSpacingZ = serverData.posSpacingZ;
             this._outlineBXY = serverData.outlineBXY;
             this._collisionOffsetsListBXY = serverData.collisionOffsetsListBXY;
             this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
@@ -305,12 +300,12 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         }
     },
 
-    positionSpacingXY: function () {
-        return this._positionSpacingXY;
+    posSpacingXY: function () {
+        return this._posSpacingXY;
     },
 
-    positionSpacingZ: function () {
-        return this._positionSpacingZ;
+    posSpacingZ: function () {
+        return this._posSpacingZ;
     },
 
     // Returns the outline, rotated by angle "a", in multiples of 90° CCW when

@@ -328,8 +328,8 @@ class BlockProperties(db.Model):
 
     # Block dimensions in world space. The side length of a block is
     # approximately two times the grid spacing in the respective direction.
-    position_spacing_xy = db.FloatProperty() # mm
-    position_spacing_z = db.FloatProperty() # mm
+    pos_spacing_xy = db.FloatProperty() # mm
+    pos_spacing_z = db.FloatProperty() # mm
 
     # Outline of a block in the xy plane, with coordinates in block space,
     # counterclockwise, when not rotated:
@@ -442,10 +442,10 @@ class RPCConstruction(webapp.RequestHandler):
             # client. => Deliver all the data.
             data.update({'has2FoldSymmetry': 
                          block_properties.has_2_fold_symmetry,
-                         'positionSpacingXY': 
-                         block_properties.position_spacing_xy,
-                         'positionSpacingZ': 
-                         block_properties.position_spacing_z,
+                         'posSpacingXY': 
+                         block_properties.pos_spacing_xy,
+                         'posSpacingZ': 
+                         block_properties.pos_spacing_z,
                          'outlineBXY': 
                          simplejson.loads(block_properties.outline_bxy),
                          'collisionOffsetsListBXY': \

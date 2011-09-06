@@ -128,8 +128,8 @@ for query in queries:
 blockProperties = BlockProperties(parent=construction)
 blockProperties.data_version = '0'
 blockProperties.has_2_fold_symmetry = False
-blockProperties.position_spacing_xy = 20.
-blockProperties.position_spacing_z = 10.
+blockProperties.pos_spacing_xy = 20.
+blockProperties.pos_spacing_z = 10.
 blockProperties.outline_bxy = '[[0, 0], [1, 0], [2, 1], [0, 1]]'
 blockProperties.collision_offsets_list_bxy = \
     ['[[-1, 0], [0, 0], [1, 0]]',
