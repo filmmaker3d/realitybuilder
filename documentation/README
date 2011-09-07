@@ -109,7 +109,7 @@ Unit tests
 
 Run unit tests by visiting (relative to the root URL) with debug mode enabled:
 
-  /javascript/realitybuilder/tests/runTests.html
+  /javascript/realityBuilder/tests/runTests.html
 
 
 About blocks
