@@ -261,14 +261,14 @@ Before releasing a new version:
 * Make sure that there no FIXME tagged comments in the code. Instead, if
   necessary, corresponding issues should be created in the issue tracker.
 
-* Test with common browsers.
-
 * Check that unit tests work.
 
 * Disable debug mode.
 
-* Check that the Reality Builder works fine with the sample data (/admin/init).
+* Check that the Reality Builder demo works fine with common browsers.
 
+Do not forget to tag the version in the version control system (Mercurial as of
+this writing).
 
 
 Versioning
