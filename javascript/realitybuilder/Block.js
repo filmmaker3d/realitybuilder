@@ -149,6 +149,10 @@ dojo.declare('realityBuilder.Block', null, {
         return this._blockProperties.congruencyOffsetB(this._a);
     },
 
+    blockProperties: function () {
+        return this._blockProperties;
+    },
+
     // Returns the block's vertexes in screen space.
     _vertexesS: function () {
         return this._bottomVertexesS.concat(this._topVertexesS);

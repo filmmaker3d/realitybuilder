@@ -12352,6 +12352,10 @@ dojo.declare('realityBuilder.Block', null, {
         return this._blockProperties.congruencyOffsetB(this._a);
     },
 
+    blockProperties: function () {
+        return this._blockProperties;
+    },
+
     // Returns the block's vertexes in screen space.
     _vertexesS: function () {
         return this._bottomVertexesS.concat(this._topVertexesS);
@@ -15683,7 +15687,8 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     },
 
     _simplifiedPosBAndAOfBlock: function (block) {
-        return this._simplifiedPosBAndA(block.posBAndA());
+        return this.simplifiedPosBAndA(block.posBAndA(), 
+                                       block.blockProperties());
     },
 
     // Returns an array created from positions and rotations angles of the real
@@ -15734,26 +15739,6 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
         }            
 
         return false; // no prerendered configuration matches
-    },
-
-    // Returns true, iff the block configuration described by the blocks
-    // "blocks" matches the currently selected prerendered block configuration.
-    blockConfigurationMatches: function (blocks) {
-        var blockConfiguration1, blockConfiguration2, posBAndA, 
-        that = this;
-
-        blockConfiguration1 = [];
-        dojo.forEach(blocks, function (block) {
-            posBAndA = that._simplifiedPosBAndAOfBlock(block);
-            blockConfiguration1.push(posBAndA);
-        });
-        this._sortBlockConfiguration(blockConfiguration1);
-
-        blockConfiguration2 = this._blockConfigurations[this.i()]; // already
-                                                                   // sorted
-
-        return this._blockConfigurationsMatch(blockConfiguration1,
-                                              blockConfiguration2);
     },
 
     _loadBlockConfigurationOnServerSucceeded: function () {
