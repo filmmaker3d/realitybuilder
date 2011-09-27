@@ -267,9 +267,12 @@ Before releasing a new version:
 
 * Check that the Reality Builder demo works fine with common browsers.
 
-Do not forget to tag the version in the version control system (Mercurial as of
-this writing).
+Do not forget:
 
+* Tag the version in the version control system (Mercurial as of this writing).
+
+* Increase the version number in "app.yaml" already to that of the next
+  version.
 
 Versioning
 ==========
