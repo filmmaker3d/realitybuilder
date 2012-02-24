@@ -21,7 +21,7 @@ To run the demo, proceed as follows:
 2. Initialize sample data. For instuctions read the documentation at the top
   of:
 
-    /demo/source/scene/init.py
+    /demo/scene/init.py
 
 3. Visit the demo user and admin interfaces (URLs relative to document root):
 
