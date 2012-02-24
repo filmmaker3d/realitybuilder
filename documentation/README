@@ -40,8 +40,8 @@ distribution of the Reality Builder. If desired, install it as follows:
 
     /separate/FlashCanvasPro
 
-  The directory "separate" is components that should not be redistributed as
-  part of the Reality Builder source code.
+  The directory "separate" is for components that should not be redistributed
+  as part of the Reality Builder source code.
 
 
 How to enable debugging
