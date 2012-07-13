@@ -14,20 +14,21 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global realityBuilderDemo, realityBuilder, $, alert */
+/*global realityBuilderDemo, realityBuilder, $ */
 
 if (typeof $ !== 'undefined') {
     $(function () {
+        'use strict';
+
         var settings = realityBuilderDemo.settings();
-        
+
         // Note for IE < 9: FlashCanvas needs to be ready at this point in
         // time!
 
         realityBuilder.initialize(settings);
     });
 } else {
-    alert('Your web browser is not supported.');
+    window.alert('Your web browser is not supported.');
 }

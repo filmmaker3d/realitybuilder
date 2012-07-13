@@ -16,10 +16,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.ConstructionBlocks');
 
@@ -107,7 +107,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     _createBlockFromServerData: function (serverData) {
         var camera = this._camera, rb = realityBuilder;
         return new rb.ConstructionBlock(this._blockProperties,
-                                        camera, 
+                                        camera,
                                         serverData.posB, serverData.a,
                                         serverData.state,
                                         serverData.timeStamp);
@@ -119,8 +119,8 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         if (this._versionOnServer !== serverData.version) {
             this._versionOnServer = serverData.version;
 
-            this._blocks = 
-                dojo.map(serverData.blocks, 
+            this._blocks =
+                dojo.map(serverData.blocks,
                          dojo.hitch(this,
                                     this._createBlockFromServerData));
 
@@ -163,9 +163,9 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         var blocks = this.blocks(), block, i;
         for (i = 0; i < blocks.length; i += 1) {
             block = blocks[i];
-            if (realityBuilder.util.pointsIdenticalB(posB, 
+            if (realityBuilder.util.pointsIdenticalB(posB,
                                                      block.posB()) &&
-                a === block.a()) {
+                    a === block.a()) {
                 return block;
             }
         }
@@ -175,9 +175,9 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // Returns true, iff there is any collision between real blocks and the
     // block "block".
     realBlocksCollideWith: function (block) {
-        var 
-        realBlocks = this.realBlocksSorted(), 
-        realBlock, i;
+        var realBlocks = this.realBlocksSorted(),
+            realBlock,
+            i;
 
         for (i = 0; i < realBlocks.length; i += 1) {
             realBlock = realBlocks[i];
@@ -209,7 +209,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Called if making the block pending on the server failed.
     _makePendingOnServerFailed: function () {
-        dojo.publish('realityBuilder/ConstructionBlocks/' + 
+        dojo.publish('realityBuilder/ConstructionBlocks/' +
                      'changeOnServerFailed');
     },
 
@@ -307,10 +307,10 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
             bXB = b.xB();
             bYB = b.yB();
             bZB = b.zB();
-            if (bZB + 1 <= zBMax && 
-                xB >= bXB && xB <= bXB + 1 &&
-                yB >= bYB && yB <= bYB + 1 &&
-                bZB + 1 > zBOfUpperSide) {
+            if (bZB + 1 <= zBMax &&
+                    xB >= bXB && xB <= bXB + 1 &&
+                    yB >= bYB && yB <= bYB + 1 &&
+                    bZB + 1 > zBOfUpperSide) {
                 zBOfUpperSide = bZB + 1;
             }
         });
@@ -332,12 +332,12 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         var sensor = this._camera.sensor();
 
         if (sensor.realBlocksAreVisible()) {
-            this._renderBlocks(sensor.realBlocksCanvas(), 
+            this._renderBlocks(sensor.realBlocksCanvas(),
                                this._realBlocksSorted);
         }
 
         if (sensor.pendingBlocksAreVisible()) {
-            this._renderBlocks(sensor.pendingBlocksCanvas(), 
+            this._renderBlocks(sensor.pendingBlocksCanvas(),
                                this._pendingBlocks);
         }
     }

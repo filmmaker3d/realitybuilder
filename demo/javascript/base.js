@@ -14,25 +14,27 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global realityBuilder, $, alert */
+/*global realityBuilderDemo, realityBuilder, $ */
 
 var realityBuilderDemo = (function () {
+    'use strict';
+
     var publicInterface,
-    coordinateButtonDeltaBs = {
-        'incX': [1, 0, 0],
-        'decX': [-1, 0, 0],
-        'incY': [0, 1, 0],
-        'decY': [0, -1, 0],
-        'incZ': [0, 0, 1],
-        'decZ': [0, 0, -1]
-    },
-    backgroundImageIsLoaded = false, // initially only a placeholder is loaded
-    realityBuilderIsReady = false,
-    realityBuilderVersion;
-    
+        coordinateButtonDeltaBs = {
+            'incX': [1, 0, 0],
+            'decX': [-1, 0, 0],
+            'incY': [0, 1, 0],
+            'decY': [0, -1, 0],
+            'incZ': [0, 0, 1],
+            'decZ': [0, 0, -1]
+        },
+        backgroundImageIsLoaded = false, // initially only a placeholder is
+                                         // loaded
+        realityBuilderIsReady = false,
+        realityBuilderVersion;
+
     function forEachCoordinateButton(f) {
         $.each(coordinateButtonDeltaBs, function (type, deltaB) {
             f(type, deltaB);
@@ -41,11 +43,11 @@ var realityBuilderDemo = (function () {
 
     function onBrowserNotSupportedError() {
         // "alert" works also in very old browsers such as Netscape 4.
-        alert('Your web browser is not supported.');
+        window.alert('Your web browser is not supported.');
     }
 
     function onServerError() {
-        alert('Server error.');
+        window.alert('Server error.');
     }
 
     // Unhides the content.
@@ -63,12 +65,12 @@ var realityBuilderDemo = (function () {
 
     function updateBackgroundImage() {
         $('#backgroundImage').
-            attr('src', 
-                 '/demo/images/prerendered_' + 
+            attr('src',
+                 '/demo/images/prerendered_' +
                  realityBuilder.prerenderMode().i() + '.jpg');
 
         if (!backgroundImageIsLoaded) {
-            $('#backgroundImage').one('load', function () { 
+            $('#backgroundImage').one('load', function () {
                 backgroundImageIsLoaded = true;
                 unhideViewIfAllReady();
             });
@@ -121,7 +123,7 @@ var realityBuilderDemo = (function () {
 
         if (realityBuilderIsReady) {
             newBlock = realityBuilder.newBlock();
-            updateControlButtonState('requestMakeReal', 
+            updateControlButtonState('requestMakeReal',
                                      newBlock.canBeMadeReal());
         }
     }
@@ -147,24 +149,21 @@ var realityBuilderDemo = (function () {
     }
 
     function setUpCoordinateButton(type, deltaB) {
-        setUpControlButton(type,
-                           function () {
-                               realityBuilder.newBlock().move(deltaB);
-                           });
+        setUpControlButton(type, function () {
+            realityBuilder.newBlock().move(deltaB);
+        });
     }
 
     function setUpRotate90Button() {
-        setUpControlButton('rotate90',
-                           function () {
-                               realityBuilder.newBlock().rotate90();
-                           });
+        setUpControlButton('rotate90', function () {
+            realityBuilder.newBlock().rotate90();
+        });
     }
 
     function setUpRequestMakeRealButton() {
-        setUpControlButton('requestMakeReal',
-                           function () {
-                               realityBuilder.newBlock().requestMakeReal();
-                           });
+        setUpControlButton('requestMakeReal', function () {
+            realityBuilder.newBlock().requestMakeReal();
+        });
     }
 
     function scheduleReset() {
@@ -211,8 +210,8 @@ var realityBuilderDemo = (function () {
                 namespace: realityBuilderVersion + '_demo',
                 onReady: onReady,
                 onBrowserNotSupportedError: onBrowserNotSupportedError,
-                onPrerenderedBlockConfigurationChanged: 
-                onPrerenderedBlockConfigurationChanged,
+                onPrerenderedBlockConfigurationChanged:
+                    onPrerenderedBlockConfigurationChanged,
                 onDegreesOfFreedomChanged: onDegreesOfFreedomChanged,
                 onServerError: onServerError
             };

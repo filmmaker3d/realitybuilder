@@ -78,10 +78,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.ShadowObscuringBlocks');
 
@@ -102,9 +102,8 @@ dojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
     // Needed for hidden lines removal and collision detection.
     _constructionBlocks: null,
 
-    constructor: function (newBlock, blockProperties, camera, 
-                           constructionBlocks)
-    {
+    constructor: function (newBlock, blockProperties, camera,
+                           constructionBlocks) {
         this._newBlock = newBlock;
         this._blockProperties = blockProperties;
         this._camera = camera;
@@ -131,12 +130,13 @@ dojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
     // Updates the list of blocks (see definition of "shadow obscuring
     // blocks").
     update: function () {
-        var 
-        zB, 
-        newBlock = this._newBlock, 
-        cbs = this._constructionBlocks,
-        blocks = [],
-        blocksInLayer, blocksInPrevLayer = [], copiedBlocks;
+        var zB,
+            newBlock = this._newBlock,
+            cbs = this._constructionBlocks,
+            blocks = [],
+            blocksInLayer,
+            blocksInPrevLayer = [],
+            copiedBlocks;
 
         for (zB = cbs.highestRealBlocksZB(); zB >= 0; zB -= 1) {
             // Collects shadow obscuring blocks for current layer:
@@ -144,7 +144,7 @@ dojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
 
             if (zB < newBlock.zB()) {
                 copiedBlocks = this._copyBlocksToLayer(blocksInPrevLayer, zB);
-                blocksInLayer = blocksInLayer.concat(blocksInLayer, 
+                blocksInLayer = blocksInLayer.concat(blocksInLayer,
                                                      copiedBlocks);
             }
 

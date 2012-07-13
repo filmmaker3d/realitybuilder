@@ -25,10 +25,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.LayerShadow');
 
@@ -60,9 +60,8 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     // weak garbage collectors).
     _helperCanvas: null,
 
-    constructor: function (newBlock, blockProperties, camera, 
-                           constructionBlocks)
-    {
+    constructor: function (newBlock, blockProperties, camera,
+                           constructionBlocks) {
         var shadowCanvas;
 
         this._newBlock = newBlock;
@@ -92,20 +91,19 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     // Updates the vertexes of the full shadow, projected onto the layer of
     // blocks of elevation "layerZB", in world space.
     _updateWorldSpace: function (layerZB) {
-        var 
-        xB = this._newBlock.xB(),
-        yB = this._newBlock.yB(),
-        zB = layerZB + 1,
-        vs = [],
-        blockOutlineBXY = 
-            this._blockProperties.rotatedOutlineBXY(this._newBlock.a()),
-        that = this;
+        var xB = this._newBlock.xB(),
+            yB = this._newBlock.yB(),
+            zB = layerZB + 1,
+            vs = [],
+            blockOutlineBXY =
+                this._blockProperties.rotatedOutlineBXY(this._newBlock.a()),
+            that = this;
 
         // counterclockwise:
         dojo.forEach(blockOutlineBXY, function (vertexBXY) {
             vs.push(realityBuilder.util.
-                    blockToWorld([xB + vertexBXY[0], 
-                                  yB + vertexBXY[1], 
+                    blockToWorld([xB + vertexBXY[0],
+                                  yB + vertexBXY[1],
                                   zB],
                                  that._blockProperties));
         });
@@ -117,8 +115,8 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     // blocks of elevation "layerZB", in view space.
     _updateViewSpaceCoordinates: function (layerZB) {
         this._updateWorldSpace(layerZB);
-        this._fullVertexesV = dojo.map(this._fullVertexes, 
-                                       dojo.hitch(this._camera, 
+        this._fullVertexesV = dojo.map(this._fullVertexes,
+                                       dojo.hitch(this._camera,
                                                   this._camera.worldToView));
     },
 
@@ -129,7 +127,7 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     // Depends on up to date view space coordinates.
     _updateSensorSpaceCoordinates: function (layerZB) {
         this._fullVertexesS = dojo.map(this._fullVertexesV,
-                                   dojo.hitch(this._camera, 
+                                   dojo.hitch(this._camera,
                                               this._camera.viewToSensor));
     },
 
@@ -142,8 +140,7 @@ dojo.declare('realityBuilder.LayerShadow', null, {
 
     // Renders the tops of the blocks in the layer "layerZB".
     _renderTops: function (layerZB, context) {
-        var 
-        realBlocksOnLayer = 
+        var realBlocksOnLayer =
             this._constructionBlocks.realBlocksInLayer(layerZB);
 
         dojo.forEach(realBlocksOnLayer, function (realBlock) {
@@ -184,9 +181,8 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     //
     // Draws the shadow in the color "color".
     render: function (layerZB, color) {
-        var 
-        canvas = this._canvas, helperCanvas = this._helperCanvas, 
-        context, helperContext;
+        var canvas = this._canvas, helperCanvas = this._helperCanvas,
+            context, helperContext;
 
         // Draws the layer shadow by drawing the intersection between the tops
         // of the layer's blocks (or the ground plane) and the full shadow. To
@@ -216,7 +212,7 @@ dojo.declare('realityBuilder.LayerShadow', null, {
 
             // completes combination:
             this._renderFull(layerZB, context, color); // fast
-            
+
             // subtracts:
             context.globalCompositeOperation = "destination-out";
             context.drawImage(helperCanvas, 0, 0);

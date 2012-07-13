@@ -14,17 +14,17 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, window, 
-  LazyLoad */
+/*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad */
 
 var realityBuilder = (function () {
+    'use strict';
+
     var
-    scriptIsLoaded,
-    initialized, // true, after the public "initialize" has been called
-    settings, publicInterface;
+        scriptIsLoaded,
+        initialized, // true, after the public "initialize" has been called
+        settings, publicInterface;
 
     /* {{ "*" }}{{ "/" }} 
        {% include "javascript/lazyload/lazyload-min.js" %}
@@ -33,7 +33,7 @@ var realityBuilder = (function () {
     // Instanciates the widget and merges its global members into the
     // "realityBuilder" name space.
     function setupWidget() {
-        realityBuilderDojo.mixin(realityBuilder, 
+        realityBuilderDojo.mixin(realityBuilder,
                                  new realityBuilder.RealityBuilder(settings));
     }
 
@@ -85,9 +85,9 @@ var realityBuilder = (function () {
     // <url:http://groups.google.com/group/dojo-interest/browse_thread/thread/2
     // bcd6c8aff0487cb/4a164ecba59d16f9>
     function fixDojoQueryBug() {
-        if (!('query' in realityBuilderDojo) && 
-            typeof acme !== 'undefined' && 'query' in acme) {
-            realityBuilderDojo.query = acme.query; 
+        if (!(realityBuilderDojo.hasOwnProperty('query')) &&
+                typeof acme !== 'undefined' && acme.hasOwnProperty('query')) {
+            realityBuilderDojo.query = acme.query;
         }
     }
 
@@ -130,7 +130,7 @@ var realityBuilder = (function () {
         //
         //   <url:http://groups.google.com/group/dojo-interest/msg/65a43ee98f27
         //   cb6e>
-        scriptUrl = 
+        scriptUrl =
             '/javascript/dojo-release-1.6.1/dojo/dojo.js.uncompressed.js';
         baseUrl = '/javascript/dojo-release-1.6.1/dojo/';
 
@@ -140,7 +140,7 @@ var realityBuilder = (function () {
             debugContainerId: "firebugLite",
             baseUrl: baseUrl,
             scopeMap: [
-                ["dojo", "realityBuilderDojo"], 
+                ["dojo", "realityBuilderDojo"],
                 ["dijit", "realityBuilderDijit"],
                 ["dojox", "realityBuilderDojox"]
             ],

@@ -14,10 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.Sensor');
 
@@ -39,10 +39,9 @@ dojo.declare('realityBuilder.Sensor', null, {
         this._canvasNodes = {};
         dojo.forEach(['realBlocks', 'pendingBlocks', 'shadow', 'newBlock'],
                      dojo.hitch(this, function (key) {
-                         this._canvasNodes[key] = 
-                             this._addCanvasNode(sensorNode, width, height);
-                     }));
-
+                this._canvasNodes[key] =
+                    this._addCanvasNode(sensorNode, width, height);
+            }));
 
         this.setRealBlocksVisibility(false);
         this.setPendingBlocksVisibility(false);
@@ -121,7 +120,7 @@ dojo.declare('realityBuilder.Sensor', null, {
     },
 
     _setCanvasVisibility: function (canvas, shouldBeVisible) {
-        dojo.style(canvas, 'visibility', 
+        dojo.style(canvas, 'visibility',
                    shouldBeVisible ? 'visible' : 'hidden');
     },
 
@@ -138,12 +137,12 @@ dojo.declare('realityBuilder.Sensor', null, {
     },
 
     setRealBlocksVisibility: function (shouldBeVisible) {
-        this._setCanvasVisibility(this._canvasNodes.realBlocks, 
+        this._setCanvasVisibility(this._canvasNodes.realBlocks,
                                   shouldBeVisible);
     },
 
     setPendingBlocksVisibility: function (shouldBeVisible) {
-        this._setCanvasVisibility(this._canvasNodes.pendingBlocks, 
+        this._setCanvasVisibility(this._canvasNodes.pendingBlocks,
                                   shouldBeVisible);
     },
 

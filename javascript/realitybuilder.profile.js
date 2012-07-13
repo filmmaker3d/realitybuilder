@@ -14,18 +14,22 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
+/*jslint browser: true, maxerr: 50, maxlen: 79 */
+
+/*global dependencies:true */
+
 dependencies = {
     layers: [{
         name: "dojo.js", // if not "dojo.js", then 2 files would be created,
                          // and scopeMap would fail
         copyrightFile: "../../../realityBuilder.copyright.js",
         dependencies: [
-            "dojox.math", 
-            "dojox.math.matrix", 
+            "dojox.math",
+            "dojox.math.matrix",
             "realityBuilder.RealityBuilder"]
     }],
     prefixes: [
-        ["dojox", "../dojox"], 
+        ["dojox", "../dojox"],
         ["realityBuilder", "../../realityBuilder"]
     ]
 };

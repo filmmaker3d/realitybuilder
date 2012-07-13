@@ -28,10 +28,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.Camera');
 
@@ -65,7 +65,7 @@ dojo.declare('realityBuilder.Camera', null, {
 
     // Sensor of the camera:
     _sensor: null,
-    
+
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -77,10 +77,9 @@ dojo.declare('realityBuilder.Camera', null, {
     constructor: function (blockProperties, sensorWidth, sensorHeight, node) {
         this._blockProperties = blockProperties;
         this._pos = [0, 0, 1];
-        this._sensor = 
+        this._sensor =
             new realityBuilder.Sensor(sensorWidth, sensorHeight, node);
         this._updateRotationMatrices();
-        
     },
 
     _updateId: function () {
@@ -162,12 +161,12 @@ dojo.declare('realityBuilder.Camera', null, {
         // the oposite direction as that of the camera, which is rotated
         // counterclockwise. Therefore the matrices rotate clockwise.
         this._rX = [
-            [1, 0, 0], 
-            [0, Math.cos(-this._aX), Math.sin(-this._aX)], 
+            [1, 0, 0],
+            [0, Math.cos(-this._aX), Math.sin(-this._aX)],
             [0, -Math.sin(-this._aX), Math.cos(-this._aX)]];
         this._rY = [
-            [Math.cos(-this._aY), 0, Math.sin(-this._aY)], 
-            [0, 1, 0], 
+            [Math.cos(-this._aY), 0, Math.sin(-this._aY)],
+            [0, 1, 0],
             [-Math.sin(-this._aY), 0, Math.cos(-this._aY)]];
         this._rZ = [
             [Math.cos(-this._aZ), Math.sin(-this._aZ), 0],
@@ -179,7 +178,7 @@ dojo.declare('realityBuilder.Camera', null, {
 
     // Returns the coordinates of the world space point "point" in view space.
     worldToView: function (point) {
-        var tmp = realityBuilder.util.subtractVectors3D(point, 
+        var tmp = realityBuilder.util.subtractVectors3D(point,
                                                         this._pos);
 
         // Rotation matrices are applied to the vector tmp, from the left side:
@@ -194,7 +193,7 @@ dojo.declare('realityBuilder.Camera', null, {
     // when projected to the screen.
     scale: function (zV) {
         return this._sensorResolution * this._fl / zV; // px / mm
-    }, 
+    },
 
     // Returns the coordinates of the view space point "pointV" in sensor
     // space.
@@ -205,7 +204,7 @@ dojo.declare('realityBuilder.Camera', null, {
         scale = this.scale(zV);
         xV *= scale; // px
         yV *= scale; // px
-    
+
         // Puts camera position (and, thus, vanishing point) in the center of
         // the sensor:
         xV += this._sensor.width() / 2;
@@ -218,7 +217,8 @@ dojo.declare('realityBuilder.Camera', null, {
     // space.
     blockToSensor: function (pointB) {
         return this.viewToSensor(this.worldToView(
-            realityBuilder.util.blockToWorld(pointB, 
-                                             this._blockProperties)));
+            realityBuilder.util.blockToWorld(pointB,
+                                             this._blockProperties)
+        ));
     }
 });

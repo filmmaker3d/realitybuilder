@@ -14,10 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.PrerenderMode');
 
@@ -118,7 +118,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     },
 
     _sortBlockConfiguration: function (blockConfiguration) {
-        blockConfiguration.sort(dojo.hitch(this, 
+        blockConfiguration.sort(dojo.hitch(this,
                                            this._sortBlockConfiguration2));
     },
 
@@ -143,9 +143,8 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     },
 
     // Returns true, iff specified block configurations match.
-    _blockConfigurationsMatch: function (blockConfiguration1, 
-                                         blockConfiguration2)
-    {
+    _blockConfigurationsMatch: function (blockConfiguration1,
+                                         blockConfiguration2) {
         var i;
 
         if (blockConfiguration1.length === blockConfiguration2.length) {
@@ -178,7 +177,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
 
         if (blockProperties.has2FoldSymmetry() && a >= 2) {
             congruencyOffsetB = blockProperties.congruencyOffsetB(a);
-            simplifiedPosBAndA = 
+            simplifiedPosBAndA =
                 realityBuilder.util.addVectorsB(posB,
                                                 congruencyOffsetB);
             simplifiedPosBAndA.push(a % 2);
@@ -190,7 +189,7 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     },
 
     _simplifiedPosBAndAOfBlock: function (block) {
-        return this.simplifiedPosBAndA(block.posBAndA(), 
+        return this.simplifiedPosBAndA(block.posBAndA(),
                                        block.blockProperties());
     },
 
@@ -230,34 +229,34 @@ dojo.declare('realityBuilder.PrerenderMode', null, {
     matchingBlockConfigurationI: function (realBlocks, newBlock) {
         var i, blockConfiguration, currentBlockConfiguration;
 
-        currentBlockConfiguration = 
+        currentBlockConfiguration =
             this._currentBlockConfiguration(realBlocks, newBlock);
 
         for (i = 0; i < this._blockConfigurations.length; i += 1) {
             blockConfiguration = this._blockConfigurations[i];
-            if (this._blockConfigurationsMatch(blockConfiguration, 
+            if (this._blockConfigurationsMatch(blockConfiguration,
                                                currentBlockConfiguration)) {
                 return i;
             }
-        }            
+        }
 
         return false; // no prerendered configuration matches
     },
 
     _loadBlockConfigurationOnServerSucceeded: function () {
-        dojo.publish('realityBuilder/PrerenderMode/' + 
+        dojo.publish('realityBuilder/PrerenderMode/' +
                      'loadedBlockConfigurationOnServer');
     },
 
     // Loads the prerendered block configuration with index "i" on the server.
     loadBlockConfigurationOnServer: function (i) {
         realityBuilder.util.jsonpGet({
-            url: realityBuilder.util.rootUrl() + 
+            url: realityBuilder.util.rootUrl() +
                 "rpc/load_prerendered_block_configuration",
             content: {
                 "i": i
             },
-            load: dojo.hitch(this, 
+            load: dojo.hitch(this,
                              this._loadBlockConfigurationOnServerSucceeded)
         });
     },

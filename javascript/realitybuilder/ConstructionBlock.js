@@ -15,10 +15,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.ConstructionBlock');
 
@@ -40,9 +40,8 @@ dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
     // the sensor of the camera "camera". A time stamp - in seconds since the
     // epoch - of the date-time when the bocks status was last changed is
     // "timeStamp".
-    constructor: function (blockProperties, camera, posB, a, 
-                           state, timeStamp)
-    {
+    constructor: function (blockProperties, camera, posB, a,
+                           state, timeStamp) {
         this._state = state;
         this._timeStamp = timeStamp;
     },
@@ -74,10 +73,10 @@ dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
         var color, properties;
 
         if (!this.isDeleted()) {
-            color = this.isReal() ? 
-                realityBuilder.util.SETTINGS.colorOfRealBlock :
-                realityBuilder.util.SETTINGS.colorOfPendingBlock;
-            this.inherited(arguments, [arguments[0], color]);
+            color = (this.isReal() ?
+                     realityBuilder.util.SETTINGS.colorOfRealBlock :
+                     realityBuilder.util.SETTINGS.colorOfPendingBlock);
+            this.inherited(arguments, [context, color]);
         }
     },
 

@@ -14,11 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl, swfobject,
-  acme */
+/*global realityBuilder, dojo, dojox, FlashCanvas, swfobject */
 
 dojo.provide('realityBuilder.util');
 
@@ -38,10 +37,9 @@ realityBuilder.util.SETTINGS = null;
 
 // Returns the coordinates of the block space point "pB" in world space.
 realityBuilder.util.blockToWorld = function (pB, blockProperties) {
-    var 
-    factorX = blockProperties.posSpacingXY(),
-    factorY = blockProperties.posSpacingXY(),
-    factorZ = blockProperties.posSpacingZ();
+    var factorX = blockProperties.posSpacingXY(),
+        factorY = blockProperties.posSpacingXY(),
+        factorZ = blockProperties.posSpacingZ();
     return [pB[0] * factorX, pB[1] * factorY, pB[2] * factorZ];
 };
 
@@ -59,7 +57,7 @@ realityBuilder.util.intersectionLinePlaneVXZ = function (lineV) {
         // line in parallel to plane or undefined => no intersection point
         return false;
     } else {
-        return [p1[0] - p1[1] * delta[0] / delta[1], 
+        return [p1[0] - p1[1] * delta[0] / delta[1],
                 p1[2] - p1[1] * delta[2] / delta[1]];
     }
 };
@@ -75,9 +73,8 @@ realityBuilder.util.intersectionLinePlaneVXZ = function (lineV) {
 // 
 // * If the line touches a boundary point of a segment, then this is also
 //   regarded as intersection.
-realityBuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ, 
-                                                               lineVXZ)
-{
+realityBuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ,
+                                                           lineVXZ) {
     // As of 2010-Apr, an explanation can be found e.g. at:
     // http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/
 
@@ -135,9 +132,8 @@ realityBuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ,
 // It is assumed that the point and the segment are in front of the camera,
 // i.e. in front of the plane defined by the camera's sensor. If that's not the
 // case, then the result is undefined.
-realityBuilder.util.relationPointSegmentVXZ = function (pointVXZ, 
-                                                            segmentVXZ)
-{
+realityBuilder.util.relationPointSegmentVXZ = function (pointVXZ,
+                                                        segmentVXZ) {
     var camPositionVXZ, lineVXZ, intersectionVXZ, util;
 
     util = realityBuilder.util;
@@ -156,8 +152,8 @@ realityBuilder.util.relationPointSegmentVXZ = function (pointVXZ,
         if (util.pointsIdenticalVXZ(intersectionVXZ, pointVXZ)) {
             return 0; // point on line segment
         } else {
-            return util.pointIsBetween2D(pointVXZ, 
-                                         camPositionVXZ, 
+            return util.pointIsBetween2D(pointVXZ,
+                                         camPositionVXZ,
                                          intersectionVXZ) ? -1 : 1;
         }
     }
@@ -200,16 +196,15 @@ realityBuilder.util.pointsIdenticalVXZ = function (p1VXZ, p2VXZ) {
 // Returns true, iff the points "p1B" and "p2B" are in the same position in
 // block space.
 realityBuilder.util.pointsIdenticalB = function (p1B, p2B) {
-    return (
-        (p1B[0] - p2B[0]) === 0 &&
-        (p1B[1] - p2B[1]) === 0 &&
-        (p1B[2] - p2B[2]) === 0);
+    return ((p1B[0] - p2B[0]) === 0 &&
+            (p1B[1] - p2B[1]) === 0 &&
+            (p1B[2] - p2B[2]) === 0);
 };
 
 // Subtracts the vectors "vector2" from the vector "vector1" in 3D and returns
 // the result.
 realityBuilder.util.subtractVectors3D = function (vector1, vector2) {
-    return [vector1[0] - vector2[0], 
+    return [vector1[0] - vector2[0],
             vector1[1] - vector2[1],
             vector1[2] - vector2[2]];
 };
@@ -217,7 +212,7 @@ realityBuilder.util.subtractVectors3D = function (vector1, vector2) {
 // Adds the vectors "vector1B" and "vector2B" in blocks space and returns the
 // result.
 realityBuilder.util.addVectorsB = function (vector1B, vector2B) {
-    return [vector1B[0] + vector2B[0], 
+    return [vector1B[0] + vector2B[0],
             vector1B[1] + vector2B[1],
             vector1B[2] + vector2B[2]];
 };
@@ -225,14 +220,14 @@ realityBuilder.util.addVectorsB = function (vector1B, vector2B) {
 // Adds the vectors "vector1BXY" and "vector2BXY" in the block space x-y-plane
 // and returns the result.
 realityBuilder.util.addVectorsBXY = function (vector1BXY, vector2BXY) {
-    return [vector1BXY[0] + vector2BXY[0], 
+    return [vector1BXY[0] + vector2BXY[0],
             vector1BXY[1] + vector2BXY[1]];
 };
 
 // Subtracts the vectors "vector1BXY" and "vector2BXY" in the block space
 // x-y-plane and returns the result.
 realityBuilder.util.subtractVectorsBXY = function (vector1BXY, vector2BXY) {
-    return [vector1BXY[0] - vector2BXY[0], 
+    return [vector1BXY[0] - vector2BXY[0],
             vector1BXY[1] - vector2BXY[1]];
 };
 
@@ -272,8 +267,8 @@ realityBuilder.util.withDuplicatesRemoved = function (ps) {
 // Returns the polar coordinates of the sensor space point "pS".
 realityBuilder.util.cartesianToPolar = function (pS) {
     var x = pS[0], y = pS[1],
-    angle = Math.atan2(y, x),
-    distance = Math.sqrt(x * x + y * y);
+        angle = Math.atan2(y, x),
+        distance = Math.sqrt(x * x + y * y);
     return [angle, distance];
 };
 
@@ -281,8 +276,8 @@ realityBuilder.util.cartesianToPolar = function (pS) {
 // is in polar coordinates.
 realityBuilder.util.polarToCartesian = function (polarPS) {
     var angle = polarPS[0], distance = polarPS[1],
-    x = distance * Math.cos(angle),
-    y = distance * Math.sin(angle);
+        x = distance * Math.cos(angle),
+        y = distance * Math.sin(angle);
     return [x, y];
 };
 
@@ -305,7 +300,7 @@ realityBuilder.util.rotatePointBXY = function (pBXY, cBXY, a) {
         cYB = cBXY[1];
         tmpXB = pBXY[0] - cXB;
         tmpYB = pBXY[1] - cYB;
-        
+
         if (a % 4 === 1) {
             return [Math.round(cXB - tmpYB), Math.round(cYB + tmpXB)];
         } else if (a % 4 === 2) {
@@ -335,8 +330,8 @@ realityBuilder.util.isFlashCanvasActive = function () {
 };
 
 realityBuilder.util.isFlashReadyForFlashCanvas = function () {
-    return (typeof swfobject !== 'undefined') &&
-        swfobject.hasFlashPlayerVersion("9"); // includes higher versions
+    return (typeof swfobject !== 'undefined' &&
+            swfobject.hasFlashPlayerVersion("9")); // includes higher versions
 };
 
 // Returns true, iff the canvas functionality is somehow supported, either

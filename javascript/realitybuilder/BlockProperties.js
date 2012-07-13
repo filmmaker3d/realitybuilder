@@ -18,10 +18,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.BlockProperties');
 
@@ -29,7 +29,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
-    
+
     // True if the block has two-fold rotational symmetry, when viewed from
     // above. Note that this setting is irrespective of the center of rotation.
     _has2FoldSymmetry: null,
@@ -79,8 +79,8 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     //
     // * Block 1: rotated by angle "a"
     //
-    // * Block 2: rotated by angle "a" and by 180°, and moved by the congruency
-    //   offset
+    // * Block 2: rotated by angle "a" and by 180°, and moved by the
+    //   congruency offset
     _congruencyOffsetsB: null,
 
     versionOnServer: function () {
@@ -119,7 +119,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         var a;
 
         this._rotatedOutlinesBXY = [];
-        for (a = 0; a < 4; a += 1) { 
+        for (a = 0; a < 4; a += 1) {
             this._rotatedOutlinesBXY.push(this._rotateOutlineBXY(a));
         }
     },
@@ -128,11 +128,12 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     _updateCongruencyOffsetB: function () {
         var diffBXY, offsetBXY, a;
 
-        diffBXY = 
+        diffBXY =
             realityBuilder.util.multiplyVectorBXY(
-                2, 
-                realityBuilder.util.subtractVectorsBXY(this._centroidBXY, 
-                                                       this._rotCenterBXY));
+                2,
+                realityBuilder.util.subtractVectorsBXY(this._centroidBXY,
+                                                       this._rotCenterBXY)
+            );
 
         this._congruencyOffsetsB = [];
         for (a = 0; a < 4; a += 1) {
@@ -152,7 +153,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         var offsetB = this.congruencyOffsetB(a);
 
         return dojo.map(coordinatesListBXY, function (coordinatesBXY) {
-            return realityBuilder.util.addVectorsBXY(coordinatesBXY, 
+            return realityBuilder.util.addVectorsBXY(coordinatesBXY,
                                                      offsetB);
         });
     },
@@ -203,7 +204,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
 
         this._rotatedCollisionOffsetsListsBXY = [];
 
-        for (a1 = 0; a1 < 4; a1 += 1) { 
+        for (a1 = 0; a1 < 4; a1 += 1) {
             tmp = this._rotateCollisionOffsetsListBXY(a1);
             this._rotatedCollisionOffsetsListsBXY.push(tmp);
         }
@@ -262,7 +263,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         var a1, tmp;
 
         this._rotatedAttachmentOffsetsListsB = [];
-        for (a1 = 0; a1 < 4; a1 += 1) { 
+        for (a1 = 0; a1 < 4; a1 += 1) {
             tmp = this._rotateAttachmentOffsetsListB(a1);
             this._rotatedAttachmentOffsetsListsB.push(tmp);
         }
@@ -331,7 +332,7 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         a1 = block1.a() % 4;
         a2 = block2.a() % 4;
 
-        attachmentOffsetsListB = 
+        attachmentOffsetsListB =
             this._rotatedAttachmentOffsetsListsB[a1];
 
         relative_a = (4 + a2 - a1) % 4;

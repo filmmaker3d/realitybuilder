@@ -14,10 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.RealityBuilder');
 
@@ -69,37 +69,37 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         this._onReadyCalled = false;
 
         this._blockProperties = new rb.BlockProperties();
-        this._camera = new rb.Camera(this._blockProperties, 
+        this._camera = new rb.Camera(this._blockProperties,
                                      settings.width, settings.height,
                                      dojo.byId(settings.id));
-        this._constructionBlocks = 
+        this._constructionBlocks =
             new rb.ConstructionBlocks(this._blockProperties, this._camera);
         this._prerenderMode = new rb.PrerenderMode();
-        this._newBlock = 
+        this._newBlock =
             new rb.NewBlock(this._blockProperties,
                             this._camera,
                             this._constructionBlocks,
                             this._prerenderMode);
 
-        dojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer', 
+        dojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realityBuilder/PrerenderMode/' + 
-                       'loadedBlockConfigurationOnServer', 
+        dojo.subscribe('realityBuilder/PrerenderMode/' +
+                       'loadedBlockConfigurationOnServer',
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realityBuilder/NewBlock/createdPendingOnServer', 
+        dojo.subscribe('realityBuilder/NewBlock/createdPendingOnServer',
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realityBuilder/NewBlock/' + 
-                       'positionAngleInitialized', 
+        dojo.subscribe('realityBuilder/NewBlock/' +
+                       'positionAngleInitialized',
                        this, this._onNewBlockPositionAngleInitialized);
-        dojo.subscribe('realityBuilder/NewBlock/buildOrMoveSpaceChanged', 
+        dojo.subscribe('realityBuilder/NewBlock/buildOrMoveSpaceChanged',
                        this, this._onMoveOrBuildSpaceChanged);
-        dojo.subscribe('realityBuilder/NewBlock/frozen', 
+        dojo.subscribe('realityBuilder/NewBlock/frozen',
                        this, this._onNewBlockFrozen);
-        dojo.subscribe('realityBuilder/NewBlock/unfrozen', 
+        dojo.subscribe('realityBuilder/NewBlock/unfrozen',
                        this, this._onNewBlockUnfrozen);
         dojo.subscribe('realityBuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
-        dojo.subscribe('realityBuilder/NewBlock/' + 
+        dojo.subscribe('realityBuilder/NewBlock/' +
                        'onNewBlockMakeRealRequested',
                        this, this._onNewBlockMakeRealRequested);
         dojo.subscribe('realityBuilder/ConstructionBlocks/changed',
@@ -186,7 +186,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
             // the list of construction blocks, and if the user is logged in as
             // administrator.
             constructionBlocks = this._constructionBlocks;
-            constructionBlocks.setBlockStateOnServer(newBlock.posB(), 
+            constructionBlocks.setBlockStateOnServer(newBlock.posB(),
                                                      newBlock.a(), 2);
         }
     },
@@ -208,13 +208,12 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     // (Re-)renders blocks, but only if all necessary components have been
     // initialized, which is relevant only in the beginning.
-    _renderConstructionBlocksIfFullyInitialized: function (
-        renderConstructionBlocks)
-    {
-        if (this._blocksAreFullyInitialized()) {
-            this._constructionBlocks.renderIfVisible();
-        }
-    },
+    _renderConstructionBlocksIfFullyInitialized:
+        function (renderConstructionBlocks) {
+            if (this._blocksAreFullyInitialized()) {
+                this._constructionBlocks.renderIfVisible();
+            }
+        },
 
     // (Re-)renders new block, but only if all necessary components have been
     // initialized, which is relevant only in the beginning.
@@ -236,10 +235,9 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // the beginning.
     _updateNewBlockStateIfFullyInitialized: function (unfreeze) {
         if (this._constructionBlocks.isInitializedWithServerData() &&
-            this._newBlock.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData() &&
-            this._prerenderMode.isInitializedWithServerData()) {
-
+                this._newBlock.isInitializedWithServerData() &&
+                this._blockProperties.isInitializedWithServerData() &&
+                this._prerenderMode.isInitializedWithServerData()) {
             realityBuilder._newBlock.updateState();
             realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
             realityBuilder.util.SETTINGS.onMovedOrRotated();
@@ -310,10 +308,9 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // the "onReady" function, but only the first time.
     _checkIfReady: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
-            this._camera.isInitializedWithServerData() &&
-            this._blockProperties.isInitializedWithServerData() &&
-            this._onReadyCalled === false) {
-
+                this._camera.isInitializedWithServerData() &&
+                this._blockProperties.isInitializedWithServerData() &&
+                this._onReadyCalled === false) {
             realityBuilder.util.SETTINGS.onReady();
             this._onReadyCalled = true;
         }
@@ -358,7 +355,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
             // run concurrently.
             clearTimeout(this._updateTimeout);
         }
-        this._updateTimeout = 
+        this._updateTimeout =
             setTimeout(function () {
                 that._update();
             }, data.updateIntervalClient);
@@ -371,14 +368,14 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "rpc/construction",
             content: {
-                "blocksDataVersion": 
-                this._constructionBlocks.versionOnServer(),
+                "blocksDataVersion":
+                    this._constructionBlocks.versionOnServer(),
                 "cameraDataVersion": this._camera.versionOnServer(),
-                "blockPropertiesDataVersion": 
-                this._blockProperties.versionOnServer(),
+                "blockPropertiesDataVersion":
+                    this._blockProperties.versionOnServer(),
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
-                "prerenderModeDataVersion": 
-                this._prerenderMode.versionOnServer()
+                "prerenderModeDataVersion":
+                    this._prerenderMode.versionOnServer()
             },
             load: dojo.hitch(this, this._updateSucceeded)
         });
@@ -395,7 +392,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     _preparedCameraData: function (cameraData) {
         var preparedCameraData;
 
-        preparedCameraData = 
+        preparedCameraData =
             realityBuilder.util.addPrefix('camera.', cameraData);
         preparedCameraData['camera.x'] = cameraData.position[0];
         preparedCameraData['camera.y'] = cameraData.position[1];
@@ -407,7 +404,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     storeSettingsOnServer: function (settings) {
         var content = {};
 
-        if ('cameraData' in settings) {
+        if (settings.hasOwnProperty('cameraData')) {
             dojo.mixin(content, this._preparedCameraData(settings.cameraData));
         }
 

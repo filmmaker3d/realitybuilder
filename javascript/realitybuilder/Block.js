@@ -14,8 +14,8 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
 /*global realityBuilder, dojo, dojox, FlashCanvas */
 
@@ -164,8 +164,8 @@ dojo.declare('realityBuilder.Block', null, {
     projectedVertexesVXZ: function () {
         this._updateCoordinates();
 
-        return (this._projectedVertexesVXZ === null) ? 
-            false : this._projectedVertexesVXZ;
+        return (this._projectedVertexesVXZ === null ?
+                false : this._projectedVertexesVXZ);
     },
 
     // Updates the vertexes of the block projected to the view space x-z-plane.
@@ -196,7 +196,7 @@ dojo.declare('realityBuilder.Block', null, {
     collidesWith: function (block) {
         var testPosB, collisionOffsetsBXY, collisionOffsetBXY, i;
 
-        collisionOffsetsBXY = 
+        collisionOffsetsBXY =
             this._blockProperties.rotatedCollisionOffsetsBXY(this, block);
 
         for (i = 0; i < collisionOffsetsBXY.length; i += 1) {
@@ -217,12 +217,12 @@ dojo.declare('realityBuilder.Block', null, {
     attachableTo: function (block) {
         var testPosB, attachmentOffsetsB, attachmentOffsetB, i;
 
-        attachmentOffsetsB = 
+        attachmentOffsetsB =
             this._blockProperties.rotatedAttachmentOffsetsB(this, block);
 
         for (i = 0; i < attachmentOffsetsB.length; i += 1) {
             attachmentOffsetB = attachmentOffsetsB[i];
-            testPosB = 
+            testPosB =
                 realityBuilder.util.addVectorsB(this.posB(),
                                                     attachmentOffsetB);
             if (realityBuilder.util.pointsIdenticalB(block.posB(),
@@ -237,24 +237,25 @@ dojo.declare('realityBuilder.Block', null, {
     // Updates the vertexes of the block and its center of rotation in block
     // space.
     _updateBlockSpaceCoordinates: function () {
-        var 
-        xB = this.posB()[0],
-        yB = this.posB()[1],
-        zB = this.posB()[2],
-        blockOutlineBXY = this._blockProperties.rotatedOutlineBXY(this.a()),
-        rotCenterBXY = this._blockProperties.rotCenterBXY(),
-        that = this;
+        var
+            xB = this.posB()[0],
+            yB = this.posB()[1],
+            zB = this.posB()[2],
+            blockOutlineBXY =
+            this._blockProperties.rotatedOutlineBXY(this.a()),
+            rotCenterBXY = this._blockProperties.rotCenterBXY(),
+            that = this;
 
         this._bottomVertexesB = [];
         this._topVertexesB = [];
 
         // top, counterclockwise (when viewed from top in block space):
         dojo.forEach(blockOutlineBXY, function (vertexBXY) {
-            that._bottomVertexesB.push([xB + vertexBXY[0], 
-                                        yB + vertexBXY[1], 
+            that._bottomVertexesB.push([xB + vertexBXY[0],
+                                        yB + vertexBXY[1],
                                         zB]);
-            that._topVertexesB.push([xB + vertexBXY[0], 
-                                     yB + vertexBXY[1], 
+            that._topVertexesB.push([xB + vertexBXY[0],
+                                     yB + vertexBXY[1],
                                      zB + 1]);
         });
 
@@ -276,9 +277,9 @@ dojo.declare('realityBuilder.Block', null, {
     //
     // Depends of up to date block space coordinates.
     _updateWorldSpaceCoordinates: function () {
-        this._bottomVertexes = dojo.map(this._bottomVertexesB, 
+        this._bottomVertexes = dojo.map(this._bottomVertexesB,
                                         dojo.hitch(this, this._blockToWorld));
-        this._topVertexes = dojo.map(this._topVertexesB, 
+        this._topVertexes = dojo.map(this._topVertexesB,
                                      dojo.hitch(this, this._blockToWorld));
 
         this._bottomRotCenter = this._blockToWorld(this._bottomRotCenterB);
@@ -290,30 +291,30 @@ dojo.declare('realityBuilder.Block', null, {
     //
     // Depends on up to date world space coordinates.
     _updateViewSpaceCoordinates: function () {
-        this._bottomVertexesV = 
-            dojo.map(this._bottomVertexes, 
+        this._bottomVertexesV =
+            dojo.map(this._bottomVertexes,
                      dojo.hitch(this._camera, this._camera.worldToView));
-        this._topVertexesV = 
-            dojo.map(this._topVertexes, 
+        this._topVertexesV =
+            dojo.map(this._topVertexes,
                      dojo.hitch(this._camera, this._camera.worldToView));
 
-        this._bottomRotCenterV = 
+        this._bottomRotCenterV =
             this._camera.worldToView(this._bottomRotCenter);
-        this._topRotCenterV = 
+        this._topRotCenterV =
             this._camera.worldToView(this._topRotCenter);
     },
 
     // Returns true, iff coordinates need to be updated.
     _coordinatesNeedToBeUpdated: function () {
-        var 
-        cameraHasChanged, blockPropertiesHaveChanged, posBHasChanged,
-        aHasChanged;
+        var
+            cameraHasChanged, blockPropertiesHaveChanged, posBHasChanged,
+            aHasChanged;
 
         cameraHasChanged = this._lastCameraId !== this._camera.id();
-        blockPropertiesHaveChanged = 
-            this._lastBlockPropertiesVersionOnServer !== 
+        blockPropertiesHaveChanged =
+            this._lastBlockPropertiesVersionOnServer !==
             this._blockProperties.versionOnServer();
-        posBHasChanged = 
+        posBHasChanged =
             this._lastPosB === null ||
             !realityBuilder.util.pointsIdenticalB(this._lastPosB,
                                                   this._posB);
@@ -325,7 +326,7 @@ dojo.declare('realityBuilder.Block', null, {
 
     // Called after the coordinates have been updated.
     _onCoordinatesUpdated: function () {
-        this._lastBlockPropertiesVersionOnServer = 
+        this._lastBlockPropertiesVersionOnServer =
             this._blockProperties.versionOnServer();
         this._lastCameraId = this._camera.id();
         this._lastPosB = [this._posB[0],
@@ -377,14 +378,13 @@ dojo.declare('realityBuilder.Block', null, {
     _updateProjectedVertexesVXZS: function () {
         var cam = this._camera;
 
-        this._projectedVertexesVXZS = 
-            dojo.map(this._projectedVertexesVXZ,
-                     function (vertexVXZ) {
-                         var vertexV = [vertexVXZ[0],
-                                        0, // in view space x-z plane!
-                                        vertexVXZ[1]];
-                         return cam.viewToSensor(vertexV);
-                     });
+        this._projectedVertexesVXZS =
+            dojo.map(this._projectedVertexesVXZ, function (vertexVXZ) {
+                var vertexV = [vertexVXZ[0],
+                               0, // in view space x-z plane!
+                               vertexVXZ[1]];
+                return cam.viewToSensor(vertexV);
+            });
     },
 
     // Updates the vertices (top left, lower right) defining the bounding box
@@ -505,9 +505,8 @@ dojo.declare('realityBuilder.Block', null, {
     // Subtracts the shape of the block from the drawing on the canvas with
     // rendering context "context".
     subtract: function (context) {
-        var
-        bottomVertexesS, topVertexesS,
-        len, vertexS, i, ilv, irv;
+        var bottomVertexesS, topVertexesS,
+            len, vertexS, i, ilv, irv;
 
         this._updateCoordinates();
 
@@ -530,15 +529,16 @@ dojo.declare('realityBuilder.Block', null, {
     // Renders the foreground of the block, i.e. the part of that block that
     // was visible were the block solid.
     _renderForeground: function (context) {
-        var
-        topVertexesS = this._topVertexesS,
-        bottomVertexesS = this._bottomVertexesS,
-        topRotCenterS = this._topRotCenterS,
-        len = topVertexesS.length, // same for top and bottom
-        vertexS, firstVertexS, i, 
-        ilv = this._indexOfLeftmostVertex,
-        irv = this._indexOfRightmostVertex,
-        imax;
+        var topVertexesS = this._topVertexesS,
+            bottomVertexesS = this._bottomVertexesS,
+            topRotCenterS = this._topRotCenterS,
+            len = topVertexesS.length, // same for top and bottom
+            vertexS,
+            firstVertexS,
+            i,
+            ilv = this._indexOfLeftmostVertex,
+            irv = this._indexOfRightmostVertex,
+            imax;
 
         context.globalAlpha = 1;
 
@@ -577,7 +577,7 @@ dojo.declare('realityBuilder.Block', null, {
 
         // rotation center dot on top:
         context.beginPath();
-        context.arc(topRotCenterS[0], topRotCenterS[1], 
+        context.arc(topRotCenterS[0], topRotCenterS[1],
                     context.lineWidth, 0, 2 * Math.PI, false);
         context.fill();
     },
@@ -585,16 +585,16 @@ dojo.declare('realityBuilder.Block', null, {
     // Renders the background of the block, i.e. the part of that block that
     // was invisible were the block solid.
     _renderBackground: function (context) {
-        var
-        bottomVertexesS = this._bottomVertexesS,
-        topVertexesS = this._topVertexesS,
-        bottomRotCenterS = this._bottomRotCenterS,
-        topRotCenterS = this._topRotCenterS,
-        len = topVertexesS.length, // same for top and bottom
-        vertexS, i, 
-        ilv = this._indexOfLeftmostVertex,
-        irv = this._indexOfRightmostVertex,
-        imax;
+        var bottomVertexesS = this._bottomVertexesS,
+            topVertexesS = this._topVertexesS,
+            bottomRotCenterS = this._bottomRotCenterS,
+            topRotCenterS = this._topRotCenterS,
+            len = topVertexesS.length, // same for top and bottom
+            vertexS,
+            i,
+            ilv = this._indexOfLeftmostVertex,
+            irv = this._indexOfRightmostVertex,
+            imax;
 
         context.globalAlpha = this._blockProperties.backgroundAlpha();
 

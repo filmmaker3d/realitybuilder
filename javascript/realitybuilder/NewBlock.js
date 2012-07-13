@@ -14,10 +14,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: true,
-  regexp: true, plusplus: true, bitwise: true, browser: true, nomen: false */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
+  unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas, logoutUrl */
+/*global realityBuilder, dojo, dojox, FlashCanvas */
 
 dojo.provide('realityBuilder.NewBlock');
 
@@ -82,14 +82,13 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Details of data for prerender-mode, if enabled, are contained in
     // "prerenderMode".
     constructor: function (blockProperties, camera, constructionBlocks,
-                           prerenderMode)
-    {
+                           prerenderMode) {
         this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
         this._isFrozen = false;
         this._constructionBlocks = constructionBlocks;
-        this._shadow = new realityBuilder.Shadow(this, blockProperties, 
-                                                     camera, 
-                                                     constructionBlocks);
+        this._shadow = new realityBuilder.Shadow(this, blockProperties,
+                                                 camera,
+                                                 constructionBlocks);
         this._camera = camera;
         this._prerenderMode = prerenderMode;
     },
@@ -126,7 +125,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             this._versionOnServer = serverData.version;
 
             if (positionAngleWereInitialized) {
-                dojo.publish('realityBuilder/NewBlock/' + 
+                dojo.publish('realityBuilder/NewBlock/' +
                              'positionAngleInitialized');
             }
             dojo.publish('realityBuilder/NewBlock/moveOrBuildSpaceChanged');
@@ -142,8 +141,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // it go out of range, and unless the block is frozen.
     move: function (deltaB) {
         if (!this._wouldGoOutOfRange(deltaB, 0) && !this._isFrozen) {
-            this._posB = realityBuilder.util.addVectorsB(
-                this._posB, deltaB);
+            this._posB = realityBuilder.util.addVectorsB(this._posB, deltaB);
             dojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
     },
@@ -188,7 +186,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
         if (this.isFrozen()) {
             // The block is currently in the state "requested to be made real".
-            
+
             if (this._prerenderMode.isEnabled()) {
                 // With prerender-mode enabled it never happens that a "make
                 // real" request is answered with turning the block into a
@@ -201,7 +199,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                 // with prerender-mode disabled.
                 return false;
             } else {
-                constructionBlock = 
+                constructionBlock =
                     this._constructionBlocks.blockAt(this.posB(),
                                                      this.a());
                 if (constructionBlock) {
@@ -223,9 +221,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     //
     // Returns true, iff the block has been elevated.
     _moveOutOfTheWay: function () {
-        var 
-        testBlock, cbs = this._constructionBlocks, 
-        xB = this.xB(), yB = this.yB(), testZB;
+        var testBlock, cbs = this._constructionBlocks,
+            xB = this.xB(), yB = this.yB(), testZB;
         if (this._collidesWithRealBlock()) {
             testZB = this.zB();
             do {
@@ -247,12 +244,12 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         var turnedIntoDeletedConstructionBlock, hasBeenMovedOutOfTheWay;
 
         // Has to be called before possibly moving the block out of the way:
-        turnedIntoDeletedConstructionBlock = 
+        turnedIntoDeletedConstructionBlock =
             this._turnedIntoDeletedConstructionBlock();
 
         hasBeenMovedOutOfTheWay = this._moveOutOfTheWay();
 
-        if (this.isFrozen() && (hasBeenMovedOutOfTheWay || 
+        if (this.isFrozen() && (hasBeenMovedOutOfTheWay ||
                                 turnedIntoDeletedConstructionBlock)) {
             this.unfreeze();
         }
@@ -269,11 +266,11 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     _wouldGoOutOfRange: function (deltaB, deltaA) {
         var testPosB, testBlock, testA;
 
-        testPosB = realityBuilder.util.addVectorsB(this.posB(), 
+        testPosB = realityBuilder.util.addVectorsB(this.posB(),
                                                         deltaB);
         testA = (this.a() + deltaA) % 4;
         testBlock = new realityBuilder.Block(this._blockProperties,
-                                             this._camera, 
+                                             this._camera,
                                              testPosB, testA);
 
         return (this._constructionBlocks.realBlocksCollideWith(testBlock) ||
@@ -303,7 +300,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         var xB = this._posB[0],
             yB = this._posB[1],
             zB = this._posB[2],
-            b1B = this._buildSpace1B, b2B = this._buildSpace2B;
+            b1B = this._buildSpace1B,
+            b2B = this._buildSpace2B;
         return (xB >= b1B[0] && xB <= b2B[0] &&
                 yB >= b1B[1] && yB <= b2B[1] &&
                 zB >= b1B[2] && zB <= b2B[2]);
@@ -312,20 +310,20 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Returns true, iff this block is attachable to another block or to the
     // ground.
     _isAttachable: function () {
-        return (this._constructionBlocks.realBlocksAreAttachableTo(this) || 
+        return (this._constructionBlocks.realBlocksAreAttachableTo(this) ||
                 this.zB() === 0);
     },
 
     _isInPrerenderedBlockConfiguration: function () {
         var realBlocks = this._constructionBlocks.realBlocksSorted();
-        return this._prerenderMode.matchingBlockConfigurationI(realBlocks, 
+        return this._prerenderMode.matchingBlockConfigurationI(realBlocks,
                                                                this) !== false;
     },
 
     // Returns true, iff the new block can be made real in its current
     // position.
     canBeMadeReal: function () {
-        return this._isInBuildSpace() && this._isAttachable() && 
+        return this._isInBuildSpace() && this._isAttachable() &&
             (!this._prerenderMode.isEnabled() ||
              this._isInPrerenderedBlockConfiguration()) &&
             !this._isFrozen;
@@ -335,9 +333,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // that of the block "block", in sensor space.
     _boundingBoxesOverlap: function (block) {
         // l = left, r = right, b = bottom, t = top
-        var 
-        l, r, b, t, blockL, blockR, blockB, blockT, 
-        horizontalOverlap, verticalOverlap;
+        var l, r, b, t, blockL, blockR, blockB, blockT,
+            horizontalOverlap, verticalOverlap;
 
         this._updateCoordinates();
         l = this._boundingBoxS[0][0];
@@ -413,7 +410,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             // block is very narrow from the perspective of the camera. In that
             // case, the straight lines going through the vertexes of "block"
             // never cut the edges of this block.
-            relation = 
+            relation =
                 this._relationVertexesEdges(vertexesVXZ, blockVertexesVXZ);
             relation = -relation;
         }
@@ -447,7 +444,9 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // drawing on the canvas with rendering context "context".
     _subtractRealBlocks: function (context) {
         var realBlocksSorted = this._constructionBlocks.realBlocksSorted(),
-        i, realBlock, zB = this.zB();
+            i,
+            realBlock,
+            zB = this.zB();
 
         // Idea behind the following loop: the new block may be obscured by
         // blocks in a layer above or the same layer. Due to perspective
@@ -487,20 +486,19 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Returns true, iff there have been changes that make it necessary to
     // rerender this block.
     _needsToBeRendered: function () {
-        var 
-        coordinatesHaveChanged, constructionBlocksHaveChanged, 
-        isFrozenStateHasChanged;
+        var coordinatesHaveChanged, constructionBlocksHaveChanged,
+            isFrozenStateHasChanged;
 
         coordinatesHaveChanged = this._coordinatesChangedAfterLastRendering;
 
         // Rerendering is necessary on construction block change, because they
         // may obscure part of the block and shadow, and are thus part of the
         // rendering:
-        constructionBlocksHaveChanged = 
+        constructionBlocksHaveChanged =
             (this._lastConstructionBlocksVersion !==
              this._constructionBlocks.versionOnServer());
 
-        isFrozenStateHasChanged = (this._wasFrozenWhenLastRendered !== 
+        isFrozenStateHasChanged = (this._wasFrozenWhenLastRendered !==
                                    this._isFrozen);
 
         return coordinatesHaveChanged || constructionBlocksHaveChanged ||
@@ -529,9 +527,9 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             canvas = this._camera.sensor().newBlockCanvas();
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
-                color = this.isFrozen() ? 
-                    realityBuilder.util.SETTINGS.colorOfFrozenNewBlock : 
-                    realityBuilder.util.SETTINGS.colorOfNewBlock;
+                color = (this.isFrozen() ?
+                         realityBuilder.util.SETTINGS.colorOfFrozenNewBlock :
+                         realityBuilder.util.SETTINGS.colorOfNewBlock);
 
                 // Shadow does currently not work with FlashCanvas.
                 if (!realityBuilder.util.isFlashCanvasActive()) {
@@ -554,9 +552,10 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
         if (this._prerenderMode.isEnabled()) {
             setTimeout(
-                dojo.hitch(this, 
-                           this._makeRealIfInPrerenderedBlockConfiguration), 
-                this._prerenderMode.makeRealAfter());
+                dojo.hitch(this,
+                           this._makeRealIfInPrerenderedBlockConfiguration),
+                this._prerenderMode.makeRealAfter()
+            );
         }
     },
 
