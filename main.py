@@ -36,7 +36,7 @@ from django.utils import simplejson
 from datetime import datetime, timedelta
 
 # Whether debugging should be turned on:
-debug = False
+debug = True
 
 # Dumps the data "data" as JSONP response, with the correct MIME type.
 # "obj" is the object from which the response is generated.
@@ -357,9 +357,6 @@ class BlockProperties(db.Model):
     # lower left corner of the unrotated block, when viewed from above:
     rot_center_bxy = db.ListProperty(float)
 
-    # Alpha transparency of the block's background:
-    background_alpha = db.FloatProperty()
-
 # Information concerning sending info emails about pending blocks.
 class PendingBlockEmail(db.Model):
     sender_address = db.EmailProperty()
@@ -454,8 +451,7 @@ class RPCConstruction(webapp.RequestHandler):
                          'attachmentOffsetsListB': \
                              cls.json_decode_list \
                              (block_properties.attachment_offsets_list_b),
-                         'rotCenterBXY': block_properties.rot_center_bxy,
-                         'backgroundAlpha': block_properties.background_alpha})
+                         'rotCenterBXY': block_properties.rot_center_bxy})
         return data
 
     # Returns JSON serializable data related to the new block

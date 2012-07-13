@@ -154,7 +154,6 @@ blockProperties.attachment_offsets_list_b = \
      '[[0, 0, -1], [0, 0, 1], [1, 0, -1], [1, 0, 1]]',
      '[[0, 0, -1], [0, 0, 1]]']
 blockProperties.rot_center_bxy = [0.5, 0.5]
-blockProperties.background_alpha = 0.2
 blockProperties.put()
 
 # Deletes all new block entries:

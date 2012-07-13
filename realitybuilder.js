@@ -280,7 +280,8 @@ var realityBuilder = (function () {
                 colorOfNewBlock: 'red',
                 colorOfFrozenNewBlock: 'white',
                 colorOfNewBlockShadow: 'red',
-                alphaOfNewBlockShadow: 0.2
+                alphaOfNewBlockShadow: 0.2,
+                backgroundAlpha: 0.2
             };
 
             if (!w3cDomIsSupported()) {

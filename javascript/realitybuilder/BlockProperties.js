@@ -72,9 +72,6 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // itself, if rotated by 180° about the centroid:
     _centroidBXY: null,
 
-    // Alpha transparency of the block's background:
-    _backgroundAlpha: null,
-
     // The congruency offset for the angles "a" = 0°, 90°, ... 
     //
     // That is the offset that makes two blocks 1 and 2 congruent, if they have
@@ -283,7 +280,6 @@ dojo.declare('realityBuilder.BlockProperties', null, {
             this._collisionOffsetsListBXY = serverData.collisionOffsetsListBXY;
             this._attachmentOffsetsListB = serverData.attachmentOffsetsListB;
             this._rotCenterBXY = serverData.rotCenterBXY;
-            this._backgroundAlpha = serverData.backgroundAlpha;
 
             this._updateCentroidBXY();
             this._updateCongruencyOffsetB();
@@ -343,8 +339,9 @@ dojo.declare('realityBuilder.BlockProperties', null, {
         return attachmentOffsetsListB[relative_a];
     },
 
+    // Alpha transparency of the block's background:
     backgroundAlpha: function () {
-        return this._backgroundAlpha;
+        return realityBuilder.util.SETTINGS.backgroundAlpha;
     },
 
     rotCenterBXY: function () {
