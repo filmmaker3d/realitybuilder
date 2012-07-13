@@ -4,7 +4,7 @@
 // would look if the all blocks in the layer would form an infinite plane
 // without holes.
 
-// Copyright 2011 Felix E. Klee <felix.klee@inka.de>
+// Copyright 2011-2012 Felix E. Klee <felix.klee@inka.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy

@@ -3,7 +3,7 @@
 ## image was matched to the construction. The rotation about the z-axis is not
 ## calculated. It can be figured out easily by trial and error.
 
-## Copyright 2010, 2011 Felix E. Klee <felix.klee@inka.de>
+## Copyright 2010-2012 Felix E. Klee <felix.klee@inka.de>
 ##
 ## Licensed under the Apache License, Version 2.0 (the "License"); you may not
 ## use this file except in compliance with the License. You may obtain a copy
