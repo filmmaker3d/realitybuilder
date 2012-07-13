@@ -394,9 +394,9 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
         preparedCameraData =
             realityBuilder.util.addPrefix('camera.', cameraData);
-        preparedCameraData['camera.x'] = cameraData.position[0];
-        preparedCameraData['camera.y'] = cameraData.position[1];
-        preparedCameraData['camera.z'] = cameraData.position[2];
+        preparedCameraData['camera.x'] = cameraData.pos[0];
+        preparedCameraData['camera.y'] = cameraData.pos[1];
+        preparedCameraData['camera.z'] = cameraData.pos[2];
         return preparedCameraData;
     },
 

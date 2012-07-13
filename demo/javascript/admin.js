@@ -71,9 +71,9 @@ var realityBuilderAdminDemo = (function () {
     // Returns data read entered using the camera controls.
     function cameraDataFromControls() {
         return {
-            "position": [parseFloat($('#cameraXTextField').val()) || 0,
-                         parseFloat($('#cameraYTextField').val()) || 0,
-                         parseFloat($('#cameraZTextField').val()) || 0],
+            "pos": [parseFloat($('#cameraXTextField').val()) || 0,
+                    parseFloat($('#cameraYTextField').val()) || 0,
+                    parseFloat($('#cameraZTextField').val()) || 0],
             "aX": parseFloat($('#cameraAXTextField').val()) || 0,
             "aY": parseFloat($('#cameraAYTextField').val()) || 0,
             "aZ": parseFloat($('#cameraAZTextField').val()) || 0,
