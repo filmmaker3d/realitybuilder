@@ -14,13 +14,11 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint browser: true, maxerr: 50, maxlen: 79 */
+/*jslint browser: true, maxerr: 50, maxlen: 79, sloppy: true */
 
 /*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad */
 
 var realityBuilder = (function () {
-    'use strict';
-
     var
         scriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
