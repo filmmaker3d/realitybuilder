@@ -18,9 +18,8 @@
 
 {# adds support for transparent PNG to IE6: #}
 <!--[if IE 6]>
-  <script type="text/javascript" 
-          src="/demo/javascript/DD_belatedPNG_0.0.8a-min.js"></script>
-  <script type="text/javascript">
+  <script src="/demo/vendor/DD_belatedPNG_0.0.8a-min.js"></script>
+  <script>
     DD_belatedPNG.fix('#controlPanel,#decXButton,#incXButton,#decYButton,' +
                       '#incYButton,#incZButton,#decZButton,#rotate90Button,' +
                       '#requestMakeRealButton');
@@ -29,8 +28,6 @@
 
 {# adds support for canvas tag to IE<9: #}
 <!--[if lt IE 9]>
-  <script type="text/javascript" 
-          src="/demo/javascript/swfobject.js"></script>
-  <script type="text/javascript" 
-          src="/separate/FlashCanvasPro/bin/flashcanvas.js"></script>
+  <script src="/demo/vendor/swfobject.js"></script>
+  <script src="/separate/FlashCanvasPro/bin/flashcanvas.js"></script>
 <![endif]-->

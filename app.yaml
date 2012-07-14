@@ -51,8 +51,11 @@ handlers:
 - url: /demo/stylesheets
   static_dir: demo/stylesheets
 
-- url: /demo/javascript
-  static_dir: demo/javascript
+- url: /demo/javascripts
+  static_dir: demo/javascripts
+
+- url: /demo/vendor
+  static_dir: demo/vendor
 
 - url: /demo/images
   static_dir: demo/images

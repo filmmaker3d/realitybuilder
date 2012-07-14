@@ -87,7 +87,7 @@
     </tr>
   </table>
 
-  <script type="text/javascript">
+  <script>
     // unhides view, unless JavaScript is not supported or JavaScript engine is
     // very old (i.e. doesn't support "getElementByID"):
     document.getElementById('view').style.display = 'block';
@@ -95,14 +95,15 @@
 
   {% include "base_IE.html" %}
 
-  <script type="text/javascript" 
-          src="/demo/javascript/jquery-1.6.2.min.js"></script>
+  <script src="/demo/vendor/jquery-1.6.2.min.js"></script>
 
-  <script type="text/javascript" src="/realitybuilder.js"></script>
+  <script src=""></script>
 
-  <script type="text/javascript" src="/demo/javascript/base.js"></script>
+  <script src="/realitybuilder.js"></script>
 
-  <script type="text/javascript">
+  <script src="/demo/javascripts/base.js"></script>
+
+  <script>
     realityBuilderDemo.setRealityBuilderVersion(
     '{{ reality_builder_version }}');
   </script>
