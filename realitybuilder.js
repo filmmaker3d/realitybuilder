@@ -25,7 +25,7 @@ var realityBuilder = (function () {
         settings, publicInterface;
 
     /* {{ "*" }}{{ "/" }} 
-       {% include "javascript/lazyload/lazyload-min.js" %}
+       {% include "javascripts/lazyload/lazyload-min.js" %}
     {{ "/" }}{{ "*" }} */
 
     // Instanciates the widget and merges its global members into the
@@ -129,8 +129,8 @@ var realityBuilder = (function () {
         //   <url:http://groups.google.com/group/dojo-interest/msg/65a43ee98f27
         //   cb6e>
         scriptUrl =
-            '/javascript/dojo-release-1.6.1/dojo/dojo.js.uncompressed.js';
-        baseUrl = '/javascript/dojo-release-1.6.1/dojo/';
+            '/javascripts/dojo-release-1.6.1/dojo/dojo.js.uncompressed.js';
+        baseUrl = '/javascripts/dojo-release-1.6.1/dojo/';
 
         window.djConfig = {
             isDebug: true,
@@ -143,7 +143,7 @@ var realityBuilder = (function () {
                 ["dojox", "realityBuilderDojox"]
             ],
             modulePaths: {
-                "realityBuilder": "/javascript/realityBuilder"
+                "realityBuilder": "/javascripts/realityBuilder"
             }
         };
 
@@ -159,7 +159,7 @@ var realityBuilder = (function () {
     // functionality is built into one file.
     function requestLoadReleaseScript() {
         var host = '{{ host }}';
-        requestLoadScript('http://' + host + '/javascript/dojo/dojo.xd.js' +
+        requestLoadScript('http://' + host + '/javascripts/dojo/dojo.xd.js' +
                           releaseScriptPostfix());
     }
 

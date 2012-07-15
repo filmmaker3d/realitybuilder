@@ -33,19 +33,19 @@ handlers:
 - url: /documentation
   static_dir: documentation
 
-- url: /javascript/dojo
-  static_dir: javascript/dojo
+- url: /javascripts/dojo
+  static_dir: javascripts/dojo
 
-- url: /javascript/dojo-release-1.6.1
-  static_dir: javascript/dojo-release-1.6.1
+- url: /javascripts/dojo-release-1.6.1
+  static_dir: javascripts/dojo-release-1.6.1
 
-- url: /javascript/dojo-release-1.6.1-src
-  static_dir: javascript/dojo-release-1.6.1-src
+- url: /javascripts/dojo-release-1.6.1-src
+  static_dir: javascripts/dojo-release-1.6.1-src
 
-- url: /javascript/realityBuilder
-  static_dir: javascript/realityBuilder
+- url: /javascripts/realityBuilder
+  static_dir: javascripts/realityBuilder
 
-# /javascript/lazyload is not statically served. Otherwise including it into a
+# /javascripts/lazyload is not statically served. Otherwise including it into a
 # template using Django wouldn't work.
 
 - url: /demo/stylesheets
@@ -87,10 +87,10 @@ skip_files:
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^(.*/)?.*\.bak$
-- ^javascript/dojo-release-1.6.1
-- ^javascript/dojo-release-1.6.1-src
-- ^javascript/realityBuilder
-- ^javascript/realityBuilder.profile.js
+- ^javascripts/dojo-release-1.6.1
+- ^javascripts/dojo-release-1.6.1-src
+- ^javascripts/realityBuilder
+- ^javascripts/realityBuilder.profile.js
 - ^demo/source$
 - ^demo/scene$
 - ^documentation$
