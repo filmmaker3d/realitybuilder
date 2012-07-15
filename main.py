@@ -185,11 +185,6 @@ class NewBlock(db.Model):
     init_a = db.IntegerProperty() # multiples of 90°, CCW when viewed from
                                   # above
 
-    # Points in block space, defining the rectangle which represents the space
-    # in which the block may be built.
-    build_space_1_b = db.ListProperty(int)
-    build_space_2_b = db.ListProperty(int)
-
 class Block(db.Model):
     # Position, in block space:
     pos_b = db.ListProperty(int)
@@ -467,9 +462,7 @@ class RPCConstruction(webapp.RequestHandler):
             # New block data version on server not the same as on client. =>
             # Deliver all the data.
             data.update({'initPosB': new_block.init_pos_b,
-                         'initA': new_block.init_a,
-                         'buildSpace1B': new_block.build_space_1_b,
-                         'buildSpace2B': new_block.build_space_2_b})
+                         'initA': new_block.init_a})
         return data
 
     # Returns JSON serializable data related to prerender-mode.

@@ -33,11 +33,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
 
-    // Points in block space, defining the rectangle which represents the space
-    // in which the block may be built.
-    _buildSpace1B: null,
-    _buildSpace2B: null,
-
     // Iff true, then the block is frozen, which means that it can neither be
     // moved nor be rotated, nor be made real.
     _isFrozen: null,
@@ -112,16 +107,12 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                 positionAngleWereInitialized = false;
             }
 
-            this._buildSpace1B = serverData.buildSpace1B;
-            this._buildSpace2B = serverData.buildSpace2B;
-
             this._versionOnServer = serverData.version;
 
             if (positionAngleWereInitialized) {
                 dojo.publish('realityBuilder/NewBlock/' +
                              'positionAngleInitialized');
             }
-            dojo.publish('realityBuilder/NewBlock/moveOrBuildSpaceChanged');
         }
     },
 
@@ -275,18 +266,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         return !this._wouldGoOutOfRange(deltaB, 0) && !this._isFrozen;
     },
 
-    // Returns true, iff this block is in the space where blocks may be build.
-    _isInBuildSpace: function () {
-        var xB = this._posB[0],
-            yB = this._posB[1],
-            zB = this._posB[2],
-            b1B = this._buildSpace1B,
-            b2B = this._buildSpace2B;
-        return (xB >= b1B[0] && xB <= b2B[0] &&
-                yB >= b1B[1] && yB <= b2B[1] &&
-                zB >= b1B[2] && zB <= b2B[2]);
-    },
-
     // Returns true, iff this block is attachable to another block or to the
     // ground.
     _isAttachable: function () {
@@ -303,7 +282,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Returns true, iff the new block can be made real in its current
     // position.
     canBeMadeReal: function () {
-        return this._isInBuildSpace() && this._isAttachable() &&
+        return this._isAttachable() &&
             (!this._prerenderMode.isEnabled() ||
              this._isInPrerenderedBlockConfiguration()) &&
             !this._isFrozen;

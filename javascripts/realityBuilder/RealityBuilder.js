@@ -91,8 +91,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         dojo.subscribe('realityBuilder/NewBlock/' +
                        'positionAngleInitialized',
                        this, this._onNewBlockPositionAngleInitialized);
-        dojo.subscribe('realityBuilder/NewBlock/buildOrMoveSpaceChanged',
-                       this, this._onMoveOrBuildSpaceChanged);
         dojo.subscribe('realityBuilder/NewBlock/frozen',
                        this, this._onNewBlockFrozen);
         dojo.subscribe('realityBuilder/NewBlock/unfrozen',
@@ -262,14 +260,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // Called after the new block's position, rotation angle have been
     // initialized.
     _onNewBlockPositionAngleInitialized: function () {
-        this._updateNewBlockStateIfFullyInitialized();
-        this._renderBlocksIfFullyInitialized();
-        this._checkIfReady();
-    },
-
-    // Called after the dimensions of the space where the new block may be
-    // moved or built have been changed.
-    _onMoveOrBuildSpaceChanged: function () {
         this._updateNewBlockStateIfFullyInitialized();
         this._renderBlocksIfFullyInitialized();
         this._checkIfReady();
