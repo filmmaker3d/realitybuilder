@@ -33,9 +33,7 @@ var realityBuilderDemo = (function () {
         backgroundImageIsLoaded = false, // initially only a placeholder is
                                          // loaded
         realityBuilderIsReady = false,
-        realityBuilderVersion,
-        prerenderedBlockConfigurations = {
-        };
+        realityBuilderVersion;
 
     function forEachCoordinateButton(f) {
         $.each(coordinateButtonDeltaBs, function (type, deltaB) {
