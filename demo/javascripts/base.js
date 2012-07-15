@@ -100,12 +100,15 @@ var realityBuilderDemo = (function () {
         updateNodeState(controlButtonNode(type), shouldBeEnabled);
     }
 
-    function updateCoordinateButtonState(type, deltaB) {
-        var newBlock;
+    // Returns true, iff the new block can be moved by "deltaB".
+    function newBlockCanBeMovedBy(deltaB) {
+        var newBlock = realityBuilder.newBlock();
+        return newBlock.zB() + deltaB[2] >= 0 && newBlock.canBeMovedBy(deltaB);
+    }
 
+    function updateCoordinateButtonState(type, deltaB) {
         if (realityBuilderIsReady) {
-            newBlock = realityBuilder.newBlock();
-            updateControlButtonState(type, newBlock.canBeMoved(deltaB));
+            updateControlButtonState(type, newBlockCanBeMovedBy(deltaB));
         }
     }
 
@@ -150,7 +153,9 @@ var realityBuilderDemo = (function () {
 
     function setUpCoordinateButton(type, deltaB) {
         setUpControlButton(type, function () {
-            realityBuilder.newBlock().move(deltaB);
+            if (newBlockCanBeMovedBy(deltaB)) {
+                realityBuilder.newBlock().move(deltaB);
+            }
         });
     }
 

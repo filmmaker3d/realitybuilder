@@ -33,11 +33,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
 
-    // Points in move space, defining the rectangle which represents the space
-    // in which the block may be moved around.
-    _moveSpace1B: null,
-    _moveSpace2B: null,
-
     // Points in block space, defining the rectangle which represents the space
     // in which the block may be built.
     _buildSpace1B: null,
@@ -117,8 +112,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                 positionAngleWereInitialized = false;
             }
 
-            this._moveSpace1B = serverData.moveSpace1B;
-            this._moveSpace2B = serverData.moveSpace2B;
             this._buildSpace1B = serverData.buildSpace1B;
             this._buildSpace2B = serverData.buildSpace2B;
 
@@ -260,9 +253,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // * it was moved in block space by the vector "deltaB", and/or 
     //
     // * rotated CCW (when viewd from above) by the angle "deltaA" (in
-    //   multiples of 90°), or 
-    //
-    // * if it would be outside of the space where it is allowed to be moved.
+    //   multiples of 90°).
     _wouldGoOutOfRange: function (deltaB, deltaA) {
         var testPosB, testBlock, testA;
 
@@ -273,26 +264,15 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                                              this._camera,
                                              testPosB, testA);
 
-        return (this._constructionBlocks.realBlocksCollideWith(testBlock) ||
-                !this._wouldBeInMoveSpace(testPosB));
+        return this._constructionBlocks.realBlocksCollideWith(testBlock);
     },
 
     canBeRotated90: function () {
         return !this._wouldGoOutOfRange([0, 0, 0], 1) && !this._isFrozen;
     },
 
-    canBeMoved: function (deltaB) {
+    canBeMovedBy: function (deltaB) {
         return !this._wouldGoOutOfRange(deltaB, 0) && !this._isFrozen;
-    },
-
-    // Returns true, if this block would be outside the move space, if it was
-    // at the position "testB" (block space coordinates). The move space is the
-    // space in which the block is allowed to be moved around.
-    _wouldBeInMoveSpace: function (testB) {
-        var m1B = this._moveSpace1B, m2B = this._moveSpace2B;
-        return (testB[0] >= m1B[0] && testB[0] <= m2B[0] &&
-                testB[1] >= m1B[1] && testB[1] <= m2B[1] &&
-                testB[2] >= 0 && testB[2] <= m2B[2]);
     },
 
     // Returns true, iff this block is in the space where blocks may be build.

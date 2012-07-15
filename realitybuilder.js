@@ -19,10 +19,10 @@
 /*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad */
 
 var realityBuilder = (function () {
-    var
-        scriptIsLoaded,
+    var scriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
-        settings, publicInterface;
+        settings,
+        publicInterface;
 
     /* {{ "*" }}{{ "/" }} 
        {% include "javascripts/lazyload/lazyload-min.js" %}

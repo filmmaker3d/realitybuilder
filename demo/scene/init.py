@@ -168,8 +168,6 @@ newBlock = NewBlock(parent=construction)
 newBlock.data_version = '0'
 newBlock.init_pos_b = [4, 0, 4]
 newBlock.init_a = 0
-newBlock.move_space_1_b = [-1, -1, 0]
-newBlock.move_space_2_b = [6, 6, 5]
 newBlock.build_space_1_b = [0, 0, 0]
 newBlock.build_space_2_b = [5, 5, 4]
 newBlock.put()
