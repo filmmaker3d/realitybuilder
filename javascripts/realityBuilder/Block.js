@@ -142,6 +142,34 @@ dojo.declare('realityBuilder.Block', null, {
         return [this.xB(), this.yB(), this.zB(), this.a()];
     },
 
+    // Returns the pose in block space (position in block space and the
+    // rotation angle) in a simplified form:
+    //
+    // * If the block has two-fold symmetry:
+    //
+    //   coordinates and rotation angle so that rotation angle is either 0° or
+    //   90°
+    //
+    // * Otherwise: unchanged pose
+    simplifiedPoseB: function () {
+        var simplifiedPoseB, posB, a, congruencyOffsetB;
+
+        posB = this.poseB();
+        a = this.poseB()[3];
+
+        if (this._blockProperties.has2FoldSymmetry() && a >= 2) {
+            congruencyOffsetB = this.congruencyOffsetB();
+            simplifiedPoseB =
+                realityBuilder.util.addVectorsB(posB,
+                                                congruencyOffsetB);
+            simplifiedPoseB.push(a % 2);
+        } else {
+            simplifiedPoseB = this.poseB().slice();
+        }
+
+        return simplifiedPoseB;
+    },
+
     has2FoldSymmetry: function () {
         return this._blockProperties.has2FoldSymmetry();
     },

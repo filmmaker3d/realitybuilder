@@ -279,13 +279,16 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                                                                this) !== false;
     },
 
+    _formsValidConstruction: function () {
+        return realityBuilder.newConstructionWouldBeValid();
+    },
+
     // Returns true, iff the new block can be made real in its current
     // position.
     canBeMadeReal: function () {
-        return this._isAttachable() &&
-            (!this._prerenderMode.isEnabled() ||
-             this._isInPrerenderedBlockConfiguration()) &&
-            !this._isFrozen;
+        return (this._isAttachable() &&
+                this._formsValidConstruction() &&
+                !this._isFrozen);
     },
 
     // Returns true, iff the bounding box of the current block overlaps with

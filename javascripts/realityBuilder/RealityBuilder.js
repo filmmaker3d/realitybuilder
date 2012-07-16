@@ -17,7 +17,7 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderConstructionValidator,
+/*global realityBuilder, realityBuilderValidator,
   dojo, dojox, FlashCanvas, _ */
 
 dojo.provide('realityBuilder.RealityBuilder');
@@ -345,7 +345,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
         if (data.validatorData.versionChanged) {
             this._validatorVersion = data.validatorData.version;
-            this._loadConstructionValidator(data.validatorData.src);
+            this._loadValidator(data.validatorData.src);
         }
 
         if (this._updateTimeout) {
@@ -417,8 +417,8 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     },
 
     // Unsets the construction validator, then 
-    _loadConstructionValidator: function (src) {
-        this._unsetConstructionValidator();
+    _loadValidator: function (src) {
+        this._unsetValidator();
         dojo.io.script.get({
             url: src,
             timeout: realityBuilder.util.SETTINGS.jsonpTimeout,
@@ -426,19 +426,19 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         });
     },
 
-    _unsetConstructionValidator: function () {
-        delete window.realityBuilderConstructionValidator;
+    _unsetValidator: function () {
+        delete window.realityBuilderValidator;
     },
 
-    // Returns true, iff the construction plus the new block would be valid.
-    //
-    // If the construction 
+    // Returns true, if the new block together with all real and pending blocks
+    // forms a valid construction.
     newConstructionWouldBeValid: function () {
-        var blocks = dojo.mixin({}, this._constructionBlocks.blocks());
+        var simplifiedPosesB =
+            this._constructionBlocks.simplifiedNonDeletedPosesB();
 
-/*fixme:        dojo.mixin(blocks, newBlock
-            blocks = dojo.mixin();*/
-        return (typeof realityBuilderConstructionValidator !== 'undefined' &&
-                realityBuilderConstructionValidator(blocks));
+        simplifiedPosesB.push(this._newBlock.simplifiedPoseB());
+
+        return (typeof realityBuilderValidator !== 'undefined' &&
+                realityBuilderValidator(simplifiedPosesB));
     }
 });

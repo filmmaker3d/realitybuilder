@@ -23,9 +23,7 @@ var realityBuilder = (function () {
     var scriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
-        publicInterface,
-        realityBuilder$, // temporary container for jQuery
-        realityBuilder_; // temporary container for Underscore.js
+        publicInterface;
 
     /* {{ "*" }}{{ "/" }} 
        {% include "javascripts/lazyload/lazyload-min.js" %}

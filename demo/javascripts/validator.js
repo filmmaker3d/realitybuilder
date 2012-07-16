@@ -12,16 +12,19 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint browser: true, maxerr: 50, maxlen: 79 */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realitybuilder */
+/*global realityBuilder */
 
-// This function returns true, iff the passed block poses describe a valid
-// construction.
-var realityBuilderConstructionValidator = (function () {
+// This function returns true, iff the passed simplified block poses describe a
+// valid construction.
+var realityBuilderValidator = (function () {
     'use strict';
 
-    var validBlocksPosesSet = [
+    // List of prerendered poses:
+    var util = realityBuilder.util,
+        _ = realityBuilder._,
+        validSimplifiedPosesBList = [
             [
                 [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
                 [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
@@ -69,8 +72,20 @@ var realityBuilderConstructionValidator = (function () {
             ]
         ];
 
-    return function (blockPoses) {
-        return (typeof blockPoses !== 'undefined' &&
-                typeof validBlocksPosesSet !== 'undefined');
+    _.each(validSimplifiedPosesBList, function (simplifiedPosesB) {
+        util.sortPosesB(simplifiedPosesB);
+    });
+
+    return function (simplifiedPosesB) {
+        var simplifiedPosesBAreValid;
+
+        realityBuilder.util.sortPosesB(simplifiedPosesB);
+
+        simplifiedPosesBAreValid = function (validSimplifiedPosesB) {
+            return util.sortedSimplifiedPosesBMatch(simplifiedPosesB,
+                                                    validSimplifiedPosesB);
+        };
+
+        return _.find(validSimplifiedPosesBList, simplifiedPosesBAreValid);
     };
 }());

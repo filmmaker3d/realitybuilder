@@ -47,6 +47,9 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // All blocks that are pending.
     _pendingBlocks: null,
 
+    // All blocks except deleted blocks = real and pending blocks.
+    _nonDeletedBlocks: null,
+
     // Creates a container for the blocks associated with the construction
     // "construction".
     constructor: function (blockProperties, camera) {
@@ -68,9 +71,14 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         return this._realBlocksSorted;
     },
 
-    // Returns the poses (position + orientiation) of the blocks, with
-    // coordinates in block space.
-    blockPosesB: function () {
+    // Returns the simplified poses of all real and pending blocks, with
+    // coordinates in block space, sorted by height.
+    simplifiedNonDeletedPosesB: function () {
+        var $ = realityBuilder.$;
+
+        return $.map(this._nonDeletedBlocks, function (block) {
+            return [block.simplifiedPoseB()];
+        });
     },
 
     // Returns block space z coordinate of the highest real blocks, or -1 if
@@ -131,6 +139,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
             this._updateRealBlocksSorted();
             this._updatePendingBlocks();
+            this._updateNonDeletedBlocks();
             dojo.publish('realityBuilder/ConstructionBlocks/changed');
         }
     },
@@ -159,6 +168,13 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     _updatePendingBlocks: function () {
         this._pendingBlocks = dojo.filter(this._blocks, function (block) {
             return block.isPending();
+        });
+    },
+
+    _updateNonDeletedBlocks: function () {
+        var $ = realityBuilder.$;
+        this._nonDeletedBlocks = $.grep(this._blocks, function (block) {
+            return !block.isDeleted();
         });
     },
 

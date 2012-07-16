@@ -359,6 +359,40 @@ realityBuilder.util.fillCanvas = function (canvas, color) {
     }
 };
 
+realityBuilder.util.comparePosesB = function (poseB1, poseB2) {
+    var a = poseB1, b = poseB2;
+
+    if (a[0] === b[0]) {
+        if (a[1] === b[1]) {
+            if (a[2] === b[2]) {
+                if (a[3] === b[3]) {
+                    return 0;
+                } else {
+                    return a[3] - b[3];
+                }
+            } else {
+                return a[2] - b[2];
+            }
+        } else {
+            return a[1] - b[1];
+        }
+    } else {
+        return a[0] - b[0];
+    }
+};
+
+// Sorts the poses ascending by xB, yB, zB, angle (in that order).
+realityBuilder.util.sortPosesB = function (posesB) {
+    posesB.sort(posesB, realityBuilder.util.comparePosesB);
+};
+
+// Returns true if boths lists of poses describe the same construction. The
+// poses are assumed to be simplified poses, and they are assumed to be sorted
+// ascending by xB, yB, zB, angle (in that order).
+realityBuilder.util.sortedSimplifiedPosesBMatch = function (posesB1, posesB2) {
+    return realityBuilder._.isEqual(posesB1, posesB2);
+};
+
 // Has a trailing slash.
 realityBuilder.util.rootUrl = function () {
     if (dojo.config.isDebug) {
