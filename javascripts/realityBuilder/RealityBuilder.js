@@ -17,7 +17,8 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas */
+/*global realityBuilder, realityBuilderConstructionValidator,
+  dojo, dojox, FlashCanvas, _ */
 
 dojo.provide('realityBuilder.RealityBuilder');
 
@@ -30,6 +31,10 @@ dojo.require('realityBuilder.PrerenderMode');
 dojo.require('realityBuilder.util');
 
 dojo.declare('realityBuilder.RealityBuilder', null, {
+    // Last construction validator version retrieved, or "-1" initially. Is a
+    // string in order to be able to contain very large integers.
+    _constructionValidatorVersion: '-1',
+
     // All blocks, permanently in the construction, including real and pending
     // blocks:
     _constructionBlocks: null,
@@ -338,6 +343,12 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
             this._newBlock.updateWithServerData(data.newBlockData);
         }
 
+        if (data.constructionValidatorData.versionChanged) {
+            this._constructionValidatorVersion =
+                data.constructionValidatorData.version;
+            this.loadConstructionValidator(data.constructionValidatorData.src);
+        }
+
         if (this._updateTimeout) {
             // Clears the last timeout. May be necessary if the call to the
             // function has not been triggered by that timeout. Without
@@ -365,7 +376,9 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                     this._blockProperties.versionOnServer(),
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
                 "prerenderModeDataVersion":
-                    this._prerenderMode.versionOnServer()
+                    this._prerenderMode.versionOnServer(),
+                "constructionValidatorVersion":
+                    this._constructionValidatorVersion
             },
             load: dojo.hitch(this, this._updateSucceeded)
         });
@@ -403,5 +416,29 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
             content: content,
             load: dojo.hitch(this, this._storeSettingsOnServerSucceeded)
         });
+    },
+
+    // Unsets the construction validator, then 
+    _loadConstructionValidator: function (src) {
+        this._unsetConstructionValidator();
+        dojo.io.script.get({
+            url: src,
+            timeout: realityBuilder.util.SETTINGS.jsonpTimeout,
+            error: realityBuilder.util.SETTINGS.onJsonpError
+        });
+    },
+
+    _unsetConstructionValidator: function () {
+        delete window.realityBuilderConstructionValidator;
+    },
+
+    // Returns true, iff the construction plus the new block would be valid.
+    //
+    // If the construction 
+    newConstructionWouldBeValid: function () {
+        var blocks = this._constructionBlocks.blocks(),
+            newBlocks = dojo.mixin();
+        return (typeof realityBuilderConstructionValidator !== 'undefined' &&
+                realityBuilderConstructionValidator(blocks));
     }
 });

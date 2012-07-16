@@ -73,6 +73,8 @@ for query in queries:
 # Creates the construction configuration.
 construction = Construction(key_name = 'main')
 construction.update_interval_client = 2000
+construction.validator_version = '0'
+construction.validator_src = '/demo/javascripts/construction_validator.js'
 construction.blocks_data_version = '0'
 construction.camera_data_version = '0'
 construction.camera_pos = [189.57, -159.16, 140.11]
@@ -81,7 +83,6 @@ construction.camera_a_y = -0.46583
 construction.camera_a_z = 0.29
 construction.camera_fl = 40.
 construction.camera_sensor_resolution = 19.9
-construction.is_valid_script_src = "/demo/javascripts/is_valid.js"
 construction.put()
 
 # Deletes all prerender-mode entries:

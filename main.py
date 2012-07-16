@@ -50,6 +50,11 @@ class Construction(db.Model):
     # How often the client should update server data.
     update_interval_client = db.IntegerProperty() # ms
 
+    # Version and URL of the script which sets the function for checking
+    # whether a given construction is valid.
+    validator_version = db.StringProperty()
+    validator_src = db.StringProperty()
+
     # Version of the blocks configuration. Is the string representation of an
     # integer because the integer may become very large. The version is
     # incremented every time a change is made to the construction, for example
@@ -354,6 +359,22 @@ class PendingBlockEmail(db.Model):
 
 # Data describing a construction, including building blocks.
 class RPCConstruction(webapp.RequestHandler):
+    # Returns JSON serializable data related to the validator.
+    @classmethod
+    def get_validator_data(cls, construction, validator_version_client):
+        validator_version = construction.validator_version
+        validator_version_changed = (validator_version !=
+                                     validator_version_client)
+        data = {
+            'version': validator_version,
+            'versionChanged': validator_version_changed}
+        if validator_version_changed:
+            # Validator version on server not the same as on client. => Provide
+            # URL, which may or may not be changed (it could also be that just
+            # the data behind the URL changed).
+            data.update({'src': construction.validator_src})
+        return data
+
     # Returns the blocks as an array of dictionaries.
     @classmethod
     def get_blocks_data_blocks(cls, construction):
@@ -508,6 +529,7 @@ class RPCConstruction(webapp.RequestHandler):
     # example if there is a transaction missing somewhere else.
     @classmethod
     def transaction(cls,
+                    validator_version_client,
                     blocks_data_version_client, 
                     camera_data_version_client,
                     block_properties_data_version_client,
@@ -519,6 +541,8 @@ class RPCConstruction(webapp.RequestHandler):
 
         data = {
             'updateIntervalClient': construction.update_interval_client,
+            'validatorData':
+                cls.get_validator_data(construction, validator_version_client),
             'blocksData':
                 cls.get_blocks_data(construction, blocks_data_version_client),
             'cameraData':
@@ -537,6 +561,7 @@ class RPCConstruction(webapp.RequestHandler):
         try:
             namespace_manager.set_namespace(self.request.get('namespace'))
 
+            validator_version_client = self.request.get('validatorVersion')
             blocks_data_version_client = \
                 self.request.get('blocksDataVersion')
             camera_data_version_client = \
@@ -550,8 +575,9 @@ class RPCConstruction(webapp.RequestHandler):
             callback = self.request.get('callback')
 
             data = db.run_in_transaction \
-                (self.transaction, 
-                 blocks_data_version_client, 
+                (self.transaction,
+                 validator_version_client,
+                 blocks_data_version_client,
                  camera_data_version_client,
                  block_properties_data_version_client,
                  new_block_data_version_client,

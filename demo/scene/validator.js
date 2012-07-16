@@ -16,12 +16,12 @@
 
 /*global realitybuilder */
 
-// Returns a function that returns true, iff the passed construction blocks
-// describe a valid construction.
-realitybuilder.constructionIsValid = (function () {
+// This function returns true, iff the passed block poses describe a valid
+// construction.
+var realityBuilderConstructionValidator = (function () {
     'use strict';
 
-    var validConstructionBlocksSet = [
+    var validBlocksPosesSet = [
             [
                 [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
                 [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
@@ -69,8 +69,8 @@ realitybuilder.constructionIsValid = (function () {
             ]
         ];
 
-    return function (constructionBlocks) {
-        return (typeof constructionBlocks !== 'undefined' &&
-                typeof validConstructionBlocksSet !== 'undefined');
+    return function (blockPoses) {
+        return (typeof blockPoses !== 'undefined' &&
+                typeof validBlocksPosesSet !== 'undefined');
     };
 }());
