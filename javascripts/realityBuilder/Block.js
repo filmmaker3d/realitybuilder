@@ -137,7 +137,8 @@ dojo.declare('realityBuilder.Block', null, {
         return this._a;
     },
 
-    posBAndA: function () {
+    // position and orientation in block space
+    poseB: function () {
         return [this.xB(), this.yB(), this.zB(), this.a()];
     },
 
