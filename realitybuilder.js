@@ -14,15 +14,18 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint browser: true, maxerr: 50, maxlen: 79, sloppy: true */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true */
 
-/*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad */
+/*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad, $,
+  _ */
 
 var realityBuilder = (function () {
     var scriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
-        publicInterface;
+        publicInterface,
+        realityBuilder$, // temporary container for jQuery
+        realityBuilder_; // temporary container for Underscore.js
 
     /* {{ "*" }}{{ "/" }} 
        {% include "javascripts/lazyload/lazyload-min.js" %}
@@ -33,6 +36,20 @@ var realityBuilder = (function () {
     function setupWidget() {
         realityBuilderDojo.mixin(realityBuilder,
                                  new realityBuilder.RealityBuilder(settings));
+    }
+
+    // Loads jQuery and Underscore.js libraries. Puts both libraries in Reality
+    // Builder namespace, to avoid conflicts with jQuery, Underscore.js or
+    // other libraries included by the page that includes the Reality Builder
+    // widget:
+    function includeLibraries() {
+        /* {{ "*" }}{{ "/" }} 
+           {% include "javascripts/jquery.min.js" %}
+           {% include "javascripts/underscore-min.js" %}
+        {{ "/" }}{{ "*" }} */
+        realityBuilder.$ = $;
+        $.noConflict(true);
+        realityBuilder._ = window._.noConflict();
     }
 
     // Some old browsers may support JavaScript but not Dojo. In this case,
@@ -59,6 +76,7 @@ var realityBuilder = (function () {
             // resolved.
             realityBuilderDojo.addOnLoad(function () {
                 setupWidget();
+                includeLibraries();
             });
         } else {
             settings.onBrowserNotSupportedError();
@@ -68,6 +86,7 @@ var realityBuilder = (function () {
     function requestSetupWidgetIfScriptIsLoaded() {
         if (scriptIsLoaded) {
             requestSetupWidget();
+            includeLibraries();
         }
     }
 

@@ -68,6 +68,11 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         return this._realBlocksSorted;
     },
 
+    // Returns the poses (position + orientiation) of the blocks, with
+    // coordinates in block space.
+    blockPosesB: function () {
+    },
+
     // Returns block space z coordinate of the highest real blocks, or -1 if
     // there are no real blocks.
     highestRealBlocksZB: function () {
