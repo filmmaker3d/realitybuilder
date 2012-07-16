@@ -33,7 +33,7 @@ dojo.require('realityBuilder.util');
 dojo.declare('realityBuilder.RealityBuilder', null, {
     // Last construction validator version retrieved, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
-    _constructionValidatorVersion: '-1',
+    _validatorVersion: '-1',
 
     // All blocks, permanently in the construction, including real and pending
     // blocks:
@@ -343,10 +343,9 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
             this._newBlock.updateWithServerData(data.newBlockData);
         }
 
-        if (data.constructionValidatorData.versionChanged) {
-            this._constructionValidatorVersion =
-                data.constructionValidatorData.version;
-            this.loadConstructionValidator(data.constructionValidatorData.src);
+        if (data.validatorData.versionChanged) {
+            this._validatorVersion = data.validatorData.version;
+            this._loadConstructionValidator(data.validatorData.src);
         }
 
         if (this._updateTimeout) {
@@ -377,8 +376,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
                 "prerenderModeDataVersion":
                     this._prerenderMode.versionOnServer(),
-                "constructionValidatorVersion":
-                    this._constructionValidatorVersion
+                "validatorVersion": this._validatorVersion
             },
             load: dojo.hitch(this, this._updateSucceeded)
         });
@@ -436,8 +434,10 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     //
     // If the construction 
     newConstructionWouldBeValid: function () {
-        var blocks = this._constructionBlocks.blocks(),
-            newBlocks = dojo.mixin();
+        var blocks = dojo.mixin({}, this._constructionBlocks.blocks());
+
+/*fixme:        dojo.mixin(blocks, newBlock
+            blocks = dojo.mixin();*/
         return (typeof realityBuilderConstructionValidator !== 'undefined' &&
                 realityBuilderConstructionValidator(blocks));
     }
