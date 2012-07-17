@@ -315,6 +315,23 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         }
     },
 
+    // Called if replacing the blocks on the server succeeded.
+    _replaceBlocksOnServerSucceeded: function () {
+        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
+    },
+
+    // Deletes all blocks on the server, and sets the real blocks to those
+    // described by the specified poses.
+    replaceBlocksOnServer: function (posesB) {
+        var content = [], _ = realityBuilder._;
+
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "admin/rpc/replace_blocks",
+            content: posesB,
+            load: dojo.hitch(this, this._replaceBlocksOnServerSucceeded)
+        });
+    },
+
     // If available, find the real block whose upper side is below the block
     // space coordinates "xB", "yB", "zB". Returns the block space z coordinate
     // of the upper side of the block. If no such block is available, returns

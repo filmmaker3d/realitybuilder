@@ -833,6 +833,51 @@ class RPCAdminMakePending(webapp.RequestHandler):
         except Exception, e:
             logging.error('Could not make block pending: ' + str(e))
 
+class RPCAdminReplaceBlocks(webapp.RequestHandler):
+    # Replaces all construction blocks with those described by the specified
+    # poses.
+    @classmethod
+    def transaction(cls, poses_b):
+        construction = Construction.get_main()
+
+        # Deletes all block entries:
+        queries = [Block.all().ancestor(construction)]
+        for query in queries:
+            for result in query:
+                result.delete()
+
+        # Inserts blocks:
+        for pose_b in poses_b:
+            x_b = pose_b[0]
+            y_b = pose_b[1]
+            z_b = pose_b[2]
+            a = pose_b[3]
+            block = Block.insert_at(construction, [x_b, y_b, z_b], a)
+            block.state = 2
+            block.put()
+
+        construction.increase_blocks_data_version()
+
+    def get(self):
+        try:
+            namespace_manager.set_namespace(self.request.get('namespace'))
+
+            poses_b = []
+            i = 0
+            while True:
+                tmp = self.request.get_all(str(i))
+                if len(tmp) < 4:
+                    break
+                pose_b = [int(tmp[0]), int(tmp[1]), int(tmp[2]), int(tmp[3])]
+                poses_b.append(pose_b)
+                i += 1
+
+            callback = self.request.get('callback')
+            db.run_in_transaction(self.transaction, poses_b)
+            dump_jsonp(self, {}, callback)
+        except Exception, e:
+            logging.error('Could replace blocks: ' + str(e))
+
 # Updates the camera settings and increases the camera version number.
 #
 # The request fails silently on error.
@@ -890,6 +935,7 @@ application = webapp.WSGIApplication([
     ('/admin/rpc/delete', RPCAdminDelete),
     ('/admin/rpc/make_real', RPCAdminMakeReal),
     ('/admin/rpc/make_pending', RPCAdminMakePending),
+    ('/admin/rpc/replace_blocks', RPCAdminReplaceBlocks),
     ('/admin/rpc/update_settings', RPCAdminUpdateSettings),
     ('/rpc/construction', RPCConstruction),
     ('/rpc/create_pending', RPCCreatePending),

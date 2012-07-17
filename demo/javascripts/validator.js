@@ -14,7 +14,7 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realityBuilder, prerenderedSimPosesBList */
+/*global realityBuilder, realityBuilderSimPosesBList */
 
 // This function returns true, iff the passed construction blocks plus new
 // block describe a valid construction.
@@ -24,7 +24,8 @@ var realityBuilderValidator = (function () {
     // List of prerendered poses:
     var util = realityBuilder.util,
         _ = realityBuilder._,
-        validSrtSimPosesBList = prerenderedSimPosesBList; // sorted in a moment
+        validSrtSimPosesBList = realityBuilderSimPosesBList; // sorted in a
+                                                             // moment
 
     _.each(validSrtSimPosesBList, function (simPosesB) {
         util.sortPosesB(simPosesB);

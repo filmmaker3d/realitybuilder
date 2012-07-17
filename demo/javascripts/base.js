@@ -16,7 +16,8 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realityBuilderDemo, realityBuilder, $, _, prerenderedSimPosesBList */
+/*global realityBuilderDemo, realityBuilder, $, _,
+  realityBuilderSimPosesBList */
 
 var realityBuilderDemo = (function () {
     'use strict';
@@ -34,9 +35,7 @@ var realityBuilderDemo = (function () {
                                          // loaded
         realityBuilderIsReady = false,
         realityBuilderVersion,
-        prerenderedSrtSimPosesBList; // List of sorted simplified poses of
-                                     // prerendered construction blocks:
-
+        prerenderedSrtSimPosesBList;
 
     function forEachCoordinateButton(f) {
         $.each(coordinateButtonDeltaBs, function (type, deltaB) {
@@ -66,29 +65,27 @@ var realityBuilderDemo = (function () {
         }
     }
 
-    // sets the list, but only if not yet set
-    function setPrerenderedSrtSimPosesBList() {
-        if (typeof prerenderedSrtSimPosesBList === 'undefined') {
-            prerenderedSrtSimPosesBList = prerenderedSimPosesBList;
-            _.each(prerenderedSrtSimPosesBList, function (simPosesB) {
-                realityBuilder.util.sortPosesB(simPosesB);
-            });
-        }
-    }
+    // Returns the list of sorted simplified poses of prerendered construction
+    // blocks:
+    prerenderedSrtSimPosesBList = _.memoize(function () {
+        var srtSimPosesBList = realityBuilderSimPosesBList;
+        _.each(srtSimPosesBList, function (simPosesB) {
+            realityBuilder.util.sortPosesB(simPosesB);
+        });
+        return srtSimPosesBList;
+    });
 
     // Returns the index of the prerendered image that matches the current
     // construction, or false if there is no matching image.
     function prerenderedImageIndex() {
         var util = realityBuilder.util, srtSimPosesB;
 
-        setPrerenderedSrtSimPosesBList();
-
         srtSimPosesB =
             realityBuilder.constructionBlocks().nonDeletedSimPosesB();
         util.sortPosesB(srtSimPosesB);
 
         return util.posInSrtSimPosesBList(srtSimPosesB,
-                                          prerenderedSrtSimPosesBList);
+                                          prerenderedSrtSimPosesBList());
     }
 
     function updateBackgroundImage() {
@@ -202,22 +199,21 @@ var realityBuilderDemo = (function () {
         });
     }
 
-    function scheduleReset() {
-        realityBuilder.prerenderMode().scheduleReset();
+    // Resets the construction to the blocks matching the first prerendered
+    // block configuration.
+    function reset() {
+        var simPosesB = prerenderedSrtSimPosesBList()[0];
+        realityBuilder.constructionBlocks().replaceBlocksOnServer(simPosesB);
     }
 
     function onKeyPressed(event) {
         if (event.which === 114) {
-            scheduleReset();
+            reset();
         }
     }
 
     function setUpHandlingOfKeyPresses() {
         $(document.documentElement).keypress(onKeyPressed);
-    }
-
-    function updateResetDelay() {
-        $('#resetDelay').text(realityBuilder.prerenderMode().resetDelay());
     }
 
     // Called when the Reality Builder is ready. Note that the background image
@@ -227,7 +223,6 @@ var realityBuilderDemo = (function () {
         setUpRotate90Button();
         setUpRequestMakeRealButton();
         setUpHandlingOfKeyPresses();
-        updateResetDelay();
 
         realityBuilderIsReady = true;
 
