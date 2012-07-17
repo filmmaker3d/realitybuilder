@@ -57,9 +57,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Version of the construction blocks when the shadow was last rendered.
     _lastConstructionBlocksVersion: null,
 
-    // Prerender-mode (only relevant if enabled):
-    _prerenderMode: null,
-
     // Creates the new block that the user may position. For collision
     // detection and for calculating hidden lines, the block needs to know
     // about the other blocks in the construction: "constructionBlocks" When
@@ -68,11 +65,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     //
     // The block's properties, such as shape and size, are described by
     // "blockProperties".
-    //
-    // Details of data for prerender-mode, if enabled, are contained in
-    // "prerenderMode".
-    constructor: function (blockProperties, camera, constructionBlocks,
-                           prerenderMode) {
+    constructor: function (blockProperties, camera, constructionBlocks) {
         this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
         this._isFrozen = false;
         this._constructionBlocks = constructionBlocks;
@@ -80,7 +73,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                                                  camera,
                                                  constructionBlocks);
         this._camera = camera;
-        this._prerenderMode = prerenderMode;
     },
 
     versionOnServer: function () {
@@ -181,27 +173,13 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         if (this.isFrozen()) {
             // The block is currently in the state "requested to be made real".
 
-            if (this._prerenderMode.isEnabled()) {
-                // With prerender-mode enabled it never happens that a "make
-                // real" request is answered with turning the block into a
-                // deleted construction block.
-                //
-                // Furthermore, the check below may fail in the case of
-                // two-fold rotational symmetry, where it could happen that the
-                // "make real" request is answered with a congruent block, is
-                // rotated by 180°. This, on the other hand, does not happen
-                // with prerender-mode disabled.
-                return false;
-            } else {
-                constructionBlock =
-                    this._constructionBlocks.blockAt(this.posB(),
-                                                     this.a());
-                if (constructionBlock) {
-                    // Construction block in same position as new block.
+            constructionBlock = this._constructionBlocks.blockAt(this.posB(),
+                                                                 this.a());
+            if (constructionBlock) {
+                // Construction block in same position as new block.
 
-                    if (constructionBlock.isDeleted()) {
-                        return true;
-                    }
+                if (constructionBlock.isDeleted()) {
+                    return true;
                 }
             }
         }
@@ -281,12 +259,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     _isAttachable: function () {
         return (this._constructionBlocks.realBlocksAreAttachableTo(this) ||
                 this.zB() === 0);
-    },
-
-    _isInPrerenderedBlockConfiguration: function () {
-        var realBlocks = this._constructionBlocks.realBlocksSorted();
-        return this._prerenderMode.matchingBlockConfigurationI(realBlocks,
-                                                               this) !== false;
     },
 
     _formsValidConstruction: function () {
@@ -521,14 +493,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Called if storing the block as pending on the server succeeded.
     _createPendingOnServerSucceeded: function () {
         dojo.publish('realityBuilder/NewBlock/createdPendingOnServer');
-
-        if (this._prerenderMode.isEnabled()) {
-            setTimeout(
-                dojo.hitch(this,
-                           this._makeRealIfInPrerenderedBlockConfiguration),
-                this._prerenderMode.makeRealAfter()
-            );
-        }
     },
 
     // Adds this block to the list of blocks on the server, with state pending.
@@ -548,20 +512,12 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Called if storing the block as pending on the server succeeded.
     _createRealOnServerSucceeded: function () {
         dojo.publish('realityBuilder/NewBlock/createdRealOnServer');
-
-        if (this._prerenderMode.isEnabled()) {
-            setTimeout(
-                dojo.hitch(this,
-                           this._makeRealIfInPrerenderedBlockConfiguration),
-                this._prerenderMode.makeRealAfter()
-            );
-        }
     },
 
     // Adds this block to the list of blocks on the server, with state pending.
     _createRealOnServer: function () {
         realityBuilder.util.jsonpGet({
-            url: realityBuilder.util.rootUrl() + "rpc/create_pending",
+            url: realityBuilder.util.rootUrl() + "rpc/create_real",
             content: {
                 "xB": this.xB(),
                 "yB": this.yB(),
@@ -570,25 +526,5 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             },
             load: dojo.hitch(this, this._createRealOnServerSucceeded)
         });
-    },
-
-    // If this block together with the real blocks matches a prerendered block
-    // configuration, then makes it real by loading the appropriate prerendered
-    // block configuration.
-    //
-    // Otherwise, just unfreezes the block.
-    _makeRealIfInPrerenderedBlockConfiguration: function () {
-        var i, realBlocks;
-
-        realBlocks = this._constructionBlocks.realBlocksSorted();
-        i = this._prerenderMode.matchingBlockConfigurationI(realBlocks, this);
-
-        if (i !== false) {
-            this._prerenderMode.loadBlockConfigurationOnServer(i);
-        } else {
-            // this block and the real block don't match a prerendered
-            // configuration
-            this.unfreeze();
-        }
     }
 });

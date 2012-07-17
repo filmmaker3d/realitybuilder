@@ -27,7 +27,6 @@ dojo.require('realityBuilder.ConstructionBlocks');
 dojo.require('realityBuilder.ConstructionBlock');
 dojo.require('realityBuilder.NewBlock');
 dojo.require('realityBuilder.Camera');
-dojo.require('realityBuilder.PrerenderMode');
 dojo.require('realityBuilder.util');
 
 dojo.declare('realityBuilder.RealityBuilder', null, {
@@ -41,9 +40,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     // Properties (shape, dimensions, etc.) of a block:
     _blockProperties: null,
-
-    // Prerender-mode:
-    _prerenderMode: null,
 
     // The new block that the user is supposed to position. Could move once the
     // real blocks are loaded, if there are any intersections.
@@ -79,17 +75,12 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                                      dojo.byId(settings.id));
         this._constructionBlocks =
             new rb.ConstructionBlocks(this._blockProperties, this._camera);
-        this._prerenderMode = new rb.PrerenderMode();
         this._newBlock =
             new rb.NewBlock(this._blockProperties,
                             this._camera,
-                            this._constructionBlocks,
-                            this._prerenderMode);
+                            this._constructionBlocks);
 
         dojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
-                       this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realityBuilder/PrerenderMode/' +
-                       'loadedBlockConfigurationOnServer',
                        this, this._update); // Speeds up responsiveness.
         dojo.subscribe('realityBuilder/NewBlock/createdPendingOnServer',
                        this, this._update); // Speeds up responsiveness.
@@ -126,10 +117,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     camera: function () {
         return this._camera;
-    },
-
-    prerenderMode: function () {
-        return this._prerenderMode;
     },
 
     constructionBlocks: function () {
@@ -244,8 +231,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     _updateNewBlockStateIfFullyInitialized: function (unfreeze) {
         if (this._constructionBlocks.isInitializedWithServerData() &&
                 this._newBlock.isInitializedWithServerData() &&
-                this._blockProperties.isInitializedWithServerData() &&
-                this._prerenderMode.isInitializedWithServerData()) {
+                this._blockProperties.isInitializedWithServerData()) {
             realityBuilder._newBlock.updateState();
             realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
             realityBuilder.util.SETTINGS.onMovedOrRotated();
@@ -285,25 +271,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         this._checkIfReady();
     },
 
-    _onPrerenderModeChanged: function () {
-        // New block state may change if the prerendered configurations change.
-        // For example it may now be possible to make the block real, where
-        // before it wasn't due to lack of a matching prerendered block
-        // configuration.
-        this._updateNewBlockStateIfFullyInitialized();
-
-        // New block is always unfrozen here. This is necessary e.g. in the
-        // following scenario: A new prerendered block configuration is loaded,
-        // and the associated construction blocks do *not* intersect with the
-        // new block. As the new block is not moved, it would not be unfrozen,
-        // and the demo application would just hang, from the point of view of
-        // the user.
-        this._newBlock.unfreeze();
-
-        this._checkIfReady();
-        realityBuilder.util.SETTINGS.onPrerenderedBlockConfigurationChanged();
-    },
-
     // Checks if the widget is ready to be used. If so, signals that by calling
     // the "onReady" function, but only the first time.
     _checkIfReady: function () {
@@ -329,10 +296,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
         if (data.blocksData.changed) {
             this._constructionBlocks.updateWithServerData(data.blocksData);
-        }
-
-        if (data.prerenderModeData.changed) {
-            this._prerenderMode.updateWithServerData(data.prerenderModeData);
         }
 
         if (data.cameraData.changed) {
@@ -379,8 +342,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                 "blockPropertiesDataVersion":
                     this._blockProperties.versionOnServer(),
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
-                "prerenderModeDataVersion":
-                    this._prerenderMode.versionOnServer(),
                 "validatorVersion": this._validatorVersion
             },
             load: dojo.hitch(this, this._updateSucceeded)
