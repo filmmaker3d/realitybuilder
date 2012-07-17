@@ -139,12 +139,22 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         }
     },
 
-    // Requests that the block be made pending, thereby requesting to
-    // eventually have it made real.
+    // Requests that the block be made pending. Fails silently if that is not
+    // possible.
+    requestMakePending: function () {
+        if (this.canBeMadeReal()) {
+            this._freeze(); // until construction is updated
+            this._createPendingOnServer();
+            dojo.publish('realityBuilder/NewBlock/makePendingRequested');
+        }
+    },
+
+    // Requests that the block be made real. Fails silently if that is not
+    // possible.
     requestMakeReal: function () {
         if (this.canBeMadeReal()) {
-            this._freeze();
-            this._createPendingOnServer();
+            this._freeze(); // until construction is updated
+            this._createRealOnServer();
             dojo.publish('realityBuilder/NewBlock/makeRealRequested');
         }
     },
@@ -532,6 +542,33 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                 "a": this.a()
             },
             load: dojo.hitch(this, this._createPendingOnServerSucceeded)
+        });
+    },
+
+    // Called if storing the block as pending on the server succeeded.
+    _createRealOnServerSucceeded: function () {
+        dojo.publish('realityBuilder/NewBlock/createdRealOnServer');
+
+        if (this._prerenderMode.isEnabled()) {
+            setTimeout(
+                dojo.hitch(this,
+                           this._makeRealIfInPrerenderedBlockConfiguration),
+                this._prerenderMode.makeRealAfter()
+            );
+        }
+    },
+
+    // Adds this block to the list of blocks on the server, with state pending.
+    _createRealOnServer: function () {
+        realityBuilder.util.jsonpGet({
+            url: realityBuilder.util.rootUrl() + "rpc/create_pending",
+            content: {
+                "xB": this.xB(),
+                "yB": this.yB(),
+                "zB": this.zB(),
+                "a": this.a()
+            },
+            load: dojo.hitch(this, this._createRealOnServerSucceeded)
         });
     },
 

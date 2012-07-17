@@ -103,6 +103,9 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         dojo.subscribe('realityBuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
         dojo.subscribe('realityBuilder/NewBlock/' +
+                       'onNewBlockMakePendingRequested',
+                       this, this._onNewBlockMakePendingRequested);
+        dojo.subscribe('realityBuilder/NewBlock/' +
                        'onNewBlockMakeRealRequested',
                        this, this._onNewBlockMakeRealRequested);
         dojo.subscribe('realityBuilder/ConstructionBlocks/changed',
@@ -147,6 +150,10 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     _onNewBlockUnfrozen: function () {
         this._renderNewBlockIfFullyInitialized(); // color changes
         realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
+    },
+
+    // Called after the block was requested to be made pending.
+    _onNewBlockMakePendingRequested: function () {
     },
 
     // Called after the block was requested to be made real.
