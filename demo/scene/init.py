@@ -47,7 +47,6 @@ from main import Block
 from main import BlockProperties
 from main import NewBlock
 from main import NewBlockEmail
-from main import PrerenderMode
 from django.utils import simplejson
 
 from google.appengine.api import namespace_manager
@@ -84,51 +83,6 @@ construction.camera_a_z = 0.29
 construction.camera_fl = 40.
 construction.camera_sensor_resolution = 19.9
 construction.put()
-
-# Deletes all prerender-mode entries:
-queries = [PrerenderMode.all()]
-for query in queries:
-    for result in query:
-        result.delete()
-
-# Sets up the prerender-mode:
-prerenderMode = PrerenderMode(parent=construction)
-prerenderMode.data_version = '0'
-prerenderMode.is_enabled = True
-prerenderMode.make_real_after = 0
-prerenderMode.block_configurations = \
-    ['[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
-     '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
-     '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0]]',
-     '[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
-     '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
-     '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0]]',
-     '[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
-     '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
-     '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0], ' + 
-     '[3, 1, 0, 2]]',
-     '[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
-     '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
-     '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [3, 1, 0, 2]]',
-     '[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
-     '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
-     '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0], ' + 
-     '[3, 1, 0, 2], [2, 1, 1, 0]]',
-     '[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
-     '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
-     '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0], ' + 
-     '[3, 1, 0, 2], [2, 1, 1, 0], [1, 1, 1, 3]]',
-     '[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
-     '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
-     '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0], ' + 
-     '[3, 1, 0, 2], [1, 1, 1, 3]]',
-     '[[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2], ' +
-     '[5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2], ' +
-     '[4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0], ' +
-     '[1, 1, 1, 3]]']
-prerenderMode.i = 0
-prerenderMode.reset_delay = 5000
-prerenderMode.put()
 
 # Deletes all block properties entries:
 queries = [BlockProperties.all()]
@@ -178,7 +132,9 @@ for query in queries:
         result.delete()
 
 # Creates block entries:
-cs = simplejson.loads(prerenderMode.block_configurations[0])
+cs = [[1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
+      [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
+      [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0]]
 for c in cs:
     x_b = c[0]
     y_b = c[1]
