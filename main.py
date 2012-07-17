@@ -73,14 +73,6 @@ class Construction(db.Model):
     camera_sensor_resolution = \
         db.FloatProperty(default=100.) # sensor resolution
 
-    def prerender_mode(self):
-        query = PrerenderMode.all().ancestor(self)
-        prerender_mode = query.get()
-        if prerender_mode is None:
-            raise Exception('Could not get prerender-mode data')
-        else:
-            return prerender_mode
-
     # Increases the blocks version number. Should be run in a transaction.
     def increase_blocks_data_version(self):
         self.blocks_data_version = str(int(self.blocks_data_version) + 1)
@@ -100,82 +92,6 @@ class Construction(db.Model):
             return construction
         else:
             raise Exception('Could not find construction')
-
-# Data specific to prerender-mode.
-class PrerenderMode(db.Model):
-    # The data version is increased every time the data is changed. The client
-    # uses this data to determine when to update the display.
-    data_version = db.StringProperty()
-
-    # With prerender-mode enabled, a block is automatically made real after
-    # "make_real_after" milliseconds, and if the total construction would
-    # afterwards match one of the block configurations in the list
-    # "block_configurations".
-    #
-    # If the block has 2-fold rotational symmetry, then the prerendered block
-    # configurations are only allowed to contain blocks rotated by angles 0°
-    # and 90°!
-    is_enabled = db.BooleanProperty()
-    make_real_after = db.IntegerProperty() # ms
-    block_configurations = db.StringListProperty()
-
-    # If "reset_at" is set, then the current configuration is reset to
-    # prerendered block configuration number 0 at or after that time. When a
-    # reset is requested, then - unless already set - "reset_at" is set to:
-    #
-    #   now plus "reset_delay"
-    reset_delay = db.IntegerProperty() # ms
-    reset_at = db.DateTimeProperty(None)
-
-    # Index of the currently loaded prerendered block configuration, and of the
-    # previously loaded one:
-    i = db.IntegerProperty()
-    prev_i = db.IntegerProperty(default=-1) # -1 = nothing
-
-    # Increases the data version number. Should be run in a transaction.
-    def increase_data_version(self):
-        self.data_version = str(int(self.data_version) + 1)
-        self.put()
-
-    def reset_should_happen(self):
-        return self.reset_at != None and datetime.now() >= self.reset_at
-
-    def unschedule_reset(self):
-        self.reset_at = None
-        self.put()
-
-    # Replaces all construction blocks with those in the prerendered block
-    # configuration number "i". Should be run in a transaction.
-    def load_block_configuration(self, i):
-        construction = self.parent()
-
-        block_configurations = self.block_configurations
-
-        if i < len(block_configurations):
-            # Deletes all block entries:
-            queries = [Block.all().ancestor(construction)]
-            for query in queries:
-                for result in query:
-                    result.delete()
-
-            # Inserts blocks:
-            blocks = simplejson.loads(block_configurations[i])
-            for block in blocks:
-                x_b = block[0]
-                y_b = block[1]
-                z_b = block[2]
-                a = block[3]
-                block = Block.insert_at(construction, [x_b, y_b, z_b], a)
-                block.state = 2
-                block.put()
-
-            construction.increase_blocks_data_version()
-
-            self.prev_i = self.i
-            self.i = i
-            self.increase_data_version()
-        else:
-            raise Exception('Index out of bounds')
 
 # Data specific to the new block.
 class NewBlock(db.Model):
@@ -486,45 +402,6 @@ class RPCConstruction(webapp.RequestHandler):
                          'initA': new_block.init_a})
         return data
 
-    # Returns JSON serializable data related to prerender-mode.
-    @classmethod
-    def get_prerender_mode_data(cls, construction, 
-                                prerender_mode_data_version_client):
-        query = PrerenderMode.all().ancestor(construction)
-        prerender_mode = query.get()
-        if prerender_mode is None:
-            raise Exception('Could not get prerender-mode data')
-
-        prerender_mode_data_version = prerender_mode.data_version
-        prerender_mode_data_changed = (prerender_mode_data_version != 
-                                       prerender_mode_data_version_client)
-        data = {
-            'version': prerender_mode_data_version,
-            'changed': prerender_mode_data_changed}
-        if prerender_mode_data_changed:
-            # Prerender-mode data version on server not the same as on client.
-            # => Deliver all the data.
-            data.update({'isEnabled': prerender_mode.is_enabled,
-                         'makeRealAfter': prerender_mode.make_real_after,
-                         'blockConfigurations': \
-                             cls.json_decode_list \
-                             (prerender_mode.block_configurations),
-                         'i': prerender_mode.i,
-                         'prevI': prerender_mode.prev_i,
-                         'resetDelay': prerender_mode.reset_delay})
-        return data
-
-    # Only has an effect in prerender-mode.
-    #
-    # If behind or on schedule, resets the current block configuration to
-    # prerendered block configuration number 0.
-    @classmethod
-    def reset_if_scheduled(cls, construction):
-        prerender_mode = construction.prerender_mode()
-        if prerender_mode.is_enabled and prerender_mode.reset_should_happen():
-            prerender_mode.load_block_configuration(0)
-            prerender_mode.unschedule_reset()
-
     # A transaction may not be necessary, but it ensures data integrity for
     # example if there is a transaction missing somewhere else.
     @classmethod
@@ -533,11 +410,8 @@ class RPCConstruction(webapp.RequestHandler):
                     blocks_data_version_client, 
                     camera_data_version_client,
                     block_properties_data_version_client,
-                    new_block_data_version_client,
-                    prerender_mode_data_version_client):
+                    new_block_data_version_client):
         construction = Construction.get_main()
-
-        cls.reset_if_scheduled(construction)
 
         data = {
             'updateIntervalClient': construction.update_interval_client,
@@ -551,9 +425,7 @@ class RPCConstruction(webapp.RequestHandler):
                 cls.get_block_properties_data(
                 construction, block_properties_data_version_client),
             'newBlockData': cls.get_new_block_data(
-                construction, new_block_data_version_client),
-            'prerenderModeData': cls.get_prerender_mode_data(
-                construction, prerender_mode_data_version_client)
+                construction, new_block_data_version_client)
         }
         return data
 
@@ -570,8 +442,6 @@ class RPCConstruction(webapp.RequestHandler):
                 self.request.get('blockPropertiesDataVersion')
             new_block_data_version_client = \
                 self.request.get('newBlockDataVersion')
-            prerender_mode_data_version_client = \
-                self.request.get('prerenderModeDataVersion')
             callback = self.request.get('callback')
 
             data = db.run_in_transaction \
@@ -580,8 +450,7 @@ class RPCConstruction(webapp.RequestHandler):
                  blocks_data_version_client,
                  camera_data_version_client,
                  block_properties_data_version_client,
-                 new_block_data_version_client,
-                 prerender_mode_data_version_client)
+                 new_block_data_version_client)
             dump_jsonp(self, data, callback)
         except Exception, e:
             logging.error('Could not retrieve data: ' + str(e))
@@ -620,65 +489,6 @@ class RPCMakeReal(webapp.RequestHandler):
             dump_jsonp(self, {}, callback)
         except Exception, e:
             logging.error('Could not make block real: ' + str(e))
-
-# Only has an effect if prerender-mode is enabled.
-#
-# Requests a reset of the block configuration to the prerendered block
-# configuration 0. The reset is scheduled to happen at or after: now plus
-# "reset_delay". If a reset is already scheduled, then that schedule is not
-# changed.
-# 
-# Silently fails on error.
-class RPCScheduleReset(webapp.RequestHandler):
-    @classmethod
-    def transaction(cls):
-        construction = Construction.get_main()
-
-        prerender_mode = construction.prerender_mode()
-
-        if prerender_mode.is_enabled:
-            if prerender_mode.reset_at == None:
-                delay = prerender_mode.reset_delay
-                prerender_mode.reset_at = datetime.now() + timedelta(0, 0, 0, 
-                                                                     delay)
-                prerender_mode.put()
-
-    # Only runs if prerender-mode is enabled.
-    def get(self):
-        try:
-            namespace_manager.set_namespace(self.request.get('namespace'))
-            callback = self.request.get('callback')
-            db.run_in_transaction(self.transaction)
-            dump_jsonp(self, {}, callback)
-        except Exception, e:
-            logging.error('Could not schedule reset: ' + str(e))
-
-# Loads the prerendered block configuration with the provided index.
-# 
-# Silently fails on error.
-class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
-    # If prerender-mode is enabled, then replaces all blocks with the blocks in
-    # the prerendered block configuration with index "i".
-    @classmethod
-    def transaction(cls, i):
-        construction = Construction.get_main()
-
-        prerender_mode = construction.prerender_mode()
-
-        if prerender_mode.is_enabled:
-            prerender_mode.load_block_configuration(i)
-
-    # Only runs if prerender-mode is enabled.
-    def get(self):
-        try:
-            namespace_manager.set_namespace(self.request.get('namespace'))
-            i = int(self.request.get('i'))
-            callback = self.request.get('callback')
-            db.run_in_transaction(self.transaction, i)
-            dump_jsonp(self, {}, callback)
-        except Exception, e:
-            logging.error('Could not load prerendered block configuration: ' + 
-                          str(e))
 
 # Sets the state of the block at the provided position to deleted.
 #
@@ -1021,10 +831,7 @@ application = webapp.WSGIApplication([
     ('/rpc/update_settings', RPCUpdateSettings),
     ('/rpc/construction', RPCConstruction),
     ('/rpc/create_real', RPCCreateReal),
-    ('/rpc/create_pending', RPCCreatePending),
-    ('/rpc/schedule_reset', RPCScheduleReset),
-    ('/rpc/load_prerendered_block_configuration', 
-     RPCLoadPrerenderedBlockConfiguration)],
+    ('/rpc/create_pending', RPCCreatePending)],
     debug = debug)
 
 def main():
