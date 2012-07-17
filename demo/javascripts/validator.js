@@ -14,76 +14,30 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realityBuilder */
+/*global realityBuilder, prerenderedSimPosesBList */
 
-// This function returns true, iff the passed simplified block poses describe a
-// valid construction.
+// This function returns true, iff the passed construction blocks plus new
+// block describe a valid construction.
 var realityBuilderValidator = (function () {
     'use strict';
 
     // List of prerendered poses:
     var util = realityBuilder.util,
         _ = realityBuilder._,
-        validSiPosesBList = [
-            [
-                [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
-                [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
-                [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0]
-            ],
-            [
-                [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
-                [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
-                [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0]
-            ],
-            [
-                [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
-                [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
-                [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0],
-                [3, 1, 0, 2]
-            ],
-            [
-                [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
-                [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
-                [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [3, 1, 0, 2]
-            ],
-            [
-                [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
-                [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
-                [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0],
-                [3, 1, 0, 2], [2, 1, 1, 0]
-            ],
-            [
-                [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
-                [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
-                [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0],
-                [3, 1, 0, 2], [2, 1, 1, 0], [1, 1, 1, 3]
-            ],
-            [
-                [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
-                [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
-                [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0],
-                [3, 1, 0, 2], [1, 1, 1, 3]
-            ],
-            [
-                [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
-                [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
-                [4, 0, 0, 0], [1, 0, 0, 0], [4, 4, 0, 0], [1, 1, 0, 0],
-                [1, 1, 1, 3]
-            ]
-        ];
+        validSrtSimPosesBList = prerenderedSimPosesBList; // sorted in a moment
 
-    _.each(validSiPosesBList, function (siPosesB) {
-        util.sortPosesB(siPosesB);
+    _.each(validSrtSimPosesBList, function (simPosesB) {
+        util.sortPosesB(simPosesB);
     });
 
     return function (constructionBlocks, newBlock) {
-        var siPosesBAreValid, siPosesB;
+        var simPosesBAreValid, srtSimPosesB;
 
-        siPosesB = constructionBlocks.nonDeletedSiPosesB();
-        siPosesB.push(newBlock.siPoseB());
+        srtSimPosesB = constructionBlocks.nonDeletedSimPosesB();
+        srtSimPosesB.push(newBlock.simPoseB());
+        util.sortPosesB(srtSimPosesB);
 
-        util.sortPosesB(siPosesB);
-
-        return util.posInSoSiPosesBList(siPosesB, validSiPosesBList) !== false;
+        return util.posInSrtSimPosesBList(srtSimPosesB,
+                                          validSrtSimPosesBList) !== false;
     };
 }());

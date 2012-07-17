@@ -151,7 +151,7 @@ dojo.declare('realityBuilder.Block', null, {
     //   90°
     //
     // * Otherwise: unchanged pose
-    siPoseB: function () {
+    simPoseB: function () {
         var siPoseB, posB, a, congruencyOffsetB;
 
         posB = this.poseB();

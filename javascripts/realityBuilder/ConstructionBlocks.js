@@ -73,11 +73,11 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Returns the simplified poses of all real and pending blocks, with
     // coordinates in block space, sorted by height.
-    nonDeletedSiPosesB: function () {
+    nonDeletedSimPosesB: function () {
         var $ = realityBuilder.$;
 
         return $.map(this._nonDeletedBlocks, function (block) {
-            return [block.siPoseB()];
+            return [block.simPoseB()];
         });
     },
 
