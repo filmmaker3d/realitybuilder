@@ -67,12 +67,6 @@ handlers:
 - url: /demo
   script: demo/main.py
 
-# RPC for administration:
-- url: /admin/rpc/.*
-  script: main.py
-  login: admin
-  secure: always
-
 - url: /.*
   script: main.py
 

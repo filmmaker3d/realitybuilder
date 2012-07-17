@@ -593,7 +593,7 @@ class RPCConstruction(webapp.RequestHandler):
 # deleted.
 # 
 # Silently fails on error.
-class RPCAdminMakeReal(webapp.RequestHandler):
+class RPCMakeReal(webapp.RequestHandler):
     # Tries to make the block at the block position "x_b", "y_b", "z_b", and
     # rotated by the angle "a", real.
     @classmethod
@@ -615,7 +615,7 @@ class RPCAdminMakeReal(webapp.RequestHandler):
             z_b = int(self.request.get('zB'))
             a = int(self.request.get('a'))
             callback = self.request.get('callback')
-            db.run_in_transaction(RPCAdminMakeReal.transaction, 
+            db.run_in_transaction(RPCMakeReal.transaction, 
                                   x_b, y_b, z_b, a)
             dump_jsonp(self, {}, callback)
         except Exception, e:
@@ -683,7 +683,7 @@ class RPCLoadPrerenderedBlockConfiguration(webapp.RequestHandler):
 # Sets the state of the block at the provided position to deleted.
 #
 # The request fails silently on error.
-class RPCAdminDelete(webapp.RequestHandler):
+class RPCDelete(webapp.RequestHandler):
     # Tries to delete the block at position "x_b", "y_b", "z_b", and rotated by
     # the angle "a".
     @classmethod
@@ -797,7 +797,7 @@ Angle: %d
 # intersects with a real block, then it is deleted.
 #
 # The request fails silently on error.
-class RPCAdminMakePending(webapp.RequestHandler):
+class RPCMakePending(webapp.RequestHandler):
     # Tries to turn the block at the block position "x_b", "y_b", "z_b" and
     # rotated by the angle "a" into a pending block, or sets its state to
     # deleted, if it intersects with a real block.
@@ -833,7 +833,7 @@ class RPCAdminMakePending(webapp.RequestHandler):
         except Exception, e:
             logging.error('Could not make block pending: ' + str(e))
 
-class RPCAdminReplaceBlocks(webapp.RequestHandler):
+class RPCReplaceBlocks(webapp.RequestHandler):
     # Replaces all construction blocks with those described by the specified
     # poses.
     @classmethod
@@ -881,7 +881,7 @@ class RPCAdminReplaceBlocks(webapp.RequestHandler):
 # Updates the camera settings and increases the camera version number.
 #
 # The request fails silently on error.
-class RPCAdminUpdateSettings(webapp.RequestHandler):
+class RPCUpdateSettings(webapp.RequestHandler):
     # Tries to update camera settings. Ignores values that cannot be assigned.
     @classmethod
     def transaction(cls, data):
@@ -932,11 +932,11 @@ class RealityBuilderJs(webapp.RequestHandler):
 
 application = webapp.WSGIApplication([
     ('/realitybuilder.js', RealityBuilderJs),
-    ('/admin/rpc/delete', RPCAdminDelete),
-    ('/admin/rpc/make_real', RPCAdminMakeReal),
-    ('/admin/rpc/make_pending', RPCAdminMakePending),
-    ('/admin/rpc/replace_blocks', RPCAdminReplaceBlocks),
-    ('/admin/rpc/update_settings', RPCAdminUpdateSettings),
+    ('/rpc/delete', RPCDelete),
+    ('/rpc/make_real', RPCMakeReal),
+    ('/rpc/make_pending', RPCMakePending),
+    ('/rpc/replace_blocks', RPCReplaceBlocks),
+    ('/rpc/update_settings', RPCUpdateSettings),
     ('/rpc/construction', RPCConstruction),
     ('/rpc/create_pending', RPCCreatePending),
     ('/rpc/schedule_reset', RPCScheduleReset),

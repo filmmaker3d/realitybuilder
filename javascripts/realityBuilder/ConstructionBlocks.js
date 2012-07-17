@@ -240,7 +240,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // blocks is updated.
     makePendingOnServer: function (posB, a) {
         realityBuilder.util.jsonpGet({
-            url: realityBuilder.util.rootUrl() + "admin/rpc/make_pending",
+            url: realityBuilder.util.rootUrl() + "rpc/make_pending",
             content: {
                 "xB": posB[0],
                 "yB": posB[1],
@@ -260,7 +260,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // rotated by the angle "a", on the client and on the server.
     deleteOnServer: function (posB, a) {
         realityBuilder.util.jsonpGet({
-            url: realityBuilder.util.rootUrl() + "admin/rpc/delete",
+            url: realityBuilder.util.rootUrl() + "rpc/delete",
             content: {
                 "xB": posB[0],
                 "yB": posB[1],
@@ -287,7 +287,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // the server.
     makeRealOnServer: function (posB, a) {
         realityBuilder.util.jsonpGet({
-            url: realityBuilder.util.rootUrl() + "admin/rpc/make_real",
+            url: realityBuilder.util.rootUrl() + "rpc/make_real",
             content: {
                 "xB": posB[0],
                 "yB": posB[1],
@@ -326,7 +326,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         var content = [], _ = realityBuilder._;
 
         realityBuilder.util.jsonpGet({
-            url: realityBuilder.util.rootUrl() + "admin/rpc/replace_blocks",
+            url: realityBuilder.util.rootUrl() + "rpc/replace_blocks",
             content: posesB,
             load: dojo.hitch(this, this._replaceBlocksOnServerSucceeded)
         });

@@ -408,7 +408,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         }
 
         realityBuilder.util.jsonpGet({
-            url: realityBuilder.util.rootUrl() + "admin/rpc/update_settings",
+            url: realityBuilder.util.rootUrl() + "rpc/update_settings",
             content: content,
             load: dojo.hitch(this, this._storeSettingsOnServerSucceeded)
         });
