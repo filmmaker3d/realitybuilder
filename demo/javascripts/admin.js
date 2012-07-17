@@ -118,36 +118,6 @@ var realityBuilderAdminDemo = (function () {
         $('#cameraSensorResolutionTextField').val(camera.sensorResolution());
     }
 
-    function updatePrerenderModeControls() {
-        var prerenderMode = realityBuilder.prerenderMode();
-        if (prerenderMode.isEnabled()) {
-            $('#prerenderedBlockConfigurationTextField').
-                val(prerenderMode.i());
-            $('#prerenderedBlockConfigurations').show();
-        } else {
-            $('#prerenderedBlockConfigurations').hide();
-        }
-    }
-
-    function setUpPrerenderModeButtons() {
-        var prerenderMode = realityBuilder.prerenderMode();
-
-        $('#setPrerenderedBlockConfigurationButton').click(function () {
-            var i =
-                parseInt($('#prerenderedBlockConfigurationTextField').val(),
-                         10);
-            prerenderMode.loadBlockConfigurationOnServer(i);
-        });
-        $('#prevPrerenderedBlockConfigurationButton').click(function () {
-            prerenderMode.loadPrevBlockConfigurationOnServer();
-            updatePrerenderModeControls();
-        });
-        $('#nextPrerenderedBlockConfigurationButton').click(function () {
-            prerenderMode.loadNextBlockConfigurationOnServer();
-            updatePrerenderModeControls();
-        });
-    }
-
     function updatePosAndADisplay() {
         var newBlock = realityBuilder.newBlock();
 
@@ -274,9 +244,7 @@ var realityBuilderAdminDemo = (function () {
         setUpLogoutButton();
         setUpSaveSettingsButton();
         setUpPreviewCameraButton();
-        setUpPrerenderModeButtons();
         updateCameraControls();
-        updatePrerenderModeControls();
 
         realityBuilder.setRealBlocksVisibility(true);
         realityBuilder.setPendingBlocksVisibility(true);
@@ -301,10 +269,6 @@ var realityBuilderAdminDemo = (function () {
                     settings.onReady();
                     onReady();
                 },
-                onPrerenderedBlockConfigurationChanged: function () {
-                    settings.onPrerenderedBlockConfigurationChanged();
-                    updatePrerenderModeControls();
-                },
                 jsonpTimeout: 20000,
                 onJsonpError: onJsonpError,
                 onRealBlocksVisibilityChanged:
@@ -312,7 +276,10 @@ var realityBuilderAdminDemo = (function () {
                 onPendingBlocksVisibilityChanged:
                     updatePendingBlocksVisibilityButton,
                 onCameraChanged: updateCameraControls,
-                onConstructionBlocksChanged: updateBlocksTable,
+                onConstructionBlocksChanged: function () {
+                    settings.onConstructionBlocksChanged();
+                    updateBlocksTable();
+                },
                 onMovedOrRotated: updatePosAndADisplay
             });
         }
