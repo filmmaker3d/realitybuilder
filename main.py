@@ -352,8 +352,8 @@ class BlockProperties(db.Model):
     # lower left corner of the unrotated block, when viewed from above:
     rot_center_bxy = db.ListProperty(float)
 
-# Information concerning sending info emails about pending blocks.
-class PendingBlockEmail(db.Model):
+# Information concerning sending info emails about new blocks.
+class NewBlockEmail(db.Model):
     sender_address = db.EmailProperty()
     recipient_address = db.EmailProperty()
 
@@ -731,10 +731,10 @@ class RPCCreatePending(webapp.RequestHandler):
     # position of the block: "pos_b" Its rotation angle: "a"
     @classmethod
     def send_info_email(cls, construction, pos_b, a):
-        query = PendingBlockEmail.all().ancestor(construction)
+        query = NewBlockEmail.all().ancestor(construction)
         pending_block_email = query.get()
         if pending_block_email is None:
-            raise Exception('Could not get pending block email data')
+            raise Exception('Could not get new block email data')
 
         sender_address = pending_block_email.sender_address
         recipient_address = pending_block_email.recipient_address
@@ -790,6 +790,88 @@ Angle: %d
         except Exception, e:
             logging.error('Could not add pending block or set existing ' + 
                           'block to pending: ' + str(e))
+
+# Creates a block at the given position, with the state: real. If a block
+# already exists in that position, and if that block is non-real and
+# non-pending, then the state of that block is made real. If the block
+# intersects with a real block, then it is left in the state deleted.
+#
+# Possible reason for failure: Adding a real block was requested from a client
+# that doesn't yet know that this block is already real. In this case, that
+# client will sooner or later pick up the latest version of the blocks, and
+# inform the user that his request was denied. There is no need for an
+# additional increase in blocks version number.
+#
+# If a new real block has been created, or if the state of an existing non-real
+# block has been changed to real, then an email is sent to the configured email
+# address.
+#
+# The request fails silently on error.
+class RPCCreateReal(webapp.RequestHandler):
+    # Tries to send an email, informing that a real block has been created, or
+    # the state of an existing block has been changed to real. The position of
+    # the block: "pos_b" Its rotation angle: "a"
+    @classmethod
+    def send_info_email(cls, construction, pos_b, a):
+        query = NewBlockEmail.all().ancestor(construction)
+        pending_block_email = query.get()
+        if pending_block_email is None:
+            raise Exception('Could not get new block email data')
+
+        sender_address = pending_block_email.sender_address
+        recipient_address = pending_block_email.recipient_address
+        subject = "New Real Block"
+        body = """
+Position: %d, %d, %d
+Angle: %d
+""" % (pos_b[0], pos_b[1], pos_b[2], a)
+
+        try:
+            mail.send_mail(sender_address, recipient_address, subject, body)
+        except:
+            return False
+
+        return True
+
+    # Tries to create a real block at the block position "x_b", "y_b", "z_b",
+    # and rotated about its center of rotation by "a".
+    @classmethod
+    def transaction(cls, x_b, y_b, z_b, a):
+        construction = Construction.get_main()
+
+        block = Block.get_at(construction, [x_b, y_b, z_b], a)
+        if not block:
+            # Block has to be created, with initial state deleted. It is left
+            # in that state, if it intersects with a real block - see below.
+            block = Block.insert_at(construction, [x_b, y_b, z_b], a)
+
+        if block.state == 2 or block.state == 1:
+            # Block is real or block is already pending.
+            return
+
+        # Block neither real nor pending. => It's in the state deleted.
+
+        if block.is_intersecting_with_real():
+            # Block intersects with real block. => Should be left deleted.
+            return
+
+        block.store_state_and_increase_blocks_data_version(2) # Set to real.
+        cls.send_info_email(construction, [x_b, y_b, z_b], a)
+
+    def get(self):
+        try:
+            namespace_manager.set_namespace(self.request.get('namespace'))
+
+            x_b = int(self.request.get('xB'))
+            y_b = int(self.request.get('yB'))
+            z_b = int(self.request.get('zB'))
+            a = int(self.request.get('a'))
+            callback = self.request.get('callback')
+            db.run_in_transaction(self.transaction, x_b, y_b, z_b, a)
+            dump_jsonp(self, {}, callback)
+        except Exception, e:
+            logging.error('Could not add real block or set existing ' + 
+                          'block to real: ' + str(e))
 
 # Changes the status of a real or deleted block to pending, unless the block
 # does intersect with any real block. If there is no block at the provided
@@ -938,6 +1020,7 @@ application = webapp.WSGIApplication([
     ('/rpc/replace_blocks', RPCReplaceBlocks),
     ('/rpc/update_settings', RPCUpdateSettings),
     ('/rpc/construction', RPCConstruction),
+    ('/rpc/create_real', RPCCreateReal),
     ('/rpc/create_pending', RPCCreatePending),
     ('/rpc/schedule_reset', RPCScheduleReset),
     ('/rpc/load_prerendered_block_configuration', 

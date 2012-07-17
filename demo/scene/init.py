@@ -46,7 +46,7 @@ from main import Construction
 from main import Block
 from main import BlockProperties
 from main import NewBlock
-from main import PendingBlockEmail
+from main import NewBlockEmail
 from main import PrerenderMode
 from django.utils import simplejson
 
@@ -188,17 +188,16 @@ for c in cs:
     block.state = 2
     block.put()
 
-# Deletes all pending block email entries:
-queries = [PendingBlockEmail.all()]
+# Deletes all new block email entries:
+queries = [NewBlockEmail.all()]
 for query in queries:
     for result in query:
         result.delete()
 
-# Creates pending block email entries:
-pendingBlockEmail = PendingBlockEmail(parent=construction)
-pendingBlockEmail.sender_address = 'Admin <admin@example.com>'
-pendingBlockEmail.recipient_address = \
-    'Block Builders <block.builders@example.com>'
-pendingBlockEmail.put()
+# Creates new block email entries:
+newBlockEmail = NewBlockEmail(parent=construction)
+newBlockEmail.sender_address = 'Admin <admin@example.com>'
+newBlockEmail.recipient_address = 'Block Builders <block.builders@example.com>'
+newBlockEmail.put()
 
 print 'Done.'
