@@ -13,7 +13,7 @@
 # the License.
 
 application: realitybuilder-hrd # HRD = High Replication Datastore
-version: 1-10-0
+version: 1-11-0
 runtime: python
 api_version: 1
 
