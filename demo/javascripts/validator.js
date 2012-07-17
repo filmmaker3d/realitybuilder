@@ -24,7 +24,7 @@ var realityBuilderValidator = (function () {
     // List of prerendered poses:
     var util = realityBuilder.util,
         _ = realityBuilder._,
-        validSimplifiedPosesBList = [
+        validSiPosesBList = [
             [
                 [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
                 [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
@@ -72,20 +72,18 @@ var realityBuilderValidator = (function () {
             ]
         ];
 
-    _.each(validSimplifiedPosesBList, function (simplifiedPosesB) {
-        util.sortPosesB(simplifiedPosesB);
+    _.each(validSiPosesBList, function (siPosesB) {
+        util.sortPosesB(siPosesB);
     });
 
-    return function (simplifiedPosesB) {
-        var simplifiedPosesBAreValid;
+    return function (constructionBlocks, newBlock) {
+        var siPosesBAreValid, siPosesB;
 
-        realityBuilder.util.sortPosesB(simplifiedPosesB);
+        siPosesB = constructionBlocks.nonDeletedSiPosesB();
+        siPosesB.push(newBlock.siPoseB());
 
-        simplifiedPosesBAreValid = function (validSimplifiedPosesB) {
-            return util.sortedSimplifiedPosesBMatch(simplifiedPosesB,
-                                                    validSimplifiedPosesB);
-        };
+        util.sortPosesB(siPosesB);
 
-        return _.find(validSimplifiedPosesBList, simplifiedPosesBAreValid);
+        return util.posInSoSiPosesBList(siPosesB, validSiPosesBList) !== false;
     };
 }());

@@ -433,12 +433,8 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // Returns true, if the new block together with all real and pending blocks
     // forms a valid construction.
     newConstructionWouldBeValid: function () {
-        var simplifiedPosesB =
-            this._constructionBlocks.simplifiedNonDeletedPosesB();
-
-        simplifiedPosesB.push(this._newBlock.simplifiedPoseB());
-
         return (typeof realityBuilderValidator !== 'undefined' &&
-                realityBuilderValidator(simplifiedPosesB));
+                realityBuilderValidator(this._constructionBlocks,
+                                        this._newBlock));
     }
 });

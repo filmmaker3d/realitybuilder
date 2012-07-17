@@ -151,23 +151,22 @@ dojo.declare('realityBuilder.Block', null, {
     //   90°
     //
     // * Otherwise: unchanged pose
-    simplifiedPoseB: function () {
-        var simplifiedPoseB, posB, a, congruencyOffsetB;
+    siPoseB: function () {
+        var siPoseB, posB, a, congruencyOffsetB;
 
         posB = this.poseB();
         a = this.poseB()[3];
 
         if (this._blockProperties.has2FoldSymmetry() && a >= 2) {
             congruencyOffsetB = this.congruencyOffsetB();
-            simplifiedPoseB =
-                realityBuilder.util.addVectorsB(posB,
-                                                congruencyOffsetB);
-            simplifiedPoseB.push(a % 2);
+            siPoseB = realityBuilder.util.addVectorsB(posB,
+                                                      congruencyOffsetB);
+            siPoseB.push(a % 2);
         } else {
-            simplifiedPoseB = this.poseB().slice();
+            siPoseB = this.poseB().slice();
         }
 
-        return simplifiedPoseB;
+        return siPoseB;
     },
 
     has2FoldSymmetry: function () {

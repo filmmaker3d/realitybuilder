@@ -386,11 +386,34 @@ realityBuilder.util.sortPosesB = function (posesB) {
     posesB.sort(posesB, realityBuilder.util.comparePosesB);
 };
 
-// Returns true if boths lists of poses describe the same construction. The
+// Returns true iff boths lists of poses describe the same construction. The
 // poses are assumed to be simplified poses, and they are assumed to be sorted
 // ascending by xB, yB, zB, angle (in that order).
-realityBuilder.util.sortedSimplifiedPosesBMatch = function (posesB1, posesB2) {
-    return realityBuilder._.isEqual(posesB1, posesB2);
+realityBuilder.util.soSiPosesBMatch = function (siPosesB1, siPosesB2) {
+    return realityBuilder._.isEqual(siPosesB1, siPosesB2);
+};
+
+// Iff the poses posesB are in the list of poses posesBList, then returns their
+// position (index, starting at 0). Otherwise returns false.
+realityBuilder.util.posInSoSiPosesBList = function (soSiPosesB,
+                                                    soSiPosesBList) {
+    var index = false,
+        match,
+        util = realityBuilder.util,
+        _ = realityBuilder._;
+
+    match = function (testPosesB, i) {
+        if (util.soSiPosesBMatch(soSiPosesB, testPosesB)) {
+            index = i;
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    _.find(soSiPosesBList, match);
+
+    return index;
 };
 
 // Has a trailing slash.
