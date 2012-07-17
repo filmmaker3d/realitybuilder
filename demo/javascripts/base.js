@@ -92,9 +92,9 @@ var realityBuilderDemo = (function () {
         var index = prerenderedImageIndex();
 
         if (index !== false) {
-            $('#backgroundImage').
-                attr('src',
-                     '/demo/images/prerendered_' + index + '.jpg');
+            $('#backgroundImage').attr('src',
+                                       '/demo/images/prerendered_' + index +
+                                       '.jpg');
 
             if (!backgroundImageIsLoaded) {
                 $('#backgroundImage').one('load', function () {
@@ -105,9 +105,8 @@ var realityBuilderDemo = (function () {
         }
     }
 
-    // Called also at the very beginning, i.e. when there has been no previous
-    // prerendered block configuration displayed.
-    function onPrerenderedBlockConfigurationChanged() {
+    // Called also at the very beginning.
+    function onConstructionBlocksChanged() {
         updateBackgroundImage();
     }
 
@@ -241,8 +240,7 @@ var realityBuilderDemo = (function () {
                 namespace: realityBuilderVersion + '_demo',
                 onReady: onReady,
                 onBrowserNotSupportedError: onBrowserNotSupportedError,
-                onPrerenderedBlockConfigurationChanged:
-                    onPrerenderedBlockConfigurationChanged,
+                onConstructionBlocksChanged: onConstructionBlocksChanged,
                 onDegreesOfFreedomChanged: onDegreesOfFreedomChanged,
                 onServerError: onServerError
             };

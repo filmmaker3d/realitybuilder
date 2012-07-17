@@ -244,9 +244,6 @@ var realityBuilder = (function () {
         //   the current browser doesn't support a required HTML element such
         //   as the canvas element.
         //
-        // * "onPrerenderedBlockConfigurationChanged": Function that is
-        //   executed when the prerendered configuration is changed.
-        //
         // * "onDegreesOfFreedomChanged": Function that is called when the
         //   degrees of freedom of the new block changed.
         //
@@ -280,7 +277,6 @@ var realityBuilder = (function () {
                 jsonpTimeout: 0,
                 onServerCommunicationError: nop,
                 onBrowserNotSupportedError: nop,
-                onPrerenderedBlockConfigurationChanged: nop,
                 onReady: nop,
                 onDegreesOfFreedomChanged: nop,
                 onRealBlocksVisibilityChanged: nop,

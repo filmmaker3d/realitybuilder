@@ -111,8 +111,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                        this, this._onCameraChanged);
         dojo.subscribe('realityBuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
-        dojo.subscribe('realityBuilder/PrerenderMode/changed',
-                       this, this._onPrerenderModeChanged);
 
         dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
 
