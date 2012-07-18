@@ -51,7 +51,7 @@ var realityBuilderUI = (function () {
 
     // Unhides the content.
     function unhideView() {
-        $('#loadIndicator').fadeOut(1000);
+        $('.user.interface .loadIndicator').fadeOut(1000);
     }
 
     // Unhides the view, if the Reality Builder is ready and if the background
@@ -89,12 +89,12 @@ var realityBuilderUI = (function () {
         var index = prerenderedImageIndex();
 
         if (index !== false) {
-            $('#backgroundImage').attr('src',
-                                       'images/prerendered_' + index +
-                                       '.jpg');
+            $('.user.interface img.background').attr('src',
+                                                     'images/prerendered_' +
+                                                     index + '.jpg');
 
             if (!backgroundImageIsLoaded) {
-                $('#backgroundImage').one('load', function () {
+                $('.user.interface img.background').one('load', function () {
                     backgroundImageIsLoaded = true;
                     unhideViewIfAllReady();
                 });
@@ -117,7 +117,7 @@ var realityBuilderUI = (function () {
     }
 
     function controlButtonNode(type) {
-        return $('#' + type + 'Button');
+        return $('.user.interface .' + type + '.button');
     }
 
     function updateControlButtonState(type, shouldBeEnabled) {
@@ -160,7 +160,8 @@ var realityBuilderUI = (function () {
 
         if (realityBuilderIsReady) {
             newBlock = realityBuilder.newBlock();
-            updateNodeState($('#controlPanel'), !newBlock.isFrozen());
+            updateNodeState($('.user.interface .controlPanel'),
+                            !newBlock.isFrozen());
         }
     }
 

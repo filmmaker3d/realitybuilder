@@ -12,124 +12,80 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
-button, input, select {
+.admin.interface button, input, select {
     font-size: 10px;
 }
 
-button {
+.admin.interface button {
     height: 19px;
     padding: 0 3px;
 }
 
-#imageSettings button {
-    width: 62px;
-}
-
-#imageUrlTextField {
-    width: 248px;
-}
-
-#sideBar {
-    padding: 10px 10px 0 0;
-    text-align: left;
-}
-
-#sideBar h2 {
-    font-size: 14px;
-    font-weight: bold;
-    margin: 20px 0 5px 0;
-}
-
-#sideBar h2.first {
-    margin-top: 0; /* otherwise a vertical scrollbar will appear in Fx 3.5 */
-}
-
-#sideBar ul {
-    list-style: none;
-}
-
-#sideBar fieldset {
-    margin: 5px 0 5px 2px;
-    padding: 5px;
-    border: 1px solid gray;
-}
-
-#sideBar fieldset legend {
-    padding: 0 3px;
-}
-
-#sideBar label {
+.admin.interface .settings label {
     white-space: nowrap;
 }
 
-#cameraSettings ul.first {
+.admin.interface .settings ul {
+    list-style: none;
+}
+
+.admin.interface .settings li {
+    margin: 0;
+}
+
+.admin.interface .settings .set {
     float: left;
+}
+
+.admin.interface .settings .first.set {
     margin-right: 10px;
 }
 
-#cameraSettings button {
-    width: 62px;
-}
-
-#cameraSettings input {
+.admin.interface .settings input {
     width: 40px;
     margin-bottom: 2px;
     text-align: right;
 }
 
-#saveSettingsButton, #previewCameraButton {
-    margin-right: 5px;
-}
-
-#sideBar .scrollPane {
+.admin.interface .scrollPane {
     overflow: auto;
     height: 195px;
+    padding: 7px;
     padding-right: 20px; /* for the scroll bar */
     border: 1px solid gray;
+    margin-bottom: 7px;
 }
 
-table#blocksTable {
+.admin.interface table.blocks {
     width: 100%;
 }
 
-table#blocksTable th, table#blocksTable td {
+.admin.interface table.blocks th, .admin.interface table.blocks td {
     padding: 0 5px;
 }
 
-table#blocksTable th {
+.admin.interface table.blocks th {
     font-weight: normal;
 }
 
-table#blocksTable th, table#blocksTable td {
+.admin.interface table.blocks th, .admin.interface table.blocks td {
     width: auto;
     text-align: left;
     white-space: nowrap;
 }
 
-table#blocksTable th.number, table#blocksTable td.number {
+.admin.interface table.blocks th.number,
+.admin.interface table.blocks td.number {
     text-align: right;
 }
 
-table#blocksTable td select {
+.admin.interface table.blocks td select {
     width: 7.5em;
 }
 
-#toggleRealButton, #togglePendingButton {
+.admin.interface button.toggleReal,
+.admin.interface button.togglePending {
     width: 12em;
     margin-right: 10px;
     float: left;
-}
-
-#positionAndAngleDisplay {
-    display: inline-block;
-    width: 13em;
-    height: 17px;
-    border: 1px solid gray; 
-    margin-right: 10px;
-    padding: 0 3px;
-    float: left;
-}
-
-#loadIndicator {
-    color: black;
 }

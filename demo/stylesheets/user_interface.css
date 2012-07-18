@@ -12,7 +12,7 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
-#view, #coordinateControlsCanvas, #backgroundImage, #status, #info {
+.user.interface .view, .user.interface img.background {
     -moz-user-select: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -20,21 +20,7 @@
     cursor: default;
 }
 
-input {
-    cursor: text;
-}
-
-:focus {
-    outline: none;
-    -moz-outline: none;
-    -moz-outline-style: none;
-}
-
-button::-moz-focus-inner {
-    border: 0;
-}
-
-#loadIndicator {
+.user.interface .loadIndicator {
     position: absolute;
     top: 0;
     left: 0;
@@ -44,151 +30,144 @@ button::-moz-focus-inner {
     z-index: 1;
 }
 
-#loadIndicator img {
+.user.interface .loadIndicator img {
     display: block;
     position: absolute;
     top: 224px;
     left: 304px;
 }
 
-#errorMessage {
-    position: relative;
-    margin: 0 auto;
-    text-align: left;
-    width: 240px;
-}
-
-#backgroundImage {
+.user.interface img.background {
     position: absolute;
     left: 0;
     top: 0;
     background-color: #808080;
 }
 
-#userInterface {
-    float: left;
-    text-align: left;
-    margin: 10px;
-}
-
-#view {
+.user.interface .view {
     position: relative;
     width: 640px;
     height: 480px;
 }
 
-#controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 
-#incZButton, #decZButton, #rotate90Button, #requestMakeRealButton {
+.user.interface .controlPanel, .user.interface .button {
     position: absolute;
     background-image: url(../images/control_panel.png);
 }
 
-#controlPanel {
+.user.interface .controlPanel {
     bottom: 10px;
     left: 145px;
     width: 350px;
     height: 110px;
 }
 
-#controlPanel.disabled {
+.user.interface .controlPanel.disabled {
     background-position: 0px -120px;
 }
 
-#incXButton, #decXButton, #incYButton, #decYButton {
+.user.interface .incX.button, .user.interface .decX.button,
+.user.interface .incY.button, .user.interface .decY.button {
     width: 50px;
     height: 29px;
 }
 
-#incXButton {
+.user.interface .incX.button {
     top: 57px;
     left: 174px;
     background-position: -170px -290px;
 }
 
-#incXButton:hover {
+.user.interface .incX.button:hover {
     background-position: -170px -390px;
 }
 
-#incXButton.disabled, #incXButton.disabled:hover {
+.user.interface .incX.button.disbled,
+.user.interface .incX.button.disbled:hover {
     background-position: -170px -490px;
 }
 
-#decXButton {
+.user.interface .decX.button {
     top: 24px;
     left: 77px;
     background-position: -50px -240px;
 }
 
-#decXButton:hover {
+.user.interface .decX.button:hover {
     background-position: -50px -340px;
 }
 
-#decXButton.disabled, #decXButton.disabled:hover {
+.user.interface .decX.button.disabled,
+.user.interface .decX.button.disabled:hover {
     background-position: -50px -440px;
 }
 
-#incYButton {
+.user.interface .incY.button {
     top: 12px;
     left: 154px;
     background-position: -170px -240px;
 }
 
-#incYButton:hover {
+.user.interface .incY.button:hover {
     background-position: -170px -340px;
 }
 
-#incYButton.disabled, #incYButton.disabled:hover {
+.user.interface .incY.button.disabled,
+.user.interface .incY.button.disabled:hover {
     background-position: -170px -440px;
 }
 
-#decYButton {
+.user.interface .decY.button {
     top: 68px;
     left: 96px;
     background-position: -50px -290px;
 }
 
-#decYButton:hover {
+.user.interface .decY.button:hover {
     background-position: -50px -390px;
 }
 
-#decYButton.disabled, #decYButton.disabled:hover {
+.user.interface .decY.button.disabled,
+.user.interface .decY.button.disabled:hover {
     background-position: -50px -490px;
 }
 
-#incZButton, #decZButton {
+.user.interface .incZ.button, .user.interface .decZ.button {
     width: 40px;
     height: 40px;
 }
 
-#incZButton {
+.user.interface .incZ.button {
     top: 10px;
     left: 10px;
     background-position: 0 -240px;
 }
 
-#incZButton:hover {
+.user.interface .incZ.button:hover {
     background-position: 0 -340px;
 }
 
-#incZButton.disabled, #incZButton.disabled:hover {
+.user.interface .incZ.button.disabled,
+.user.interface .incZ.button.disabled:hover {
     background-position: 0 -440px;
 }
 
-#decZButton {
+.user.interface .decZ.button {
     top: 60px;
     left: 10px;
     background-position: 0 -290px;
 }
 
-#decZButton:hover {
+.user.interface .decZ.button:hover {
     background-position: 0 -390px;
 }
 
-#decZButton.disabled, #decZButton.disabled:hover {
+.user.interface .decZ.button.disabled,
+.user.interface .decZ.button.disabled:hover {
     background-position: 0 -490px;
 }
 
-#rotate90Button {
+.user.interface .rotate90.button {
     top: 40px;
     left: 125px;
     width: 49px;
@@ -196,15 +175,16 @@ button::-moz-focus-inner {
     background-position: -110px -240px;
 }
 
-#rotate90Button:hover {
+.user.interface .rotate90.button:hover {
     background-position: -110px -340px;
 }
 
-#rotate90Button.disabled, #rotate90Button.disabled:hover {
+.user.interface .rotate90.button.disabled,
+.user.interface .rotate90.button.disabled:hover {
     background-position: -110px -440px;
 }
 
-#requestMakeRealButton {
+.user.interface .requestMakeReal.button {
     top: 10px;
     left: 250px;
     width: 90px;
@@ -212,18 +192,11 @@ button::-moz-focus-inner {
     background-position: -230px -240px;
 }
 
-#requestMakeRealButton:hover {
+.user.interface .requestMakeReal.button:hover {
     background-position: -230px -340px;
 }
 
-#requestMakeRealButton.disabled, #requestMakeRealButton.disabled:hover {
+.user.interface .requestMakeReal.button.disabled,
+.user.interface .requestMakeReal.button.disabled:hover {
     background-position: -230px -440px;
-}
-
-#infoMessage {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    color: white;
-    display: block;
 }
