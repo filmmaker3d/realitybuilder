@@ -30,7 +30,6 @@ button {
 }
 
 #sideBar {
-    min-width: 310px;
     padding: 10px 10px 0 0;
     text-align: left;
 }
@@ -113,18 +112,6 @@ table#blocksTable th.number, table#blocksTable td.number {
 
 table#blocksTable td select {
     width: 7.5em;
-}
-
-#bottomBar {
-    clear: both;
-    float: left;
-    margin: 0 10px;
-    text-align: left;
-    width: 640px;
-}
-
-#logoutButton {
-    float: right;
 }
 
 #toggleRealButton, #togglePendingButton {

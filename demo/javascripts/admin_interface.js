@@ -1,4 +1,4 @@
-// For the admin page.
+// Admin interface to the Reality Builder.
 
 // Copyright 2010-2012 Felix E. Klee <felix.klee@inka.de>
 //
@@ -16,12 +16,10 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global realityBuilderDemo, realityBuilder, $ */
+/*global realityBuilder, $, realityBuilderSimPosesBList */
 
-var realityBuilderAdminDemo = (function () {
+var realityBuilderAI = (function () {
     'use strict';
-
-    var logoutUrl;
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible,
                                           setVisibility) {
@@ -55,17 +53,6 @@ var realityBuilderAdminDemo = (function () {
         blocksAreVisible = realityBuilder.pendingBlocksAreVisible();
         updateBlocksVisibilityButton('pending', 'Pending',
                                      blocksAreVisible, setVisibility);
-    }
-
-    // Logs the administrator out, sending him back to the login screen.
-    function logout() {
-        if (typeof logoutUrl !== 'undefined') {
-            location.href = logoutUrl;
-        }
-    }
-
-    function setUpLogoutButton() {
-        $('#logoutButton').click(logout);
     }
 
     // Returns data read entered using the camera controls.
@@ -116,6 +103,17 @@ var realityBuilderAdminDemo = (function () {
         $('#cameraAZTextField').val(camera.aZ());
         $('#cameraFlTextField').val(camera.fl());
         $('#cameraSensorResolutionTextField').val(camera.sensorResolution());
+    }
+
+    // Resets the construction to the blocks matching the first prerendered
+    // block configuration.
+    function resetBlocks() {
+        var simPosesB = realityBuilderSimPosesBList[0];
+        realityBuilder.constructionBlocks().replaceBlocksOnServer(simPosesB);
+    }
+
+    function setUpResetBlocksButton() {
+        $('.admin.interface .resetBlocks.button').click(resetBlocks);
     }
 
     function updatePosAndADisplay() {
@@ -241,7 +239,6 @@ var realityBuilderAdminDemo = (function () {
     }
 
     function onReady() {
-        setUpLogoutButton();
         setUpSaveSettingsButton();
         setUpPreviewCameraButton();
         updateCameraControls();
@@ -252,44 +249,23 @@ var realityBuilderAdminDemo = (function () {
 
         updatePendingBlocksVisibilityButton();
         updatePosAndADisplay();
+
+        setUpResetBlocksButton();
     }
 
     return {
-        setLogoutUrl: function (x) {
-            logoutUrl = x;
-        },
+        onReady: onReady,
 
-        settings: function () {
-            var settings;
+        onJsonpError: onJsonpError,
 
-            settings = realityBuilderDemo.settings();
+        onRealBlocksVisibilityChanged: updateRealBlocksVisibilityButton,
 
-            return $.extend({}, settings, {
-                onReady: function () {
-                    settings.onReady();
-                    onReady();
-                },
-                jsonpTimeout: 20000,
-                onJsonpError: onJsonpError,
-                onRealBlocksVisibilityChanged:
-                    updateRealBlocksVisibilityButton,
-                onPendingBlocksVisibilityChanged:
-                    updatePendingBlocksVisibilityButton,
-                onCameraChanged: updateCameraControls,
-                onConstructionBlocksChanged: function () {
-                    settings.onConstructionBlocksChanged();
-                    updateBlocksTable();
-                },
-                onMovedOrRotated: updatePosAndADisplay
-            });
-        }
+        onPendingBlocksVisibilityChanged: updatePendingBlocksVisibilityButton,
+
+        onCameraChanged: updateCameraControls,
+
+        onConstructionBlocksChanged: updateBlocksTable,
+
+        onMovedOrRotated: updatePosAndADisplay
     };
 }());
-
-$(function () {
-    'use strict';
-
-    var settings = realityBuilderAdminDemo.settings();
-
-    realityBuilder.initialize(settings);
-});

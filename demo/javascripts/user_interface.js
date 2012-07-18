@@ -1,4 +1,4 @@
-// For all pages.
+// User interface to the Reality Builder.
 
 // Copyright 2011-2012 Felix E. Klee <felix.klee@inka.de>
 //
@@ -16,10 +16,9 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realityBuilderDemo, realityBuilder, $, _,
-  realityBuilderSimPosesBList */
+/*global realityBuilder, $, _, realityBuilderSimPosesBList */
 
-var realityBuilderDemo = (function () {
+var realityBuilderUI = (function () {
     'use strict';
 
     var coordinateButtonDeltaBs = {
@@ -33,7 +32,6 @@ var realityBuilderDemo = (function () {
         backgroundImageIsLoaded = false, // initially only a placeholder is
                                          // loaded
         realityBuilderIsReady = false,
-        realityBuilderVersion,
         prerenderedSrtSimPosesBList;
 
     function forEachCoordinateButton(f) {
@@ -197,30 +195,12 @@ var realityBuilderDemo = (function () {
         });
     }
 
-    // Resets the construction to the blocks matching the first prerendered
-    // block configuration.
-    function reset() {
-        var simPosesB = prerenderedSrtSimPosesBList()[0];
-        realityBuilder.constructionBlocks().replaceBlocksOnServer(simPosesB);
-    }
-
-    function onKeyPressed(event) {
-        if (event.which === 114) {
-            reset();
-        }
-    }
-
-    function setUpHandlingOfKeyPresses() {
-        $(document.documentElement).keypress(onKeyPressed);
-    }
-
     // Called when the Reality Builder is ready. Note that the background image
     // is separate and may still be in the process of being loaded.
     function onReady() {
         forEachCoordinateButton(setUpCoordinateButton);
         setUpRotate90Button();
         setUpRequestMakeRealButton();
-        setUpHandlingOfKeyPresses();
 
         realityBuilderIsReady = true;
 
@@ -228,21 +208,14 @@ var realityBuilderDemo = (function () {
     }
 
     return {
-        setRealityBuilderVersion: function (x) {
-            realityBuilderVersion = x;
-        },
+        onReady: onReady,
 
-        settings: function () {
-            return {
-                width: 640,
-                height: 480,
-                namespace: 'demo',
-                onReady: onReady,
-                onBrowserNotSupportedError: onBrowserNotSupportedError,
-                onConstructionBlocksChanged: onConstructionBlocksChanged,
-                onDegreesOfFreedomChanged: onDegreesOfFreedomChanged,
-                onServerError: onServerError
-            };
-        }
+        onBrowserNotSupportedError: onBrowserNotSupportedError,
+
+        onConstructionBlocksChanged: onConstructionBlocksChanged,
+
+        onDegreesOfFreedomChanged: onDegreesOfFreedomChanged,
+
+        onServerError: onServerError
     };
 }());

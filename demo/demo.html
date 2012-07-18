@@ -49,10 +49,6 @@
         <div id="requestMakeRealButton"></div>
       </div>
 
-      <div id="infoMessage">
-        Press <strong>R</strong> to reset.
-      </div>
-
       <div id="loadIndicator">
         <img src="images/load_indicator.gif" alt="Loading...">
       </div>
@@ -61,8 +57,95 @@
 
   <div class="admin interface">
     <h2>Admin Interface</h2>
-    <p>This interface may normally be on a separate page, password
-    protected.</p>
+
+    <p>
+      This interface is normally not visible to the end user. Instead it may be
+      located on a separate page, password protected.
+    </p>
+
+    <h3>New Block Pose</h3>
+
+    <p class="newBlockPose">
+      x&nbsp;=&nbsp;<span class="xB">0</span>,
+      y&nbsp;=&nbsp;<span class="yB">0</span>,
+      z&nbsp;=&nbsp;<span class="zB">0</span>,
+      a&nbsp;=&nbsp;<span class="a">0</span>
+    </p>
+    
+    <h3>Settings</h3>
+
+    <fieldset class="camera settings">
+      <legend>Camera</legend>
+      <ul>
+        <li class="firstSet">
+          <ul>
+            <li>
+              <input type="text" id="cameraXTextField">
+              <label for="cameraXTextField">mm = x</label>
+            </li>
+            <li>
+              <input type="text" id="cameraYTextField">
+              <label for="cameraYTextField">mm = y</label>
+            </li>
+            <li>
+              <input type="text" id="cameraZTextField">
+              <label for="cameraZTextField">mm = z</label>
+            </li>
+            <li>
+              <input type="text" id="cameraFlTextField">
+              <label for="cameraFlTextField">mm = Focal Length</label>
+            </li>
+          </ul>
+        </li>
+        <li class="secondSet">
+          <ul>
+            <li>
+              <input type="text" id="cameraAXTextField">
+              <label for="cameraAXTextField">rad = x Rot.</label>
+            </li>
+            <li>
+              <input type="text" id="cameraAYTextField">
+              <label for="cameraAYTextField">rad = y Rot.</label>
+            </li>
+            <li>
+              <input type="text" id="cameraAZTextField">
+              <label for="cameraAZTextField">rad = z Rot.</label>
+            </li>
+            <li>
+              <input type="text" id="cameraSensorResolutionTextField">
+              <label for="cameraSensorResolutionTextField">px/mm = Sensor 
+                Resol.</label>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </fieldset>
+
+    <button type="button" class="saveSettings button">Save Settings</button>
+    <button type="button" class="previewCamera button">Preview Camera</button>
+
+    <h3>Blocks</h3>
+
+    <div class="scrollPane">
+      <table class="blocks">
+        <thead>
+          <tr>
+            <th class="number">x</th>
+            <th class="number">y</th>
+            <th class="number">z</th>
+            <th class="number">a</th>
+            <th>Created</th>
+            <th>State</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+    <button type="button" class="realBlocksVisibility button"></button>
+    <button type="button" class="pendingBlocksVisibility button"></button>
+    <button type="button" class="resetBlocks button">Reset Blocks</button>
   </div>
 
   <!-- adds support for canvas tag to IE<9: -->
@@ -75,6 +158,7 @@
   <script src="vendor/underscore-min.js"></script>
   <script src="http://localhost:8080/realitybuilder.js"></script>
   <script src="javascripts/prerendered.js"></script>
-  <script src="javascripts/base.js"></script>
-  <script src="javascripts/index.js"></script>
+  <script src="javascripts/user_interface.js"></script>
+  <script src="javascripts/admin_interface.js"></script>
+  <script src="javascripts/demo.js"></script>
 </body>

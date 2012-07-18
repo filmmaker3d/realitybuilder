@@ -26,13 +26,13 @@ body {
     margin: 14px;
 }
 
-h1, h2, p, li {
-    line-height: 14px;
+h1, h2, h3, p, li {
+    line-height: 1.2em;
     margin-bottom: 7px;
-    width: 600px;
+    max-width: 600px;
 }
 
-h1, h2 {
+h1, h2, h3 {
     margin-top: 14px;
     font-weight: bold;
 }
@@ -43,6 +43,10 @@ h1 {
 
 h2 {
     font-size: 14px;
+}
+
+h3 {
+    font-size: 12px;
 }
 
 ol {
