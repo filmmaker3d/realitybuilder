@@ -12,10 +12,6 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
-html, body {
-    background: white;
-}
-
 button, input, select {
     font-size: 10px;
 }
@@ -25,13 +21,8 @@ button {
     padding: 0 3px;
 }
 
-table#contentContainer td {
-    vertical-align: top;
-}
-
-#view {
-    float: left;
-    margin: 10px;
+#adminInterface {
+    border: 1px solid black;
 }
 
 #imageSettings button {

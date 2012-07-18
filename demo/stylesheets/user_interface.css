@@ -12,18 +12,7 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
-* {
-    margin: 0;
-    padding: 0;
-    border-collapse: collapse;
-    border-spacing: 0;
-}
-
-strong {
-    font-weight: bold;
-}
-
-body, html, #view, #coordinateControlsCanvas, #backgroundImage, 
+body, html, #userInterface, #coordinateControlsCanvas, #backgroundImage, 
 #status, #info {
     -moz-user-select: none;
     -webkit-user-select: none;
@@ -34,37 +23,6 @@ body, html, #view, #coordinateControlsCanvas, #backgroundImage,
 
 input {
     cursor: text;
-}
-
-html, body {
-    height: 100%;
-}
-
-body {
-    font-size: 12px;
-    font-family: Helvetica, Arial, Verdana, sans-serif;
-}
-
-h1 {
-    text-align: left;
-    font-size: 16px;
-}
-
-a, a:link, a:visited, a:hover, a:active, a:focus {
-    text-decoration: none;
-    -moz-outline-style: none;
-    border-bottom: 1px dotted;
-}
-
-a, a:link, a:visited, a:active, a:focus {
-    color: white;
-}
-
-/* ":focus" is not highlighted, since otherwise, when hitting the back button
-with Opera 11, the lastly clicked link is always highlighted, which looks
-strange. */
-a:hover {
-    color: red;
 }
 
 :focus {
@@ -114,12 +72,13 @@ p {
     background-color: #808080;
 }
 
-#view {
+#userInterface {
     position: relative;
-    margin: 0 auto;
+    float: left;
     text-align: left;
     width: 640px;
     height: 480px;
+    margin: 10px;
 }
 
 #controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 
@@ -271,13 +230,4 @@ p {
     left: 10px;
     color: white;
     display: block;
-}
-
-/* Disabled, for two reasons:
-
-* Takes up space also in release mode, in IE8 and Opera 11.50.
-
-* Is not needed with modern browsers. */
-#firebugLite {
-    display: none;
 }

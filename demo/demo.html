@@ -1,0 +1,73 @@
+<!-- Copyright 2010-2012 Felix E. Klee <felix.klee@inka.de>
+  
+     Licensed under the Apache License, Version 2.0 (the "License"); you may
+     not use this file except in compliance with the License. You may obtain a
+     copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+     WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+     License for the specific language governing permissions and limitations
+     under the License. -->
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Reality Builder Demo Interface</title>        
+  <link rel="stylesheet" href="stylesheets/reset.css">
+  <link rel="stylesheet" href="stylesheets/common.css">
+  <link rel="stylesheet" href="stylesheets/user_interface.css">
+  <link rel="stylesheet" href="stylesheets/admin_interface.css">
+</head>
+
+<body>
+  <h1>Reality Builder Demo</h1>
+  <div id="userInterface">
+    <h2>User Interface</h2>
+    <img id="backgroundImage" src="images/placeholder.gif" 
+         alt="Background Image">
+    <div id="realityBuilder"></div>
+    <div id="controlPanel">
+      <div id="incXButton"></div>
+      <div id="decXButton"></div>
+      <div id="incYButton"></div>
+      <div id="decYButton"></div>
+      <div id="incZButton"></div>
+      <div id="decZButton"></div>
+      <div id="rotate90Button"></div>
+      <div id="requestMakeRealButton"></div>
+    </div>
+
+    <div id="infoMessage">
+      Press <strong>R</strong> to reset.
+    </div>
+
+    <div id="loadIndicator">
+      <img src="images/load_indicator.gif" alt="Loading...">
+    </div>
+  </div>
+
+  <div id="adminInterface">
+    <h2>Admin Interface</h2>
+    <p>This interface may normally be on a separate page, password
+    protected.</p>
+  </div>
+
+  <!-- adds support for canvas tag to IE<9: -->
+  <!--[if lt IE 9]>
+    <script src="vendor/swfobject.js"></script>
+    <script src="../separate/FlashCanvasPro/bin/flashcanvas.js"></script>
+  <![endif]-->
+
+  <script src="vendor/jquery-1.6.2.min.js"></script>
+  <script src="vendor/underscore-min.js"></script>
+  <script src="http://localhost:8080/realitybuilder.js"></script>
+  <script src="javascripts/prerendered.js"></script>
+  <script src="javascripts/base.js"></script>
+  <script src="javascripts/index.js"></script>
+</body>

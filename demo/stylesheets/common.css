@@ -12,6 +12,43 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
-#content {
-    position: relative; /* to make hidden overflow work. */
+strong {
+    font-weight: bold;
+}
+
+body {
+    font-size: 12px;
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 14px;
+    width: 600px;
+}
+
+h1, h2, p, li {
+    line-height: 14px;
+    margin-bottom: 7px;
+}
+
+h1, h2 {
+    margin-top: 14px;
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 18px;
+}
+
+h2 {
+    font-size: 14px;
+}
+
+ol {
+    list-style: decimal outside;
+}
+
+ul {
+    list-style: square;
+}
+
+li {
+    margin-left: 20px;
 }

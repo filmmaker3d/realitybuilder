@@ -18,41 +18,77 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Reality Builder</title>        
+  <title>Reality Builder Demo: Instructions</title>        
   <link rel="stylesheet" href="stylesheets/reset.css">
-  <link rel="stylesheet" href="stylesheets/base.css">
-  <link rel="stylesheet" href="stylesheets/index.css">
+  <link rel="stylesheet" href="stylesheets/common.css">
 </head>
 
 <body>
-  <div id="view">
-    <img id="backgroundImage" src="images/placeholder.gif" 
-         alt="Background Image">
-    <div id="realityBuilder"></div>
-    <div id="controlPanel">
-      <div id="incXButton"></div>
-      <div id="decXButton"></div>
-      <div id="incYButton"></div>
-      <div id="decYButton"></div>
-      <div id="incZButton"></div>
-      <div id="decZButton"></div>
-      <div id="rotate90Button"></div>
-      <div id="requestMakeRealButton"></div>
-    </div>
+  <h1>Reality Builder Demo: Instructions</h1>
 
-    <div id="infoMessage">
-      Press <strong>R</strong> to reset.
-    </div>
+  <h2>Steps</h2>
 
-    <div id="loadIndicator">
-      <img src="images/load_indicator.gif" alt="Loading...">
-    </div>
-  </div>
+  <ol>
+    <li>Start hosting of the Reality Builder widget.</li>
 
-  <script src="vendor/jquery-1.6.2.min.js"></script>
-  <script src="vendor/underscore-min.js"></script>
-  <script src="http://localhost:8080/realitybuilder.js"></script>
-  <script src="javascripts/prerendered.js"></script>
-  <script src="javascripts/base.js"></script>
-  <script src="javascripts/index.js"></script>
+    <li>Initialize the database with demo data.</li>
+
+    <li>Play with the demo interface:
+      <p>
+        <form action="demo.html">
+          <label for="host">Reality Builder host from step 1:</label>
+          <input type="text" id="host" name="host"
+                 value="localhost:8080"></input>
+          <input type="submit" value="Run"></input>
+        </form>
+      </p>
+      <p>
+        Note about the administration controls: The date-time is shown in the
+        time zone of the system/browser.
+      </p>
+    </li>
+  </ol>
+
+  <h2>Supported Browsers</h2>
+
+  <p>
+    Tested with (in default configurations; versions current as of release of
+    this Reality Builder version):
+  </p>
+
+  <ul>
+    <li>
+      Google Chrome
+    </li>
+    <li>
+      Firefox
+    </li>
+    <li>
+      Opera
+    </li>
+    <li>
+      Internet Explorer 8: see below
+    </li>
+    <li>
+      Internet Explorer 9
+    </li>
+  </ul>
+
+  <h2>Internet Explorer 8 Support</h2>
+
+  <p>
+    To make the demo work with Internet Explorer 8, FlashCanvas Pro is
+    required. For reasons of license, this library is not included in the
+    source code distribution. If desired, install it as follows:
+  </p>
+
+  <ol>
+    <li>
+      Download <a href="http://flashcanvas.net/">FlashCanvas Pro 1.5 or
+      compatible</a>.
+    </li>
+    <li>
+      Place FlashCanvas Pro into: ../separate/FlashCanvasPro
+    </li>
+  </ol>
 </body>
