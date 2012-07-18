@@ -12,6 +12,10 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
+.admin.interface {
+    max-width: 300px;
+}
+
 .admin.interface button, input, select {
     font-size: 10px;
 }
@@ -50,7 +54,6 @@
 .admin.interface .scrollPane {
     overflow: auto;
     height: 195px;
-    padding: 7px;
     padding-right: 20px; /* for the scroll bar */
     border: 1px solid gray;
     margin-bottom: 7px;
@@ -61,7 +64,7 @@
 }
 
 .admin.interface table.blocks th, .admin.interface table.blocks td {
-    padding: 0 5px;
+    padding: 2px 5px;
 }
 
 .admin.interface table.blocks th {
@@ -77,10 +80,6 @@
 .admin.interface table.blocks th.number,
 .admin.interface table.blocks td.number {
     text-align: right;
-}
-
-.admin.interface table.blocks td select {
-    width: 7.5em;
 }
 
 .admin.interface button.toggleReal,

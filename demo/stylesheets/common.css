@@ -29,7 +29,7 @@ body {
 h1, h2, h3, p, li {
     line-height: 1.2em;
     margin-bottom: 7px;
-    max-width: 600px;
+    max-width: 60em;
 }
 
 h1, h2, h3 {

@@ -23,7 +23,7 @@ var realityBuilderAI = (function () {
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible,
                                           setVisibility) {
-        var node = $('#' + type + 'BlocksVisibilityButton');
+        var node = $('.admin.interface button.' + type + 'BlocksVisibility');
 
         node.
             text((blocksAreVisible ? "Hide" : "Show") + " " + text +
@@ -72,7 +72,7 @@ var realityBuilderAI = (function () {
     }
 
     function setUpSaveSettingsButton() {
-        $('#saveSettingsButton').click(function () {
+        $('.admin.interface .button.saveSettings').click(function () {
             var cameraData = cameraDataFromControls();
 
             realityBuilder.storeSettingsOnServer({cameraData: cameraData});
@@ -86,7 +86,7 @@ var realityBuilderAI = (function () {
     }
 
     function setUpPreviewCameraButton() {
-        $('#previewCameraButton').click(updateCamera);
+        $('.admin.interface button.previewCamera').click(updateCamera);
     }
 
     // Updates controls defining the camera "camera".
@@ -113,16 +113,16 @@ var realityBuilderAI = (function () {
     }
 
     function setUpResetBlocksButton() {
-        $('.admin.interface .resetBlocks.button').click(resetBlocks);
+        $('.admin.interface button.resetBlocks').click(resetBlocks);
     }
 
     function updatePosAndADisplay() {
         var newBlock = realityBuilder.newBlock();
 
-        $('#newBlockXB').text(newBlock.xB());
-        $('#newBlockYB').text(newBlock.yB());
-        $('#newBlockZB').text(newBlock.zB());
-        $('#newBlockA').text(newBlock.a());
+        $('.admin.interface .newBlockPose .xB').text(newBlock.xB());
+        $('.admin.interface .newBlockPose .yB').text(newBlock.yB());
+        $('.admin.interface .newBlockPose .zB').text(newBlock.zB());
+        $('.admin.interface .newBlockPose .a').text(newBlock.a());
     }
 
     // Sorting function for sorting blocks for display in the table.
@@ -226,7 +226,7 @@ var realityBuilderAI = (function () {
 
     // Refreshes the table displaying the list of blocks.
     function updateBlocksTable() {
-        var node = $('#blocksTable tbody');
+        var node = $('.admin.interface table.blocks tbody');
 
         node.empty();
         $.each(blocksSortedForTable(), function (i, block) {
@@ -243,8 +243,8 @@ var realityBuilderAI = (function () {
         setUpPreviewCameraButton();
         updateCameraControls();
 
-        realityBuilder.setRealBlocksVisibility(true);
-        realityBuilder.setPendingBlocksVisibility(true);
+        realityBuilder.setRealBlocksVisibility(false);
+        realityBuilder.setPendingBlocksVisibility(false);
         updateRealBlocksVisibilityButton();
 
         updatePendingBlocksVisibilityButton();
