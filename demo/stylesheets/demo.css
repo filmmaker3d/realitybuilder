@@ -12,53 +12,20 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
-strong {
-    font-weight: bold;
+.interface {
+    float: left;
+    border: 1px solid black;
+    padding: 8px;
 }
 
-em {
-    font-style: italic;
+.user.interface {
+    margin: 0 14px 14px 0;
 }
 
-body {
-    font-size: 12px;
-    font-family: Helvetica, Arial, sans-serif;
-    margin: 14px;
-}
-
-h1, h2, p, li {
-    line-height: 14px;
-    margin-bottom: 7px;
-    width: 600px;
-}
-
-h1, h2 {
-    margin-top: 14px;
-    font-weight: bold;
+.interface h2 {
+    margin-top: 0;
 }
 
 h1 {
-    font-size: 18px;
-}
-
-h2 {
-    font-size: 14px;
-}
-
-ol {
-    list-style: decimal outside;
-}
-
-ul {
-    list-style: square;
-}
-
-li {
-    margin-left: 20px;
-}
-
-fieldset {
-    margin: 7px 0;
-    border: ridge;
-    padding: 7px;
+    margin-bottom: 14px;
 }

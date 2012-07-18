@@ -29,19 +29,44 @@
   <h2>Steps</h2>
 
   <ol>
-    <li>Start hosting of the Reality Builder widget.</li>
+    <li>
+      If necessary, set up a MongoDB database.
+    </li>
 
-    <li>Initialize the database with demo data.</li>
+    <li>
+      Set MongoDB database connection in Reality Builder configuration. Perhaps
+      use an environment variable for that.
+    </li>
 
-    <li>Play with the demo interface:
-      <p>
-        <form action="demo.html">
-          <label for="host">Reality Builder host from step 1:</label>
+    <li>
+      Start serving Reality Builder widget.
+    </li>
+
+    <li>
+      Initialize the database with demo data:
+      <form action="initialize_db.html">
+        <fieldset>
+          <label for="dbHost">Database <em>host:port</em> (see step 1):</label>
+          <input type="text" id="dbHost" name="dbHost"
+                 value="something:3000"></input><br>
+          <label for="dbName">Database <em>name</em>:</label>
+          <input type="text" id="dbName" name="dbName"
+                 value="demo_database"></input><br>
+          <input type="submit" value="Initialize"></input>
+        </fieldset>
+      </form>
+    </li>
+
+    <li>
+      Run the demo:
+      <form action="demo.html">
+        <fieldset>
+          <label for="host">Widget's <em>host:port</em> (see step 3):</label>
           <input type="text" id="host" name="host"
-                 value="localhost:8080"></input>
+                 value="localhost:8080"></input><br>
           <input type="submit" value="Run"></input>
-        </form>
-      </p>
+        </fieldset>
+      </form>
       <p>
         Note about the administration controls: The date-time is shown in the
         time zone of the system/browser.
@@ -67,14 +92,14 @@
       Opera
     </li>
     <li>
-      Internet Explorer 8: see below
+      Internet Explorer 8: <a href="#ie8">see below</a>
     </li>
     <li>
       Internet Explorer 9
     </li>
   </ul>
 
-  <h2>Internet Explorer 8 Support</h2>
+  <h2><a name="ie8">Internet Explorer 8 Support</a></h2>
 
   <p>
     To make the demo work with Internet Explorer 8, FlashCanvas Pro is

@@ -21,10 +21,6 @@ button {
     padding: 0 3px;
 }
 
-#adminInterface {
-    border: 1px solid black;
-}
-
 #imageSettings button {
     width: 62px;
 }

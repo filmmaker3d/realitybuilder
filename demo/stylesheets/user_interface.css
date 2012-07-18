@@ -12,8 +12,7 @@
   License for the specific language governing permissions and limitations under
   the License. */
 
-body, html, #userInterface, #coordinateControlsCanvas, #backgroundImage, 
-#status, #info {
+#view, #coordinateControlsCanvas, #backgroundImage, #status, #info {
     -moz-user-select: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -33,12 +32,6 @@ input {
 
 button::-moz-focus-inner {
     border: 0;
-}
-
-p {
-    margin-top: 1em;
-    text-align: left;
-    color: white;
 }
 
 #loadIndicator {
@@ -73,12 +66,15 @@ p {
 }
 
 #userInterface {
-    position: relative;
     float: left;
     text-align: left;
+    margin: 10px;
+}
+
+#view {
+    position: relative;
     width: 640px;
     height: 480px;
-    margin: 10px;
 }
 
 #controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 

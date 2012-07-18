@@ -21,38 +21,45 @@
   <title>Reality Builder Demo Interface</title>        
   <link rel="stylesheet" href="stylesheets/reset.css">
   <link rel="stylesheet" href="stylesheets/common.css">
+  <link rel="stylesheet" href="stylesheets/demo.css">
   <link rel="stylesheet" href="stylesheets/user_interface.css">
   <link rel="stylesheet" href="stylesheets/admin_interface.css">
 </head>
 
 <body>
+  <p>
+    <a href="index.html">↑ Instructions</a>
+  </p>
+
   <h1>Reality Builder Demo</h1>
-  <div id="userInterface">
+  <div class="user interface">
     <h2>User Interface</h2>
-    <img id="backgroundImage" src="images/placeholder.gif" 
-         alt="Background Image">
-    <div id="realityBuilder"></div>
-    <div id="controlPanel">
-      <div id="incXButton"></div>
-      <div id="decXButton"></div>
-      <div id="incYButton"></div>
-      <div id="decYButton"></div>
-      <div id="incZButton"></div>
-      <div id="decZButton"></div>
-      <div id="rotate90Button"></div>
-      <div id="requestMakeRealButton"></div>
-    </div>
+    <div id="view">
+      <img id="backgroundImage" src="images/placeholder.gif" 
+           alt="Background Image">
+      <div id="realityBuilder"></div>
+      <div id="controlPanel">
+        <div id="incXButton"></div>
+        <div id="decXButton"></div>
+        <div id="incYButton"></div>
+        <div id="decYButton"></div>
+        <div id="incZButton"></div>
+        <div id="decZButton"></div>
+        <div id="rotate90Button"></div>
+        <div id="requestMakeRealButton"></div>
+      </div>
 
-    <div id="infoMessage">
-      Press <strong>R</strong> to reset.
-    </div>
+      <div id="infoMessage">
+        Press <strong>R</strong> to reset.
+      </div>
 
-    <div id="loadIndicator">
-      <img src="images/load_indicator.gif" alt="Loading...">
+      <div id="loadIndicator">
+        <img src="images/load_indicator.gif" alt="Loading...">
+      </div>
     </div>
   </div>
 
-  <div id="adminInterface">
+  <div class="admin interface">
     <h2>Admin Interface</h2>
     <p>This interface may normally be on a separate page, password
     protected.</p>
