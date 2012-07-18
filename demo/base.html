@@ -42,39 +42,6 @@
   <table id="contentContainer">
     <tr>
       <td>
-        <div id="errorMessage">
-          <noscript>
-            <p>The Reality Builder does not work because your browser does not
-              support
-              <a href="http://developer.mozilla.org/en/JavaScript/About_JavaScript"
-                 >JavaScript</a>, or because JavaScript is disabled.</p>
-          </noscript>
-        </div>
-
-        <div id="view">
-          <img id="backgroundImage" src="/demo/images/placeholder.gif" 
-               alt="Background Image">
-          <div id="realityBuilder"></div>
-          <div id="controlPanel">
-            <div id="incXButton"></div>
-            <div id="decXButton"></div>
-            <div id="incYButton"></div>
-            <div id="decYButton"></div>
-            <div id="incZButton"></div>
-            <div id="decZButton"></div>
-            <div id="rotate90Button"></div>
-            <div id="requestMakeRealButton"></div>
-          </div>
-
-          <div id="infoMessage">
-            Press <strong>R</strong> to reset.
-          </div>
-
-          <div id="loadIndicator">
-            <img src="/demo/images/load_indicator.gif" alt="Loading...">
-          </div>
-        </div>
-
         {# For admin mode. #}
         {% block sideBar %}{% endblock %}
         {% block bottomBar %}{% endblock %}

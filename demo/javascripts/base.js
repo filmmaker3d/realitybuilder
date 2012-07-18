@@ -22,8 +22,7 @@
 var realityBuilderDemo = (function () {
     'use strict';
 
-    var publicInterface,
-        coordinateButtonDeltaBs = {
+    var coordinateButtonDeltaBs = {
             'incX': [1, 0, 0],
             'decX': [-1, 0, 0],
             'incY': [0, 1, 0],
@@ -93,7 +92,7 @@ var realityBuilderDemo = (function () {
 
         if (index !== false) {
             $('#backgroundImage').attr('src',
-                                       '/demo/images/prerendered_' + index +
+                                       'images/prerendered_' + index +
                                        '.jpg');
 
             if (!backgroundImageIsLoaded) {
@@ -228,7 +227,7 @@ var realityBuilderDemo = (function () {
         unhideViewIfAllReady();
     }
 
-    publicInterface = {
+    return {
         setRealityBuilderVersion: function (x) {
             realityBuilderVersion = x;
         },
@@ -237,7 +236,7 @@ var realityBuilderDemo = (function () {
             return {
                 width: 640,
                 height: 480,
-                namespace: realityBuilderVersion + '_demo',
+                namespace: 'demo',
                 onReady: onReady,
                 onBrowserNotSupportedError: onBrowserNotSupportedError,
                 onConstructionBlocksChanged: onConstructionBlocksChanged,
@@ -246,6 +245,4 @@ var realityBuilderDemo = (function () {
             };
         }
     };
-
-    return publicInterface;
 }());

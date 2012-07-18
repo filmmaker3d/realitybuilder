@@ -50,18 +50,6 @@ h1 {
     font-size: 16px;
 }
 
-table#contentContainer {
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-}
-
-table#contentContainer td {
-    width: 100%;
-    height: 100%;
-}
-
 a, a:link, a:visited, a:hover, a:active, a:focus {
     text-decoration: none;
     -moz-outline-style: none;
@@ -126,31 +114,12 @@ p {
     background-color: #808080;
 }
 
-table#contentContainer {
-    position: absolute;
-}
-
-table#contentContainer td {
-    vertical-align: middle;
-}
-
-table#contentContainer tr {
-    height: 100%;
-}
-
-table#contentContainer tr.debug {
-    height: auto;
-}
-
 #view {
     position: relative;
     margin: 0 auto;
     text-align: left;
     width: 640px;
     height: 480px;
-
-    display: none; /* Initially hidden, and only unhidden for browsers that 
-                      support JavaScript with "document.getElementById". */
 }
 
 #controlPanel, #decXButton, #incXButton, #decYButton, #incYButton, 

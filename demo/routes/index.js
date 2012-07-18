@@ -1,4 +1,4 @@
-// For the index page.
+// -*- coding: utf-8 -*-
 
 // Copyright 2010-2012 Felix E. Klee <felix.klee@inka.de>
 //
@@ -14,16 +14,13 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint browser: true, maxerr: 50, maxlen: 79 */
+/*jslint node: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realityBuilderDemo, realityBuilder, $ */
+'use strict';
 
-$(function () {
-    'use strict';
-
-    var settings = realityBuilderDemo.settings();
-
-    // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
-
-    realityBuilder.initialize(settings);
-});
+// Home page.
+/*jslint unparam:true */
+exports.index = function (req, res) {
+    /*jslint unparam:false */
+    res.render('../demo/views/index');
+};

@@ -61,7 +61,7 @@ else:
     (options, args) = parser.parse_args()
     app_version = options.server.split('.')[0]
 
-namespace_manager.set_namespace(app_version + '_demo')
+namespace_manager.set_namespace('demo')
 
 # Deletes all construction entries:
 queries = [Construction.all()]

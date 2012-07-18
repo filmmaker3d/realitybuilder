@@ -23,7 +23,9 @@ var realityBuilder = (function () {
     var scriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
-        publicInterface;
+        publicInterface,
+        host = '{{ host }}',
+        hostUrl = 'http://' + host;
 
     /* {{ "*" }}{{ "/" }} 
        {% include "javascripts/lazyload/lazyload-min.js" %}
@@ -131,23 +133,15 @@ var realityBuilder = (function () {
     function requestLoadDebugScript() {
         var scriptUrl, baseUrl;
 
-        // For debugging it is assumed that this script and related Dojo
-        // resources are included from files which are hosted on the same
-        // domain.
-        //
-        // This makes  it possible to  use for example Apache's  "ProxyPass" to
-        // work around GAE's current limitation of only being able to serve one
-        // file at a  time (slow!). "host" would be the host  of the Google App
-        // Engine, and not of the proxy.
-        //
         // Note that with Dojo 1.6, the baseUrl has to be set manually because
         // it is not detected correctly:
         //
         //   <url:http://groups.google.com/group/dojo-interest/msg/65a43ee98f27
         //   cb6e>
         scriptUrl =
+            hostUrl +
             '/javascripts/dojo-release-1.6.1/dojo/dojo.js.uncompressed.js';
-        baseUrl = '/javascripts/dojo-release-1.6.1/dojo/';
+        baseUrl = hostUrl + '/javascripts/dojo-release-1.6.1/dojo/';
 
         window.djConfig = {
             isDebug: true,
@@ -160,7 +154,7 @@ var realityBuilder = (function () {
                 ["dojox", "realityBuilderDojox"]
             ],
             modulePaths: {
-                "realityBuilder": "/javascripts/realityBuilder"
+                "realityBuilder": hostUrl + "/javascripts/realityBuilder"
             }
         };
 
@@ -175,8 +169,7 @@ var realityBuilder = (function () {
     // Loads the Dojo JavaScript that is used for release mode. Almost all
     // functionality is built into one file.
     function requestLoadReleaseScript() {
-        var host = '{{ host }}';
-        requestLoadScript('http://' + host + '/javascripts/dojo/dojo.xd.js' +
+        requestLoadScript(hostUrl + '/javascripts/dojo/dojo.xd.js' +
                           releaseScriptPostfix());
     }
 

@@ -21,7 +21,7 @@
 var realityBuilderAdminDemo = (function () {
     'use strict';
 
-    var publicInterface, logoutUrl;
+    var logoutUrl;
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible,
                                           setVisibility) {
@@ -254,7 +254,7 @@ var realityBuilderAdminDemo = (function () {
         updatePosAndADisplay();
     }
 
-    publicInterface = {
+    return {
         setLogoutUrl: function (x) {
             logoutUrl = x;
         },
@@ -284,8 +284,6 @@ var realityBuilderAdminDemo = (function () {
             });
         }
     };
-
-    return publicInterface;
 }());
 
 $(function () {
