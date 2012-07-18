@@ -18,29 +18,51 @@
 
 'use strict';
 
-var express = require('express'),
-    routes = require('./routes'),
-    http = require('http'),
-    app = express();
+var requirejs = require('requirejs');
 
-app.configure(function () {
-    app.set('port', process.env.PORT || 3000);
-    app.set('views', __dirname + '/views');
-    app.set('view engine', 'jade');
-    app.use(express.favicon());
-    app.use(express.logger('dev'));
-    app.use(express.bodyParser());
-    app.use(express.methodOverride());
-    app.use(app.router);
-    app.use(express['static'](__dirname + '/public'));
-});
+requirejs.config({ nodeRequire: require });
 
-app.configure('development', function () {
-    app.use(express.errorHandler());
-});
+requirejs(['http', 'socket.io', 'fs'], function (http, socketio, fs) {
+    var httpServer, io;
 
-app.get('/', routes.index);
+    /*jslint unparam:true */
+    function handler(req, res) {
+        /*jslint unparam:false */
+        fs.readFile(__dirname + '/fixme.html', function (err, data) {
+            if (err) {
+                res.writeHead(500);
+                return res.end('Error loading fixme.html');
+            }
 
-http.createServer(app).listen(app.get('port'), function () {
-    console.log("Express server listening on port " + app.get('port'));
+            res.writeHead(200);
+            res.end(data);
+        });
+    }
+
+    httpServer = http.createServer(handler);
+    io = socketio.listen(httpServer);
+    httpServer.listen(80);
+
+    io.sockets.on('connection', function (socket) {
+        socket.emit('construction blocks', [
+            {
+                posB: [0, 1, 0],
+                a: 3,
+                state: 2,
+                timeStamp: 0 // fixme
+            },
+            {
+                posB: [1, 0, 0],
+                a: 0,
+                state: 2,
+                timeStamp: 0 // fixme
+            }
+        ]);
+        socket.emit('camera', [
+            
+        ]);
+        socket.on('my other event', function (data) {
+            console.log(data);
+        });
+    });
 });
