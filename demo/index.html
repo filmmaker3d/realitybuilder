@@ -61,16 +61,19 @@
       Run the demo:
       <form action="demo.html">
         <fieldset>
-          <label for="host">Widget's <em>host:port</em> (see step 3):</label>
-          <input type="text" id="host" name="host"
-                 value="localhost:8080"></input><br>
+          <label for="demoHostTextField">Widget's <em>host:port</em> (see step
+          3):</label>
+          <input type="text" id="demoHostTextField" name="demoHost"
+                 value="localhost:8080"><br>
+
+          <input type="checkbox" id="demoDevelModeCheckbox"
+                 name="demoDevelMode">
+          <label for="demoDevelModeCheckbox">Enable <em>development mode</em>
+          (uncompressed code)</label><br>
+
           <input type="submit" value="Run"></input>
         </fieldset>
       </form>
-      <p>
-        Note about the administration controls: The date-time is shown in the
-        time zone of the system/browser.
-      </p>
     </li>
   </ol>
 
@@ -102,9 +105,10 @@
   <h2><a name="ie8">Internet Explorer 8 Support</a></h2>
 
   <p>
-    To make the demo work with Internet Explorer 8, FlashCanvas Pro is
-    required. For reasons of license, this library is not included in the
-    source code distribution. If desired, install it as follows:
+    To make the demo work with Internet Explorer 8, the FlashCanvas Pro library
+    is required. For reasons of license, this library is not included in the
+    Reality Builder distribution. If desired, install FlashCanvas Pro as
+    follows:
   </p>
 
   <ol>

@@ -14,6 +14,8 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
+/*global define */
+
 // List of prerendered simplified poses in block space.
 var realityBuilderSimPosesBList = [
     [
@@ -62,3 +64,8 @@ var realityBuilderSimPosesBList = [
         [1, 1, 1, 3]
     ]
 ];
+
+define(function () {
+    'use strict';
+    return realityBuilderSimPosesBList;
+});

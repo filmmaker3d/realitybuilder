@@ -16,9 +16,9 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global realityBuilder, $, realityBuilderSimPosesBList */
+/*global realityBuilder, $, define */
 
-var realityBuilderAI = (function () {
+define(function () {
     'use strict';
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible,
@@ -268,4 +268,4 @@ var realityBuilderAI = (function () {
 
         onMovedOrRotated: updatePosAndADisplay
     };
-}());
+});

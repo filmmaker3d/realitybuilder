@@ -22,11 +22,13 @@ var requirejs = require('requirejs');
 
 requirejs.config({ nodeRequire: require });
 
-requirejs(['http', 'socket.io', 'fs'], function (http, socketio, fs) {
+requirejs(['http', 'socket.io', 'fs', 'fixme_data'], function (http, socketio,
+                                                               fs, fixmeData) {
     var httpServer, io;
 
     /*jslint unparam:true */
     function handler(req, res) {
+        
         /*jslint unparam:false */
         fs.readFile(__dirname + '/fixme.html', function (err, data) {
             if (err) {
@@ -44,23 +46,7 @@ requirejs(['http', 'socket.io', 'fs'], function (http, socketio, fs) {
     httpServer.listen(80);
 
     io.sockets.on('connection', function (socket) {
-        socket.emit('construction blocks', [
-            {
-                posB: [0, 1, 0],
-                a: 3,
-                state: 2,
-                timeStamp: 0 // fixme
-            },
-            {
-                posB: [1, 0, 0],
-                a: 0,
-                state: 2,
-                timeStamp: 0 // fixme
-            }
-        ]);
-        socket.emit('camera', [
-            
-        ]);
+        socket.emit('updated blocks', fixmeData.blocks);
         socket.on('my other event', function (data) {
             console.log(data);
         });

@@ -20,7 +20,7 @@
   _ */
 
 var realityBuilder = (function () {
-    var scriptIsLoaded,
+    var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
         publicInterface,
@@ -83,8 +83,8 @@ var realityBuilder = (function () {
         }
     }
 
-    function requestSetupWidgetIfScriptIsLoaded() {
-        if (scriptIsLoaded) {
+    function requestSetupWidgetIfDojoScriptIsLoaded() {
+        if (dojoScriptIsLoaded) {
             requestSetupWidget();
             includeLibraries();
         }
@@ -108,13 +108,21 @@ var realityBuilder = (function () {
         }
     }
 
-    function onScriptLoaded() {
-        scriptIsLoaded = true;
-        fixDojoQueryBug();
+    function onSocketioScriptLoaded() {
         requestSetupWidgetIfInitialized();
     }
 
-    // Requests asynchronous loading of the specified JavaScript file.
+    function requestLoadSocketioScript() {
+        LazyLoad.js('/socket.io/socket.io.js', onSocketioScriptLoaded);
+    }
+
+    function onDojoScriptLoaded() {
+        dojoScriptIsLoaded = true;
+        fixDojoQueryBug();
+        requestLoadSocketioScript();
+    }
+
+    // Requests asynchronous loading of the specified Dojo JavaScript file.
     //
     // Note that this function causes "onload" to be blocked until the script
     // is loaded in Firefox, Chrome, and Safari:
@@ -125,12 +133,12 @@ var realityBuilder = (function () {
     // anticipated use cases the widget is an integral part of a web page.
     // Also, one can still work around the issue by loading the current script
     // in an asynchronous way.
-    function requestLoadScript(scriptUrl) {
-        LazyLoad.js(scriptUrl, onScriptLoaded);
+    function requestLoadDojoScript(scriptUrl) {
+        LazyLoad.js(scriptUrl, onDojoScriptLoaded);
     }
 
     // Loads the Dojo JavaScript that is used for debugging mode.
-    function requestLoadDebugScript() {
+    function requestLoadDebugDojoScript() {
         var scriptUrl, baseUrl;
 
         // Note that with Dojo 1.6, the baseUrl has to be set manually because
@@ -158,19 +166,19 @@ var realityBuilder = (function () {
             }
         };
 
-        requestLoadScript(scriptUrl);
+        requestLoadDojoScript(scriptUrl);
     }
 
-    function releaseScriptPostfix() {
+    function releaseDojoScriptPostfix() {
         return (typeof realityBuilderDojoUncompressed !== 'undefined' &&
                 realityBuilderDojoUncompressed) ? '.uncompressed.js' : '';
     }
 
     // Loads the Dojo JavaScript that is used for release mode. Almost all
     // functionality is built into one file.
-    function requestLoadReleaseScript() {
-        requestLoadScript(hostUrl + '/javascripts/dojo/dojo.xd.js' +
-                          releaseScriptPostfix());
+    function requestLoadReleaseDojoScript() {
+        requestLoadDojoScript(hostUrl + '/javascripts/dojo/dojo.xd.js' +
+                              releaseDojoScriptPostfix());
     }
 
     function mergeIntoSettings(newSettings) {
@@ -185,15 +193,15 @@ var realityBuilder = (function () {
 
     function nop() {}
 
-    scriptIsLoaded = false;
+    dojoScriptIsLoaded = false;
     initialized = false;
     settings = {};
 
     if (w3cDomIsSupported()) {
         // {% if debug %}
-        requestLoadDebugScript();
+        requestLoadDebugDojoScript();
         // {% else %}
-        requestLoadReleaseScript();
+        requestLoadReleaseDojoScript();
         // {% endif %}
     } // else: don't do anything - "settings.onBrowserNotSupportedError" is not
       // yet set.
@@ -296,7 +304,7 @@ var realityBuilder = (function () {
                 mergeIntoSettings(defaultSettings);
                 mergeIntoSettings(settings);
                 initialized = true;
-                requestSetupWidgetIfScriptIsLoaded();
+                requestSetupWidgetIfDojoScriptIsLoaded();
             }
         }
     };

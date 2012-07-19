@@ -16,9 +16,10 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global realityBuilderUI, realityBuilderAI, realityBuilder, $ */
+/*global realityBuilder, $, require */
 
-$(function () {
+require(['user_interface', 'admin_interface'], function (userInterface,
+                                                         adminInterface) {
     'use strict';
 
     // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
@@ -28,23 +29,23 @@ $(function () {
         height: 480,
         namespace: 'demo',
         onReady: function () {
-            realityBuilderUI.onReady();
-            realityBuilderAI.onReady();
+            userInterface.onReady();
+            adminInterface.onReady();
         },
         jsonpTimeout: 20000,
-        onJsonpError: realityBuilderUI.onJsonpError,
+        onJsonpError: userInterface.onJsonpError,
         onRealBlocksVisibilityChanged:
-            realityBuilderAI.onRealBlocksVisibilityChanged,
+            adminInterface.onRealBlocksVisibilityChanged,
         onPendingBlocksVisibilityChanged:
-            realityBuilderAI.onPendingBlocksVisibilityChanged,
-        onCameraChanged: realityBuilderAI.onCameraChanged,
+            adminInterface.onPendingBlocksVisibilityChanged,
+        onCameraChanged: adminInterface.onCameraChanged,
         onConstructionBlocksChanged: function () {
-            realityBuilderUI.onConstructionBlocksChanged();
-            realityBuilderAI.onConstructionBlocksChanged();
+            userInterface.onConstructionBlocksChanged();
+            adminInterface.onConstructionBlocksChanged();
         },
-        onMovedOrRotated: realityBuilderAI.onMovedOrRotated,
-        onDegreesOfFreedomChanged: realityBuilderUI.onDegreesOfFreedomChanged,
-        onServerError: realityBuilderUI.onServerError,
-        onBrowserNotSupportedError: realityBuilderUI.onBrowserNotSupportedError
+        onMovedOrRotated: adminInterface.onMovedOrRotated,
+        onDegreesOfFreedomChanged: userInterface.onDegreesOfFreedomChanged,
+        onServerError: userInterface.onServerError,
+        onBrowserNotSupportedError: userInterface.onBrowserNotSupportedError
     });
 });

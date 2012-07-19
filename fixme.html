@@ -2,8 +2,11 @@
 
 <script>
   var socket = io.connect('http://localhost');
-  socket.on('construction blocks', function (data) {
+  socket.on('updated blocks', function (data) {
       console.log(data);
+  });
+  socket.on('connection', function (data) {
+      console.log('fixme: connected');
   });
   socket.on('news', function (data) {
       console.log(data);

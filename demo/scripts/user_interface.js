@@ -16,9 +16,9 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realityBuilder, $, _, realityBuilderSimPosesBList */
+/*global realityBuilder, $, _, define */
 
-var realityBuilderUI = (function () {
+define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
     'use strict';
 
     var coordinateButtonDeltaBs = {
@@ -65,7 +65,7 @@ var realityBuilderUI = (function () {
     // Returns the list of sorted simplified poses of prerendered construction
     // blocks:
     prerenderedSrtSimPosesBList = _.memoize(function () {
-        var srtSimPosesBList = realityBuilderSimPosesBList;
+        var srtSimPosesBList = simPosesBList;
         _.each(srtSimPosesBList, function (simPosesB) {
             realityBuilder.util.sortPosesB(simPosesB);
         });
@@ -90,7 +90,7 @@ var realityBuilderUI = (function () {
 
         if (index !== false) {
             $('.user.interface img.background').attr('src',
-                                                     'images/prerendered_' +
+                                                     'scene/prerendered/' +
                                                      index + '.jpg');
 
             if (!backgroundImageIsLoaded) {
@@ -219,4 +219,4 @@ var realityBuilderUI = (function () {
 
         onServerError: onServerError
     };
-}());
+});

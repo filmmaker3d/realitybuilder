@@ -128,6 +128,10 @@
 
     <h3>Blocks</h3>
 
+    <p>
+      The date-time is shown in the time zone of the system/browser.
+    </p>
+
     <div class="scrollPane">
       <table class="blocks">
         <thead>
@@ -161,8 +165,5 @@
   <script src="vendor/jquery-1.6.2.min.js"></script>
   <script src="vendor/underscore-min.js"></script>
   <script src="http://localhost:8080/realitybuilder.js"></script>
-  <script src="javascripts/prerendered.js"></script>
-  <script src="javascripts/user_interface.js"></script>
-  <script src="javascripts/admin_interface.js"></script>
-  <script src="javascripts/demo.js"></script>
+  <script data-main="scripts/demo.js" src="vendor/require.js"></script>
 </body>
