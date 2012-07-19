@@ -16,7 +16,7 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realityBuilder, $, _, define */
+/*global $, _, define */
 
 define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
     'use strict';
@@ -32,6 +32,7 @@ define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
         backgroundImageIsLoaded = false, // initially only a placeholder is
                                          // loaded
         realityBuilderIsReady = false,
+//fixme        realityBuilder,
         prerenderedSrtSimPosesBList;
 
     function forEachCoordinateButton(f) {
@@ -208,7 +209,13 @@ define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
         unhideViewIfAllReady();
     }
 
+    function init(settings) {
+        realityBuilder = settings.realityBuilder;
+    }
+
     return {
+        init: init,
+
         onReady: onReady,
 
         onBrowserNotSupportedError: onBrowserNotSupportedError,

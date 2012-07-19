@@ -45,8 +45,8 @@ handlers:
 - url: /javascripts/realityBuilder
   static_dir: javascripts/realityBuilder
 
-# /javascripts/lazyload is not statically served. Otherwise including it into a
-# template using Django wouldn't work.
+- url: /javascripts/lazyload
+  static_dir: javascripts/lazyload
 
 - url: /demo/stylesheets
   static_dir: demo/stylesheets

@@ -17,19 +17,15 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true */
 
 /*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad, $,
-  _ */
+  _, define */
 
-var realityBuilder = (function () {
+define(['./javascripts/lazyload/lazyload-min.js'], function () {
     var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
-        publicInterface,
         host = '{{ host }}',
-        hostUrl = 'http://' + host;
-
-    /* {{ "*" }}{{ "/" }} 
-       {% include "javascripts/lazyload/lazyload-min.js" %}
-    {{ "/" }}{{ "*" }} */
+        hostUrl = 'http://' + host,
+        exportsFixme = {};
 
     // Instanciates the widget and merges its global members into the
     // "realityBuilder" name space.
@@ -69,6 +65,7 @@ var realityBuilder = (function () {
     function requestSetupWidget() {
         if (dojoIsSupported()) {
             // {% if debug %}
+            // creates "realityBuilder":
             realityBuilderDojo.require('realityBuilder.RealityBuilder');
             // {% endif %}
 
@@ -113,7 +110,8 @@ var realityBuilder = (function () {
     }
 
     function requestLoadSocketioScript() {
-        LazyLoad.js('/socket.io/socket.io.js', onSocketioScriptLoaded);
+//fixme:        LazyLoad.js('/socket.io/socket.io.js', onSocketioScriptLoaded);
+        onSocketioScriptLoaded(); // fixme
     }
 
     function onDojoScriptLoaded() {
@@ -193,6 +191,107 @@ var realityBuilder = (function () {
 
     function nop() {}
 
+    // Mandatory settings:
+    //
+    // * "width", "height": dimensions (px)
+    //
+    // Optional settings:
+    //
+    // * "id": ID of HTML element into which to insert the Reality Builder.
+    //
+    // * "namespace": Namespace used when accessing the data store.
+    //
+    // * "onReady": Function that is called when the Reality Builder is ready
+    //   to use, i.e. after it has downloaded the required resources, rendered
+    //   itself, etc.
+    //
+    // * "jsonpTimeout", "onJsonpError": 
+    //
+    //   Possible values of the timeout "jsonpTimeout":
+    //   
+    //   0: no effect
+    // 
+    //   >0 (ms): "onJsonpError" is called when the server doesn't respond to a
+    //     JSONP request before the timeout has been reached.
+    //
+    //   This functionality is necessary since the method of making JSONP
+    //   requests otherwise is incapable of reporting errors when the server is
+    //   not responding:
+    //
+    //     <url:http://www.ibm.com/developerworks/library/wa-aj-jsonp1/?ca=
+    //     dgr-jw64JSONP-jQuery&S%5FTACT=105AGY46&S%5FCMP=grsitejw64>
+    //
+    //   Be careful with specifying a timeout though: A user of the Reality
+    //   Builder may be behind a very slow connection.
+    //
+    // * "onBrowserNotSupportedError": Function that is executed when the
+    //   Reality Builder does not work with the current browser, e.g. when the
+    //   current browser doesn't support a required HTML element such as the
+    //   canvas element.
+    //
+    // * "onDegreesOfFreedomChanged": Function that is called when the degrees
+    //   of freedom of the new block changed.
+    //
+    //   That may happen for example when after the block has been moved into a
+    //   corner from where it can only be moved in certain directions. Or it
+    //   may happen if the block can now be made real.
+    //
+    // * "onMovedOrRotated": Function that is called when the new block has
+    //   been moved or rotated.
+    //
+    // * "onCameraChanged": Function that is called when camera data has
+    //   changed.
+    //
+    // * "onConstructionBlocksChanged": Called when new blocks have been added,
+    //   when a pending block has been made real, etc.
+    //
+    // * "onServerError": Called when the server could not process are request,
+    //   for example because the server was down.
+    //
+    // * "lineWidthOfBlock": line width of block (px)
+    //
+    // * "colorOfPendingBlock", "colorOfRealBlock", "colorOfNewBlock",
+    //   "colorOfFrozenNewBlock", "colorOfNewBlockShadow",
+    //   "alphaOfNewBlockShadow":
+    //
+    //   Colors (CSS format) and alpha transparency of blocks, shadow.
+    function init(settings) {
+        var defaultSettings = {
+            id: 'realityBuilder',
+            namespace: 'default',
+            jsonpTimeout: 0,
+            onServerCommunicationError: nop,
+            onBrowserNotSupportedError: nop,
+            onReady: nop,
+            onDegreesOfFreedomChanged: nop,
+            onRealBlocksVisibilityChanged: nop,
+            onPendingBlocksVisibilityChanged: nop,
+            onCameraChanged: nop,
+            onMovedOrRotated: nop,
+            onConstructionBlocksChanged: nop,
+            onServerError: nop,
+            lineWidthOfBlock: 1,
+            colorOfPendingBlock: 'white',
+            colorOfRealBlock: 'green',
+            colorOfNewBlock: 'red',
+            colorOfFrozenNewBlock: 'white',
+            colorOfNewBlockShadow: 'red',
+            alphaOfNewBlockShadow: 0.2,
+            backgroundAlpha: 0.2
+        };
+
+        if (!w3cDomIsSupported()) {
+            // Happens for example with Netscape 4. There is no point in
+            // continuing.
+            settings.onBrowserNotSupportedError();
+        } else {
+            mergeIntoSettings(defaultSettings);
+            mergeIntoSettings(settings);
+            initialized = true;
+            requestSetupWidgetIfDojoScriptIsLoaded();
+        }
+    }
+
     dojoScriptIsLoaded = false;
     initialized = false;
     settings = {};
@@ -206,108 +305,7 @@ var realityBuilder = (function () {
     } // else: don't do anything - "settings.onBrowserNotSupportedError" is not
       // yet set.
 
-    publicInterface = {
-        // Mandatory settings:
-        //
-        // * "width", "height": dimensions (px)
-        //
-        // Optional settings:
-        //
-        // * "id": ID of HTML element into which to insert the Reality Builder.
-        //
-        // * "namespace": Namespace used when accessing the data store.
-        //
-        // * "onReady": Function that is called when the Reality Builder is
-        //   ready to use, i.e. after it has downloaded the required resources,
-        //   rendered itself, etc.
-        //
-        // * "jsonpTimeout", "onJsonpError": 
-        //
-        //   Possible values of the timeout "jsonpTimeout":
-        //   
-        //   0: no effect
-        // 
-        //   >0 (ms): "onJsonpError" is called when the server doesn't respond
-        //     to a JSONP request before the timeout has been reached.
-        //
-        //   This functionality is necessary since the method of making JSONP
-        //   requests otherwise is incapable of reporting errors when the
-        //   server is not responding:
-        //
-        //     <url:http://www.ibm.com/developerworks/library/wa-aj-jsonp1/?ca=
-        //     dgr-jw64JSONP-jQuery&S%5FTACT=105AGY46&S%5FCMP=grsitejw64>
-        //
-        //   Be careful with specifying a timeout though: A user of the Reality
-        //   Builder may be behind a very slow connection.
-        //
-        // * "onBrowserNotSupportedError": Function that is executed when the
-        //   Reality Builder does not work with the current browser, e.g. when
-        //   the current browser doesn't support a required HTML element such
-        //   as the canvas element.
-        //
-        // * "onDegreesOfFreedomChanged": Function that is called when the
-        //   degrees of freedom of the new block changed.
-        //
-        //   That may happen for example when after the block has been moved
-        //   into a corner from where it can only be moved in certain
-        //   directions. Or it may happen if the block can now be made real.
-        //
-        // * "onMovedOrRotated": Function that is called when the new block has
-        //   been moved or rotated.
-        //
-        // * "onCameraChanged": Function that is called when camera data has
-        //   changed.
-        //
-        // * "onConstructionBlocksChanged": Called when new blocks have been
-        //   added, when a pending block has been made real, etc.
-        //
-        // * "onServerError": Called when the server could not process are
-        //   request, for example because the server was down.
-        //
-        // * "lineWidthOfBlock": line width of block (px)
-        //
-        // * "colorOfPendingBlock", "colorOfRealBlock", "colorOfNewBlock",
-        //   "colorOfFrozenNewBlock", "colorOfNewBlockShadow",
-        //   "alphaOfNewBlockShadow":
-        //
-        //   Colors (CSS format) and alpha transparency of blocks, shadow.
-        initialize: function (settings) {
-            var defaultSettings = {
-                id: 'realityBuilder',
-                namespace: 'default',
-                jsonpTimeout: 0,
-                onServerCommunicationError: nop,
-                onBrowserNotSupportedError: nop,
-                onReady: nop,
-                onDegreesOfFreedomChanged: nop,
-                onRealBlocksVisibilityChanged: nop,
-                onPendingBlocksVisibilityChanged: nop,
-                onCameraChanged: nop,
-                onMovedOrRotated: nop,
-                onConstructionBlocksChanged: nop,
-                onServerError: nop,
-                lineWidthOfBlock: 1,
-                colorOfPendingBlock: 'white',
-                colorOfRealBlock: 'green',
-                colorOfNewBlock: 'red',
-                colorOfFrozenNewBlock: 'white',
-                colorOfNewBlockShadow: 'red',
-                alphaOfNewBlockShadow: 0.2,
-                backgroundAlpha: 0.2
-            };
+    exportsFixme.init = init;
 
-            if (!w3cDomIsSupported()) {
-                // Happens for example with Netscape 4. There is no point in
-                // continuing.
-                settings.onBrowserNotSupportedError();
-            } else {
-                mergeIntoSettings(defaultSettings);
-                mergeIntoSettings(settings);
-                initialized = true;
-                requestSetupWidgetIfDojoScriptIsLoaded();
-            }
-        }
-    };
-
-    return publicInterface;
-}());
+    return exportsFixme;
+});

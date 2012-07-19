@@ -16,10 +16,12 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global realityBuilder, $, define */
+/*global $, define */
 
-define(function () {
+define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
     'use strict';
+
+// fixme    var realityBuilder;
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible,
                                           setVisibility) {
@@ -108,7 +110,7 @@ define(function () {
     // Resets the construction to the blocks matching the first prerendered
     // block configuration.
     function resetBlocks() {
-        var simPosesB = realityBuilderSimPosesBList[0];
+        var simPosesB = simPosesBList[0];
         realityBuilder.constructionBlocks().replaceBlocksOnServer(simPosesB);
     }
 
@@ -253,7 +255,13 @@ define(function () {
         setUpResetBlocksButton();
     }
 
+    function init(settings) {
+        realityBuilder = settings.realityBuilder;
+    }
+
     return {
+        init: init,
+
         onReady: onReady,
 
         onJsonpError: onJsonpError,

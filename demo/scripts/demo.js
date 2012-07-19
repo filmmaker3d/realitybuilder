@@ -16,19 +16,27 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global realityBuilder, $, require */
+/*global $, require */
 
-require(['user_interface', 'admin_interface'], function (userInterface,
-                                                         adminInterface) {
+require(['user_interface',
+         'admin_interface',
+         'http://localhost:8080/realitybuilder.js'
+        ], function (userInterface,
+                     adminInterface,
+                     realityBuilder) {
     'use strict';
 
     // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
-
-    realityBuilder.initialize({
+    realityBuilder.init({
         width: 640,
         height: 480,
         namespace: 'demo',
         onReady: function () {
+
+// fixme:
+//    userInterface.init({realityBuilder: realityBuilder});
+//    adminInterface.init({realityBuilder: realityBuilder});
+
             userInterface.onReady();
             adminInterface.onReady();
         },
