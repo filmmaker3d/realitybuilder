@@ -19,7 +19,7 @@
 /*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad, $,
   _, define */
 
-define(['./javascripts/lazyload/lazyload-min.js'], function () {
+define(['./vendor/lazyload/lazyload-min.js'], function () {
     var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
@@ -40,8 +40,8 @@ define(['./javascripts/lazyload/lazyload-min.js'], function () {
     // widget:
     function includeLibraries() {
         /* {{ "*" }}{{ "/" }} 
-           {% include "javascripts/jquery.min.js" %}
-           {% include "javascripts/underscore-min.js" %}
+           {% include "vendor/jquery-1.7.2.js" %}
+           {% include "vendor/underscore-min.js" %}
         {{ "/" }}{{ "*" }} */
         realityBuilder.$ = $;
         $.noConflict(true);
