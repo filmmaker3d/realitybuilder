@@ -43,9 +43,10 @@ window.djConfig = {
     }
 };
 
-define(['./vendor/lazyload/lazyload-min.js',
-        './vendor/jquery-1.7.2.js',
-        './vendor/underscore-min.js'], function () {
+define(['./vendor/sylvester.src-modified.js',
+        './vendor/lazyload/lazyload.js',
+        './vendor/jquery.js',
+        './vendor/underscore-min.js'], function (sylvester) {
     var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
@@ -53,22 +54,22 @@ define(['./vendor/lazyload/lazyload-min.js',
         hostUrl = 'http://' + host,
         exportsFixme = {};
 
+    // fixme: remove
+    window.sylvester = sylvester;
+
+    // Puts jQuery and Underscore.js in Reality Builder namespace, to avoid
+    // conflicts with jQuery, Underscore.js or other libraries included by the
+    // page that includes the Reality Builder widget:
+    realityBuilder.$ = $;
+    $.noConflict(true);
+    realityBuilder._ = window._.noConflict(); // fixme: use AMD version
+                                              // instead
+
     // Instanciates the widget and merges its global members into the
     // "realityBuilder" name space.
     function setupWidget() {
         realityBuilderDojo.mixin(realityBuilder,
                                  new realityBuilder.RealityBuilder(settings));
-    }
-
-    // Loads jQuery and Underscore.js libraries. Puts both libraries in Reality
-    // Builder namespace, to avoid conflicts with jQuery, Underscore.js or
-    // other libraries included by the page that includes the Reality Builder
-    // widget:
-    function includeLibraries() {
-        realityBuilder.$ = $;
-        $.noConflict(true);
-        realityBuilder._ = window._.noConflict(); // fixme: use AMD version
-                                                  // instead
     }
 
     // Some old browsers may support JavaScript but not Dojo. In this case,
@@ -96,7 +97,6 @@ define(['./vendor/lazyload/lazyload-min.js',
             // resolved.
             realityBuilderDojo.addOnLoad(function () {
                 setupWidget();
-                includeLibraries();
             });
         } else {
             settings.onBrowserNotSupportedError();
@@ -106,7 +106,6 @@ define(['./vendor/lazyload/lazyload-min.js',
     function requestSetupWidgetIfDojoScriptIsLoaded() {
         if (dojoScriptIsLoaded) {
             requestSetupWidget();
-            includeLibraries();
         }
     }
 
