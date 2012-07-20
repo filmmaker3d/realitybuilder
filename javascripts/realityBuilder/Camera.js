@@ -156,20 +156,9 @@ dojo.declare('realityBuilder.Camera', null, {
         // Matrices are for rotating view space points, and that rotation is in
         // the oposite direction as that of the camera, which is rotated
         // counterclockwise. Therefore the matrices rotate clockwise.
-
-        // fixme: use rotation matrices right away:
-        rX = sylvester.Matrix.create([
-            [1, 0, 0],
-            [0, Math.cos(-this._aX), Math.sin(-this._aX)],
-            [0, -Math.sin(-this._aX), Math.cos(-this._aX)]]);
-        rY = sylvester.Matrix.create([
-            [Math.cos(-this._aY), 0, Math.sin(-this._aY)],
-            [0, 1, 0],
-            [-Math.sin(-this._aY), 0, Math.cos(-this._aY)]]);
-        rZ = sylvester.Matrix.create([
-            [Math.cos(-this._aZ), Math.sin(-this._aZ), 0],
-            [-Math.sin(-this._aZ), Math.cos(-this._aZ), 0],
-            [0, 0, 1]]);
+        rX = sylvester.Matrix.RotationX(this._aX);
+        rY = sylvester.Matrix.RotationY(-this._aY);
+        rZ = sylvester.Matrix.RotationZ(this._aZ);
         rYX = rY.multiply(rX);
         this._rZYX = rZ.multiply(rYX);
     },
