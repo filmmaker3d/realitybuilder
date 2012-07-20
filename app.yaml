@@ -45,8 +45,8 @@ handlers:
 - url: /javascripts/realityBuilder
   static_dir: javascripts/realityBuilder
 
-- url: /vendor/lazyload
-  static_dir: vendor/lazyload
+- url: /vendor
+  static_dir: vendor
 
 - url: /demo/stylesheets
   static_dir: demo/stylesheets

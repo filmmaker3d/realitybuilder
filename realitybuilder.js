@@ -19,7 +19,33 @@
 /*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad, $,
   _, define */
 
-define(['./vendor/lazyload/lazyload-min.js'], function () {
+// Note that with Dojo 1.6, the baseUrl has to be set manually because it is
+// not detected correctly:
+//
+//   <url:http://groups.google.com/group/dojo-interest/msg/65a43ee98f27cb6e>
+window.host = '{{ host }}';
+window.hostUrl = 'http://' + window.host;
+window.baseUrl = window.hostUrl + '/javascripts/dojo-release-1.6.1/dojo/';
+window.scriptUrl = window.baseUrl + 'dojo.js.uncompressed.js';
+
+window.djConfig = {
+    isDebug: true,
+    locale: "en",
+    debugContainerId: "firebugLite",
+    baseUrl: window.baseUrl,
+    scopeMap: [
+        ["dojo", "realityBuilderDojo"],
+        ["dijit", "realityBuilderDijit"],
+        ["dojox", "realityBuilderDojox"]
+    ],
+    modulePaths: {
+        "realityBuilder": window.hostUrl + "/javascripts/realityBuilder"
+    }
+};
+
+define(['./vendor/lazyload/lazyload-min.js',
+        './vendor/jquery-1.7.2.js',
+        './vendor/underscore-min.js'], function () {
     var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
@@ -39,13 +65,10 @@ define(['./vendor/lazyload/lazyload-min.js'], function () {
     // other libraries included by the page that includes the Reality Builder
     // widget:
     function includeLibraries() {
-        /* {{ "*" }}{{ "/" }} 
-           {% include "vendor/jquery-1.7.2.js" %}
-           {% include "vendor/underscore-min.js" %}
-        {{ "/" }}{{ "*" }} */
         realityBuilder.$ = $;
         $.noConflict(true);
-        realityBuilder._ = window._.noConflict();
+        realityBuilder._ = window._.noConflict(); // fixme: use AMD version
+                                                  // instead
     }
 
     // Some old browsers may support JavaScript but not Dojo. In this case,
@@ -137,34 +160,7 @@ define(['./vendor/lazyload/lazyload-min.js'], function () {
 
     // Loads the Dojo JavaScript that is used for debugging mode.
     function requestLoadDebugDojoScript() {
-        var scriptUrl, baseUrl;
-
-        // Note that with Dojo 1.6, the baseUrl has to be set manually because
-        // it is not detected correctly:
-        //
-        //   <url:http://groups.google.com/group/dojo-interest/msg/65a43ee98f27
-        //   cb6e>
-        scriptUrl =
-            hostUrl +
-            '/javascripts/dojo-release-1.6.1/dojo/dojo.js.uncompressed.js';
-        baseUrl = hostUrl + '/javascripts/dojo-release-1.6.1/dojo/';
-
-        window.djConfig = {
-            isDebug: true,
-            locale: "en",
-            debugContainerId: "firebugLite",
-            baseUrl: baseUrl,
-            scopeMap: [
-                ["dojo", "realityBuilderDojo"],
-                ["dijit", "realityBuilderDijit"],
-                ["dojox", "realityBuilderDojox"]
-            ],
-            modulePaths: {
-                "realityBuilder": hostUrl + "/javascripts/realityBuilder"
-            }
-        };
-
-        requestLoadDojoScript(scriptUrl);
+        requestLoadDojoScript(window.scriptUrl);
     }
 
     function releaseDojoScriptPostfix() {
