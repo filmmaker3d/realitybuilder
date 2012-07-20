@@ -17,8 +17,7 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderValidator,
-  dojo, dojox, FlashCanvas, _ */
+/*global realityBuilder, realityBuilderValidator, dojo, FlashCanvas, _ */
 
 dojo.provide('realityBuilder.RealityBuilder');
 

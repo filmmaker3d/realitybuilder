@@ -1272,7 +1272,7 @@ var $P = Plane.create;
 
 return {
     Sylvester: Sylvester,
-    Vestor: Vector,
+    Vector: Vector,
     Matrix: Matrix,
     Line: Line,
     Plane: Plane,

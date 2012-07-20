@@ -31,14 +31,12 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas */
+/*global realityBuilder, dojo, FlashCanvas, sylvester */
 
 dojo.provide('realityBuilder.Camera');
 
 dojo.require('realityBuilder.util');
 dojo.require('realityBuilder.Sensor');
-
-dojo.require('dojox.math.matrix');
 
 dojo.declare('realityBuilder.Camera', null, {
     // Properties (shape, dimensions, etc.) of a block:
@@ -59,8 +57,6 @@ dojo.declare('realityBuilder.Camera', null, {
     _sensorResolution: 100,
 
     // Rotation matrices.
-    _rZ: null,
-    _rX: null,
     _rZYX: null, // rotation about X, then Y, then Z
 
     // Sensor of the camera:
@@ -155,25 +151,27 @@ dojo.declare('realityBuilder.Camera', null, {
     // Updates matrices describing the rotation of the camera. Should be called
     // every time the rotation angles have been changed.
     _updateRotationMatrices: function () {
-        var rYX;
+        var rYX, rX, rY, rZ;
 
         // Matrices are for rotating view space points, and that rotation is in
         // the oposite direction as that of the camera, which is rotated
         // counterclockwise. Therefore the matrices rotate clockwise.
-        this._rX = [
+
+        // fixme: use rotation matrices right away:
+        rX = sylvester.Matrix.create([
             [1, 0, 0],
             [0, Math.cos(-this._aX), Math.sin(-this._aX)],
-            [0, -Math.sin(-this._aX), Math.cos(-this._aX)]];
-        this._rY = [
+            [0, -Math.sin(-this._aX), Math.cos(-this._aX)]]);
+        rY = sylvester.Matrix.create([
             [Math.cos(-this._aY), 0, Math.sin(-this._aY)],
             [0, 1, 0],
-            [-Math.sin(-this._aY), 0, Math.cos(-this._aY)]];
-        this._rZ = [
+            [-Math.sin(-this._aY), 0, Math.cos(-this._aY)]]);
+        rZ = sylvester.Matrix.create([
             [Math.cos(-this._aZ), Math.sin(-this._aZ), 0],
             [-Math.sin(-this._aZ), Math.cos(-this._aZ), 0],
-            [0, 0, 1]];
-        rYX = dojox.math.matrix.multiply(this._rY, this._rX);
-        this._rZYX = dojox.math.matrix.multiply(this._rZ, rYX);
+            [0, 0, 1]]);
+        rYX = rY.multiply(rX);
+        this._rZYX = rZ.multiply(rYX);
     },
 
     // Returns the coordinates of the world space point "point" in view space.
@@ -182,11 +180,10 @@ dojo.declare('realityBuilder.Camera', null, {
                                                         this._pos);
 
         // Rotation matrices are applied to the vector tmp, from the left side:
-        tmp = dojox.math.matrix.transpose([tmp]);
-        tmp = dojox.math.matrix.multiply(this._rZYX, tmp);
-        tmp = dojox.math.matrix.transpose(tmp)[0];
+        tmp = sylvester.Vector.create(tmp);
+        tmp = this._rZYX.multiply(tmp);
 
-        return tmp;
+        return tmp.elements;
     },
 
     // Scale of distances parallel to the screen at view space position "zV",
