@@ -105,8 +105,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         dojo.subscribe('realityBuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
 
-        dojo.connect(null, "onkeypress", dojo.hitch(this, this._onKeyPress));
-
         this._update();
     },
 
@@ -164,25 +162,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     pendingBlocksAreVisible: function () {
         return this._camera.sensor().pendingBlocksAreVisible();
-    },
-
-    // Handles keys events.
-    _onKeyPress: function (event) {
-        var constructionBlocks, newBlock;
-
-        newBlock = this._newBlock;
-
-        if (event.keyCode === 109) { // m
-            // For demoing the Reality Builder:
-            //
-            // Makes the block at the position of the new block real on the
-            // server. This only works if there is a block at that position in
-            // the list of construction blocks, and if the user is logged in as
-            // administrator.
-            constructionBlocks = this._constructionBlocks;
-            constructionBlocks.setBlockStateOnServer(newBlock.posB(),
-                                                     newBlock.a(), 2);
-        }
     },
 
     // Called after the new block has been moved or rotated. Lets it redraw.
