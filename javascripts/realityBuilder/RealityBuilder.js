@@ -311,6 +311,8 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // server. Only updates data where there is a new version. Fails silently
     // on error.
     _update: function () {
+        var _ = realityBuilder._;
+
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "rpc/construction",
             content: {
@@ -322,7 +324,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
                 "validatorVersion": this._validatorVersion
             },
-            load: dojo.hitch(this, this._updateSucceeded)
+            load: _.bind(this._updateSucceeded, this)
         });
     },
 
@@ -347,10 +349,10 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     // Updates certain settings on the server. Fails silently on error.
     storeSettingsOnServer: function (settings) {
-        var content = {};
+        var content = {}, _ = realityBuilder._;
 
         if (settings.hasOwnProperty('cameraData')) {
-            dojo.mixin(content, this._preparedCameraData(settings.cameraData));
+            _.extend(content, this._preparedCameraData(settings.cameraData));
         }
 
         realityBuilder.util.jsonpGet({
