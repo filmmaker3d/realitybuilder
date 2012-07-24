@@ -111,9 +111,10 @@ dojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
     },
 
     _copyBlocksToLayer: function (srcBlocks, dstZB) {
-        var blocks = [], camera = this._camera, that = this;
+        var blocks = [], camera = this._camera, that = this,
+            _ = realityBuilder._;
 
-        dojo.forEach(srcBlocks, function (srcBlock) {
+        _.each(srcBlocks, function (srcBlock) {
             var dstBlock, dstPosB;
 
             dstPosB = [srcBlock.xB(), srcBlock.yB(), dstZB];
@@ -177,9 +178,9 @@ dojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
     // Graphically subtract the shadow obscuring blocks with vertical position
     // "zB" from the canvas with the rendering context "context".
     subtract: function (context, zB) {
-        var blocksInLayer = this._blocksInLayer(zB);
+        var blocksInLayer = this._blocksInLayer(zB), _ = realityBuilder._;
 
-        dojo.forEach(blocksInLayer, function (block) {
+        _.each(blocksInLayer, function (block) {
             block.subtract(context);
         });
     }

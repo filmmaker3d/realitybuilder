@@ -32,16 +32,16 @@ dojo.declare('realityBuilder.Sensor', null, {
     // Sets up the sensor of the camera, with width "width" and height
     // "height". The sensor is placed as a child of the DOM node "node".
     constructor: function (width, height, node) {
-        var sensorNode;
+        var sensorNode, _ = realityBuilder._;
 
         sensorNode = this._addSensorNode(node);
 
         this._canvasNodes = {};
-        dojo.forEach(['realBlocks', 'pendingBlocks', 'shadow', 'newBlock'],
-                     dojo.hitch(this, function (key) {
+        _.each(['realBlocks', 'pendingBlocks', 'shadow', 'newBlock'],
+               _.bind(function (key) {
                 this._canvasNodes[key] =
-                    this._addCanvasNode(sensorNode, width, height);
-            }));
+                       this._addCanvasNode(sensorNode, width, height);
+            }, this));
 
         this.setRealBlocksVisibility(false);
         this.setPendingBlocksVisibility(false);
@@ -53,7 +53,7 @@ dojo.declare('realityBuilder.Sensor', null, {
     // Merges "style" into some basic style settings, which reset the style of
     // a block element to reasonable default values.
     _styleBasedOnDefaults: function (style) {
-        var tmp;
+        var tmp, _ = realityBuilder._;
 
         tmp = {
 	        margin: 0,
@@ -62,7 +62,7 @@ dojo.declare('realityBuilder.Sensor', null, {
             display: 'block'
         };
 
-        dojo.mixin(tmp, style);
+        _.extend(tmp, style);
 
         return tmp;
     },
