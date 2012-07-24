@@ -74,7 +74,7 @@ define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
     }
 
     function setUpSaveSettingsButton() {
-        $('.admin.interface .button.saveSettings').click(function () {
+        $('.admin.interface button.saveSettings').click(function () {
             var cameraData = cameraDataFromControls();
 
             realityBuilder.storeSettingsOnServer({cameraData: cameraData});
