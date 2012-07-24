@@ -106,9 +106,9 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     },
 
     _rotateOutlineBXY: function (a) {
-        var that = this;
+        var that = this, _ = realityBuilder._;
 
-        return dojo.map(this._outlineBXY, function (pBXY) {
+        return _.map(this._outlineBXY, function (pBXY) {
             return realityBuilder.util.rotatePointBXY(pBXY,
                                                       that._rotCenterBXY,
                                                       a);
@@ -150,9 +150,9 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     // every element in the given list of coordinates, and returns the
     // resulting list. Does not modify the original list.
     _withCongruencyOffsetsAddedBXY: function (coordinatesListBXY, a) {
-        var offsetB = this.congruencyOffsetB(a);
+        var offsetB = this.congruencyOffsetB(a), _ = realityBuilder._;
 
-        return dojo.map(coordinatesListBXY, function (coordinatesBXY) {
+        return _.map(coordinatesListBXY, function (coordinatesBXY) {
             return realityBuilder.util.addVectorsBXY(coordinatesBXY,
                                                      offsetB);
         });
@@ -181,9 +181,9 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     },
 
     _rotateCollisionOffsetsBXY: function (collisionOffsetsBXY, a) {
-        var util = realityBuilder.util;
+        var util = realityBuilder.util, _ = realityBuilder._;
 
-        return dojo.map(collisionOffsetsBXY, function (collisionOffsetBXY) {
+        return _.map(collisionOffsetsBXY, function (collisionOffsetBXY) {
             return util.rotatePointBXY(collisionOffsetBXY, [0, 0], a);
         });
     },
@@ -212,9 +212,9 @@ dojo.declare('realityBuilder.BlockProperties', null, {
 
     // See also: _withCongruencyOffsetsAddedBXY()
     _withCongruencyOffsetsAddedB: function (coordinatesListB, a) {
-        var offsetB = this.congruencyOffsetB(a);
+        var offsetB = this.congruencyOffsetB(a), _ = realityBuilder._;
 
-        return dojo.map(coordinatesListB, function (coordinatesB) {
+        return _.map(coordinatesListB, function (coordinatesB) {
             return realityBuilder.util.addVectorsB(coordinatesB, offsetB);
         });
     },
@@ -241,9 +241,9 @@ dojo.declare('realityBuilder.BlockProperties', null, {
     },
 
     _rotateAttachmentOffsetsB: function (attachmentOffsetsB, a) {
-        var that = this;
+        var that = this, _ = realityBuilder._;
 
-        return dojo.map(attachmentOffsetsB, function (attachmentOffsetB) {
+        return _.map(attachmentOffsetsB, function (attachmentOffsetB) {
             return that._rotateAttachmentOffsetB(attachmentOffsetB, a);
         });
     },

@@ -304,10 +304,12 @@ dojo.declare('realityBuilder.Block', null, {
     //
     // Depends of up to date block space coordinates.
     _updateWorldSpaceCoordinates: function () {
-        this._bottomVertexes = dojo.map(this._bottomVertexesB,
-                                        dojo.hitch(this, this._blockToWorld));
-        this._topVertexes = dojo.map(this._topVertexesB,
-                                     dojo.hitch(this, this._blockToWorld));
+        var _ = realityBuilder._;
+
+        this._bottomVertexes = _.map(this._bottomVertexesB,
+                                     _.bind(this._blockToWorld, this));
+        this._topVertexes = _.map(this._topVertexesB,
+                                  _.bind(this._blockToWorld, this));
 
         this._bottomRotCenter = this._blockToWorld(this._bottomRotCenterB);
         this._topRotCenter = this._blockToWorld(this._topRotCenterB);
@@ -318,12 +320,14 @@ dojo.declare('realityBuilder.Block', null, {
     //
     // Depends on up to date world space coordinates.
     _updateViewSpaceCoordinates: function () {
-        this._bottomVertexesV =
-            dojo.map(this._bottomVertexes,
-                     dojo.hitch(this._camera, this._camera.worldToView));
-        this._topVertexesV =
-            dojo.map(this._topVertexes,
-                     dojo.hitch(this._camera, this._camera.worldToView));
+        var _ = realityBuilder._;
+
+        this._bottomVertexesV = _.map(this._bottomVertexes,
+                                      _.bind(this._camera.worldToView,
+                                             this._camera));
+        this._topVertexesV = _.map(this._topVertexes,
+                                   _.bind(this._camera.worldToView,
+                                          this._camera));
 
         this._bottomRotCenterV =
             this._camera.worldToView(this._bottomRotCenter);
@@ -403,10 +407,10 @@ dojo.declare('realityBuilder.Block', null, {
     },
 
     _updateProjectedVertexesVXZS: function () {
-        var cam = this._camera;
+        var cam = this._camera, _ = realityBuilder._;
 
         this._projectedVertexesVXZS =
-            dojo.map(this._projectedVertexesVXZ, function (vertexVXZ) {
+            _.map(this._projectedVertexesVXZ, function (vertexVXZ) {
                 var vertexV = [vertexVXZ[0],
                                0, // in view space x-z plane!
                                vertexVXZ[1]];
@@ -449,12 +453,12 @@ dojo.declare('realityBuilder.Block', null, {
     //
     // Depends on up to date view space coordinates.
     _updateSensorSpaceCoordinates: function () {
-        var cam = this._camera;
+        var cam = this._camera, _ = realityBuilder._;
 
-        this._bottomVertexesS = dojo.map(this._bottomVertexesV,
-                                         dojo.hitch(cam, cam.viewToSensor));
-        this._topVertexesS = dojo.map(this._topVertexesV,
-                                      dojo.hitch(cam, cam.viewToSensor));
+        this._bottomVertexesS = _.map(this._bottomVertexesV,
+                                      _.bind(cam.viewToSensor, cam));
+        this._topVertexesS = _.map(this._topVertexesV,
+                                   _.bind(cam.viewToSensor, cam));
 
         this._bottomRotCenterS = cam.viewToSensor(this._bottomRotCenterV);
         this._topRotCenterS = cam.viewToSensor(this._topRotCenterV);
