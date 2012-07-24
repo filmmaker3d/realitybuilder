@@ -357,10 +357,13 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Renders the blocks "blocks" on the canvas "canvas".
     _renderBlocks: function (canvas, blocks) {
+        var context, _ = realityBuilder._;
+
         if (canvas.getContext) {
-            var context = canvas.getContext('2d');
+            context = canvas.getContext('2d');
             realityBuilder.util.clearCanvas(canvas);
-            dojo.forEach(blocks, function (b) {
+
+            _.each(blocks, function (b) {
                 b.render(context);
             });
         }

@@ -97,10 +97,11 @@ dojo.declare('realityBuilder.LayerShadow', null, {
             vs = [],
             blockOutlineBXY =
                 this._blockProperties.rotatedOutlineBXY(this._newBlock.a()),
-            that = this;
+            that = this,
+            _ = realityBuilder._;
 
         // counterclockwise:
-        dojo.forEach(blockOutlineBXY, function (vertexBXY) {
+        _.each(blockOutlineBXY, function (vertexBXY) {
             vs.push(realityBuilder.util.
                     blockToWorld([xB + vertexBXY[0],
                                   yB + vertexBXY[1],
@@ -141,9 +142,10 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     // Renders the tops of the blocks in the layer "layerZB".
     _renderTops: function (layerZB, context) {
         var realBlocksOnLayer =
-            this._constructionBlocks.realBlocksInLayer(layerZB);
+            this._constructionBlocks.realBlocksInLayer(layerZB),
+            _ = realityBuilder._;
 
-        dojo.forEach(realBlocksOnLayer, function (realBlock) {
+        _.each(realBlocksOnLayer, function (realBlock) {
             realBlock.renderSolidTop(context);
         });
     },

@@ -497,6 +497,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Adds this block to the list of blocks on the server, with state pending.
     _createPendingOnServer: function () {
+        var _ = realityBuilder._;
+
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "rpc/create_pending",
             content: {
@@ -505,7 +507,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                 "zB": this.zB(),
                 "a": this.a()
             },
-            load: dojo.hitch(this, this._createPendingOnServerSucceeded)
+            load: _.bind(this._createPendingOnServerSucceeded, this)
         });
     },
 
@@ -516,6 +518,8 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Adds this block to the list of blocks on the server, with state pending.
     _createRealOnServer: function () {
+        var _ = realityBuilder._;
+
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "rpc/create_real",
             content: {
@@ -524,7 +528,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
                 "zB": this.zB(),
                 "a": this.a()
             },
-            load: dojo.hitch(this, this._createRealOnServerSucceeded)
+            load: _.bind(this._createRealOnServerSucceeded, this)
         });
     }
 });

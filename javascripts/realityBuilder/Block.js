@@ -278,7 +278,7 @@ dojo.declare('realityBuilder.Block', null, {
         this._topVertexesB = [];
 
         // top, counterclockwise (when viewed from top in block space):
-        dojo.forEach(blockOutlineBXY, function (vertexBXY) {
+        realityBuilder._.each(blockOutlineBXY, function (vertexBXY) {
             that._bottomVertexesB.push([xB + vertexBXY[0],
                                         yB + vertexBXY[1],
                                         zB]);
@@ -296,8 +296,7 @@ dojo.declare('realityBuilder.Block', null, {
     },
 
     _blockToWorld: function (pB) {
-        return realityBuilder.util.blockToWorld(pB,
-                                                    this._blockProperties);
+        return realityBuilder.util.blockToWorld(pB, this._blockProperties);
     },
 
     // Updates the vertexes of the block and its center of rotation in world
