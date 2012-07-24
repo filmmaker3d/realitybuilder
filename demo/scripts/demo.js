@@ -20,7 +20,13 @@
 
 require(['user_interface',
          'admin_interface',
-         'http://localhost:8080/realitybuilder.js'
+         'realitybuilder/realitybuilder' // Loaded with a path. Loading
+                                         // directly from a remote domain
+                                         // requires appending ".js", and that
+                                         // then breaks the dependency chain
+                                         // (probably only during debugging - a
+                                         // monolythic AMD module shouldn't be
+                                         // a problem).
         ], function (userInterface,
                      adminInterface,
                      realityBuilder) {

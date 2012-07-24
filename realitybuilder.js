@@ -43,10 +43,10 @@ window.djConfig = {
     }
 };
 
-define(['./vendor/sylvester.src-modified.js',
-        './vendor/lazyload/lazyload.js',
-        './vendor/jquery.js',
-        './vendor/underscore-min.js'], function (sylvester) {
+define(['./vendor/sylvester.src-modified',
+        './vendor/lazyload/lazyload',
+        './vendor/jquery',
+        './vendor/underscore-min'], function (sylvester) {
     var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
