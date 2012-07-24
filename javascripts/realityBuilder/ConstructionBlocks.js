@@ -129,13 +129,14 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // Sets the data of construction blocks to the version on the server, which
     // is described by "serverData".
     updateWithServerData: function (serverData) {
+        var _ = realityBuilder._;
+
         if (this._versionOnServer !== serverData.version) {
             this._versionOnServer = serverData.version;
 
-            this._blocks =
-                dojo.map(serverData.blocks,
-                         dojo.hitch(this,
-                                    this._createBlockFromServerData));
+            this._blocks = _.map(serverData.blocks,
+                                 _.bind(this._createBlockFromServerData,
+                                        this));
 
             this._updateRealBlocksSorted();
             this._updatePendingBlocks();
@@ -157,16 +158,18 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Finds all real blocks and stores them.
     _updateRealBlocksSorted: function () {
-        var tmp = dojo.filter(this._blocks, function (block) {
-            return block.isReal();
-        });
+        var _ = realityBuilder._,
+            tmp = _.filter(this._blocks, function (block) {
+                return block.isReal();
+            });
         tmp.sort(this._sortByHeight);
         this._realBlocksSorted = tmp;
     },
 
     // Finds all pending blocks and stores them.
     _updatePendingBlocks: function () {
-        this._pendingBlocks = dojo.filter(this._blocks, function (block) {
+        var _ = realityBuilder._;
+        this._pendingBlocks = _.filter(this._blocks, function (block) {
             return block.isPending();
         });
     },
@@ -239,6 +242,8 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // the server. Once the server has completed the request, the list of
     // blocks is updated.
     makePendingOnServer: function (posB, a) {
+        var _ = realityBuilder._;
+
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "rpc/make_pending",
             content: {
@@ -247,7 +252,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
                 "zB": posB[2],
                 "a": a
             },
-            load: dojo.hitch(this, this._makePendingOnServerSucceeded)
+            load: _.bind(this._makePendingOnServerSucceeded, this)
         });
     },
 
@@ -259,6 +264,8 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // Deletes the block positioned at the block space position "posB" and
     // rotated by the angle "a", on the client and on the server.
     deleteOnServer: function (posB, a) {
+        var _ = realityBuilder._;
+
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "rpc/delete",
             content: {
@@ -267,7 +274,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
                 "zB": posB[2],
                 "a": a
             },
-            load: dojo.hitch(this, this._deleteOnServerSucceeded)
+            load: _.bind(this._deleteOnServerSucceeded, this)
         });
     },
 
@@ -286,6 +293,8 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // "posB" and rotated by the angle "a" to real: on the client and on
     // the server.
     makeRealOnServer: function (posB, a) {
+        var _ = realityBuilder._;
+
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "rpc/make_real",
             content: {
@@ -294,7 +303,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
                 "zB": posB[2],
                 "a": a
             },
-            load: dojo.hitch(this, this._makeRealOnServerSucceeded)
+            load: _.bind(this._makeRealOnServerSucceeded, this)
         });
     },
 
@@ -328,7 +337,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "rpc/replace_blocks",
             content: posesB,
-            load: dojo.hitch(this, this._replaceBlocksOnServerSucceeded)
+            load: _.bind(this._replaceBlocksOnServerSucceeded, this)
         });
     },
 
@@ -337,11 +346,13 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // of the upper side of the block. If no such block is available, returns
     // 0.
     zBOfUpperSideOfRealBlockBelow: function (xB, yB, zB) {
-        var realBlocks, zBMax, zBOfUpperSide, bXB, bYB, bZB;
+        var realBlocks, zBMax, zBOfUpperSide, bXB, bYB, bZB,
+            _ = realityBuilder._;
+
         realBlocks = this._realBlocksSorted;
         zBMax = zB - 1;
         zBOfUpperSide = 0;
-        dojo.forEach(realBlocks, function (b) {
+        _.each(realBlocks, function (b) {
             bXB = b.xB();
             bYB = b.yB();
             bZB = b.zB();
