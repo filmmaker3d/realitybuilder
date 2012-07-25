@@ -53,6 +53,7 @@ define(['./vendor/sylvester.src-modified',
         './scripts/construction_block',
         './scripts/new_block',
         './scripts/block',
+        './scripts/reality_builder',
         './scripts/util',
         './vendor/lazyload/lazyload',
         './vendor/jquery',
@@ -66,6 +67,7 @@ define(['./vendor/sylvester.src-modified',
                                           constructionBlock,
                                           newBlock,
                                           block,
+                                          realityBuilderFixme,
                                           util) {
     var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
@@ -98,8 +100,8 @@ define(['./vendor/sylvester.src-modified',
     // Instanciates the widget and merges its global members into the
     // "realityBuilder" name space.
     function setupWidget() {
-        realityBuilderDojo.mixin(realityBuilder,
-                                 new realityBuilder.RealityBuilder(settings));
+        realityBuilderFixme.init(settings);
+        realityBuilderDojo.mixin(realityBuilder, realityBuilderFixme);
     }
 
     // Some old browsers may support JavaScript but not Dojo. In this case,
@@ -118,11 +120,6 @@ define(['./vendor/sylvester.src-modified',
     // Sets up the widget after waiting for Dojo to be ready.
     function requestSetupWidget() {
         if (dojoIsSupported()) {
-            // {% if debug %}
-            // creates "realityBuilder":
-            realityBuilderDojo.require('realityBuilder.RealityBuilder');
-            // {% endif %}
-
             // "addOnLoad" is necessary to wait for Dojo dependencies to be
             // resolved.
             realityBuilderDojo.addOnLoad(function () {
