@@ -21,16 +21,12 @@
 
 realityBuilderDojo.provide('realityBuilder.RealityBuilder');
 
-realityBuilderDojo.require('realityBuilder.NewBlock');
+realityBuilderDojo.require('realityBuilder.Block');
 
 realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // Last construction validator version retrieved, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _validatorVersion: '-1',
-
-    // The new block that the user is supposed to position. Could move once the
-    // real blocks are loaded, if there are any intersections.
-    _newBlock: null,
 
     // Handle for the timeout between requests to the server for new
     // construction data.
@@ -56,7 +52,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
         camera.init(settings.width, settings.height,
                     realityBuilderDojo.byId(settings.id));
         constructionBlock.init(realityBuilder);
-        this._newBlock = new rb.NewBlock();
+        newBlock.init(realityBuilder);
 
         realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
                        this, this._update); // Speeds up responsiveness.
@@ -88,7 +84,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     },
 
     newBlock: function () {
-        return this._newBlock;
+        return newBlock;
     },
 
     constructionBlocks: function () {
@@ -137,7 +133,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
 
     // Called after the new block has been moved or rotated. Lets it redraw.
     _onNewBlockMovedOrRotated: function () {
-        this._newBlock.render();
+        newBlock.render();
         realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged(); // may have
                                                                   // changed
         realityBuilder.util.SETTINGS.onMovedOrRotated();
@@ -145,7 +141,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
 
     _blocksAreFullyInitialized: function () {
         return (constructionBlocks.isInitializedWithServerData() &&
-                this._newBlock.isInitializedWithServerData() &&
+                newBlock.isInitializedWithServerData() &&
                 camera.isInitializedWithServerData() &&
                 blockProperties.isInitializedWithServerData());
     },
@@ -165,7 +161,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
         // Note that construction blocks are needed also for rendering the new
         // block, e.g. to know which parts of it are obscured.
         if (this._blocksAreFullyInitialized()) {
-            this._newBlock.render();
+            newBlock.render();
         }
     },
 
@@ -179,9 +175,9 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // the beginning.
     _updateNewBlockStateIfFullyInitialized: function (unfreeze) {
         if (constructionBlocks.isInitializedWithServerData() &&
-                this._newBlock.isInitializedWithServerData() &&
+                newBlock.isInitializedWithServerData() &&
                 blockProperties.isInitializedWithServerData()) {
-            realityBuilder._newBlock.updateState();
+            newBlock.updateState();
             realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
             realityBuilder.util.SETTINGS.onMovedOrRotated();
         }
@@ -256,7 +252,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
         }
 
         if (data.newBlockData.changed) {
-            this._newBlock.updateWithServerData(data.newBlockData);
+            newBlock.updateWithServerData(data.newBlockData);
         }
 
         if (data.validatorData.versionChanged) {
@@ -291,7 +287,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
                 "cameraDataVersion": camera.versionOnServer(),
                 "blockPropertiesDataVersion":
                     blockProperties.versionOnServer(),
-                "newBlockDataVersion": this._newBlock.versionOnServer(),
+                "newBlockDataVersion": newBlock.versionOnServer(),
                 "validatorVersion": this._validatorVersion
             },
             load: _.bind(this._updateSucceeded, this)
@@ -348,8 +344,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // forms a valid construction.
     newConstructionWouldBeValid: function () {
         return (typeof realityBuilderValidator !== 'undefined' &&
-                realityBuilderValidator(constructionBlocks,
-                                        this._newBlock));
+                realityBuilderValidator(constructionBlocks, newBlock));
     },
 
     camera: function () {

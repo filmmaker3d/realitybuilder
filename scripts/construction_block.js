@@ -88,8 +88,8 @@ define(['./util'], function () {
 
             if (!this.isDeleted()) {
                 color = (this.isReal() ?
-                         realityBuilder.util.SETTINGS.colorOfRealBlock :
-                         realityBuilder.util.SETTINGS.colorOfPendingBlock);
+                         util.SETTINGS.colorOfRealBlock :
+                         util.SETTINGS.colorOfPendingBlock);
                 this.inherited(arguments, [context, color]);
             }
         },
