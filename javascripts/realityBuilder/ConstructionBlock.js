@@ -35,12 +35,10 @@ dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
     _timeStamp: null,
 
     // Creates a block at the position in block space ("xB", "yB", "zB") =
-    // "posB", and rotated about its center of rotation by "a" (° CCW,
-    // when viewed from above). When the block is rendered, it is as seen by
-    // the sensor of the camera "camera". A time stamp - in seconds since the
-    // epoch - of the date-time when the bocks status was last changed is
-    // "timeStamp".
-    constructor: function (camera, posB, a, state, timeStamp) {
+    // "posB", and rotated about its center of rotation by "a" (° CCW, when
+    // viewed from above). A time stamp - in seconds since the epoch - of the
+    // date-time when the bocks status was last changed is "timeStamp".
+    constructor: function (posB, a, state, timeStamp) {
         this._state = state;
         this._timeStamp = timeStamp;
     },

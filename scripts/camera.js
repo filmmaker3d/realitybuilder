@@ -31,14 +31,9 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas, sylvester */
+/*global realityBuilder, realityBuilderDojo, define */
 
-dojo.provide('realityBuilder.Camera');
-
-dojo.require('realityBuilder.util');
-dojo.require('realityBuilder.Sensor');
-
-dojo.declare('realityBuilder.Camera', null, {
+define({
     // Position of the camera in world space (mm):
     _pos: null,
 
@@ -67,10 +62,9 @@ dojo.declare('realityBuilder.Camera', null, {
     // on every change of camera settings, not only on those on the server.
     _id: null,
 
-    constructor: function (sensorWidth, sensorHeight, node) {
+    init: function (sensorWidth, sensorHeight, node, Sensor) {
         this._pos = [0, 0, 1];
-        this._sensor =
-            new realityBuilder.Sensor(sensorWidth, sensorHeight, node);
+        this._sensor = new Sensor(sensorWidth, sensorHeight, node);
         this._updateRotationMatrices();
     },
 
@@ -132,7 +126,7 @@ dojo.declare('realityBuilder.Camera', null, {
         this._updateRotationMatrices();
         this._updateId();
 
-        dojo.publish('realityBuilder/Camera/changed');
+        realityBuilderDojo.publish('realityBuilder/Camera/changed');
     },
 
     // Updates the settings of the camera to the version on the server, which

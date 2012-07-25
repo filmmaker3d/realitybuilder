@@ -44,9 +44,6 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Shadow in south-east direction.
     _shadow: null,
 
-    // Camera object, used for calculating the projection on the camera sensor.
-    _camera: null,
-
     // Block space position used when last calculating the sensor space
     // coordinates.
     _lastPosB: null,
@@ -59,17 +56,13 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Creates the new block that the user may position. For collision
     // detection and for calculating hidden lines, the block needs to know
-    // about the other blocks in the construction: "constructionBlocks" When
-    // the block is rendered, it is as seen by the sensor of the camera
-    // "camera".
-    constructor: function (camera, constructionBlocks) {
-        this.inherited(arguments, [camera, [0, 0, 0], 0]);
+    // about the other blocks in the construction: "constructionBlocks"
+    constructor: function (constructionBlocks) {
+        this.inherited(arguments, [[0, 0, 0], 0]);
         this._isFrozen = false;
         this._constructionBlocks = constructionBlocks;
         this._shadow = new realityBuilder.Shadow(this,
-                                                 camera,
                                                  constructionBlocks);
-        this._camera = camera;
     },
 
     versionOnServer: function () {
@@ -196,8 +189,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             testZB = this.zB();
             do {
                 testZB += 1;
-                testBlock = new realityBuilder.Block(this._camera,
-                                                     [xB, yB, testZB],
+                testBlock = new realityBuilder.Block([xB, yB, testZB],
                                                      this.a());
             } while (cbs.realBlocksCollideWith(testBlock));
             this._posB[2] = testZB;
@@ -235,8 +227,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         testPosB = realityBuilder.util.addVectorsB(this.posB(),
                                                         deltaB);
         testA = (this.a() + deltaA) % 4;
-        testBlock = new realityBuilder.Block(this._camera,
-                                             testPosB, testA);
+        testBlock = new realityBuilder.Block(testPosB, testA);
 
         return this._constructionBlocks.realBlocksCollideWith(testBlock);
     },
@@ -463,7 +454,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         this._updateCoordinates();
 
         if (this._needsToBeRendered()) {
-            canvas = this._camera.sensor().newBlockCanvas();
+            canvas = camera.sensor().newBlockCanvas();
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
                 color = (this.isFrozen() ?

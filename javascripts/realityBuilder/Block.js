@@ -17,7 +17,7 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas */
+/*global realityBuilder, dojo, FlashCanvas, camera */
 
 dojo.provide('realityBuilder.Block');
 
@@ -28,10 +28,6 @@ dojo.declare('realityBuilder.Block', null, {
 
     // Rotation angle, about center of rotation:
     _a: null, // mulitples of 90°, CCW when viewed from above
-
-    // Camera object, used for calculating the projection of the block on the
-    // camera sensor.
-    _camera: null,
 
     // Coordinates of the vertexes in block space, world space, view space, and
     // sensor space.
@@ -100,12 +96,10 @@ dojo.declare('realityBuilder.Block', null, {
 
     // Creates a block at the position in block space ("xB", "yB", "zB") =
     // "posB", and rotated about its center of rotation by "a" (° CCW,
-    // when viewed from above). When the block is rendered, it is as seen by
-    // the sensor of the camera "camera".
-    constructor: function (camera, posB, a) {
+    // when viewed from above).
+    constructor: function (posB, a) {
         this._posB = posB;
         this._a = a;
-        this._camera = camera;
     },
 
     // Returns the block's position in block space. From the position the block
@@ -312,16 +306,12 @@ dojo.declare('realityBuilder.Block', null, {
         var _ = realityBuilder._;
 
         this._bottomVertexesV = _.map(this._bottomVertexes,
-                                      _.bind(this._camera.worldToView,
-                                             this._camera));
+                                      _.bind(camera.worldToView, camera));
         this._topVertexesV = _.map(this._topVertexes,
-                                   _.bind(this._camera.worldToView,
-                                          this._camera));
+                                   _.bind(camera.worldToView, camera));
 
-        this._bottomRotCenterV =
-            this._camera.worldToView(this._bottomRotCenter);
-        this._topRotCenterV =
-            this._camera.worldToView(this._topRotCenter);
+        this._bottomRotCenterV = camera.worldToView(this._bottomRotCenter);
+        this._topRotCenterV = camera.worldToView(this._topRotCenter);
     },
 
     // Returns true, iff coordinates need to be updated.
@@ -330,7 +320,7 @@ dojo.declare('realityBuilder.Block', null, {
             cameraHasChanged, blockPropertiesHaveChanged, posBHasChanged,
             aHasChanged;
 
-        cameraHasChanged = this._lastCameraId !== this._camera.id();
+        cameraHasChanged = this._lastCameraId !== camera.id();
         blockPropertiesHaveChanged =
             this._lastBlockPropertiesVersionOnServer !==
             blockProperties.versionOnServer();
@@ -348,7 +338,7 @@ dojo.declare('realityBuilder.Block', null, {
     _onCoordinatesUpdated: function () {
         this._lastBlockPropertiesVersionOnServer =
             blockProperties.versionOnServer();
-        this._lastCameraId = this._camera.id();
+        this._lastCameraId = camera.id();
         this._lastPosB = [this._posB[0],
                                this._posB[1],
                                this._posB[2]]; // deep copy necessary
@@ -396,7 +386,7 @@ dojo.declare('realityBuilder.Block', null, {
     },
 
     _updateProjectedVertexesVXZS: function () {
-        var cam = this._camera, _ = realityBuilder._;
+        var cam = camera, _ = realityBuilder._;
 
         this._projectedVertexesVXZS =
             _.map(this._projectedVertexesVXZ, function (vertexVXZ) {
@@ -442,7 +432,7 @@ dojo.declare('realityBuilder.Block', null, {
     //
     // Depends on up to date view space coordinates.
     _updateSensorSpaceCoordinates: function () {
-        var cam = this._camera, _ = realityBuilder._;
+        var cam = camera, _ = realityBuilder._;
 
         this._bottomVertexesS = _.map(this._bottomVertexesV,
                                       _.bind(cam.viewToSensor, cam));

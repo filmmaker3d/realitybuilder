@@ -24,7 +24,7 @@ dojo.provide('realityBuilder.RealityBuilder');
 dojo.require('realityBuilder.ConstructionBlocks');
 dojo.require('realityBuilder.ConstructionBlock');
 dojo.require('realityBuilder.NewBlock');
-dojo.require('realityBuilder.Camera');
+dojo.require('realityBuilder.Sensor');
 dojo.require('realityBuilder.util');
 
 dojo.declare('realityBuilder.RealityBuilder', null, {
@@ -39,9 +39,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // The new block that the user is supposed to position. Could move once the
     // real blocks are loaded, if there are any intersections.
     _newBlock: null,
-
-    // The camera, whose sensor is shown.
-    _camera: null,
 
     // Handle for the timeout between requests to the server for new
     // construction data.
@@ -64,13 +61,10 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
         this._onReadyCalled = false;
 
-        this._camera = new rb.Camera(settings.width, settings.height,
-                                     dojo.byId(settings.id));
-        this._constructionBlocks =
-            new rb.ConstructionBlocks(this._camera);
-        this._newBlock =
-            new rb.NewBlock(this._camera,
-                            this._constructionBlocks);
+        camera.init(settings.width, settings.height, dojo.byId(settings.id),
+                    realityBuilder.Sensor);
+        this._constructionBlocks = new rb.ConstructionBlocks();
+        this._newBlock = new rb.NewBlock(this._constructionBlocks);
 
         dojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
                        this, this._update); // Speeds up responsiveness.
@@ -105,10 +99,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         return this._newBlock;
     },
 
-    camera: function () {
-        return this._camera;
-    },
-
     constructionBlocks: function () {
         return this._constructionBlocks;
     },
@@ -134,23 +124,23 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     },
 
     setRealBlocksVisibility: function (shouldBeVisible) {
-        this._camera.sensor().setRealBlocksVisibility(shouldBeVisible);
+        camera.sensor().setRealBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
         realityBuilder.util.SETTINGS.onRealBlocksVisibilityChanged();
     },
 
     setPendingBlocksVisibility: function (shouldBeVisible) {
-        this._camera.sensor().setPendingBlocksVisibility(shouldBeVisible);
+        camera.sensor().setPendingBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
         realityBuilder.util.SETTINGS.onPendingBlocksVisibilityChanged();
     },
 
     realBlocksAreVisible: function () {
-        return this._camera.sensor().realBlocksAreVisible();
+        return camera.sensor().realBlocksAreVisible();
     },
 
     pendingBlocksAreVisible: function () {
-        return this._camera.sensor().pendingBlocksAreVisible();
+        return camera.sensor().pendingBlocksAreVisible();
     },
 
     // Called after the new block has been moved or rotated. Lets it redraw.
@@ -164,7 +154,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     _blocksAreFullyInitialized: function () {
         return (this._constructionBlocks.isInitializedWithServerData() &&
                 this._newBlock.isInitializedWithServerData() &&
-                this._camera.isInitializedWithServerData() &&
+                camera.isInitializedWithServerData() &&
                 blockProperties.isInitializedWithServerData());
     },
 
@@ -242,7 +232,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // the "onReady" function, but only the first time.
     _checkIfReady: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
-                this._camera.isInitializedWithServerData() &&
+                camera.isInitializedWithServerData() &&
                 blockProperties.isInitializedWithServerData() &&
                 this._onReadyCalled === false) {
             realityBuilder.util.SETTINGS.onReady();
@@ -266,7 +256,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         }
 
         if (data.cameraData.changed) {
-            this._camera.updateWithServerData(data.cameraData);
+            camera.updateWithServerData(data.cameraData);
         }
 
         if (data.blockPropertiesData.changed) {
@@ -306,7 +296,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
             content: {
                 "blocksDataVersion":
                     this._constructionBlocks.versionOnServer(),
-                "cameraDataVersion": this._camera.versionOnServer(),
+                "cameraDataVersion": camera.versionOnServer(),
                 "blockPropertiesDataVersion":
                     blockProperties.versionOnServer(),
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
@@ -370,5 +360,9 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         return (typeof realityBuilderValidator !== 'undefined' &&
                 realityBuilderValidator(this._constructionBlocks,
                                         this._newBlock));
+    },
+
+    camera: function () {
+        return camera;
     }
 });

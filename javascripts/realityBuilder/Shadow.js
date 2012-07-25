@@ -29,9 +29,6 @@ dojo.declare('realityBuilder.Shadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
-    // Camera object, used for calculating the projection on the camera sensor.
-    _camera: null,
-
     // Permament blocks in the construction, including real and pending blocks.
     // Needed for hidden lines removal and collision detection.
     _constructionBlocks: null,
@@ -44,27 +41,22 @@ dojo.declare('realityBuilder.Shadow', null, {
     // documentation of LayerShadow for more information.
     _layerShadow: null,
 
-    // Creates the shadow of the block "newBlock". When the shadow is rendered,
-    // it is as seen by the sensor of the camera "camera". For finding which
-    // parts of the shadow have to be obscured, the list of non-new blocks in
-    // the construction is used: "constructionBlocks"
-    constructor: function (newBlock, camera,
-                           constructionBlocks) {
+    // Creates the shadow of the block "newBlock". For finding which parts of
+    // the shadow have to be obscured, the list of non-new blocks in the
+    // construction is used: "constructionBlocks"
+    constructor: function (newBlock, constructionBlocks) {
         this._newBlock = newBlock;
-        this._camera = camera;
         this._constructionBlocks = constructionBlocks;
 
         this._shadowObscuringBlocks =
             new realityBuilder.ShadowObscuringBlocks(newBlock,
-                                                     camera,
                                                      constructionBlocks);
 
         this._layerShadow =
-            new realityBuilder.LayerShadow(newBlock, camera,
-                                           constructionBlocks);
+            new realityBuilder.LayerShadow(newBlock, constructionBlocks);
     },
 
-    _renderLayerShadow: function (context, newBlock, camera,
+    _renderLayerShadow: function (context, newBlock,
                                   constructionBlocks, layerZB, color, alpha) {
         this._layerShadow.render(layerZB, color);
         context.globalAlpha = alpha;
@@ -77,9 +69,9 @@ dojo.declare('realityBuilder.Shadow', null, {
     // Draws the shadow in the color "color" and with alpha transparency
     // "alpha".
     render: function (color, alpha) {
-        var canvas = this._camera.sensor().shadowCanvas(), context,
+        var canvas = camera.sensor().shadowCanvas(), context,
             layerZB,
-            newBlock = this._newBlock, camera = this._camera,
+            newBlock = this._newBlock,
             constructionBlocks = this._constructionBlocks,
             maxLayerZB = constructionBlocks.highestRealBlocksZB();
 
@@ -93,7 +85,7 @@ dojo.declare('realityBuilder.Shadow', null, {
             // are obscured by blocks in the layer above:
             for (layerZB = -1; layerZB <= maxLayerZB; layerZB += 1) {
                 if (layerZB < newBlock.zB()) {
-                    this._renderLayerShadow(context, newBlock, camera,
+                    this._renderLayerShadow(context, newBlock,
                                             constructionBlocks, layerZB,
                                             color, alpha);
                 }
@@ -105,7 +97,7 @@ dojo.declare('realityBuilder.Shadow', null, {
 
     // Makes sure that the shadow is not shown on the sensor.
     clear: function () {
-        var canvas = this._camera.sensor().shadowCanvas();
+        var canvas = camera.sensor().shadowCanvas();
         realityBuilder.util.clearCanvas(canvas);
     }
 });

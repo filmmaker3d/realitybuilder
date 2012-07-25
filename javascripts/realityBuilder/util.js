@@ -111,7 +111,7 @@ realityBuilder.util.intersectionSegmentLineVXZ = function (segmentVXZ,
 
 // Investigates the relation between the positions of the point "pointVXZ" and
 // the line segment "segmentVXZ", in the view space x-z-plane, when viewed with
-// the camera "camera".
+// the camera.
 //
 // Return values:
 //

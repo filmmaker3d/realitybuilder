@@ -32,9 +32,6 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     // integers.
     _versionOnServer: '-1',
 
-    // Camera that sees the blocks (for rendering):
-    _camera: null,
-
     // The blocks.
     _blocks: null,
 
@@ -49,10 +46,9 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Creates a container for the blocks associated with the construction
     // "construction".
-    constructor: function (camera) {
+    constructor: function () {
         this._blocks = [];
         this._realBlocksSorted = [];
-        this._camera = camera;
     },
 
     blocks: function () {
@@ -114,9 +110,8 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     },
 
     _createBlockFromServerData: function (serverData) {
-        var camera = this._camera, rb = realityBuilder;
-        return new rb.ConstructionBlock(camera,
-                                        serverData.posB, serverData.a,
+        var rb = realityBuilder;
+        return new rb.ConstructionBlock(serverData.posB, serverData.a,
                                         serverData.state,
                                         serverData.timeStamp);
     },
@@ -376,7 +371,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
     },
 
     renderIfVisible: function () {
-        var sensor = this._camera.sensor();
+        var sensor = camera.sensor();
 
         if (sensor.realBlocksAreVisible()) {
             this._renderBlocks(sensor.realBlocksCanvas(),

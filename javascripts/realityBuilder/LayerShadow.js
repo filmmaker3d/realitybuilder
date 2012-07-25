@@ -36,9 +36,6 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
-    // Camera object, used for calculating the projection on the camera sensor.
-    _camera: null,
-
     // Permament blocks in the construction, including real and pending blocks.
     // Needed for hidden lines removal and collision detection.
     _constructionBlocks: null,
@@ -57,11 +54,10 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     // weak garbage collectors).
     _helperCanvas: null,
 
-    constructor: function (newBlock, camera, constructionBlocks) {
+    constructor: function (newBlock, constructionBlocks) {
         var shadowCanvas, $ = realityBuilder.$;
 
         this._newBlock = newBlock;
-        this._camera = camera;
         this._constructionBlocks = constructionBlocks;
 
         shadowCanvas = camera.sensor().shadowCanvas();
@@ -113,8 +109,7 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     _updateViewSpaceCoordinates: function (layerZB) {
         this._updateWorldSpace(layerZB);
         this._fullVertexesV = dojo.map(this._fullVertexes,
-                                       dojo.hitch(this._camera,
-                                                  this._camera.worldToView));
+                                       dojo.hitch(camera, camera.worldToView));
     },
 
     // Calculates the vertexes of the full shadow, projected onto the layer of
@@ -124,8 +119,7 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     // Depends on up to date view space coordinates.
     _updateSensorSpaceCoordinates: function (layerZB) {
         this._fullVertexesS = dojo.map(this._fullVertexesV,
-                                   dojo.hitch(this._camera,
-                                              this._camera.viewToSensor));
+                                   dojo.hitch(camera, camera.viewToSensor));
     },
 
     // Updates coordinates for the full shadow, projected onto the layer of
