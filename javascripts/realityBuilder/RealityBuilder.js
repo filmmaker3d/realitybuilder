@@ -24,7 +24,6 @@ realityBuilderDojo.provide('realityBuilder.RealityBuilder');
 realityBuilderDojo.require('realityBuilder.ConstructionBlocks');
 realityBuilderDojo.require('realityBuilder.ConstructionBlock');
 realityBuilderDojo.require('realityBuilder.NewBlock');
-realityBuilderDojo.require('realityBuilder.Sensor');
 realityBuilderDojo.require('realityBuilder.util');
 
 realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
@@ -61,8 +60,8 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
 
         this._onReadyCalled = false;
 
-        camera.init(settings.width, settings.height, realityBuilderDojo.byId(settings.id),
-                    realityBuilder.Sensor);
+        camera.init(settings.width, settings.height,
+                    realityBuilderDojo.byId(settings.id));
         this._constructionBlocks = new rb.ConstructionBlocks();
         this._newBlock = new rb.NewBlock(this._constructionBlocks);
 
@@ -124,23 +123,23 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     },
 
     setRealBlocksVisibility: function (shouldBeVisible) {
-        camera.sensor().setRealBlocksVisibility(shouldBeVisible);
+        sensor.setRealBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
         realityBuilder.util.SETTINGS.onRealBlocksVisibilityChanged();
     },
 
     setPendingBlocksVisibility: function (shouldBeVisible) {
-        camera.sensor().setPendingBlocksVisibility(shouldBeVisible);
+        sensor.setPendingBlocksVisibility(shouldBeVisible);
         this._constructionBlocks.renderIfVisible();
         realityBuilder.util.SETTINGS.onPendingBlocksVisibilityChanged();
     },
 
     realBlocksAreVisible: function () {
-        return camera.sensor().realBlocksAreVisible();
+        return sensor.realBlocksAreVisible();
     },
 
     pendingBlocksAreVisible: function () {
-        return camera.sensor().pendingBlocksAreVisible();
+        return sensor.pendingBlocksAreVisible();
     },
 
     // Called after the new block has been moved or rotated. Lets it redraw.

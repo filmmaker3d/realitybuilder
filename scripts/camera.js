@@ -33,167 +33,166 @@
 
 /*global realityBuilder, realityBuilderDojo, define */
 
-define({
-    // Position of the camera in world space (mm):
-    _pos: null,
+define(['./sensor'], function (sensor) {
+    return {
+        // Position of the camera in world space (mm):
+        _pos: null,
 
-    // Angles defining orientation (rad):
-    _aX: 0,
-    _aY: 0,
-    _aZ: 0,
+        // Angles defining orientation (rad):
+        _aX: 0,
+        _aY: 0,
+        _aZ: 0,
 
-    // Focal length (mm):
-    _fl: 1,
+        // Focal length (mm):
+        _fl: 1,
 
-    // Sensor resolution (px/mm) and dimensions (px):
-    _sensorResolution: 100,
+        // Sensor resolution (px/mm) and dimensions (px):
+        _sensorResolution: 100,
 
-    // Rotation matrices.
-    _rZYX: null, // rotation about X, then Y, then Z
+        // Rotation matrices.
+        _rZYX: null, // rotation about X, then Y, then Z
 
-    // Sensor of the camera:
-    _sensor: null,
+        // Version of data last retrieved from the server, or "-1" initially.
+        // Is a string in order to be able to contain very large integers.
+        _versionOnServer: '-1',
 
-    // Version of data last retrieved from the server, or "-1" initially. Is a
-    // string in order to be able to contain very large integers.
-    _versionOnServer: '-1',
+        // Identifier of the camera settings. It is a random string that is
+        // updated on every change of camera settings, not only on those on the
+        // server.
+        _id: null,
 
-    // Identifier of the camera settings. It is a random string that is updated
-    // on every change of camera settings, not only on those on the server.
-    _id: null,
+        init: function (sensorWidth, sensorHeight, node) {
+            this._pos = [0, 0, 1];
+            sensor.init(sensorWidth, sensorHeight, node);
+            this._updateRotationMatrices();
+        },
 
-    init: function (sensorWidth, sensorHeight, node, Sensor) {
-        this._pos = [0, 0, 1];
-        this._sensor = new Sensor(sensorWidth, sensorHeight, node);
-        this._updateRotationMatrices();
-    },
+        _updateId: function () {
+            this._id = Math.random().toString();
+        },
 
-    _updateId: function () {
-        this._id = Math.random().toString();
-    },
+        versionOnServer: function () {
+            return this._versionOnServer;
+        },
 
-    sensor: function () {
-        return this._sensor;
-    },
+        // Returns false when the object is new and has not yet been updated
+        // with server data.
+        isInitializedWithServerData: function () {
+            return this._versionOnServer !== '-1';
+        },
 
-    versionOnServer: function () {
-        return this._versionOnServer;
-    },
+        pos: function () {
+            return this._pos;
+        },
 
-    // Returns false when the object is new and has not yet been updated with
-    // server data.
-    isInitializedWithServerData: function () {
-        return this._versionOnServer !== '-1';
-    },
+        aX: function () {
+            return this._aX;
+        },
 
-    pos: function () {
-        return this._pos;
-    },
+        aY: function () {
+            return this._aY;
+        },
 
-    aX: function () {
-        return this._aX;
-    },
+        aZ: function () {
+            return this._aZ;
+        },
 
-    aY: function () {
-        return this._aY;
-    },
+        fl: function () {
+            return this._fl;
+        },
 
-    aZ: function () {
-        return this._aZ;
-    },
+        sensorResolution: function () {
+            return this._sensorResolution;
+        },
 
-    fl: function () {
-        return this._fl;
-    },
+        id: function () {
+            return this._id;
+        },
 
-    sensorResolution: function () {
-        return this._sensorResolution;
-    },
+        // Updates the settings of the camera using the "data" which is a
+        // subset of the data that also the server delivers.
+        update: function (data) {
+            this._pos = data.pos;
+            this._aX = data.aX;
+            this._aY = data.aY;
+            this._aZ = data.aZ;
+            this._fl = data.fl;
+            this._sensorResolution = data.sensorResolution;
+            this._updateRotationMatrices();
+            this._updateId();
 
-    id: function () {
-        return this._id;
-    },
+            realityBuilderDojo.publish('realityBuilder/Camera/changed');
+        },
 
-    // Updates the settings of the camera using the "data" which is a subset of
-    // the data that also the server delivers.
-    update: function (data) {
-        this._pos = data.pos;
-        this._aX = data.aX;
-        this._aY = data.aY;
-        this._aZ = data.aZ;
-        this._fl = data.fl;
-        this._sensorResolution = data.sensorResolution;
-        this._updateRotationMatrices();
-        this._updateId();
+        // Updates the settings of the camera to the version on the server,
+        // which is described by "serverData".
+        updateWithServerData: function (serverData) {
+            if (this._versionOnServer !== serverData.version) {
+                this._versionOnServer = serverData.version;
+                this.update(serverData);
+            }
+        },
 
-        realityBuilderDojo.publish('realityBuilder/Camera/changed');
-    },
+        // Updates matrices describing the rotation of the camera. Should be
+        // called every time the rotation angles have been changed.
+        _updateRotationMatrices: function () {
+            var rYX, rX, rY, rZ;
 
-    // Updates the settings of the camera to the version on the server, which
-    // is described by "serverData".
-    updateWithServerData: function (serverData) {
-        if (this._versionOnServer !== serverData.version) {
-            this._versionOnServer = serverData.version;
-            this.update(serverData);
+            // Matrices are for rotating view space points, and that rotation
+            // is in the oposite direction as that of the camera, which is
+            // rotated counterclockwise. Therefore the matrices rotate
+            // clockwise.
+            rX = sylvester.Matrix.RotationX(this._aX);
+            rY = sylvester.Matrix.RotationY(-this._aY);
+            rZ = sylvester.Matrix.RotationZ(this._aZ);
+            rYX = rY.multiply(rX);
+            this._rZYX = rZ.multiply(rYX);
+        },
+
+        // Returns the coordinates of the world space point "point" in view
+        // space.
+        worldToView: function (point) {
+            var tmp = realityBuilder.util.subtractVectors3D(point,
+                                                            this._pos);
+
+            // Rotation matrices are applied to the vector tmp, from the left
+            // side:
+            tmp = sylvester.Vector.create(tmp);
+            tmp = this._rZYX.multiply(tmp);
+
+            return tmp.elements;
+        },
+
+        // Scale of distances parallel to the screen at view space position
+        // "zV", when projected to the screen.
+        scale: function (zV) {
+            return this._sensorResolution * this._fl / zV; // px / mm
+        },
+
+        // Returns the coordinates of the view space point "pointV" in sensor
+        // space.
+        viewToSensor: function (pointV) {
+            var xV = pointV[0], yV = pointV[1], zV = pointV[2], scale;
+
+            // Projection on sensor:
+            scale = this.scale(zV);
+            xV *= scale; // px
+            yV *= scale; // px
+
+            // Puts camera position (and, thus, vanishing point) in the center
+            // of the sensor:
+            xV += sensor.width() / 2;
+            yV += sensor.height() / 2;
+
+            return [xV, yV];
+        },
+
+        // Returns the coordinates of the block space point "pointB" in sensor
+        // space.
+        blockToSensor: function (pointB) {
+            return this.viewToSensor(this.worldToView(
+                realityBuilder.util.blockToWorld(pointB)
+            ));
         }
-    },
-
-    // Updates matrices describing the rotation of the camera. Should be called
-    // every time the rotation angles have been changed.
-    _updateRotationMatrices: function () {
-        var rYX, rX, rY, rZ;
-
-        // Matrices are for rotating view space points, and that rotation is in
-        // the oposite direction as that of the camera, which is rotated
-        // counterclockwise. Therefore the matrices rotate clockwise.
-        rX = sylvester.Matrix.RotationX(this._aX);
-        rY = sylvester.Matrix.RotationY(-this._aY);
-        rZ = sylvester.Matrix.RotationZ(this._aZ);
-        rYX = rY.multiply(rX);
-        this._rZYX = rZ.multiply(rYX);
-    },
-
-    // Returns the coordinates of the world space point "point" in view space.
-    worldToView: function (point) {
-        var tmp = realityBuilder.util.subtractVectors3D(point,
-                                                        this._pos);
-
-        // Rotation matrices are applied to the vector tmp, from the left side:
-        tmp = sylvester.Vector.create(tmp);
-        tmp = this._rZYX.multiply(tmp);
-
-        return tmp.elements;
-    },
-
-    // Scale of distances parallel to the screen at view space position "zV",
-    // when projected to the screen.
-    scale: function (zV) {
-        return this._sensorResolution * this._fl / zV; // px / mm
-    },
-
-    // Returns the coordinates of the view space point "pointV" in sensor
-    // space.
-    viewToSensor: function (pointV) {
-        var xV = pointV[0], yV = pointV[1], zV = pointV[2], scale;
-
-        // Projection on sensor:
-        scale = this.scale(zV);
-        xV *= scale; // px
-        yV *= scale; // px
-
-        // Puts camera position (and, thus, vanishing point) in the center of
-        // the sensor:
-        xV += this._sensor.width() / 2;
-        yV += this._sensor.height() / 2;
-
-        return [xV, yV];
-    },
-
-    // Returns the coordinates of the block space point "pointB" in sensor
-    // space.
-    blockToSensor: function (pointB) {
-        return this.viewToSensor(this.worldToView(
-            realityBuilder.util.blockToWorld(pointB)
-        ));
     }
 });

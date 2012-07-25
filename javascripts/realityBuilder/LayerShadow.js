@@ -60,7 +60,7 @@ realityBuilderDojo.declare('realityBuilder.LayerShadow', null, {
         this._newBlock = newBlock;
         this._constructionBlocks = constructionBlocks;
 
-        shadowCanvas = camera.sensor().shadowCanvas();
+        shadowCanvas = sensor.shadowCanvas();
         this._canvas = $('<canvas>').
             attr('width', shadowCanvas.width).
             attr('height', shadowCanvas.height).
@@ -119,7 +119,8 @@ realityBuilderDojo.declare('realityBuilder.LayerShadow', null, {
     // Depends on up to date view space coordinates.
     _updateSensorSpaceCoordinates: function (layerZB) {
         this._fullVertexesS = realityBuilderDojo.map(this._fullVertexesV,
-                                   realityBuilderDojo.hitch(camera, camera.viewToSensor));
+                                   realityBuilderDojo.hitch(camera,
+                                                            camera.viewToSensor));
     },
 
     // Updates coordinates for the full shadow, projected onto the layer of

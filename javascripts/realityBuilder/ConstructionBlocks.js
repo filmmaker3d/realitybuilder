@@ -371,8 +371,6 @@ realityBuilderDojo.declare('realityBuilder.ConstructionBlocks', null, {
     },
 
     renderIfVisible: function () {
-        var sensor = camera.sensor();
-
         if (sensor.realBlocksAreVisible()) {
             this._renderBlocks(sensor.realBlocksCanvas(),
                                this._realBlocksSorted);

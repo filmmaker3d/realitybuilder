@@ -454,7 +454,7 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         this._updateCoordinates();
 
         if (this._needsToBeRendered()) {
-            canvas = camera.sensor().newBlockCanvas();
+            canvas = sensor.newBlockCanvas();
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
                 color = (this.isFrozen() ?

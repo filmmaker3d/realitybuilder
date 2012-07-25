@@ -19,9 +19,7 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-realityBuilderDojo.provide('realityBuilder.Sensor');
-
-realityBuilderDojo.declare('realityBuilder.Sensor', null, {
+define({
     // Canvases for drawing various parts.
     _canvasNodes: null,
 
@@ -31,7 +29,7 @@ realityBuilderDojo.declare('realityBuilder.Sensor', null, {
 
     // Sets up the sensor of the camera, with width "width" and height
     // "height". The sensor is placed as a child of the DOM node "node".
-    constructor: function (width, height, node) {
+    init: function (width, height, node) {
         var sensorNode, _ = realityBuilder._;
 
         sensorNode = this._addSensorNode(node);

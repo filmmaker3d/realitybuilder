@@ -69,7 +69,7 @@ realityBuilderDojo.declare('realityBuilder.Shadow', null, {
     // Draws the shadow in the color "color" and with alpha transparency
     // "alpha".
     render: function (color, alpha) {
-        var canvas = camera.sensor().shadowCanvas(), context,
+        var canvas = sensor.shadowCanvas(), context,
             layerZB,
             newBlock = this._newBlock,
             constructionBlocks = this._constructionBlocks,
@@ -97,7 +97,7 @@ realityBuilderDojo.declare('realityBuilder.Shadow', null, {
 
     // Makes sure that the shadow is not shown on the sensor.
     clear: function () {
-        var canvas = camera.sensor().shadowCanvas();
+        var canvas = sensor.shadowCanvas();
         realityBuilder.util.clearCanvas(canvas);
     }
 });
