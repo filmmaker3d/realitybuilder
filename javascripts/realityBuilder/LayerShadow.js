@@ -62,7 +62,7 @@ dojo.declare('realityBuilder.LayerShadow', null, {
 
     constructor: function (newBlock, blockProperties, camera,
                            constructionBlocks) {
-        var shadowCanvas;
+        var shadowCanvas, $ = realityBuilder.$;
 
         this._newBlock = newBlock;
         this._blockProperties = blockProperties;
@@ -70,12 +70,14 @@ dojo.declare('realityBuilder.LayerShadow', null, {
         this._constructionBlocks = constructionBlocks;
 
         shadowCanvas = camera.sensor().shadowCanvas();
-        this._canvas = dojo.create('canvas');
-        dojo.attr(this._canvas, 'width', shadowCanvas.width);
-        dojo.attr(this._canvas, 'height', shadowCanvas.height);
-        this._helperCanvas = dojo.create('canvas');
-        dojo.attr(this._helperCanvas, 'width', shadowCanvas.width);
-        dojo.attr(this._helperCanvas, 'height', shadowCanvas.height);
+        this._canvas = $('<canvas>').
+            attr('width', shadowCanvas.width).
+            attr('height', shadowCanvas.height).
+            get(0);
+        this._helperCanvas = $('<canvas>').
+            attr('width', shadowCanvas.width).
+            attr('height', shadowCanvas.height).
+            get(0);
 
         if (realityBuilder.util.isFlashCanvasActive()) {
             FlashCanvas.initElement(this._canvas);

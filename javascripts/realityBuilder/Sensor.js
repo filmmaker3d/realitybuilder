@@ -68,33 +68,29 @@ dojo.declare('realityBuilder.Sensor', null, {
     },
 
     _addSensorNode: function (node) {
-        var sensorNode;
+        var sensorNode, $ = realityBuilder.$;
 
-        sensorNode = dojo.create('div', null, node);
-
-        dojo.style(sensorNode, this._styleBasedOnDefaults({
+        sensorNode = $('<div>').css(this._styleBasedOnDefaults({
             position: 'relative'
-        }));
+        })).appendTo($(node)).get(0);
 
         return sensorNode;
     },
 
     // Returns the canvas node.
     _addCanvasNode: function (sensorNode, width, height) {
-        var canvasNode;
+        var canvasNode, $ = realityBuilder.$;
 
-        canvasNode = dojo.create('canvas', {
+        canvasNode = $('<canvas>').attr({
             width: width,
             height: height
-        }, sensorNode);
-
-        dojo.style(canvasNode, this._styleBasedOnDefaults({
+        }).css(this._styleBasedOnDefaults({
             position: 'absolute',
             left: 0,
             top: 0,
             width: width,
             height: height
-        }));
+        })).appendTo(sensorNode).get(0);
 
         if (realityBuilder.util.isFlashCanvasActive()) {
             FlashCanvas.initElement(canvasNode);
@@ -120,12 +116,15 @@ dojo.declare('realityBuilder.Sensor', null, {
     },
 
     _setCanvasVisibility: function (canvas, shouldBeVisible) {
-        dojo.style(canvas, 'visibility',
-                   shouldBeVisible ? 'visible' : 'hidden');
+        var $ = realityBuilder.$;
+
+        $(canvas).css('visibility', shouldBeVisible ? 'visible' : 'hidden');
     },
 
     _canvasIsVisible: function (canvas) {
-        return dojo.style(canvas, 'visibility') === 'visible';
+        var $ = realityBuilder.$;
+
+        return $(canvas).css('visibility') === 'visible';
     },
 
     realBlocksAreVisible: function () {
