@@ -310,11 +310,15 @@ define({
     // Deletes all blocks on the server, and sets the real blocks to those
     // described by the specified poses.
     replaceBlocksOnServer: function (posesB) {
-        var content = [], _ = realityBuilder._;
+        var _ = realityBuilder._, content = {};
+
+        _.each(posesB, function (poseB, i) {
+            content[String(i)] = poseB;
+        });
 
         realityBuilder.util.jsonpGet({
             url: realityBuilder.util.rootUrl() + "rpc/replace_blocks",
-            content: posesB,
+            content: content,
             load: _.bind(this._replaceBlocksOnServerSucceeded, this)
         });
     },

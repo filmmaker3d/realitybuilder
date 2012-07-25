@@ -757,7 +757,7 @@ class RPCReplaceBlocks(webapp.RequestHandler):
             poses_b = []
             i = 0
             while True:
-                tmp = self.request.get_all(str(i))
+                tmp = self.request.get_all(str(i) + '[]')
                 if len(tmp) < 4:
                     break
                 pose_b = [int(tmp[0]), int(tmp[1]), int(tmp[2]), int(tmp[3])]
