@@ -22,7 +22,6 @@
 realityBuilderDojo.provide('realityBuilder.NewBlock');
 
 realityBuilderDojo.require('realityBuilder.Block');
-realityBuilderDojo.require('realityBuilder.ShadowObscuringBlocks');
 
 realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     '-chains-': {

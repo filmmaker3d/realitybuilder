@@ -81,23 +81,25 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderDojo. FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-realityBuilderDojo.provide('realityBuilder.ShadowObscuringBlocks');
-
-realityBuilderDojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
+define({
     // The blocks, sorted by height, from top to bottom.
     _blocksSorted: null,
 
     // New block that the shadow is associated with.
     _newBlock: null,
 
-    constructor: function (newBlock) {
+    _realityBuilder: null,
+
+    init: function (realityBuilder, newBlock) {
+        this._realityBuilder = realityBuilder;
         this._newBlock = newBlock;
     },
 
     _copyBlocksToLayer: function (srcBlocks, dstZB) {
         var blocks = [], that = this,
+            realityBuilder = this._realityBuilder,
             _ = realityBuilder._;
 
         _.each(srcBlocks, function (srcBlock) {

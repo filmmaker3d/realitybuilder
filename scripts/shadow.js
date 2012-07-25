@@ -20,21 +20,18 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./construction_blocks'], function (constructionBlocks) {
+define(['./construction_blocks',
+        './shadow_obscuring_blocks'
+       ], function (constructionBlocks, shadowObscuringBlocks) {
     return {
         // New block that the shadow is associated with.
         _newBlock: null,
-
-        // Blocks that are used for graphically removing that parts of a shadow
-        // that are not actually visible.
-        _shadowObscuringBlocks: null,
 
         // Creates the shadow of the block "newBlock".
         init: function (realityBuilder, newBlock) {
             this._newBlock = newBlock;
 
-            this._shadowObscuringBlocks =
-                new realityBuilder.ShadowObscuringBlocks(newBlock);
+            shadowObscuringBlocks.init(realityBuilder, newBlock);
             layerShadow.init(newBlock);
         },
 
@@ -55,7 +52,7 @@ define(['./construction_blocks'], function (constructionBlocks) {
             newBlock = this._newBlock,
             maxLayerZB = constructionBlocks.highestRealBlocksZB();
 
-            this._shadowObscuringBlocks.update();
+            shadowObscuringBlocks.update();
 
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
@@ -68,7 +65,7 @@ define(['./construction_blocks'], function (constructionBlocks) {
                         this._renderLayerShadow(context, newBlock, layerZB,
                                                 color, alpha);
                     }
-                    this._shadowObscuringBlocks.subtract(context, layerZB + 1);
+                    shadowObscuringBlocks.subtract(context, layerZB + 1);
                 }
                 return;
             }
