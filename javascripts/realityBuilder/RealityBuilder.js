@@ -23,7 +23,6 @@ realityBuilderDojo.provide('realityBuilder.RealityBuilder');
 
 realityBuilderDojo.require('realityBuilder.ConstructionBlock');
 realityBuilderDojo.require('realityBuilder.NewBlock');
-realityBuilderDojo.require('realityBuilder.util');
 
 realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // Last construction validator version retrieved, or "-1" initially. Is a

@@ -33,7 +33,7 @@
 
 /*global realityBuilder, realityBuilderDojo, define */
 
-define(['./sensor'], function (sensor) {
+define(['./sensor', './util'], function (sensor, util) {
     return {
         // Position of the camera in world space (mm):
         _pos: null,
@@ -152,7 +152,7 @@ define(['./sensor'], function (sensor) {
         // Returns the coordinates of the world space point "point" in view
         // space.
         worldToView: function (point) {
-            var tmp = realityBuilder.util.subtractVectors3D(point,
+            var tmp = util.subtractVectors3D(point,
                                                             this._pos);
 
             // Rotation matrices are applied to the vector tmp, from the left
@@ -191,7 +191,7 @@ define(['./sensor'], function (sensor) {
         // space.
         blockToSensor: function (pointB) {
             return this.viewToSensor(this.worldToView(
-                realityBuilder.util.blockToWorld(pointB)
+                util.blockToWorld(pointB)
             ));
         }
     }

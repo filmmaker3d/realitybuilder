@@ -30,7 +30,8 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-define(['./construction_blocks'], function (constructionBlocks) {
+define(['./construction_blocks', './util'], function (constructionBlocks,
+                                                      util) {
     return {
         // New block that the shadow is associated with.
         _newBlock: null,
@@ -64,7 +65,7 @@ define(['./construction_blocks'], function (constructionBlocks) {
                 attr('height', shadowCanvas.height).
                 get(0);
 
-            if (realityBuilder.util.isFlashCanvasActive()) {
+            if (util.isFlashCanvasActive()) {
                 FlashCanvas.initElement(this._canvas);
                 FlashCanvas.initElement(this._helperCanvas);
             }
@@ -89,7 +90,7 @@ define(['./construction_blocks'], function (constructionBlocks) {
 
             // counterclockwise:
             _.each(blockOutlineBXY, function (vertexBXY) {
-                vs.push(realityBuilder.util.
+                vs.push(util.
                         blockToWorld([xB + vertexBXY[0],
                                       yB + vertexBXY[1],
                                       zB]));
@@ -180,13 +181,13 @@ define(['./construction_blocks'], function (constructionBlocks) {
             // Chrome 11.
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
-                realityBuilder.util.clearCanvas(canvas);
+                util.clearCanvas(canvas);
                 helperContext = helperCanvas.getContext('2d');
-                realityBuilder.util.clearCanvas(helperCanvas);
+                util.clearCanvas(helperCanvas);
 
                 context.globalCompositeOperation = "source-over";
                 if (layerZB === -1) {
-                    realityBuilder.util.fillCanvas(canvas, "black");
+                    util.fillCanvas(canvas, "black");
                 } else {
                     this._renderTops(layerZB, context); // slow with many blocks
                 }

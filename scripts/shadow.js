@@ -21,8 +21,9 @@
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
 define(['./construction_blocks',
-        './shadow_obscuring_blocks'
-       ], function (constructionBlocks, shadowObscuringBlocks) {
+        './shadow_obscuring_blocks',
+        './util'
+       ], function (constructionBlocks, shadowObscuringBlocks, util) {
     return {
         // New block that the shadow is associated with.
         _newBlock: null,
@@ -56,7 +57,7 @@ define(['./construction_blocks',
 
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
-                realityBuilder.util.clearCanvas(canvas);
+                util.clearCanvas(canvas);
 
                 // draws shadow from bottom up, in each step removing parts that
                 // are obscured by blocks in the layer above:
@@ -74,7 +75,7 @@ define(['./construction_blocks',
         // Makes sure that the shadow is not shown on the sensor.
         clear: function () {
             var canvas = sensor.shadowCanvas();
-            realityBuilder.util.clearCanvas(canvas);
+            util.clearCanvas(canvas);
         }
     }
 });
