@@ -40,8 +40,7 @@ dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
     // the sensor of the camera "camera". A time stamp - in seconds since the
     // epoch - of the date-time when the bocks status was last changed is
     // "timeStamp".
-    constructor: function (blockProperties, camera, posB, a,
-                           state, timeStamp) {
+    constructor: function (camera, posB, a, state, timeStamp) {
         this._state = state;
         this._timeStamp = timeStamp;
     },

@@ -62,14 +62,11 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // about the other blocks in the construction: "constructionBlocks" When
     // the block is rendered, it is as seen by the sensor of the camera
     // "camera".
-    //
-    // The block's properties, such as shape and size, are described by
-    // "blockProperties".
-    constructor: function (blockProperties, camera, constructionBlocks) {
-        this.inherited(arguments, [blockProperties, camera, [0, 0, 0], 0]);
+    constructor: function (camera, constructionBlocks) {
+        this.inherited(arguments, [camera, [0, 0, 0], 0]);
         this._isFrozen = false;
         this._constructionBlocks = constructionBlocks;
-        this._shadow = new realityBuilder.Shadow(this, blockProperties,
+        this._shadow = new realityBuilder.Shadow(this,
                                                  camera,
                                                  constructionBlocks);
         this._camera = camera;
@@ -199,10 +196,9 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             testZB = this.zB();
             do {
                 testZB += 1;
-                testBlock = new realityBuilder.Block(this._blockProperties,
-                                                         this._camera,
-                                                         [xB, yB, testZB],
-                                                         this.a());
+                testBlock = new realityBuilder.Block(this._camera,
+                                                     [xB, yB, testZB],
+                                                     this.a());
             } while (cbs.realBlocksCollideWith(testBlock));
             this._posB[2] = testZB;
             return true;
@@ -239,8 +235,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         testPosB = realityBuilder.util.addVectorsB(this.posB(),
                                                         deltaB);
         testA = (this.a() + deltaA) % 4;
-        testBlock = new realityBuilder.Block(this._blockProperties,
-                                             this._camera,
+        testBlock = new realityBuilder.Block(this._camera,
                                              testPosB, testA);
 
         return this._constructionBlocks.realBlocksCollideWith(testBlock);

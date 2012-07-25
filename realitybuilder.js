@@ -44,9 +44,10 @@ window.djConfig = {
 };
 
 define(['./vendor/sylvester.src-modified',
+        './scripts/block_properties',
         './vendor/lazyload/lazyload',
         './vendor/jquery',
-        './vendor/underscore-min'], function (sylvester) {
+        './vendor/underscore-min'], function (sylvester, blockProperties) {
     var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
@@ -56,6 +57,7 @@ define(['./vendor/sylvester.src-modified',
 
     // fixme: remove
     window.sylvester = sylvester;
+    window.blockProperties = blockProperties;
 
     // Puts jQuery and Underscore.js in Reality Builder namespace, to avoid
     // conflicts with jQuery, Underscore.js or other libraries included by the

@@ -21,7 +21,6 @@
 
 dojo.provide('realityBuilder.RealityBuilder');
 
-dojo.require('realityBuilder.BlockProperties');
 dojo.require('realityBuilder.ConstructionBlocks');
 dojo.require('realityBuilder.ConstructionBlock');
 dojo.require('realityBuilder.NewBlock');
@@ -36,9 +35,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // All blocks, permanently in the construction, including real and pending
     // blocks:
     _constructionBlocks: null,
-
-    // Properties (shape, dimensions, etc.) of a block:
-    _blockProperties: null,
 
     // The new block that the user is supposed to position. Could move once the
     // real blocks are loaded, if there are any intersections.
@@ -68,15 +64,12 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
         this._onReadyCalled = false;
 
-        this._blockProperties = new rb.BlockProperties();
-        this._camera = new rb.Camera(this._blockProperties,
-                                     settings.width, settings.height,
+        this._camera = new rb.Camera(settings.width, settings.height,
                                      dojo.byId(settings.id));
         this._constructionBlocks =
-            new rb.ConstructionBlocks(this._blockProperties, this._camera);
+            new rb.ConstructionBlocks(this._camera);
         this._newBlock =
-            new rb.NewBlock(this._blockProperties,
-                            this._camera,
+            new rb.NewBlock(this._camera,
                             this._constructionBlocks);
 
         dojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
@@ -118,10 +111,6 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
     constructionBlocks: function () {
         return this._constructionBlocks;
-    },
-
-    blockProperties: function () {
-        return this._blockProperties;
     },
 
     // Called after the new block has been frozen.
@@ -176,7 +165,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         return (this._constructionBlocks.isInitializedWithServerData() &&
                 this._newBlock.isInitializedWithServerData() &&
                 this._camera.isInitializedWithServerData() &&
-                this._blockProperties.isInitializedWithServerData());
+                blockProperties.isInitializedWithServerData());
     },
 
     // (Re-)renders blocks, but only if all necessary components have been
@@ -209,7 +198,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     _updateNewBlockStateIfFullyInitialized: function (unfreeze) {
         if (this._constructionBlocks.isInitializedWithServerData() &&
                 this._newBlock.isInitializedWithServerData() &&
-                this._blockProperties.isInitializedWithServerData()) {
+                blockProperties.isInitializedWithServerData()) {
             realityBuilder._newBlock.updateState();
             realityBuilder.util.SETTINGS.onDegreesOfFreedomChanged();
             realityBuilder.util.SETTINGS.onMovedOrRotated();
@@ -254,7 +243,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     _checkIfReady: function () {
         if (this._constructionBlocks.isInitializedWithServerData() &&
                 this._camera.isInitializedWithServerData() &&
-                this._blockProperties.isInitializedWithServerData() &&
+                blockProperties.isInitializedWithServerData() &&
                 this._onReadyCalled === false) {
             realityBuilder.util.SETTINGS.onReady();
             this._onReadyCalled = true;
@@ -281,8 +270,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
         }
 
         if (data.blockPropertiesData.changed) {
-            this._blockProperties.
-                updateWithServerData(data.blockPropertiesData);
+            blockProperties.updateWithServerData(data.blockPropertiesData);
         }
 
         if (data.newBlockData.changed) {
@@ -320,7 +308,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
                     this._constructionBlocks.versionOnServer(),
                 "cameraDataVersion": this._camera.versionOnServer(),
                 "blockPropertiesDataVersion":
-                    this._blockProperties.versionOnServer(),
+                    blockProperties.versionOnServer(),
                 "newBlockDataVersion": this._newBlock.versionOnServer(),
                 "validatorVersion": this._validatorVersion
             },

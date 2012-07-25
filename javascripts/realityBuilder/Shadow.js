@@ -32,9 +32,6 @@ dojo.declare('realityBuilder.Shadow', null, {
     // Camera object, used for calculating the projection on the camera sensor.
     _camera: null,
 
-    // Properties (shape, dimensions, etc.) of a block:
-    _blockProperties: null,
-
     // Permament blocks in the construction, including real and pending blocks.
     // Needed for hidden lines removal and collision detection.
     _constructionBlocks: null,
@@ -51,22 +48,20 @@ dojo.declare('realityBuilder.Shadow', null, {
     // it is as seen by the sensor of the camera "camera". For finding which
     // parts of the shadow have to be obscured, the list of non-new blocks in
     // the construction is used: "constructionBlocks"
-    constructor: function (newBlock, blockProperties, camera,
+    constructor: function (newBlock, camera,
                            constructionBlocks) {
         this._newBlock = newBlock;
-        this._blockProperties = blockProperties;
         this._camera = camera;
         this._constructionBlocks = constructionBlocks;
 
         this._shadowObscuringBlocks =
             new realityBuilder.ShadowObscuringBlocks(newBlock,
-                                                     blockProperties,
                                                      camera,
                                                      constructionBlocks);
 
         this._layerShadow =
-            new realityBuilder.LayerShadow(newBlock, blockProperties,
-                                               camera, constructionBlocks);
+            new realityBuilder.LayerShadow(newBlock, camera,
+                                           constructionBlocks);
     },
 
     _renderLayerShadow: function (context, newBlock, camera,

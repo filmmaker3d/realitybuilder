@@ -45,6 +45,9 @@ handlers:
 - url: /javascripts/realityBuilder
   static_dir: javascripts/realityBuilder
 
+- url: /scripts
+  static_dir: scripts
+
 - url: /vendor
   static_dir: vendor
 

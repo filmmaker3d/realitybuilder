@@ -36,7 +36,7 @@ realityBuilder.util.TOLERANCE_VXZ = 0.00001;
 realityBuilder.util.SETTINGS = null;
 
 // Returns the coordinates of the block space point "pB" in world space.
-realityBuilder.util.blockToWorld = function (pB, blockProperties) {
+realityBuilder.util.blockToWorld = function (pB) {
     var factorX = blockProperties.posSpacingXY(),
         factorY = blockProperties.posSpacingXY(),
         factorZ = blockProperties.posSpacingZ();

@@ -33,9 +33,6 @@ dojo.declare('realityBuilder.Block', null, {
     // camera sensor.
     _camera: null,
 
-    // Properties (shape, dimensions, etc.) of a block:
-    _blockProperties: null,
-
     // Coordinates of the vertexes in block space, world space, view space, and
     // sensor space.
     _bottomVertexesB: null,
@@ -105,13 +102,9 @@ dojo.declare('realityBuilder.Block', null, {
     // "posB", and rotated about its center of rotation by "a" (° CCW,
     // when viewed from above). When the block is rendered, it is as seen by
     // the sensor of the camera "camera".
-    //
-    // The block's properties, such as shape and size, are described by
-    // "blockProperties".
-    constructor: function (blockProperties, camera, posB, a) {
+    constructor: function (camera, posB, a) {
         this._posB = posB;
         this._a = a;
-        this._blockProperties = blockProperties;
         this._camera = camera;
     },
 
@@ -157,7 +150,7 @@ dojo.declare('realityBuilder.Block', null, {
         posB = this.poseB();
         a = this.poseB()[3];
 
-        if (this._blockProperties.has2FoldSymmetry() && a >= 2) {
+        if (blockProperties.has2FoldSymmetry() && a >= 2) {
             congruencyOffsetB = this.congruencyOffsetB();
             siPoseB = realityBuilder.util.addVectorsB(posB,
                                                       congruencyOffsetB);
@@ -170,15 +163,11 @@ dojo.declare('realityBuilder.Block', null, {
     },
 
     has2FoldSymmetry: function () {
-        return this._blockProperties.has2FoldSymmetry();
+        return blockProperties.has2FoldSymmetry();
     },
 
     congruencyOffsetB: function () {
-        return this._blockProperties.congruencyOffsetB(this._a);
-    },
-
-    blockProperties: function () {
-        return this._blockProperties;
+        return blockProperties.congruencyOffsetB(this._a);
     },
 
     // Returns the block's vertexes in screen space.
@@ -225,7 +214,7 @@ dojo.declare('realityBuilder.Block', null, {
         var testPosB, collisionOffsetsBXY, collisionOffsetBXY, i;
 
         collisionOffsetsBXY =
-            this._blockProperties.rotatedCollisionOffsetsBXY(this, block);
+            blockProperties.rotatedCollisionOffsetsBXY(this, block);
 
         for (i = 0; i < collisionOffsetsBXY.length; i += 1) {
             collisionOffsetBXY = collisionOffsetsBXY[i];
@@ -246,7 +235,7 @@ dojo.declare('realityBuilder.Block', null, {
         var testPosB, attachmentOffsetsB, attachmentOffsetB, i;
 
         attachmentOffsetsB =
-            this._blockProperties.rotatedAttachmentOffsetsB(this, block);
+            blockProperties.rotatedAttachmentOffsetsB(this, block);
 
         for (i = 0; i < attachmentOffsetsB.length; i += 1) {
             attachmentOffsetB = attachmentOffsetsB[i];
@@ -270,8 +259,8 @@ dojo.declare('realityBuilder.Block', null, {
             yB = this.posB()[1],
             zB = this.posB()[2],
             blockOutlineBXY =
-            this._blockProperties.rotatedOutlineBXY(this.a()),
-            rotCenterBXY = this._blockProperties.rotCenterBXY(),
+            blockProperties.rotatedOutlineBXY(this.a()),
+            rotCenterBXY = blockProperties.rotCenterBXY(),
             that = this;
 
         this._bottomVertexesB = [];
@@ -296,7 +285,7 @@ dojo.declare('realityBuilder.Block', null, {
     },
 
     _blockToWorld: function (pB) {
-        return realityBuilder.util.blockToWorld(pB, this._blockProperties);
+        return realityBuilder.util.blockToWorld(pB, blockProperties);
     },
 
     // Updates the vertexes of the block and its center of rotation in world
@@ -344,7 +333,7 @@ dojo.declare('realityBuilder.Block', null, {
         cameraHasChanged = this._lastCameraId !== this._camera.id();
         blockPropertiesHaveChanged =
             this._lastBlockPropertiesVersionOnServer !==
-            this._blockProperties.versionOnServer();
+            blockProperties.versionOnServer();
         posBHasChanged =
             this._lastPosB === null ||
             !realityBuilder.util.pointsIdenticalB(this._lastPosB,
@@ -358,7 +347,7 @@ dojo.declare('realityBuilder.Block', null, {
     // Called after the coordinates have been updated.
     _onCoordinatesUpdated: function () {
         this._lastBlockPropertiesVersionOnServer =
-            this._blockProperties.versionOnServer();
+            blockProperties.versionOnServer();
         this._lastCameraId = this._camera.id();
         this._lastPosB = [this._posB[0],
                                this._posB[1],
@@ -627,7 +616,7 @@ dojo.declare('realityBuilder.Block', null, {
             irv = this._indexOfRightmostVertex,
             imax;
 
-        context.globalAlpha = this._blockProperties.backgroundAlpha();
+        context.globalAlpha = blockProperties.backgroundAlpha();
 
         // bottom:
         context.beginPath();

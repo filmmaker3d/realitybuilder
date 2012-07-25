@@ -21,11 +21,9 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, dojox, FlashCanvas */
+/*global realityBuilder, realityBuilderDojo, define */
 
-dojo.provide('realityBuilder.BlockProperties');
-
-dojo.declare('realityBuilder.BlockProperties', null, {
+define({
     // Version of data last retrieved from the server, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _versionOnServer: '-1',
@@ -293,7 +291,8 @@ dojo.declare('realityBuilder.BlockProperties', null, {
             this._completeAttachmentOffsetsListB();
             this._updateRotatedAttachmentOffsetsListsB();
 
-            dojo.publish('realityBuilder/BlockProperties/changed');
+            realityBuilderDojo.publish('realityBuilder/BlockProperties/' +
+                                       'changed');
         }
     },
 
