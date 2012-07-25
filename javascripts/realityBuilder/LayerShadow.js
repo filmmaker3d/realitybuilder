@@ -107,9 +107,10 @@ realityBuilderDojo.declare('realityBuilder.LayerShadow', null, {
     // Calculates the vertexes of the full shadow, projected onto the layer of
     // blocks of elevation "layerZB", in view space.
     _updateViewSpaceCoordinates: function (layerZB) {
+        var _ = realityBuilder._;
         this._updateWorldSpace(layerZB);
-        this._fullVertexesV = realityBuilderDojo.map(this._fullVertexes,
-                                       realityBuilderDojo.hitch(camera, camera.worldToView));
+        this._fullVertexesV = _.map(this._fullVertexes,
+                                    _.bind(camera.worldToView, camera));
     },
 
     // Calculates the vertexes of the full shadow, projected onto the layer of
@@ -118,9 +119,9 @@ realityBuilderDojo.declare('realityBuilder.LayerShadow', null, {
     //
     // Depends on up to date view space coordinates.
     _updateSensorSpaceCoordinates: function (layerZB) {
-        this._fullVertexesS = realityBuilderDojo.map(this._fullVertexesV,
-                                   realityBuilderDojo.hitch(camera,
-                                                            camera.viewToSensor));
+        var _ = realityBuilder._;
+        this._fullVertexesS = _.map(this._fullVertexesV,
+                                    _.bind(camera.viewToSensor, camera));
     },
 
     // Updates coordinates for the full shadow, projected onto the layer of
