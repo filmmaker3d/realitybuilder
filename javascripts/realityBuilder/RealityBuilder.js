@@ -21,7 +21,6 @@
 
 realityBuilderDojo.provide('realityBuilder.RealityBuilder');
 
-realityBuilderDojo.require('realityBuilder.ConstructionBlock');
 realityBuilderDojo.require('realityBuilder.NewBlock');
 
 realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
@@ -56,6 +55,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
 
         camera.init(settings.width, settings.height,
                     realityBuilderDojo.byId(settings.id));
+        constructionBlock.init(realityBuilder);
         this._newBlock = new rb.NewBlock();
 
         realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',

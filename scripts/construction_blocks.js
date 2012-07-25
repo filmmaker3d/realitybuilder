@@ -21,7 +21,7 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./util'], function (util) {
+define(['./util', './construction_block'], function (util, constructionBlock) {
     return {
         // Version of blocks data last retrieved from the server, or "-1"
         // initially. Is a string in order to be able to contain very large
@@ -100,7 +100,7 @@ define(['./util'], function (util) {
 
         _createBlockFromServerData: function (serverData) {
             var rb = realityBuilder;
-            return new rb.ConstructionBlock(serverData.posB, serverData.a,
+            return constructionBlock.extend(serverData.posB, serverData.a,
                                             serverData.state,
                                             serverData.timeStamp);
         },
