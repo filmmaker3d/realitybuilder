@@ -333,14 +333,12 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
         });
     },
 
-    // Unsets the construction validator, then 
+    // Unsets the construction validator, then reloads it from the server.
     _loadValidator: function (src) {
+        var $ = realityBuilder.$;
+
         this._unsetValidator();
-        realityBuilderDojo.io.script.get({
-            url: src,
-            timeout: realityBuilder.util.SETTINGS.jsonpTimeout,
-            error: realityBuilder.util.SETTINGS.onJsonpError
-        });
+        $.getScript(src);
     },
 
     _unsetValidator: function () {

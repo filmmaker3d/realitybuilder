@@ -21,8 +21,6 @@
 
 realityBuilderDojo.provide('realityBuilder.util');
 
-realityBuilderDojo.require('dojo.io.script');
-
 // Tolerance when comparing coordinates in sensor space.
 realityBuilder.util.TOLERANCE_S = 0.5;
 
@@ -418,24 +416,25 @@ realityBuilder.util.posInSrtSimPosesBList = function (srtSimPosesB,
 
 // Has a trailing slash.
 realityBuilder.util.rootUrl = function () {
-    if (realityBuilderDojo.config.isDebug) {
-        return realityBuilderDojo.baseUrl + '../../../';
-    } else {
-        return realityBuilderDojo.baseUrl + '../../';
-    }
+    return realityBuilderDojo.baseUrl + '../../../';
 };
 
 // Performs a JSONP request, using some default settings.
 realityBuilder.util.jsonpGet = function (args) {
+    var $ = realityBuilder.$;
+
     if (typeof args.content === 'undefined') {
         args.content = {};
     }
 
     args.content.namespace = realityBuilder.util.SETTINGS.namespace;
 
-    realityBuilderDojo.io.script.get(realityBuilderDojo.mixin({
-        callbackParamName: 'callback',
+    $.ajax({
+        dataType: 'jsonp',
+        url: args.url,
+        data: args.content,
+        success: args.load,
         timeout: realityBuilder.util.SETTINGS.jsonpTimeout,
         error: realityBuilder.util.SETTINGS.onJsonpError
-    }, args));
+    });
 };
