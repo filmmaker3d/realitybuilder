@@ -18,13 +18,9 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderDojo. FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-realityBuilderDojo.provide('realityBuilder.Shadow');
-
-realityBuilderDojo.require('realityBuilder.ShadowObscuringBlocks');
-
-realityBuilderDojo.declare('realityBuilder.Shadow', null, {
+define({
     // New block that the shadow is associated with.
     _newBlock: null,
 
@@ -39,7 +35,7 @@ realityBuilderDojo.declare('realityBuilder.Shadow', null, {
     // Creates the shadow of the block "newBlock". For finding which parts of
     // the shadow have to be obscured, the list of non-new blocks in the
     // construction is used: "constructionBlocks"
-    constructor: function (newBlock, constructionBlocks) {
+    init: function (realityBuilder, newBlock, constructionBlocks) {
         this._newBlock = newBlock;
         this._constructionBlocks = constructionBlocks;
 

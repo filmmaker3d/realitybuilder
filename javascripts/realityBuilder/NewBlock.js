@@ -22,7 +22,7 @@
 realityBuilderDojo.provide('realityBuilder.NewBlock');
 
 realityBuilderDojo.require('realityBuilder.Block');
-realityBuilderDojo.require('realityBuilder.Shadow');
+realityBuilderDojo.require('realityBuilder.ShadowObscuringBlocks');
 
 realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     '-chains-': {
@@ -41,9 +41,6 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Needed for hidden lines removal and collision detection.
     _constructionBlocks: null,
 
-    // Shadow in south-east direction.
-    _shadow: null,
-
     // Block space position used when last calculating the sensor space
     // coordinates.
     _lastPosB: null,
@@ -61,8 +58,7 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         this.inherited(arguments, [[0, 0, 0], 0]);
         this._isFrozen = false;
         this._constructionBlocks = constructionBlocks;
-        this._shadow = new realityBuilder.Shadow(this,
-                                                 constructionBlocks);
+        shadow.init(realityBuilder, this, constructionBlocks);
     },
 
     versionOnServer: function () {
@@ -405,11 +401,11 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         var color, alpha;
 
         if (this.isFrozen()) {
-            this._shadow.clear();
+            shadow.clear();
         } else {
             color = realityBuilder.util.SETTINGS.colorOfNewBlockShadow;
             alpha = realityBuilder.util.SETTINGS.alphaOfNewBlockShadow;
-            this._shadow.render(color, alpha);
+            shadow.render(color, alpha);
         }
     },
 
