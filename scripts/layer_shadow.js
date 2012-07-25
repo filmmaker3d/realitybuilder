@@ -30,9 +30,7 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-realityBuilderDojo.provide('realityBuilder.LayerShadow');
-
-realityBuilderDojo.declare('realityBuilder.LayerShadow', null, {
+define({
     // New block that the shadow is associated with.
     _newBlock: null,
 
@@ -54,7 +52,7 @@ realityBuilderDojo.declare('realityBuilder.LayerShadow', null, {
     // weak garbage collectors).
     _helperCanvas: null,
 
-    constructor: function (newBlock, constructionBlocks) {
+    init: function (newBlock, constructionBlocks) {
         var shadowCanvas, $ = realityBuilder.$;
 
         this._newBlock = newBlock;

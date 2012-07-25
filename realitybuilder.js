@@ -47,12 +47,14 @@ define(['./vendor/sylvester.src-modified',
         './scripts/block_properties',
         './scripts/camera',
         './scripts/sensor',
+        './scripts/layer_shadow',
         './vendor/lazyload/lazyload',
         './vendor/jquery',
         './vendor/underscore-min'], function (sylvester,
                                               blockProperties,
                                               camera,
-                                              sensor) {
+                                              sensor,
+                                              layerShadow) {
     var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
         settings,
@@ -65,6 +67,7 @@ define(['./vendor/sylvester.src-modified',
     window.blockProperties = blockProperties;
     window.camera = camera;
     window.sensor = sensor;
+    window.layerShadow = layerShadow;
 
     // Puts jQuery and Underscore.js in Reality Builder namespace, to avoid
     // conflicts with jQuery, Underscore.js or other libraries included by the

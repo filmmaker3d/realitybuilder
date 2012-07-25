@@ -22,7 +22,6 @@
 
 realityBuilderDojo.provide('realityBuilder.Shadow');
 
-realityBuilderDojo.require('realityBuilder.LayerShadow');
 realityBuilderDojo.require('realityBuilder.ShadowObscuringBlocks');
 
 realityBuilderDojo.declare('realityBuilder.Shadow', null, {
@@ -37,10 +36,6 @@ realityBuilderDojo.declare('realityBuilder.Shadow', null, {
     // that are not actually visible.
     _shadowObscuringBlocks: null,
 
-    // Only one instance of LayerShadow is used, to avoid memory leaks. See the
-    // documentation of LayerShadow for more information.
-    _layerShadow: null,
-
     // Creates the shadow of the block "newBlock". For finding which parts of
     // the shadow have to be obscured, the list of non-new blocks in the
     // construction is used: "constructionBlocks"
@@ -51,16 +46,14 @@ realityBuilderDojo.declare('realityBuilder.Shadow', null, {
         this._shadowObscuringBlocks =
             new realityBuilder.ShadowObscuringBlocks(newBlock,
                                                      constructionBlocks);
-
-        this._layerShadow =
-            new realityBuilder.LayerShadow(newBlock, constructionBlocks);
+        layerShadow.init(newBlock, constructionBlocks);
     },
 
     _renderLayerShadow: function (context, newBlock,
                                   constructionBlocks, layerZB, color, alpha) {
-        this._layerShadow.render(layerZB, color);
+        layerShadow.render(layerZB, color);
         context.globalAlpha = alpha;
-        context.drawImage(this._layerShadow.canvas(), 0, 0);
+        context.drawImage(layerShadow.canvas(), 0, 0);
         context.globalAlpha = 1;
     },
 
