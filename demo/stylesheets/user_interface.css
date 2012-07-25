@@ -82,8 +82,8 @@
     background-position: -170px -390px;
 }
 
-.user.interface .incX.button.disbled,
-.user.interface .incX.button.disbled:hover {
+.user.interface .incX.button.disabled,
+.user.interface .incX.button.disabled:hover {
     background-position: -170px -490px;
 }
 
