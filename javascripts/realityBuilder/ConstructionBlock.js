@@ -18,13 +18,13 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-dojo.provide('realityBuilder.ConstructionBlock');
+realityBuilderDojo.provide('realityBuilder.ConstructionBlock');
 
-dojo.require('realityBuilder.Block');
+realityBuilderDojo.require('realityBuilder.Block');
 
-dojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
+realityBuilderDojo.declare('realityBuilder.ConstructionBlock', realityBuilder.Block, {
     // State of the block: 0 = deleted, 1 = pending (= requested to be build),
     // 2 = real
     _state: null,

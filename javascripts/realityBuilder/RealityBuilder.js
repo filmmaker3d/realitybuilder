@@ -17,17 +17,17 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderValidator, dojo, FlashCanvas, _ */
+/*global realityBuilder, realityBuilderValidator, realityBuilderDojo. FlashCanvas, _ */
 
-dojo.provide('realityBuilder.RealityBuilder');
+realityBuilderDojo.provide('realityBuilder.RealityBuilder');
 
-dojo.require('realityBuilder.ConstructionBlocks');
-dojo.require('realityBuilder.ConstructionBlock');
-dojo.require('realityBuilder.NewBlock');
-dojo.require('realityBuilder.Sensor');
-dojo.require('realityBuilder.util');
+realityBuilderDojo.require('realityBuilder.ConstructionBlocks');
+realityBuilderDojo.require('realityBuilder.ConstructionBlock');
+realityBuilderDojo.require('realityBuilder.NewBlock');
+realityBuilderDojo.require('realityBuilder.Sensor');
+realityBuilderDojo.require('realityBuilder.util');
 
-dojo.declare('realityBuilder.RealityBuilder', null, {
+realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // Last construction validator version retrieved, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _validatorVersion: '-1',
@@ -61,35 +61,35 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
 
         this._onReadyCalled = false;
 
-        camera.init(settings.width, settings.height, dojo.byId(settings.id),
+        camera.init(settings.width, settings.height, realityBuilderDojo.byId(settings.id),
                     realityBuilder.Sensor);
         this._constructionBlocks = new rb.ConstructionBlocks();
         this._newBlock = new rb.NewBlock(this._constructionBlocks);
 
-        dojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
+        realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realityBuilder/NewBlock/createdPendingOnServer',
+        realityBuilderDojo.subscribe('realityBuilder/NewBlock/createdPendingOnServer',
                        this, this._update); // Speeds up responsiveness.
-        dojo.subscribe('realityBuilder/NewBlock/' +
+        realityBuilderDojo.subscribe('realityBuilder/NewBlock/' +
                        'positionAngleInitialized',
                        this, this._onNewBlockPositionAngleInitialized);
-        dojo.subscribe('realityBuilder/NewBlock/frozen',
+        realityBuilderDojo.subscribe('realityBuilder/NewBlock/frozen',
                        this, this._onNewBlockFrozen);
-        dojo.subscribe('realityBuilder/NewBlock/unfrozen',
+        realityBuilderDojo.subscribe('realityBuilder/NewBlock/unfrozen',
                        this, this._onNewBlockUnfrozen);
-        dojo.subscribe('realityBuilder/NewBlock/movedOrRotated',
+        realityBuilderDojo.subscribe('realityBuilder/NewBlock/movedOrRotated',
                        this, this._onNewBlockMovedOrRotated);
-        dojo.subscribe('realityBuilder/NewBlock/' +
+        realityBuilderDojo.subscribe('realityBuilder/NewBlock/' +
                        'onNewBlockMakePendingRequested',
                        this, this._onNewBlockMakePendingRequested);
-        dojo.subscribe('realityBuilder/NewBlock/' +
+        realityBuilderDojo.subscribe('realityBuilder/NewBlock/' +
                        'onNewBlockMakeRealRequested',
                        this, this._onNewBlockMakeRealRequested);
-        dojo.subscribe('realityBuilder/ConstructionBlocks/changed',
+        realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changed',
                        this, this._onConstructionBlocksChanged);
-        dojo.subscribe('realityBuilder/Camera/changed',
+        realityBuilderDojo.subscribe('realityBuilder/Camera/changed',
                        this, this._onCameraChanged);
-        dojo.subscribe('realityBuilder/BlockProperties/changed',
+        realityBuilderDojo.subscribe('realityBuilder/BlockProperties/changed',
                        this, this._onBlockPropertiesChanged);
 
         this._update();
@@ -343,7 +343,7 @@ dojo.declare('realityBuilder.RealityBuilder', null, {
     // Unsets the construction validator, then 
     _loadValidator: function (src) {
         this._unsetValidator();
-        dojo.io.script.get({
+        realityBuilderDojo.io.script.get({
             url: src,
             timeout: realityBuilder.util.SETTINGS.jsonpTimeout,
             error: realityBuilder.util.SETTINGS.onJsonpError

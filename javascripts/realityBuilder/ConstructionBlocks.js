@@ -19,14 +19,14 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-dojo.provide('realityBuilder.ConstructionBlocks');
+realityBuilderDojo.provide('realityBuilder.ConstructionBlocks');
 
-dojo.require('realityBuilder.ConstructionBlock');
-dojo.require('realityBuilder.util');
+realityBuilderDojo.require('realityBuilder.ConstructionBlock');
+realityBuilderDojo.require('realityBuilder.util');
 
-dojo.declare('realityBuilder.ConstructionBlocks', null, {
+realityBuilderDojo.declare('realityBuilder.ConstructionBlocks', null, {
     // Version of blocks data last retrieved from the server, or "-1"
     // initially. Is a string in order to be able to contain very large
     // integers.
@@ -131,7 +131,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
             this._updateRealBlocksSorted();
             this._updatePendingBlocks();
             this._updateNonDeletedBlocks();
-            dojo.publish('realityBuilder/ConstructionBlocks/changed');
+            realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changed');
         }
     },
 
@@ -218,12 +218,12 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Called if making the block pending on the server succeeded.
     _makePendingOnServerSucceeded: function () {
-        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
+        realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block pending on the server failed.
     _makePendingOnServerFailed: function () {
-        dojo.publish('realityBuilder/ConstructionBlocks/' +
+        realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/' +
                      'changeOnServerFailed');
     },
 
@@ -248,7 +248,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Called if deleting the block on the server succeeded.
     _deleteOnServerSucceeded: function () {
-        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
+        realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Deletes the block positioned at the block space position "posB" and
@@ -270,12 +270,12 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Called if making the block real on the server succeeded.
     _makeRealOnServerSucceeded: function () {
-        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
+        realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Called if making the block real on the server failed.
     _makeRealOnServerFailed: function () {
-        dojo.publish('realityBuilder/ConstructionBlocks/' +
+        realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/' +
                      'changeOnServerFailed');
     },
 
@@ -316,7 +316,7 @@ dojo.declare('realityBuilder.ConstructionBlocks', null, {
 
     // Called if replacing the blocks on the server succeeded.
     _replaceBlocksOnServerSucceeded: function () {
-        dojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
+        realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
     },
 
     // Deletes all blocks on the server, and sets the real blocks to those

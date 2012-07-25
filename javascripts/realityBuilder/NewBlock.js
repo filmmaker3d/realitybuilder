@@ -17,14 +17,14 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-dojo.provide('realityBuilder.NewBlock');
+realityBuilderDojo.provide('realityBuilder.NewBlock');
 
-dojo.require('realityBuilder.Block');
-dojo.require('realityBuilder.Shadow');
+realityBuilderDojo.require('realityBuilder.Block');
+realityBuilderDojo.require('realityBuilder.Shadow');
 
-dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
+realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     '-chains-': {
         constructor: 'manual'
     },
@@ -92,7 +92,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
             this._versionOnServer = serverData.version;
 
             if (positionAngleWereInitialized) {
-                dojo.publish('realityBuilder/NewBlock/' +
+                realityBuilderDojo.publish('realityBuilder/NewBlock/' +
                              'positionAngleInitialized');
             }
         }
@@ -108,7 +108,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     move: function (deltaB) {
         if (!this._wouldGoOutOfRange(deltaB, 0) && !this._isFrozen) {
             this._posB = realityBuilder.util.addVectorsB(this._posB, deltaB);
-            dojo.publish('realityBuilder/NewBlock/movedOrRotated');
+            realityBuilderDojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
     },
 
@@ -117,7 +117,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     rotate90: function () {
         if (!this._wouldGoOutOfRange([0, 0, 0], 1) && !this._isFrozen) {
             this._a = (this._a + 1) % 4; // multiples of 90°
-            dojo.publish('realityBuilder/NewBlock/movedOrRotated');
+            realityBuilderDojo.publish('realityBuilder/NewBlock/movedOrRotated');
         }
     },
 
@@ -127,7 +127,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         if (this.canBeMadeReal()) {
             this._freeze(); // until construction is updated
             this._createPendingOnServer();
-            dojo.publish('realityBuilder/NewBlock/makePendingRequested');
+            realityBuilderDojo.publish('realityBuilder/NewBlock/makePendingRequested');
         }
     },
 
@@ -137,7 +137,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         if (this.canBeMadeReal()) {
             this._freeze(); // until construction is updated
             this._createRealOnServer();
-            dojo.publish('realityBuilder/NewBlock/makeRealRequested');
+            realityBuilderDojo.publish('realityBuilder/NewBlock/makeRealRequested');
         }
     },
 
@@ -147,12 +147,12 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     _freeze: function () {
         this._isFrozen = true;
-        dojo.publish('realityBuilder/NewBlock/frozen');
+        realityBuilderDojo.publish('realityBuilder/NewBlock/frozen');
     },
 
     unfreeze: function () {
         this._isFrozen = false;
-        dojo.publish('realityBuilder/NewBlock/unfrozen');
+        realityBuilderDojo.publish('realityBuilder/NewBlock/unfrozen');
     },
 
     // Returns true, iff this block equals a construction block that has been
@@ -478,7 +478,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Called if storing the block as pending on the server succeeded.
     _createPendingOnServerSucceeded: function () {
-        dojo.publish('realityBuilder/NewBlock/createdPendingOnServer');
+        realityBuilderDojo.publish('realityBuilder/NewBlock/createdPendingOnServer');
     },
 
     // Adds this block to the list of blocks on the server, with state pending.
@@ -499,7 +499,7 @@ dojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Called if storing the block as pending on the server succeeded.
     _createRealOnServerSucceeded: function () {
-        dojo.publish('realityBuilder/NewBlock/createdRealOnServer');
+        realityBuilderDojo.publish('realityBuilder/NewBlock/createdRealOnServer');
     },
 
     // Adds this block to the list of blocks on the server, with state pending.

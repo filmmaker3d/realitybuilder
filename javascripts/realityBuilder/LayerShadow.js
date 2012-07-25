@@ -28,11 +28,11 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-dojo.provide('realityBuilder.LayerShadow');
+realityBuilderDojo.provide('realityBuilder.LayerShadow');
 
-dojo.declare('realityBuilder.LayerShadow', null, {
+realityBuilderDojo.declare('realityBuilder.LayerShadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
@@ -108,8 +108,8 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     // blocks of elevation "layerZB", in view space.
     _updateViewSpaceCoordinates: function (layerZB) {
         this._updateWorldSpace(layerZB);
-        this._fullVertexesV = dojo.map(this._fullVertexes,
-                                       dojo.hitch(camera, camera.worldToView));
+        this._fullVertexesV = realityBuilderDojo.map(this._fullVertexes,
+                                       realityBuilderDojo.hitch(camera, camera.worldToView));
     },
 
     // Calculates the vertexes of the full shadow, projected onto the layer of
@@ -118,8 +118,8 @@ dojo.declare('realityBuilder.LayerShadow', null, {
     //
     // Depends on up to date view space coordinates.
     _updateSensorSpaceCoordinates: function (layerZB) {
-        this._fullVertexesS = dojo.map(this._fullVertexesV,
-                                   dojo.hitch(camera, camera.viewToSensor));
+        this._fullVertexesS = realityBuilderDojo.map(this._fullVertexesV,
+                                   realityBuilderDojo.hitch(camera, camera.viewToSensor));
     },
 
     // Updates coordinates for the full shadow, projected onto the layer of

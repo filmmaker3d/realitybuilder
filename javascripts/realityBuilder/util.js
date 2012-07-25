@@ -17,11 +17,11 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas, swfobject */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas, swfobject */
 
-dojo.provide('realityBuilder.util');
+realityBuilderDojo.provide('realityBuilder.util');
 
-dojo.require('dojo.io.script');
+realityBuilderDojo.require('dojo.io.script');
 
 // Tolerance when comparing coordinates in sensor space.
 realityBuilder.util.TOLERANCE_S = 0.5;
@@ -418,10 +418,10 @@ realityBuilder.util.posInSrtSimPosesBList = function (srtSimPosesB,
 
 // Has a trailing slash.
 realityBuilder.util.rootUrl = function () {
-    if (dojo.config.isDebug) {
-        return dojo.baseUrl + '../../../';
+    if (realityBuilderDojo.config.isDebug) {
+        return realityBuilderDojo.baseUrl + '../../../';
     } else {
-        return dojo.baseUrl + '../../';
+        return realityBuilderDojo.baseUrl + '../../';
     }
 };
 
@@ -433,7 +433,7 @@ realityBuilder.util.jsonpGet = function (args) {
 
     args.content.namespace = realityBuilder.util.SETTINGS.namespace;
 
-    dojo.io.script.get(dojo.mixin({
+    realityBuilderDojo.io.script.get(realityBuilderDojo.mixin({
         callbackParamName: 'callback',
         timeout: realityBuilder.util.SETTINGS.jsonpTimeout,
         error: realityBuilder.util.SETTINGS.onJsonpError

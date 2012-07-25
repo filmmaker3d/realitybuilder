@@ -81,11 +81,11 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-dojo.provide('realityBuilder.ShadowObscuringBlocks');
+realityBuilderDojo.provide('realityBuilder.ShadowObscuringBlocks');
 
-dojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
+realityBuilderDojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
     // The blocks, sorted by height, from top to bottom.
     _blocksSorted: null,
 

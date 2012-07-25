@@ -17,11 +17,11 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-dojo.provide('realityBuilder.Sensor');
+realityBuilderDojo.provide('realityBuilder.Sensor');
 
-dojo.declare('realityBuilder.Sensor', null, {
+realityBuilderDojo.declare('realityBuilder.Sensor', null, {
     // Canvases for drawing various parts.
     _canvasNodes: null,
 

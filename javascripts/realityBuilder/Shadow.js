@@ -18,14 +18,14 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-dojo.provide('realityBuilder.Shadow');
+realityBuilderDojo.provide('realityBuilder.Shadow');
 
-dojo.require('realityBuilder.LayerShadow');
-dojo.require('realityBuilder.ShadowObscuringBlocks');
+realityBuilderDojo.require('realityBuilder.LayerShadow');
+realityBuilderDojo.require('realityBuilder.ShadowObscuringBlocks');
 
-dojo.declare('realityBuilder.Shadow', null, {
+realityBuilderDojo.declare('realityBuilder.Shadow', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 

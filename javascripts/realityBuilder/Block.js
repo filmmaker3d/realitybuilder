@@ -17,11 +17,11 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, dojo, FlashCanvas, camera */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas, camera */
 
-dojo.provide('realityBuilder.Block');
+realityBuilderDojo.provide('realityBuilder.Block');
 
-dojo.declare('realityBuilder.Block', null, {
+realityBuilderDojo.declare('realityBuilder.Block', null, {
     // Position of the block in block space. From the position the block
     // extends in positive direction along the x-, y-, and z-axis.
     _posB: null,
