@@ -21,8 +21,6 @@
 
 realityBuilderDojo.provide('realityBuilder.RealityBuilder');
 
-realityBuilderDojo.require('realityBuilder.Block');
-
 realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // Last construction validator version retrieved, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
@@ -51,8 +49,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
 
         camera.init(settings.width, settings.height,
                     realityBuilderDojo.byId(settings.id));
-        constructionBlock.init(realityBuilder);
-        newBlock.init(realityBuilder);
+        shadow.init(realityBuilder, newBlock);
 
         realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
                        this, this._update); // Speeds up responsiveness.

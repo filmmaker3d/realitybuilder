@@ -52,6 +52,7 @@ define(['./vendor/sylvester.src-modified',
         './scripts/construction_blocks',
         './scripts/construction_block',
         './scripts/new_block',
+        './scripts/block',
         './scripts/util',
         './vendor/lazyload/lazyload',
         './vendor/jquery',
@@ -64,6 +65,7 @@ define(['./vendor/sylvester.src-modified',
                                           constructionBlocks,
                                           constructionBlock,
                                           newBlock,
+                                          block,
                                           util) {
     var dojoScriptIsLoaded,
         initialized, // true, after the public "initialize" has been called
@@ -82,6 +84,7 @@ define(['./vendor/sylvester.src-modified',
     window.constructionBlocks = constructionBlocks;
     window.constructionBlock = constructionBlock;
     window.newBlock = newBlock;
+    window.block = block;
     realityBuilder.util = util;
 
     // Puts jQuery and Underscore.js in Reality Builder namespace, to avoid

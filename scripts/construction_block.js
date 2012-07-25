@@ -20,8 +20,8 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./util'], function () {
-    return {
+define(['./util', './block'], function (util, block) {
+    return block.extend({
         // State of the block: 0 = deleted, 1 = pending (= requested to be
         // build), 2 = real
         _state: null,
@@ -30,14 +30,6 @@ define(['./util'], function () {
         // bocks status was last changed. Block creation also counts as status
         // change.
         _timeStamp: null,
-
-        // fixme: eventually remove
-        init: function (realityBuilder) {
-            var block = new realityBuilder.Block([0, 0, 0], 0);
-
-            // Wouldn't be necessary if the prototype was correctly set:
-            _.extend(this, block);
-        },
 
         extend: function (posB, a, state, timeStamp) {
             var newObject = Object.create(this);
@@ -114,5 +106,5 @@ define(['./util'], function () {
             context.closePath();
             context.fill();
         }
-    }
+    });
 });

@@ -19,15 +19,19 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./util', './shadow'], function (util, shadow) {
-    return {
+define(['./util', './shadow', './block'], function (util, shadow, block) {
+    return block.extend({
+        // May change later:
+        _posB: [0, 0, 0],
+        _a: 0,
+
         // Version of data last retrieved from the server, or "-1" initially.
         // Is a string in order to be able to contain very large integers.
         _versionOnServer: '-1',
 
         // Iff true, then the block is frozen, which means that it can neither
         // be moved nor be rotated, nor be made real.
-        _isFrozen: null,
+        _isFrozen: false,
 
         // Block space position used when last calculating the sensor space
         // coordinates.
@@ -38,24 +42,6 @@ define(['./util', './shadow'], function (util, shadow) {
 
         // Version of the construction blocks when the shadow was last rendered.
         _lastConstructionBlocksVersion: null,
-
-        _renderBlock: null,
-
-        // Creates the new block that the user may position. For collision
-        // detection and for calculating hidden lines, the block needs to know
-        // about the other blocks in the construction.
-        init: function (realityBuilder) {
-            var block = new realityBuilder.Block([0, 0, 0], 0), render;
-
-            // Wouldn't be necessary if the prototype was correctly set:
-            render = this.render;
-            _.extend(this, block);
-            this._renderBlock = this.render;
-            this.render = render;
-
-            this._isFrozen = false;
-            shadow.init(realityBuilder, this);
-        },
 
         versionOnServer: function () {
             return this._versionOnServer;
@@ -181,8 +167,10 @@ define(['./util', './shadow'], function (util, shadow) {
                 testZB = this.zB();
                 do {
                     testZB += 1;
-                    testBlock = new realityBuilder.Block([xB, yB, testZB],
-                                                         this.a());
+                    testBlock = block.extend({
+                        _posB: [xB, yB, testZB],
+                        _a: this.a()
+                    });
                 } while (cbs.realBlocksCollideWith(testBlock));
                 this._posB[2] = testZB;
                 return true;
@@ -219,7 +207,10 @@ define(['./util', './shadow'], function (util, shadow) {
             testPosB = util.addVectorsB(this.posB(),
                                         deltaB);
             testA = (this.a() + deltaA) % 4;
-            testBlock = new realityBuilder.Block(testPosB, testA);
+            testBlock = block.extend({
+                _posB: testPosB,
+                _a: testA
+            });
 
             return constructionBlocks.realBlocksCollideWith(testBlock);
         },
@@ -457,7 +448,7 @@ define(['./util', './shadow'], function (util, shadow) {
                     }
 
                     util.clearCanvas(canvas);
-                    this._renderBlock(context, color);
+                    block.render.call(this, context, color);
 
                     // removes parts of the real block obscured by other blocks:
                     this._subtractRealBlocks(context);
@@ -507,5 +498,5 @@ define(['./util', './shadow'], function (util, shadow) {
                 load: _.bind(this._createRealOnServerSucceeded, this)
             });
         }
-    }
+    });
 });

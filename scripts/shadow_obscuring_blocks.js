@@ -83,41 +83,45 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define({
-    // The blocks, sorted by height, from top to bottom.
-    _blocksSorted: null,
+define(['./block'], function (block) {
+    return {
+        // The blocks, sorted by height, from top to bottom.
+        _blocksSorted: null,
 
-    // New block that the shadow is associated with.
-    _newBlock: null,
+        // New block that the shadow is associated with.
+        _newBlock: null,
 
-    _realityBuilder: null,
+        _realityBuilder: null,
 
-    init: function (realityBuilder, newBlock) {
-        this._realityBuilder = realityBuilder;
-        this._newBlock = newBlock;
-    },
+        init: function (realityBuilder, newBlock) {
+            this._realityBuilder = realityBuilder;
+            this._newBlock = newBlock;
+        },
 
-    _copyBlocksToLayer: function (srcBlocks, dstZB) {
-        var blocks = [], that = this,
+        _copyBlocksToLayer: function (srcBlocks, dstZB) {
+            var blocks = [], that = this,
             realityBuilder = this._realityBuilder,
             _ = realityBuilder._;
 
-        _.each(srcBlocks, function (srcBlock) {
-            var dstBlock, dstPosB;
+            _.each(srcBlocks, function (srcBlock) {
+                var dstBlock, dstPosB;
 
-            dstPosB = [srcBlock.xB(), srcBlock.yB(), dstZB];
-            dstBlock = new realityBuilder.Block(dstPosB, srcBlock.a());
-            dstBlock.onlySubtractBottom();
-            blocks.push(dstBlock);
-        });
+                dstPosB = [srcBlock.xB(), srcBlock.yB(), dstZB];
+                dstBlock = block.extend({
+                    _posB: dstPosB,
+                    _a: srcBlock.a()
+                })
+                dstBlock.onlySubtractBottom();
+                blocks.push(dstBlock);
+            });
 
-        return blocks;
-    },
+            return blocks;
+        },
 
-    // Updates the list of blocks (see definition of "shadow obscuring
-    // blocks").
-    update: function () {
-        var zB,
+        // Updates the list of blocks (see definition of "shadow obscuring
+        // blocks").
+        update: function () {
+            var zB,
             newBlock = this._newBlock,
             cbs = constructionBlocks,
             blocks = [],
@@ -125,49 +129,50 @@ define({
             blocksInPrevLayer = [],
             copiedBlocks;
 
-        for (zB = cbs.highestRealBlocksZB(); zB >= 0; zB -= 1) {
-            // Collects shadow obscuring blocks for current layer:
-            blocksInLayer = cbs.realBlocksInLayer(zB);
+            for (zB = cbs.highestRealBlocksZB(); zB >= 0; zB -= 1) {
+                // Collects shadow obscuring blocks for current layer:
+                blocksInLayer = cbs.realBlocksInLayer(zB);
 
-            if (zB < newBlock.zB()) {
-                copiedBlocks = this._copyBlocksToLayer(blocksInPrevLayer, zB);
-                blocksInLayer = blocksInLayer.concat(blocksInLayer,
-                                                     copiedBlocks);
+                if (zB < newBlock.zB()) {
+                    copiedBlocks = this._copyBlocksToLayer(blocksInPrevLayer, zB);
+                    blocksInLayer = blocksInLayer.concat(blocksInLayer,
+                                                         copiedBlocks);
+                }
+
+                blocks = blocks.concat(blocksInLayer);
+
+                blocksInPrevLayer = blocksInLayer;
             }
 
-            blocks = blocks.concat(blocksInLayer);
+            this._blocksSorted = blocks;
+        },
 
-            blocksInPrevLayer = blocksInLayer;
-        }
+        // Returns the blocks with the z coordination "zB", in block space.
+        _blocksInLayer: function (zB) {
+            var blocksSorted, block, i, blocks = [];
 
-        this._blocksSorted = blocks;
-    },
+            blocksSorted = this._blocksSorted;
 
-    // Returns the blocks with the z coordination "zB", in block space.
-    _blocksInLayer: function (zB) {
-        var blocksSorted, block, i, blocks = [];
-
-        blocksSorted = this._blocksSorted;
-
-        for (i = 0; i < blocksSorted.length; i += 1) {
-            block = blocksSorted[i];
-            if (block.zB() === zB) {
-                blocks.push(block);
-            } else if (block.zB() < zB) {
-                break; // no further matching blocks in sorted array
+            for (i = 0; i < blocksSorted.length; i += 1) {
+                block = blocksSorted[i];
+                if (block.zB() === zB) {
+                    blocks.push(block);
+                } else if (block.zB() < zB) {
+                    break; // no further matching blocks in sorted array
+                }
             }
+
+            return blocks;
+        },
+
+        // Graphically subtract the shadow obscuring blocks with vertical position
+        // "zB" from the canvas with the rendering context "context".
+        subtract: function (context, zB) {
+            var blocksInLayer = this._blocksInLayer(zB), _ = realityBuilder._;
+
+            _.each(blocksInLayer, function (block) {
+                block.subtract(context);
+            });
         }
-
-        return blocks;
-    },
-
-    // Graphically subtract the shadow obscuring blocks with vertical position
-    // "zB" from the canvas with the rendering context "context".
-    subtract: function (context, zB) {
-        var blocksInLayer = this._blocksInLayer(zB), _ = realityBuilder._;
-
-        _.each(blocksInLayer, function (block) {
-            block.subtract(context);
-        });
     }
 });
