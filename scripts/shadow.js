@@ -20,73 +20,64 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define({
-    // New block that the shadow is associated with.
-    _newBlock: null,
+define(['./construction_blocks'], function (constructionBlocks) {
+    return {
+        // New block that the shadow is associated with.
+        _newBlock: null,
 
-    // Permament blocks in the construction, including real and pending blocks.
-    // Needed for hidden lines removal and collision detection.
-    _constructionBlocks: null,
+        // Blocks that are used for graphically removing that parts of a shadow
+        // that are not actually visible.
+        _shadowObscuringBlocks: null,
 
-    // Blocks that are used for graphically removing that parts of a shadow
-    // that are not actually visible.
-    _shadowObscuringBlocks: null,
+        // Creates the shadow of the block "newBlock".
+        init: function (realityBuilder, newBlock) {
+            this._newBlock = newBlock;
 
-    // Creates the shadow of the block "newBlock". For finding which parts of
-    // the shadow have to be obscured, the list of non-new blocks in the
-    // construction is used: "constructionBlocks"
-    init: function (realityBuilder, newBlock, constructionBlocks) {
-        this._newBlock = newBlock;
-        this._constructionBlocks = constructionBlocks;
+            this._shadowObscuringBlocks =
+                new realityBuilder.ShadowObscuringBlocks(newBlock);
+            layerShadow.init(newBlock);
+        },
 
-        this._shadowObscuringBlocks =
-            new realityBuilder.ShadowObscuringBlocks(newBlock,
-                                                     constructionBlocks);
-        layerShadow.init(newBlock, constructionBlocks);
-    },
+        _renderLayerShadow: function (context, newBlock, layerZB, color, alpha) {
+            layerShadow.render(layerZB, color);
+            context.globalAlpha = alpha;
+            context.drawImage(layerShadow.canvas(), 0, 0);
+            context.globalAlpha = 1;
+        },
 
-    _renderLayerShadow: function (context, newBlock,
-                                  constructionBlocks, layerZB, color, alpha) {
-        layerShadow.render(layerZB, color);
-        context.globalAlpha = alpha;
-        context.drawImage(layerShadow.canvas(), 0, 0);
-        context.globalAlpha = 1;
-    },
-
-    // Draws the shadow of the new block as seen by the sensor of the camera.
-    //
-    // Draws the shadow in the color "color" and with alpha transparency
-    // "alpha".
-    render: function (color, alpha) {
-        var canvas = sensor.shadowCanvas(), context,
+        // Draws the shadow of the new block as seen by the sensor of the camera.
+        //
+        // Draws the shadow in the color "color" and with alpha transparency
+        // "alpha".
+        render: function (color, alpha) {
+            var canvas = sensor.shadowCanvas(), context,
             layerZB,
             newBlock = this._newBlock,
-            constructionBlocks = this._constructionBlocks,
             maxLayerZB = constructionBlocks.highestRealBlocksZB();
 
-        this._shadowObscuringBlocks.update();
+            this._shadowObscuringBlocks.update();
 
-        if (canvas.getContext) {
-            context = canvas.getContext('2d');
-            realityBuilder.util.clearCanvas(canvas);
+            if (canvas.getContext) {
+                context = canvas.getContext('2d');
+                realityBuilder.util.clearCanvas(canvas);
 
-            // draws shadow from bottom up, in each step removing parts that
-            // are obscured by blocks in the layer above:
-            for (layerZB = -1; layerZB <= maxLayerZB; layerZB += 1) {
-                if (layerZB < newBlock.zB()) {
-                    this._renderLayerShadow(context, newBlock,
-                                            constructionBlocks, layerZB,
-                                            color, alpha);
+                // draws shadow from bottom up, in each step removing parts that
+                // are obscured by blocks in the layer above:
+                for (layerZB = -1; layerZB <= maxLayerZB; layerZB += 1) {
+                    if (layerZB < newBlock.zB()) {
+                        this._renderLayerShadow(context, newBlock, layerZB,
+                                                color, alpha);
+                    }
+                    this._shadowObscuringBlocks.subtract(context, layerZB + 1);
                 }
-                this._shadowObscuringBlocks.subtract(context, layerZB + 1);
+                return;
             }
-            return;
-        }
-    },
+        },
 
-    // Makes sure that the shadow is not shown on the sensor.
-    clear: function () {
-        var canvas = sensor.shadowCanvas();
-        realityBuilder.util.clearCanvas(canvas);
+        // Makes sure that the shadow is not shown on the sensor.
+        clear: function () {
+            var canvas = sensor.shadowCanvas();
+            realityBuilder.util.clearCanvas(canvas);
+        }
     }
 });

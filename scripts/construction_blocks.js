@@ -19,37 +19,25 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderDojo. FlashCanvas */
+/*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-realityBuilderDojo.provide('realityBuilder.ConstructionBlocks');
-
-realityBuilderDojo.require('realityBuilder.ConstructionBlock');
-realityBuilderDojo.require('realityBuilder.util');
-
-realityBuilderDojo.declare('realityBuilder.ConstructionBlocks', null, {
+define({
     // Version of blocks data last retrieved from the server, or "-1"
     // initially. Is a string in order to be able to contain very large
     // integers.
     _versionOnServer: '-1',
 
     // The blocks.
-    _blocks: null,
+    _blocks: [],
 
     // All real blocks, sorted by height, from top to bottom.
-    _realBlocksSorted: null,
+    _realBlocksSorted: [],
 
     // All blocks that are pending.
     _pendingBlocks: null,
 
     // All blocks except deleted blocks = real and pending blocks.
     _nonDeletedBlocks: null,
-
-    // Creates a container for the blocks associated with the construction
-    // "construction".
-    constructor: function () {
-        this._blocks = [];
-        this._realBlocksSorted = [];
-    },
 
     blocks: function () {
         return this._blocks;

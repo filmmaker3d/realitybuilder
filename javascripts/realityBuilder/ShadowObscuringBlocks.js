@@ -92,13 +92,8 @@ realityBuilderDojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
     // New block that the shadow is associated with.
     _newBlock: null,
 
-    // Permament blocks in the construction, including real and pending blocks.
-    // Needed for hidden lines removal and collision detection.
-    _constructionBlocks: null,
-
-    constructor: function (newBlock, constructionBlocks) {
+    constructor: function (newBlock) {
         this._newBlock = newBlock;
-        this._constructionBlocks = constructionBlocks;
     },
 
     _copyBlocksToLayer: function (srcBlocks, dstZB) {
@@ -122,7 +117,7 @@ realityBuilderDojo.declare('realityBuilder.ShadowObscuringBlocks', null, {
     update: function () {
         var zB,
             newBlock = this._newBlock,
-            cbs = this._constructionBlocks,
+            cbs = constructionBlocks,
             blocks = [],
             blocksInLayer,
             blocksInPrevLayer = [],

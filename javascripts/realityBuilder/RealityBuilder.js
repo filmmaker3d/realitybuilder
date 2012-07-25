@@ -21,7 +21,6 @@
 
 realityBuilderDojo.provide('realityBuilder.RealityBuilder');
 
-realityBuilderDojo.require('realityBuilder.ConstructionBlocks');
 realityBuilderDojo.require('realityBuilder.ConstructionBlock');
 realityBuilderDojo.require('realityBuilder.NewBlock');
 realityBuilderDojo.require('realityBuilder.util');
@@ -30,10 +29,6 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // Last construction validator version retrieved, or "-1" initially. Is a
     // string in order to be able to contain very large integers.
     _validatorVersion: '-1',
-
-    // All blocks, permanently in the construction, including real and pending
-    // blocks:
-    _constructionBlocks: null,
 
     // The new block that the user is supposed to position. Could move once the
     // real blocks are loaded, if there are any intersections.
@@ -62,8 +57,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
 
         camera.init(settings.width, settings.height,
                     realityBuilderDojo.byId(settings.id));
-        this._constructionBlocks = new rb.ConstructionBlocks();
-        this._newBlock = new rb.NewBlock(this._constructionBlocks);
+        this._newBlock = new rb.NewBlock();
 
         realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
                        this, this._update); // Speeds up responsiveness.
@@ -99,7 +93,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     },
 
     constructionBlocks: function () {
-        return this._constructionBlocks;
+        return constructionBlocks;
     },
 
     // Called after the new block has been frozen.
@@ -124,13 +118,13 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
 
     setRealBlocksVisibility: function (shouldBeVisible) {
         sensor.setRealBlocksVisibility(shouldBeVisible);
-        this._constructionBlocks.renderIfVisible();
+        constructionBlocks.renderIfVisible();
         realityBuilder.util.SETTINGS.onRealBlocksVisibilityChanged();
     },
 
     setPendingBlocksVisibility: function (shouldBeVisible) {
         sensor.setPendingBlocksVisibility(shouldBeVisible);
-        this._constructionBlocks.renderIfVisible();
+        constructionBlocks.renderIfVisible();
         realityBuilder.util.SETTINGS.onPendingBlocksVisibilityChanged();
     },
 
@@ -151,7 +145,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     },
 
     _blocksAreFullyInitialized: function () {
-        return (this._constructionBlocks.isInitializedWithServerData() &&
+        return (constructionBlocks.isInitializedWithServerData() &&
                 this._newBlock.isInitializedWithServerData() &&
                 camera.isInitializedWithServerData() &&
                 blockProperties.isInitializedWithServerData());
@@ -162,7 +156,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     _renderConstructionBlocksIfFullyInitialized:
         function (renderConstructionBlocks) {
             if (this._blocksAreFullyInitialized()) {
-                this._constructionBlocks.renderIfVisible();
+                constructionBlocks.renderIfVisible();
             }
         },
 
@@ -185,7 +179,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // necessary components have been initialized, which is relevant only in
     // the beginning.
     _updateNewBlockStateIfFullyInitialized: function (unfreeze) {
-        if (this._constructionBlocks.isInitializedWithServerData() &&
+        if (constructionBlocks.isInitializedWithServerData() &&
                 this._newBlock.isInitializedWithServerData() &&
                 blockProperties.isInitializedWithServerData()) {
             realityBuilder._newBlock.updateState();
@@ -230,7 +224,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // Checks if the widget is ready to be used. If so, signals that by calling
     // the "onReady" function, but only the first time.
     _checkIfReady: function () {
-        if (this._constructionBlocks.isInitializedWithServerData() &&
+        if (constructionBlocks.isInitializedWithServerData() &&
                 camera.isInitializedWithServerData() &&
                 blockProperties.isInitializedWithServerData() &&
                 this._onReadyCalled === false) {
@@ -251,7 +245,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
         var that = this;
 
         if (data.blocksData.changed) {
-            this._constructionBlocks.updateWithServerData(data.blocksData);
+            constructionBlocks.updateWithServerData(data.blocksData);
         }
 
         if (data.cameraData.changed) {
@@ -294,7 +288,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
             url: realityBuilder.util.rootUrl() + "rpc/construction",
             content: {
                 "blocksDataVersion":
-                    this._constructionBlocks.versionOnServer(),
+                    constructionBlocks.versionOnServer(),
                 "cameraDataVersion": camera.versionOnServer(),
                 "blockPropertiesDataVersion":
                     blockProperties.versionOnServer(),
@@ -357,7 +351,7 @@ realityBuilderDojo.declare('realityBuilder.RealityBuilder', null, {
     // forms a valid construction.
     newConstructionWouldBeValid: function () {
         return (typeof realityBuilderValidator !== 'undefined' &&
-                realityBuilderValidator(this._constructionBlocks,
+                realityBuilderValidator(constructionBlocks,
                                         this._newBlock));
     },
 

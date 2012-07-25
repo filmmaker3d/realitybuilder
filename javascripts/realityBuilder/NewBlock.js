@@ -37,10 +37,6 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // moved nor be rotated, nor be made real.
     _isFrozen: null,
 
-    // Permament blocks in the construction, including real and pending blocks.
-    // Needed for hidden lines removal and collision detection.
-    _constructionBlocks: null,
-
     // Block space position used when last calculating the sensor space
     // coordinates.
     _lastPosB: null,
@@ -53,12 +49,11 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Creates the new block that the user may position. For collision
     // detection and for calculating hidden lines, the block needs to know
-    // about the other blocks in the construction: "constructionBlocks"
-    constructor: function (constructionBlocks) {
+    // about the other blocks in the construction.
+    constructor: function () {
         this.inherited(arguments, [[0, 0, 0], 0]);
         this._isFrozen = false;
-        this._constructionBlocks = constructionBlocks;
-        shadow.init(realityBuilder, this, constructionBlocks);
+        shadow.init(realityBuilder, this);
     },
 
     versionOnServer: function () {
@@ -96,7 +91,7 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
 
     // Returns true, iff the current block collides with any real block.
     _collidesWithRealBlock: function () {
-        return this._constructionBlocks.realBlocksCollideWith(this);
+        return constructionBlocks.realBlocksCollideWith(this);
     },
 
     // Moves the block in block space, by "delta", unless the move would make
@@ -159,8 +154,8 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         if (this.isFrozen()) {
             // The block is currently in the state "requested to be made real".
 
-            constructionBlock = this._constructionBlocks.blockAt(this.posB(),
-                                                                 this.a());
+            constructionBlock = constructionBlocks.blockAt(this.posB(),
+                                                           this.a());
             if (constructionBlock) {
                 // Construction block in same position as new block.
 
@@ -179,7 +174,7 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     //
     // Returns true, iff the block has been elevated.
     _moveOutOfTheWay: function () {
-        var testBlock, cbs = this._constructionBlocks,
+        var testBlock, cbs = constructionBlocks,
             xB = this.xB(), yB = this.yB(), testZB;
         if (this._collidesWithRealBlock()) {
             testZB = this.zB();
@@ -225,7 +220,7 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         testA = (this.a() + deltaA) % 4;
         testBlock = new realityBuilder.Block(testPosB, testA);
 
-        return this._constructionBlocks.realBlocksCollideWith(testBlock);
+        return constructionBlocks.realBlocksCollideWith(testBlock);
     },
 
     canBeRotated90: function () {
@@ -239,7 +234,7 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Returns true, iff this block is attachable to another block or to the
     // ground.
     _isAttachable: function () {
-        return (this._constructionBlocks.realBlocksAreAttachableTo(this) ||
+        return (constructionBlocks.realBlocksAreAttachableTo(this) ||
                 this.zB() === 0);
     },
 
@@ -369,7 +364,7 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
     // Subtracts the shapes of the real blocks in front of the block from the
     // drawing on the canvas with rendering context "context".
     _subtractRealBlocks: function (context) {
-        var realBlocksSorted = this._constructionBlocks.realBlocksSorted(),
+        var realBlocksSorted = constructionBlocks.realBlocksSorted(),
             i,
             realBlock,
             zB = this.zB();
@@ -422,7 +417,7 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         // rendering:
         constructionBlocksHaveChanged =
             (this._lastConstructionBlocksVersion !==
-             this._constructionBlocks.versionOnServer());
+             constructionBlocks.versionOnServer());
 
         isFrozenStateHasChanged = (this._wasFrozenWhenLastRendered !==
                                    this._isFrozen);
@@ -435,7 +430,7 @@ realityBuilderDojo.declare('realityBuilder.NewBlock', realityBuilder.Block, {
         this._coordinatesChangedAfterLastRendering = false;
         this._wasFrozenWhenLastRendered = this._isFrozen;
         this._lastConstructionBlocksVersion =
-            this._constructionBlocks.versionOnServer();
+            constructionBlocks.versionOnServer();
     },
 
     // Draws the block with shadow on the sensor of the camera. Depends on the
