@@ -194,7 +194,7 @@ define(['../vendor/sylvester.src-modified',
         // space.
         blockToSensor: function (pointB) {
             return this.viewToSensor(this.worldToView(
-                util.blockToWorld(pointB)
+                util.blockToWorld(pointB, blockProperties)
             ));
         }
     };

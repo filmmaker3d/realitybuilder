@@ -19,7 +19,7 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, camera, define */
 
-define(['./util'], function (util) {
+define(['./util', './block_properties'], function (util, blockProperties) {
     return {
         // Position of the block in block space. From the position the block
         // extends in positive direction along the x-, y-, and z-axis.

@@ -32,9 +32,11 @@
 
 define(['./construction_blocks',
         './sensor',
+        './block_properties',
         './util'
        ], function (constructionBlocks,
                     sensor,
+                    blockProperties,
                     util) {
     var object = {
         // Coordinates of the full shadow's vertexes in world space, view space,
@@ -91,7 +93,7 @@ define(['./construction_blocks',
                 vs.push(util.
                         blockToWorld([xB + vertexBXY[0],
                                       yB + vertexBXY[1],
-                                      zB]));
+                                      zB], blockProperties));
             });
 
             this._fullVertexes = vs;

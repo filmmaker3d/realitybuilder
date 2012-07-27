@@ -53,6 +53,7 @@ define(['./vendor/sylvester.src-modified',
         './scripts/block',
         './scripts/reality_builder',
         './scripts/util',
+        window.scriptUrl,
         './vendor/lazyload/lazyload',
         './vendor/jquery',
         './vendor/underscore'], function (sylvester,
@@ -65,16 +66,13 @@ define(['./vendor/sylvester.src-modified',
                                           block,
                                           realityBuilderFixme,
                                           util) {
-    var dojoScriptIsLoaded,
-        initialized, // true, after the public "initialize" has been called
-        settings,
+    var settings,
         host = '{{ host }}',
         hostUrl = 'http://' + host,
         exportsFixme = {};
 
     // fixme: remove
     window.sylvester = sylvester;
-    window.blockProperties = blockProperties;
     window.camera = camera;
     window.sensor = sensor;
     window.layerShadow = layerShadow;
@@ -124,18 +122,6 @@ define(['./vendor/sylvester.src-modified',
         }
     }
 
-    function requestSetupWidgetIfDojoScriptIsLoaded() {
-        if (dojoScriptIsLoaded) {
-            requestSetupWidget();
-        }
-    }
-
-    function requestSetupWidgetIfInitialized() {
-        if (initialized) {
-            requestSetupWidget();
-        }
-    }
-
     // Necessary to work around a bug in Dojo 1.6 where "scopeMap" breaks
     // "dojo.query":
     //
@@ -148,51 +134,8 @@ define(['./vendor/sylvester.src-modified',
         }
     }
 
-    function onSocketioScriptLoaded() {
-        requestSetupWidgetIfInitialized();
-    }
-
-    function requestLoadSocketioScript() {
-//fixme:        LazyLoad.js('/socket.io/socket.io.js', onSocketioScriptLoaded);
-        onSocketioScriptLoaded(); // fixme
-    }
-
     function onDojoScriptLoaded() {
-        dojoScriptIsLoaded = true;
         fixDojoQueryBug();
-        requestLoadSocketioScript();
-    }
-
-    // Requests asynchronous loading of the specified Dojo JavaScript file.
-    //
-    // Note that this function causes "onload" to be blocked until the script
-    // is loaded in Firefox, Chrome, and Safari:
-    //
-    //   http://friendlybit.com/js/lazy-loading-asyncronous-javascript/
-    //
-    // However, in general this should be no problem. After all, in the
-    // anticipated use cases the widget is an integral part of a web page.
-    // Also, one can still work around the issue by loading the current script
-    // in an asynchronous way.
-    function requestLoadDojoScript(scriptUrl) {
-        LazyLoad.js(scriptUrl, onDojoScriptLoaded);
-    }
-
-    // Loads the Dojo JavaScript that is used for debugging mode.
-    function requestLoadDebugDojoScript() {
-        requestLoadDojoScript(window.scriptUrl);
-    }
-
-    function releaseDojoScriptPostfix() {
-        return (typeof realityBuilderDojoUncompressed !== 'undefined' &&
-                realityBuilderDojoUncompressed) ? '.uncompressed.js' : '';
-    }
-
-    // Loads the Dojo JavaScript that is used for release mode. Almost all
-    // functionality is built into one file.
-    function requestLoadReleaseDojoScript() {
-        requestLoadDojoScript(hostUrl + '/javascripts/dojo/dojo.xd.js' +
-                              releaseDojoScriptPostfix());
     }
 
     function mergeIntoSettings(newSettings) {
@@ -303,21 +246,14 @@ define(['./vendor/sylvester.src-modified',
         } else {
             mergeIntoSettings(defaultSettings);
             mergeIntoSettings(settings);
-            initialized = true;
-            requestSetupWidgetIfDojoScriptIsLoaded();
+            requestSetupWidget();
         }
     }
 
-    dojoScriptIsLoaded = false;
-    initialized = false;
     settings = {};
 
     if (w3cDomIsSupported()) {
-        // {% if debug %}
-        requestLoadDebugDojoScript();
-        // {% else %}
-        requestLoadReleaseDojoScript();
-        // {% endif %}
+        onDojoScriptLoaded();
     } // else: don't do anything - "settings.onBrowserNotSupportedError" is not
       // yet set.
 

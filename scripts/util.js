@@ -33,7 +33,7 @@ define({
     SETTINGS: null,
 
     // Returns the coordinates of the block space point "pB" in world space.
-    blockToWorld: function (pB) {
+    blockToWorld: function (pB, blockProperties) {
         var factorX = blockProperties.posSpacingXY(),
         factorY = blockProperties.posSpacingXY(),
         factorZ = blockProperties.posSpacingZ();
