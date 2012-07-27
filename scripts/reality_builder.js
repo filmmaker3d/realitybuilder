@@ -50,9 +50,7 @@ define(['./util',
         // Creates a construction. For a documentation of the settings, see the
         // main Reality Builder include script.
         init: function (settings) {
-            var rb = realityBuilder;
-
-            if (!rb.util.isCanvasSupported()) {
+            if (!util.isCanvasSupported()) {
                 // canvas not supported => abort
                 settings.onBrowserNotSupportedError();
                 return;
@@ -359,6 +357,10 @@ define(['./util',
 
         camera: function () {
             return camera;
+        },
+
+        util: function () {
+            return util;
         }
     }
 });

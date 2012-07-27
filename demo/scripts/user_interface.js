@@ -68,7 +68,7 @@ define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
     prerenderedSrtSimPosesBList = _.memoize(function () {
         var srtSimPosesBList = simPosesBList;
         _.each(srtSimPosesBList, function (simPosesB) {
-            realityBuilder.util.sortPosesB(simPosesB);
+            realityBuilder.util().sortPosesB(simPosesB);
         });
         return srtSimPosesBList;
     });
@@ -76,7 +76,7 @@ define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
     // Returns the index of the prerendered image that matches the current
     // construction, or false if there is no matching image.
     function prerenderedImageIndex() {
-        var util = realityBuilder.util, srtSimPosesB;
+        var util = realityBuilder.util(), srtSimPosesB;
 
         srtSimPosesB =
             realityBuilder.constructionBlocks().nonDeletedSimPosesB();

@@ -131,25 +131,23 @@ define({
     // case, then the result is undefined.
     relationPointSegmentVXZ: function (pointVXZ,
                                        segmentVXZ) {
-        var camPositionVXZ, lineVXZ, intersectionVXZ, util;
-
-        util = realityBuilder.util;
+        var camPositionVXZ, lineVXZ, intersectionVXZ;
 
         camPositionVXZ = [0, 0]; // in origin of view space, naturally
 
         lineVXZ = [camPositionVXZ, pointVXZ];
 
-        intersectionVXZ = util.intersectionSegmentLineVXZ(segmentVXZ, lineVXZ);
+        intersectionVXZ = this.intersectionSegmentLineVXZ(segmentVXZ, lineVXZ);
 
         if (intersectionVXZ === false) {
             // no intersection
             return 0;
         } else {
             // intersection
-            if (util.pointsIdenticalVXZ(intersectionVXZ, pointVXZ)) {
+            if (this.pointsIdenticalVXZ(intersectionVXZ, pointVXZ)) {
                 return 0; // point on line segment
             } else {
-                return util.pointIsBetween2D(pointVXZ,
+                return this.pointIsBetween2D(pointVXZ,
                                              camPositionVXZ,
                                              intersectionVXZ) ? -1 : 1;
             }
@@ -396,11 +394,11 @@ define({
                                      srtSimPosesBList) {
         var index = false,
         match,
-        util = realityBuilder.util,
+        srtSimPosesBMatch = this.srtSimPosesBMatch,
         _ = realityBuilder._;
 
         match = function (testPosesB, i) {
-            if (util.srtSimPosesBMatch(srtSimPosesB, testPosesB)) {
+            if (srtSimPosesBMatch(srtSimPosesB, testPosesB)) {
                 index = i;
                 return true;
             } else {
