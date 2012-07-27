@@ -72,7 +72,6 @@ define(['./vendor/sylvester.src-modified',
         exportsFixme = {};
 
     // fixme: remove
-    window.sylvester = sylvester;
     realityBuilder.util = util;
 
     // Puts jQuery and Underscore.js in Reality Builder namespace, to avoid
