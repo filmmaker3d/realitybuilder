@@ -24,12 +24,16 @@ define(['./util',
         './block_properties',
         './camera',
         './construction_blocks',
-        './new_block'],
+        './new_block',
+        './shadow_obscuring_blocks',
+        './shadow'],
        function (util,
                  blockProperties,
                  camera,
                  constructionBlocks,
-                 newBlock) {
+                 newBlock,
+                 shadowObscuringBlocks,
+                 shadow) {
     return {
         // Last construction validator version retrieved, or "-1" initially. Is a
         // string in order to be able to contain very large integers.
@@ -56,9 +60,7 @@ define(['./util',
 
             this._onReadyCalled = false;
 
-            camera.init(settings.width, settings.height,
-                        realityBuilderDojo.byId(settings.id));
-            shadow.init(realityBuilder, newBlock);
+            $('#' + settings.id).append(sensor.node());
 
             realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
                                          this, this._update); // Speeds up responsiveness.

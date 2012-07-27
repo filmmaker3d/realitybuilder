@@ -20,41 +20,47 @@
 /*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
 define(['./util'], function (util) {
-    return {
+    var object = {
         // Canvases for drawing various parts.
         _canvasNodes: null,
 
         // Dimensions in pixels.
-        _width: null,
-        _height: null,
+        _width: 640,
+        _height: 480,
 
-        // Sets up the sensor of the camera, with width "width" and height
-        // "height". The sensor is placed as a child of the DOM node "node".
-        init: function (width, height, node) {
-            var sensorNode, _ = realityBuilder._;
+        _sensorNode: null,
 
-            sensorNode = this._addSensorNode(node);
+        // fixme: implement
+        setDimensions: function (width, height) {
+            this._width = width;
+            this._height = height;
+
+            _.each(this._canvasNodes, function (canvasNode) {
+                canvasNode.attr();
+            });
+        },
+
+        init: function () {
+            this._sensorNode = $('<div>').css(this._styleBasedOnDefaults({
+                position: 'relative'
+            }));
 
             this._canvasNodes = {};
             _.each(['realBlocks', 'pendingBlocks', 'shadow', 'newBlock'],
                    _.bind(function (key) {
                        this._canvasNodes[key] =
-                           this._addCanvasNode(sensorNode, width, height);
+                           this._addCanvasNode(this._sensorNode,
+                                               this._width, this._height);
                    }, this));
 
             this.setRealBlocksVisibility(false);
             this.setPendingBlocksVisibility(false);
-
-            this._width = width;
-            this._height = height;
         },
 
         // Merges "style" into some basic style settings, which reset the style of
         // a block element to reasonable default values.
         _styleBasedOnDefaults: function (style) {
-            var tmp, _ = realityBuilder._;
-
-            tmp = {
+            var tmp = {
 	            margin: 0,
 	            padding: 0,
 	            border: 0,
@@ -66,19 +72,13 @@ define(['./util'], function (util) {
             return tmp;
         },
 
-        _addSensorNode: function (node) {
-            var sensorNode, $ = realityBuilder.$;
-
-            sensorNode = $('<div>').css(this._styleBasedOnDefaults({
-                position: 'relative'
-            })).appendTo($(node)).get(0);
-
-            return sensorNode;
+        node: function () {
+            return this._sensorNode;
         },
 
         // Returns the canvas node.
         _addCanvasNode: function (sensorNode, width, height) {
-            var canvasNode, $ = realityBuilder.$;
+            var canvasNode;
 
             canvasNode = $('<canvas>').attr({
                 width: width,
@@ -115,14 +115,10 @@ define(['./util'], function (util) {
         },
 
         _setCanvasVisibility: function (canvas, shouldBeVisible) {
-            var $ = realityBuilder.$;
-
             $(canvas).css('visibility', shouldBeVisible ? 'visible' : 'hidden');
         },
 
         _canvasIsVisible: function (canvas) {
-            var $ = realityBuilder.$;
-
             return $(canvas).css('visibility') === 'visible';
         },
 
@@ -151,5 +147,9 @@ define(['./util'], function (util) {
         height: function () {
             return this._height;
         }
-    }
+    };
+
+    object.init();
+
+    return object;
 });

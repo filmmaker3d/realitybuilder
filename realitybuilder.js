@@ -48,10 +48,8 @@ define(['./vendor/sylvester.src-modified',
         './scripts/camera',
         './scripts/sensor',
         './scripts/layer_shadow',
-        './scripts/shadow',
         './scripts/construction_blocks',
         './scripts/construction_block',
-        './scripts/new_block',
         './scripts/block',
         './scripts/reality_builder',
         './scripts/util',
@@ -62,10 +60,8 @@ define(['./vendor/sylvester.src-modified',
                                           camera,
                                           sensor,
                                           layerShadow,
-                                          shadow,
                                           constructionBlocks,
                                           constructionBlock,
-                                          newBlock,
                                           block,
                                           realityBuilderFixme,
                                           util) {
@@ -82,10 +78,8 @@ define(['./vendor/sylvester.src-modified',
     window.camera = camera;
     window.sensor = sensor;
     window.layerShadow = layerShadow;
-    window.shadow = shadow;
     window.constructionBlocks = constructionBlocks;
     window.constructionBlock = constructionBlock;
-    window.newBlock = newBlock;
     window.block = block;
     realityBuilder.util = util;
 

@@ -33,10 +33,15 @@
 
 /*global realityBuilder, realityBuilderDojo, define */
 
-define(['./sensor', './util'], function (sensor, util) {
-    return {
+define(['../vendor/sylvester.src-modified',
+        './sensor',
+        './util'
+       ], function (sylvester,
+                    sensor,
+                    util) {
+    var object = {
         // Position of the camera in world space (mm):
-        _pos: null,
+        _pos: [0, 0, 1],
 
         // Angles defining orientation (rad):
         _aX: 0,
@@ -61,9 +66,7 @@ define(['./sensor', './util'], function (sensor, util) {
         // server.
         _id: null,
 
-        init: function (sensorWidth, sensorHeight, node) {
-            this._pos = [0, 0, 1];
-            sensor.init(sensorWidth, sensorHeight, node);
+        init: function () {
             this._updateRotationMatrices();
         },
 
@@ -194,5 +197,9 @@ define(['./sensor', './util'], function (sensor, util) {
                 util.blockToWorld(pointB)
             ));
         }
-    }
+    };
+
+    object.init();
+
+    return object;
 });

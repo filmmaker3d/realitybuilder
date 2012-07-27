@@ -390,7 +390,7 @@ define(['./util', './shadow', './block'], function (util, shadow, block) {
             } else {
                 color = util.SETTINGS.colorOfNewBlockShadow;
                 alpha = util.SETTINGS.alphaOfNewBlockShadow;
-                shadow.render(color, alpha);
+                shadow.render(color, alpha, this);
             }
         },
 

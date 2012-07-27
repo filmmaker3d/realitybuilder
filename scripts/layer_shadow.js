@@ -30,12 +30,13 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-define(['./construction_blocks', './util'], function (constructionBlocks,
-                                                      util) {
-    return {
-        // New block that the shadow is associated with.
-        _newBlock: null,
-
+define(['./construction_blocks',
+        './sensor',
+        './util'
+       ], function (constructionBlocks,
+                    sensor,
+                    util) {
+    var object = {
         // Coordinates of the full shadow's vertexes in world space, view space,
         // and sensor space.
         _fullVertexes: null,
@@ -50,12 +51,10 @@ define(['./construction_blocks', './util'], function (constructionBlocks,
         // weak garbage collectors).
         _helperCanvas: null,
 
-        init: function (newBlock) {
-            var shadowCanvas, $ = realityBuilder.$;
+        init: function (settings) {
+            var shadowCanvas;
 
-            this._newBlock = newBlock;
-
-            shadowCanvas = sensor.shadowCanvas();
+            shadowCanvas = sensor.shadowCanvas(); // fixme: doesn't exist yet - perhaps call init (of parent) only later, after sensor has been initialized
             this._canvas = $('<canvas>').
                 attr('width', shadowCanvas.width).
                 attr('height', shadowCanvas.height).
@@ -78,15 +77,14 @@ define(['./construction_blocks', './util'], function (constructionBlocks,
 
         // Updates the vertexes of the full shadow, projected onto the layer of
         // blocks of elevation "layerZB", in world space.
-        _updateWorldSpace: function (layerZB) {
-            var xB = this._newBlock.xB(),
-            yB = this._newBlock.yB(),
+        _updateWorldSpace: function (layerZB, newBlock) {
+            var xB = newBlock.xB(),
+            yB = newBlock.yB(),
             zB = layerZB + 1,
             vs = [],
             blockOutlineBXY =
-                blockProperties.rotatedOutlineBXY(this._newBlock.a()),
-            that = this,
-            _ = realityBuilder._;
+                blockProperties.rotatedOutlineBXY(newBlock.a()),
+            that = this;
 
             // counterclockwise:
             _.each(blockOutlineBXY, function (vertexBXY) {
@@ -101,9 +99,8 @@ define(['./construction_blocks', './util'], function (constructionBlocks,
 
         // Calculates the vertexes of the full shadow, projected onto the layer of
         // blocks of elevation "layerZB", in view space.
-        _updateViewSpaceCoordinates: function (layerZB) {
-            var _ = realityBuilder._;
-            this._updateWorldSpace(layerZB);
+        _updateViewSpaceCoordinates: function (layerZB, newBlock) {
+            this._updateWorldSpace(layerZB, newBlock);
             this._fullVertexesV = _.map(this._fullVertexes,
                                         _.bind(camera.worldToView, camera));
         },
@@ -114,22 +111,20 @@ define(['./construction_blocks', './util'], function (constructionBlocks,
         //
         // Depends on up to date view space coordinates.
         _updateSensorSpaceCoordinates: function (layerZB) {
-            var _ = realityBuilder._;
             this._fullVertexesS = _.map(this._fullVertexesV,
                                         _.bind(camera.viewToSensor, camera));
         },
 
         // Updates coordinates for the full shadow, projected onto the layer of
         // blocks of elevation "layerZB"
-        _updateCoordinates: function (layerZB) {
-            this._updateViewSpaceCoordinates(layerZB);
+        _updateCoordinates: function (layerZB, newBlock) {
+            this._updateViewSpaceCoordinates(layerZB, newBlock);
             this._updateSensorSpaceCoordinates(layerZB);
         },
 
         // Renders the tops of the blocks in the layer "layerZB".
         _renderTops: function (layerZB, context) {
-            var realBlocksOnLayer = constructionBlocks.realBlocksInLayer(layerZB),
-            _ = realityBuilder._;
+            var realBlocksOnLayer = constructionBlocks.realBlocksInLayer(layerZB);
 
             _.each(realBlocksOnLayer, function (realBlock) {
                 realBlock.renderSolidTop(context);
@@ -139,10 +134,10 @@ define(['./construction_blocks', './util'], function (constructionBlocks,
         // Draws the full shadow, projected onto the layer of blocks of elevation
         // "layerZB", on the canvas with rendering context "context". Uses the
         // color "color" as the color of the shadow.
-        _renderFull: function (layerZB, context, color) {
+        _renderFull: function (layerZB, context, color, newBlock) {
             var fullVertexesS, vertexS, i;
 
-            this._updateCoordinates(layerZB);
+            this._updateCoordinates(layerZB, newBlock);
 
             fullVertexesS = this._fullVertexesS;
 
@@ -168,7 +163,7 @@ define(['./construction_blocks', './util'], function (constructionBlocks,
         // is projected (-1 is the ground plane):
         //
         // Draws the shadow in the color "color".
-        render: function (layerZB, color) {
+        render: function (layerZB, color, newBlock) {
             var canvas = this._canvas, helperCanvas = this._helperCanvas,
             context, helperContext;
 
@@ -196,15 +191,19 @@ define(['./construction_blocks', './util'], function (constructionBlocks,
                 helperContext.globalCompositeOperation = "source-over";
                 helperContext.drawImage(canvas, 0, 0);
                 helperContext.globalCompositeOperation = "xor";
-                this._renderFull(layerZB, helperContext, color); // fast
+                this._renderFull(layerZB, helperContext, color,
+                                 newBlock); // fast
 
                 // completes combination:
-                this._renderFull(layerZB, context, color); // fast
+                this._renderFull(layerZB, context, color, newBlock); // fast
 
                 // subtracts:
                 context.globalCompositeOperation = "destination-out";
                 context.drawImage(helperCanvas, 0, 0);
             }
         }
-    }
+    };
+
+    object.init();
+    return object;
 });

@@ -22,22 +22,13 @@
 
 define(['./construction_blocks',
         './shadow_obscuring_blocks',
+        './layer_shadow',
         './util'
-       ], function (constructionBlocks, shadowObscuringBlocks, util) {
+       ], function (constructionBlocks, shadowObscuringBlocks,
+                    layerShadow, util) {
     return {
-        // New block that the shadow is associated with.
-        _newBlock: null,
-
-        // Creates the shadow of the block "newBlock".
-        init: function (realityBuilder, newBlock) {
-            this._newBlock = newBlock;
-
-            shadowObscuringBlocks.init(realityBuilder, newBlock);
-            layerShadow.init(newBlock);
-        },
-
         _renderLayerShadow: function (context, newBlock, layerZB, color, alpha) {
-            layerShadow.render(layerZB, color);
+            layerShadow.render(layerZB, color, newBlock);
             context.globalAlpha = alpha;
             context.drawImage(layerShadow.canvas(), 0, 0);
             context.globalAlpha = 1;
@@ -47,13 +38,12 @@ define(['./construction_blocks',
         //
         // Draws the shadow in the color "color" and with alpha transparency
         // "alpha".
-        render: function (color, alpha) {
+        render: function (color, alpha, newBlock) {
             var canvas = sensor.shadowCanvas(), context,
             layerZB,
-            newBlock = this._newBlock,
             maxLayerZB = constructionBlocks.highestRealBlocksZB();
 
-            shadowObscuringBlocks.update();
+            shadowObscuringBlocks.update(newBlock);
 
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
@@ -77,5 +67,5 @@ define(['./construction_blocks',
             var canvas = sensor.shadowCanvas();
             util.clearCanvas(canvas);
         }
-    }
+    };
 });

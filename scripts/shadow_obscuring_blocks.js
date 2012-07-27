@@ -83,24 +83,13 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./block'], function (block) {
+define(['require', './block'], function (require, block) {
     return {
         // The blocks, sorted by height, from top to bottom.
         _blocksSorted: null,
 
-        // New block that the shadow is associated with.
-        _newBlock: null,
-
-        _realityBuilder: null,
-
-        init: function (realityBuilder, newBlock) {
-            this._realityBuilder = realityBuilder;
-            this._newBlock = newBlock;
-        },
-
         _copyBlocksToLayer: function (srcBlocks, dstZB) {
             var blocks = [], that = this,
-            realityBuilder = this._realityBuilder,
             _ = realityBuilder._;
 
             _.each(srcBlocks, function (srcBlock) {
@@ -120,9 +109,8 @@ define(['./block'], function (block) {
 
         // Updates the list of blocks (see definition of "shadow obscuring
         // blocks").
-        update: function () {
+        update: function (newBlock) {
             var zB,
-            newBlock = this._newBlock,
             cbs = constructionBlocks,
             blocks = [],
             blocksInLayer,
