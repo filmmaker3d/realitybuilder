@@ -73,7 +73,6 @@ define(['./vendor/sylvester.src-modified',
 
     // fixme: remove
     window.sylvester = sylvester;
-    window.constructionBlock = constructionBlock;
     window.block = block;
     realityBuilder.util = util;
 
