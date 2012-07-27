@@ -33,10 +33,12 @@
 define(['./construction_blocks',
         './sensor',
         './block_properties',
+        './camera',
         './util'
        ], function (constructionBlocks,
                     sensor,
                     blockProperties,
+                    camera,
                     util) {
     var object = {
         // Coordinates of the full shadow's vertexes in world space, view space,
