@@ -19,15 +19,6 @@
 /*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad, $,
   _, define */
 
-// Note that with Dojo 1.6, the baseUrl has to be set manually because it is
-// not detected correctly:
-//
-//   <url:http://groups.google.com/group/dojo-interest/msg/65a43ee98f27cb6e>
-window.host = '{{ host }}';
-window.hostUrl = 'http://' + window.host;
-window.baseUrl = window.hostUrl + '/javascripts/dojo-release-1.6.1/dojo/';
-window.scriptUrl = window.baseUrl + 'dojo.js.uncompressed.js';
-
 window.djConfig = {
     isDebug: true,
     locale: "en",
@@ -43,31 +34,10 @@ window.djConfig = {
     }
 };
 
-define(['./vendor/sylvester.src-modified',
-        './scripts/block_properties',
-        './scripts/camera',
-        './scripts/sensor',
-        './scripts/layer_shadow',
-        './scripts/construction_blocks',
-        './scripts/construction_block',
-        './scripts/block',
-        './scripts/reality_builder',
-        './scripts/util',
-        window.scriptUrl,
-        './vendor/lazyload/lazyload',
-        './vendor/jquery'], function (sylvester,
-                                          blockProperties,
-                                          camera,
-                                          sensor,
-                                          layerShadow,
-                                          constructionBlocks,
-                                          constructionBlock,
-                                          block,
-                                          realityBuilderFixme,
-                                          util) {
+define(['./scripts/reality_builder',
+        './javascripts/dojo-release-1.6.1/dojo/dojo.js.uncompressed',
+        './vendor/jquery'], function (realityBuilderFixme) {
     var settings,
-        host = '{{ host }}',
-        hostUrl = 'http://' + host,
         exportsFixme = {};
 
     // fixme: remove:
