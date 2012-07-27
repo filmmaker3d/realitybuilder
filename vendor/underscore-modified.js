@@ -1,3 +1,21 @@
+// Modified by Felix E. Klee <felix.klee@inka.de> in 2012, to play nicely with
+// AMD and not pollute the global namespace.
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(factory);
+    } else {
+        // Browser globals
+        root.amdWeb = factory(root.b);
+    }
+}(this, function () {
+    var object = {}, f;
+
+    f = function () {
+
+// underscore.js: start -------------------------------------------------------
+
 //     Underscore.js 1.3.3
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore is freely distributable under the MIT license.
@@ -1057,3 +1075,12 @@
   };
 
 }).call(this);
+
+// underscore.js: end ---------------------------------------------------------
+
+    };
+
+    f.call(object);
+
+    return object._;
+}));

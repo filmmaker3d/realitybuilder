@@ -19,8 +19,9 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./util', './shadow', './block', './sensor', './construction_blocks'
-       ], function (util, shadow, block, sensor, constructionBlocks) {
+define(['./util', './shadow', './block', './sensor', './construction_blocks',
+        '../vendor/underscore-modified'
+       ], function (util, shadow, block, sensor, constructionBlocks, _) {
     return block.extend({
         // May change later:
         _posB: [0, 0, 0],
@@ -465,8 +466,6 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks'
 
         // Adds this block to the list of blocks on the server, with state pending.
         _createPendingOnServer: function () {
-            var _ = realityBuilder._;
-
             util.jsonpGet({
                 url: util.rootUrl() + "rpc/create_pending",
                 content: {
@@ -486,8 +485,6 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks'
 
         // Adds this block to the list of blocks on the server, with state pending.
         _createRealOnServer: function () {
-            var _ = realityBuilder._;
-
             util.jsonpGet({
                 url: util.rootUrl() + "rpc/create_real",
                 content: {

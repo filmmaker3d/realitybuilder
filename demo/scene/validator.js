@@ -23,7 +23,7 @@ var realityBuilderValidator = (function () {
 
     // List of prerendered poses:
     var util = realityBuilder.util(),
-        _ = realityBuilder._,
+        _ = realityBuilder._(),
         validSrtSimPosesBList = realityBuilderSimPosesBList; // sorted in a
                                                              // moment
 

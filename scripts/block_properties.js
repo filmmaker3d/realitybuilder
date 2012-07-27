@@ -23,7 +23,7 @@
 
 /*global realityBuilder, realityBuilderDojo, define */
 
-define(['./util'], function (util) {
+define(['./util', '../vendor/underscore-modified'], function (util, _) {
     return {
         // Version of data last retrieved from the server, or "-1" initially. Is a
         // string in order to be able to contain very large integers.
@@ -105,7 +105,7 @@ define(['./util'], function (util) {
         },
 
         _rotateOutlineBXY: function (a) {
-            var that = this, _ = realityBuilder._;
+            var that = this;
 
             return _.map(this._outlineBXY, function (pBXY) {
                 return util.rotatePointBXY(pBXY,
@@ -149,7 +149,7 @@ define(['./util'], function (util) {
         // every element in the given list of coordinates, and returns the
         // resulting list. Does not modify the original list.
         _withCongruencyOffsetsAddedBXY: function (coordinatesListBXY, a) {
-            var offsetB = this.congruencyOffsetB(a), _ = realityBuilder._;
+            var offsetB = this.congruencyOffsetB(a);
 
             return _.map(coordinatesListBXY, function (coordinatesBXY) {
                 return util.addVectorsBXY(coordinatesBXY,
@@ -180,8 +180,6 @@ define(['./util'], function (util) {
         },
 
         _rotateCollisionOffsetsBXY: function (collisionOffsetsBXY, a) {
-            var _ = realityBuilder._;
-
             return _.map(collisionOffsetsBXY, function (collisionOffsetBXY) {
                 return util.rotatePointBXY(collisionOffsetBXY, [0, 0], a);
             });
@@ -211,7 +209,7 @@ define(['./util'], function (util) {
 
         // See also: _withCongruencyOffsetsAddedBXY()
         _withCongruencyOffsetsAddedB: function (coordinatesListB, a) {
-            var offsetB = this.congruencyOffsetB(a), _ = realityBuilder._;
+            var offsetB = this.congruencyOffsetB(a);
 
             return _.map(coordinatesListB, function (coordinatesB) {
                 return util.addVectorsB(coordinatesB, offsetB);
@@ -238,7 +236,7 @@ define(['./util'], function (util) {
         },
 
         _rotateAttachmentOffsetsB: function (attachmentOffsetsB, a) {
-            var that = this, _ = realityBuilder._;
+            var that = this;
 
             return _.map(attachmentOffsetsB, function (attachmentOffsetB) {
                 return that._rotateAttachmentOffsetB(attachmentOffsetB, a);

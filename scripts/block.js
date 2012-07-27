@@ -21,8 +21,9 @@
 
 define(['./util',
         './block_properties',
-        './camera'
-       ], function (util, blockProperties, camera) {
+        './camera',
+        '../vendor/underscore-modified'
+       ], function (util, blockProperties, camera, _) {
     return {
         // Position of the block in block space. From the position the block
         // extends in positive direction along the x-, y-, and z-axis.
@@ -265,7 +266,7 @@ define(['./util',
             this._topVertexesB = [];
 
             // top, counterclockwise (when viewed from top in block space):
-            realityBuilder._.each(blockOutlineBXY, function (vertexBXY) {
+            _.each(blockOutlineBXY, function (vertexBXY) {
                 that._bottomVertexesB.push([xB + vertexBXY[0],
                                             yB + vertexBXY[1],
                                             zB]);
@@ -291,8 +292,6 @@ define(['./util',
         //
         // Depends of up to date block space coordinates.
         _updateWorldSpaceCoordinates: function () {
-            var _ = realityBuilder._;
-
             this._bottomVertexes = _.map(this._bottomVertexesB,
                                          _.bind(this._blockToWorld, this));
             this._topVertexes = _.map(this._topVertexesB,
@@ -307,8 +306,6 @@ define(['./util',
         //
         // Depends on up to date world space coordinates.
         _updateViewSpaceCoordinates: function () {
-            var _ = realityBuilder._;
-
             this._bottomVertexesV = _.map(this._bottomVertexes,
                                           _.bind(camera.worldToView, camera));
             this._topVertexesV = _.map(this._topVertexes,
@@ -390,7 +387,7 @@ define(['./util',
         },
 
         _updateProjectedVertexesVXZS: function () {
-            var cam = camera, _ = realityBuilder._;
+            var cam = camera;
 
             this._projectedVertexesVXZS =
                 _.map(this._projectedVertexesVXZ, function (vertexVXZ) {
@@ -436,7 +433,7 @@ define(['./util',
         //
         // Depends on up to date view space coordinates.
         _updateSensorSpaceCoordinates: function () {
-            var cam = camera, _ = realityBuilder._;
+            var cam = camera;
 
             this._bottomVertexesS = _.map(this._bottomVertexesV,
                                           _.bind(cam.viewToSensor, cam));

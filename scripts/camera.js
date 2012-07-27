@@ -35,10 +35,12 @@
 
 define(['../vendor/sylvester.src-modified',
         './sensor',
-        './util'
+        './util',
+        '../vendor/underscore-modified'
        ], function (sylvester,
                     sensor,
-                    util) {
+                    util,
+                    _) {
     var object = {
         // Position of the camera in world space (mm):
         _pos: [0, 0, 1],

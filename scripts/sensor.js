@@ -19,7 +19,7 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas */
 
-define(['./util'], function (util) {
+define(['./util', '../vendor/underscore-modified'], function (util, _) {
     var object = {
         // Canvases for drawing various parts.
         _canvasNodes: null,

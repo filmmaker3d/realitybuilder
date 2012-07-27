@@ -18,7 +18,7 @@
   unparam: true */
 
 /*global realityBuilder, realityBuilderValidator, realityBuilderDojo.
-  FlashCanvas, _, define */
+  FlashCanvas, define */
 
 define(['./util',
         './block_properties',
@@ -27,7 +27,8 @@ define(['./util',
         './new_block',
         './sensor',
         './shadow_obscuring_blocks',
-        './shadow'],
+        './shadow',
+        '../vendor/underscore-modified'],
        function (util,
                  blockProperties,
                  camera,
@@ -35,7 +36,8 @@ define(['./util',
                  newBlock,
                  sensor,
                  shadowObscuringBlocks,
-                 shadow) {
+                 shadow,
+                 _) {
     return {
         // Last construction validator version retrieved, or "-1" initially. Is a
         // string in order to be able to contain very large integers.
@@ -285,8 +287,6 @@ define(['./util',
         // server. Only updates data where there is a new version. Fails silently
         // on error.
         _update: function () {
-            var _ = realityBuilder._;
-
             util.jsonpGet({
                 url: util.rootUrl() + "rpc/construction",
                 content: {
@@ -323,7 +323,7 @@ define(['./util',
 
         // Updates certain settings on the server. Fails silently on error.
         storeSettingsOnServer: function (settings) {
-            var content = {}, _ = realityBuilder._;
+            var content = {};
 
             if (settings.hasOwnProperty('cameraData')) {
                 _.extend(content, this._preparedCameraData(settings.cameraData));
@@ -361,6 +361,10 @@ define(['./util',
 
         util: function () {
             return util;
+        },
+
+        _: function () {
+            return _;
         }
     }
 });

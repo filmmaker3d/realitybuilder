@@ -20,7 +20,9 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./util', './block'], function (util, block) {
+define(['./util', './block',
+        '../vendor/underscore-modified'
+       ], function (util, block, _) {
     return block.extend({
         // State of the block: 0 = deleted, 1 = pending (= requested to be
         // build), 2 = real

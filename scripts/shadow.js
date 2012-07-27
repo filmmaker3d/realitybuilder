@@ -24,9 +24,10 @@ define(['./construction_blocks',
         './shadow_obscuring_blocks',
         './layer_shadow',
         './sensor',
-        './util'
+        './util',
+        '../vendor/underscore-modified'
        ], function (constructionBlocks, shadowObscuringBlocks,
-                    layerShadow, sensor, util) {
+                    layerShadow, sensor, util, _) {
     return {
         _renderLayerShadow: function (context, newBlock, layerZB, color, alpha) {
             layerShadow.render(layerZB, color, newBlock);

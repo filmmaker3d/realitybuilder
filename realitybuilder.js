@@ -55,8 +55,7 @@ define(['./vendor/sylvester.src-modified',
         './scripts/util',
         window.scriptUrl,
         './vendor/lazyload/lazyload',
-        './vendor/jquery',
-        './vendor/underscore'], function (sylvester,
+        './vendor/jquery'], function (sylvester,
                                           blockProperties,
                                           camera,
                                           sensor,
@@ -71,13 +70,12 @@ define(['./vendor/sylvester.src-modified',
         hostUrl = 'http://' + host,
         exportsFixme = {};
 
+    // fixme: remove:
     // Puts jQuery and Underscore.js in Reality Builder namespace, to avoid
     // conflicts with jQuery, Underscore.js or other libraries included by the
     // page that includes the Reality Builder widget:
     realityBuilder.$ = $;
     $.noConflict(true);
-    realityBuilder._ = window._.noConflict(); // fixme: use AMD version
-                                              // instead
 
     // Instanciates the widget and merges its global members into the
     // "realityBuilder" name space.

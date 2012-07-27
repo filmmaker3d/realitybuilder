@@ -83,15 +83,15 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['require', './block', './construction_blocks'
-       ], function (require, block, constructionBlocks) {
+define(['require', './block', './construction_blocks',
+        '../vendor/underscore-modified'
+       ], function (require, block, constructionBlocks, _) {
     return {
         // The blocks, sorted by height, from top to bottom.
         _blocksSorted: null,
 
         _copyBlocksToLayer: function (srcBlocks, dstZB) {
-            var blocks = [], that = this,
-            _ = realityBuilder._;
+            var blocks = [], that = this;
 
             _.each(srcBlocks, function (srcBlock) {
                 var dstBlock, dstPosB;
@@ -157,7 +157,7 @@ define(['require', './block', './construction_blocks'
         // Graphically subtract the shadow obscuring blocks with vertical position
         // "zB" from the canvas with the rendering context "context".
         subtract: function (context, zB) {
-            var blocksInLayer = this._blocksInLayer(zB), _ = realityBuilder._;
+            var blocksInLayer = this._blocksInLayer(zB);
 
             _.each(blocksInLayer, function (block) {
                 block.subtract(context);

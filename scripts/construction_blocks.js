@@ -21,8 +21,9 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./util', './construction_block', './sensor'
-       ], function (util, constructionBlock, sensor) {
+define(['./util', './construction_block', './sensor',
+        '../vendor/underscore-modified'
+       ], function (util, constructionBlock, sensor, _) {
     return {
         // Version of blocks data last retrieved from the server, or "-1"
         // initially. Is a string in order to be able to contain very large
@@ -109,8 +110,6 @@ define(['./util', './construction_block', './sensor'
         // Sets the data of construction blocks to the version on the server, which
         // is described by "serverData".
         updateWithServerData: function (serverData) {
-            var _ = realityBuilder._;
-
             if (this._versionOnServer !== serverData.version) {
                 this._versionOnServer = serverData.version;
 
@@ -138,8 +137,7 @@ define(['./util', './construction_block', './sensor'
 
         // Finds all real blocks and stores them.
         _updateRealBlocksSorted: function () {
-            var _ = realityBuilder._,
-            tmp = _.filter(this._blocks, function (block) {
+            var tmp = _.filter(this._blocks, function (block) {
                 return block.isReal();
             });
             tmp.sort(this._sortByHeight);
@@ -148,7 +146,6 @@ define(['./util', './construction_block', './sensor'
 
         // Finds all pending blocks and stores them.
         _updatePendingBlocks: function () {
-            var _ = realityBuilder._;
             this._pendingBlocks = _.filter(this._blocks, function (block) {
                 return block.isPending();
             });
@@ -222,8 +219,6 @@ define(['./util', './construction_block', './sensor'
         // the server. Once the server has completed the request, the list of
         // blocks is updated.
         makePendingOnServer: function (posB, a) {
-            var _ = realityBuilder._;
-
             util.jsonpGet({
                 url: util.rootUrl() + "rpc/make_pending",
                 content: {
@@ -244,8 +239,6 @@ define(['./util', './construction_block', './sensor'
         // Deletes the block positioned at the block space position "posB" and
         // rotated by the angle "a", on the client and on the server.
         deleteOnServer: function (posB, a) {
-            var _ = realityBuilder._;
-
             util.jsonpGet({
                 url: util.rootUrl() + "rpc/delete",
                 content: {
@@ -273,8 +266,6 @@ define(['./util', './construction_block', './sensor'
         // "posB" and rotated by the angle "a" to real: on the client and on
         // the server.
         makeRealOnServer: function (posB, a) {
-            var _ = realityBuilder._;
-
             util.jsonpGet({
                 url: util.rootUrl() + "rpc/make_real",
                 content: {
@@ -312,7 +303,7 @@ define(['./util', './construction_block', './sensor'
         // Deletes all blocks on the server, and sets the real blocks to those
         // described by the specified poses.
         replaceBlocksOnServer: function (posesB) {
-            var _ = realityBuilder._, content = {};
+            var content = {};
 
             _.each(posesB, function (poseB, i) {
                 content[String(i)] = poseB;
@@ -330,8 +321,7 @@ define(['./util', './construction_block', './sensor'
         // of the upper side of the block. If no such block is available, returns
         // 0.
         zBOfUpperSideOfRealBlockBelow: function (xB, yB, zB) {
-            var realBlocks, zBMax, zBOfUpperSide, bXB, bYB, bZB,
-            _ = realityBuilder._;
+            var realBlocks, zBMax, zBOfUpperSide, bXB, bYB, bZB;
 
             realBlocks = this._realBlocksSorted;
             zBMax = zB - 1;
@@ -352,7 +342,7 @@ define(['./util', './construction_block', './sensor'
 
         // Renders the blocks "blocks" on the canvas "canvas".
         _renderBlocks: function (canvas, blocks) {
-            var context, _ = realityBuilder._;
+            var context;
 
             if (canvas.getContext) {
                 context = canvas.getContext('2d');
