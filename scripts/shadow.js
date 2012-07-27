@@ -25,7 +25,7 @@ define(['./construction_blocks',
         './layer_shadow',
         './sensor',
         './util',
-        '../vendor/underscore-modified'
+        '../vendor/underscore-wrapped'
        ], function (constructionBlocks, shadowObscuringBlocks,
                     layerShadow, sensor, util, _) {
     return {

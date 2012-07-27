@@ -1,18 +1,14 @@
-// Modified by Felix E. Klee <felix.klee@inka.de> in 2012, to play nicely with
+// Wrapped by Felix E. Klee <felix.klee@inka.de> in 2012, to play nicely with
 // AMD and not pollute the global namespace.
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(factory);
-    } else {
         // Browser globals
         root.amdWeb = factory(root.b);
     }
 }(this, function () {
-    var object = {}, f;
-
-    f = function () {
 
 // underscore.js: start -------------------------------------------------------
 
@@ -1078,9 +1074,5 @@
 
 // underscore.js: end ---------------------------------------------------------
 
-    };
-
-    f.call(object);
-
-    return object._;
+    return window._.noConflict();
 }));

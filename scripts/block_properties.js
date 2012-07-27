@@ -23,7 +23,7 @@
 
 /*global realityBuilder, realityBuilderDojo, define */
 
-define(['./util', '../vendor/underscore-modified'], function (util, _) {
+define(['./util', '../vendor/underscore-wrapped'], function (util, _) {
     return {
         // Version of data last retrieved from the server, or "-1" initially. Is a
         // string in order to be able to contain very large integers.

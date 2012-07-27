@@ -22,7 +22,7 @@
 define(['./util',
         './block_properties',
         './camera',
-        '../vendor/underscore-modified'
+        '../vendor/underscore-wrapped'
        ], function (util, blockProperties, camera, _) {
     return {
         // Position of the block in block space. From the position the block

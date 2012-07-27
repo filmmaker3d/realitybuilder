@@ -35,17 +35,10 @@ window.djConfig = {
 };
 
 define(['./scripts/reality_builder',
-        './javascripts/dojo-release-1.6.1/dojo/dojo.js.uncompressed',
-        './vendor/jquery'], function (realityBuilderFixme) {
+        './javascripts/dojo-release-1.6.1/dojo/dojo.js.uncompressed'
+       ], function (realityBuilderFixme) {
     var settings,
         exportsFixme = {};
-
-    // fixme: remove:
-    // Puts jQuery and Underscore.js in Reality Builder namespace, to avoid
-    // conflicts with jQuery, Underscore.js or other libraries included by the
-    // page that includes the Reality Builder widget:
-    realityBuilder.$ = $;
-    $.noConflict(true);
 
     // Instanciates the widget and merges its global members into the
     // "realityBuilder" name space.

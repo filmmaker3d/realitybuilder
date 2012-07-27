@@ -22,8 +22,9 @@
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
 define(['./util', './construction_block', './sensor',
-        '../vendor/underscore-modified'
-       ], function (util, constructionBlock, sensor, _) {
+        '../vendor/jquery-wrapped',
+        '../vendor/underscore-wrapped'
+       ], function (util, constructionBlock, sensor, $, _) {
     return {
         // Version of blocks data last retrieved from the server, or "-1"
         // initially. Is a string in order to be able to contain very large
@@ -57,8 +58,6 @@ define(['./util', './construction_block', './sensor',
         // Returns the simplified poses of all real and pending blocks, with
         // coordinates in block space, sorted by height.
         nonDeletedSimPosesB: function () {
-            var $ = realityBuilder.$;
-
             return $.map(this._nonDeletedBlocks, function (block) {
                 return [block.simPoseB()];
             });
@@ -152,7 +151,6 @@ define(['./util', './construction_block', './sensor',
         },
 
         _updateNonDeletedBlocks: function () {
-            var $ = realityBuilder.$;
             this._nonDeletedBlocks = $.grep(this._blocks, function (block) {
                 return !block.isDeleted();
             });

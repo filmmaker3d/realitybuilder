@@ -84,7 +84,7 @@
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
 define(['require', './block', './construction_blocks',
-        '../vendor/underscore-modified'
+        '../vendor/underscore-wrapped'
        ], function (require, block, constructionBlocks, _) {
     return {
         // The blocks, sorted by height, from top to bottom.

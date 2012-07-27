@@ -20,7 +20,7 @@
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
 define(['./util', './shadow', './block', './sensor', './construction_blocks',
-        '../vendor/underscore-modified'
+        '../vendor/underscore-wrapped'
        ], function (util, shadow, block, sensor, constructionBlocks, _) {
     return block.extend({
         // May change later:

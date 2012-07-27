@@ -19,7 +19,8 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, swfobject, define */
 
-define(['../vendor/underscore-modified'], function (_) {
+define(['../vendor/jquery-wrapped',
+        '../vendor/underscore-wrapped'], function ($, _) {
     return {
         // Tolerance when comparing coordinates in sensor space.
         TOLERANCE_S: 0.5,
@@ -418,8 +419,6 @@ define(['../vendor/underscore-modified'], function (_) {
 
         // Performs a JSONP request, using some default settings.
         jsonpGet: function (args) {
-            var $ = realityBuilder.$;
-
             if (typeof args.content === 'undefined') {
                 args.content = {};
             }

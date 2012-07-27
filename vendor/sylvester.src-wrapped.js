@@ -1,4 +1,4 @@
-// Modified by Felix E. Klee <felix.klee@inka.de> in 2012, to play nicely with
+// Wrapped by Felix E. Klee <felix.klee@inka.de> in 2012, to play nicely with
 // AMD and not pollute the global namespace.
 
 (function (root, factory) {

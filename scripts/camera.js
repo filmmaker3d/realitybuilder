@@ -33,10 +33,10 @@
 
 /*global realityBuilder, realityBuilderDojo, define */
 
-define(['../vendor/sylvester.src-modified',
+define(['../vendor/sylvester.src-wrapped',
         './sensor',
         './util',
-        '../vendor/underscore-modified'
+        '../vendor/underscore-wrapped'
        ], function (sylvester,
                     sensor,
                     util,

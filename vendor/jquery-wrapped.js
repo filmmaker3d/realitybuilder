@@ -1,3 +1,17 @@
+// Wrapped by Felix E. Klee <felix.klee@inka.de> in 2012, to play nicely with
+// AMD and not pollute the global namespace.
+
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(factory);
+        // Browser globals
+        root.amdWeb = factory(root.b);
+    }
+}(this, function () {
+
+// jquery.js: start ------------------------------------------------------------
+
 /*!
  * jQuery JavaScript Library v1.7.2
  * http://jquery.com/
@@ -8634,7 +8648,7 @@ jQuery.fn.extend({
 		}
 		if ( clearQueue && type !== false ) {
 			this.queue( type || "fx", [] );
-		}
+	    }
 
 		return this.each(function() {
 			var index,
@@ -9402,3 +9416,10 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 
 
 })( window );
+
+// jquery.js: end -------------------------------------------------------------
+
+    var $ = window.$;
+    $.noConflict(true);
+    return $;
+}));

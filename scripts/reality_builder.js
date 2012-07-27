@@ -28,7 +28,8 @@ define(['./util',
         './sensor',
         './shadow_obscuring_blocks',
         './shadow',
-        '../vendor/underscore-modified'],
+        '../vendor/jquery-wrapped',
+        '../vendor/underscore-wrapped'],
        function (util,
                  blockProperties,
                  camera,
@@ -37,6 +38,7 @@ define(['./util',
                  sensor,
                  shadowObscuringBlocks,
                  shadow,
+                 $,
                  _) {
     return {
         // Last construction validator version retrieved, or "-1" initially. Is a
@@ -338,8 +340,6 @@ define(['./util',
 
         // Unsets the construction validator, then reloads it from the server.
         _loadValidator: function (src) {
-            var $ = realityBuilder.$;
-
             this._unsetValidator();
             $.getScript(src);
         },
