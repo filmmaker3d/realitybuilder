@@ -83,7 +83,8 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['require', './block'], function (require, block) {
+define(['require', './block', './construction_blocks'
+       ], function (require, block, constructionBlocks) {
     return {
         // The blocks, sorted by height, from top to bottom.
         _blocksSorted: null,

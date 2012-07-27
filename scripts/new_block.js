@@ -19,8 +19,8 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./util', './shadow', './block', './sensor'
-       ], function (util, shadow, block, sensor) {
+define(['./util', './shadow', './block', './sensor', './construction_blocks'
+       ], function (util, shadow, block, sensor, constructionBlocks) {
     return block.extend({
         // May change later:
         _posB: [0, 0, 0],
