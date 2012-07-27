@@ -21,7 +21,8 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./util', './construction_block'], function (util, constructionBlock) {
+define(['./util', './construction_block', './sensor'
+       ], function (util, constructionBlock, sensor) {
     return {
         // Version of blocks data last retrieved from the server, or "-1"
         // initially. Is a string in order to be able to contain very large

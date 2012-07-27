@@ -73,7 +73,6 @@ define(['./vendor/sylvester.src-modified',
 
     // fixme: remove
     window.sylvester = sylvester;
-    window.sensor = sensor;
     window.layerShadow = layerShadow;
     window.constructionBlocks = constructionBlocks;
     window.constructionBlock = constructionBlock;

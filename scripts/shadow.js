@@ -23,9 +23,10 @@
 define(['./construction_blocks',
         './shadow_obscuring_blocks',
         './layer_shadow',
+        './sensor',
         './util'
        ], function (constructionBlocks, shadowObscuringBlocks,
-                    layerShadow, util) {
+                    layerShadow, sensor, util) {
     return {
         _renderLayerShadow: function (context, newBlock, layerZB, color, alpha) {
             layerShadow.render(layerZB, color, newBlock);
