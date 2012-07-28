@@ -28,6 +28,7 @@ define(['./util',
         './sensor',
         './shadow_obscuring_blocks',
         './shadow',
+        '../vendor/backbone-wrapped',
         '../vendor/jquery-wrapped',
         '../vendor/underscore-wrapped'],
        function (util,
@@ -38,6 +39,7 @@ define(['./util',
                  sensor,
                  shadowObscuringBlocks,
                  shadow,
+                 Backbone,
                  $,
                  _) {
     return {
@@ -54,6 +56,7 @@ define(['./util',
         // Creates a construction. For a documentation of the settings, see the
         // main Reality Builder include script.
         init: function (settings) {
+            console.log(Backbone); // fixme
             if (!util.isCanvasSupported()) {
                 // canvas not supported => abort
                 settings.onBrowserNotSupportedError();
