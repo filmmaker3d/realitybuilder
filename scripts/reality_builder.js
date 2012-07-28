@@ -56,7 +56,6 @@ define(['./util',
         // Creates a construction. For a documentation of the settings, see the
         // main Reality Builder include script.
         init: function (settings) {
-            console.log(Backbone); // fixme
             if (!util.isCanvasSupported()) {
                 // canvas not supported => abort
                 settings.onBrowserNotSupportedError();
