@@ -111,6 +111,10 @@ define(['./scripts/reality_builder',
     //
     // * "namespace": Namespace used when accessing the data store.
     //
+    // * "baseUrl": Base URL of this script. Example: If this script has the
+    //   URL "http://example.com/some/where/realitybuilder.js", then its base
+    //   URL needs to be specified as "http://example.com/some/where".
+    //
     // * "onReady": Function that is called when the Reality Builder is ready
     //   to use, i.e. after it has downloaded the required resources, rendered
     //   itself, etc.
@@ -169,6 +173,7 @@ define(['./scripts/reality_builder',
         var defaultSettings = {
             id: 'realityBuilder',
             namespace: 'default',
+            baseUrl: null,
             jsonpTimeout: 0,
             onServerCommunicationError: nop,
             onBrowserNotSupportedError: nop,

@@ -218,7 +218,7 @@ define(['./util', './construction_block', './sensor',
         // blocks is updated.
         makePendingOnServer: function (posB, a) {
             util.jsonpGet({
-                url: util.rootUrl() + "rpc/make_pending",
+                url: util.baseUrl() + "rpc/make_pending",
                 content: {
                     "xB": posB[0],
                     "yB": posB[1],
@@ -238,7 +238,7 @@ define(['./util', './construction_block', './sensor',
         // rotated by the angle "a", on the client and on the server.
         deleteOnServer: function (posB, a) {
             util.jsonpGet({
-                url: util.rootUrl() + "rpc/delete",
+                url: util.baseUrl() + "rpc/delete",
                 content: {
                     "xB": posB[0],
                     "yB": posB[1],
@@ -265,7 +265,7 @@ define(['./util', './construction_block', './sensor',
         // the server.
         makeRealOnServer: function (posB, a) {
             util.jsonpGet({
-                url: util.rootUrl() + "rpc/make_real",
+                url: util.baseUrl() + "rpc/make_real",
                 content: {
                     "xB": posB[0],
                     "yB": posB[1],
@@ -308,7 +308,7 @@ define(['./util', './construction_block', './sensor',
             });
 
             util.jsonpGet({
-                url: util.rootUrl() + "rpc/replace_blocks",
+                url: util.baseUrl() + "rpc/replace_blocks",
                 content: content,
                 load: _.bind(this._replaceBlocksOnServerSucceeded, this)
             });

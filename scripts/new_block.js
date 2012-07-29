@@ -467,7 +467,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
         // Adds this block to the list of blocks on the server, with state pending.
         _createPendingOnServer: function () {
             util.jsonpGet({
-                url: util.rootUrl() + "rpc/create_pending",
+                url: util.baseUrl() + "rpc/create_pending",
                 content: {
                     "xB": this.xB(),
                     "yB": this.yB(),
@@ -486,7 +486,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
         // Adds this block to the list of blocks on the server, with state pending.
         _createRealOnServer: function () {
             util.jsonpGet({
-                url: util.rootUrl() + "rpc/create_real",
+                url: util.baseUrl() + "rpc/create_real",
                 content: {
                     "xB": this.xB(),
                     "yB": this.yB(),

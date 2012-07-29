@@ -16,7 +16,7 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global $, require */
+/*global $, require, realityBuilderBaseUrl */
 
 require(['user_interface',
          'admin_interface',
@@ -37,6 +37,7 @@ require(['user_interface',
         width: 640,
         height: 480,
         namespace: 'demo',
+        baseUrl: realityBuilderBaseUrl,
         onReady: function () {
 
 // fixme:

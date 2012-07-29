@@ -292,7 +292,7 @@ define(['./util',
         // on error.
         _update: function () {
             util.jsonpGet({
-                url: util.rootUrl() + "rpc/construction",
+                url: util.baseUrl() + "rpc/construction",
                 content: {
                     "blocksDataVersion":
                     constructionBlocks.versionOnServer(),
@@ -334,7 +334,7 @@ define(['./util',
             }
 
             util.jsonpGet({
-                url: util.rootUrl() + "rpc/update_settings",
+                url: util.baseUrl() + "rpc/update_settings",
                 content: content,
                 load: _.bind(this._storeSettingsOnServerSucceeded, this)
             });

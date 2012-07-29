@@ -421,9 +421,10 @@ define(['../vendor/jquery-wrapped',
         },
 
         // Has a trailing slash.
-        rootUrl: function () {
-            return realityBuilderDojo.baseUrl + '../../../';
-        },
+        baseUrl: _.memoize(function () {
+            var url = this.SETTINGS.baseUrl;
+            return url[url.length - 1] === '/' ? url : url + '/';
+        }),
 
         // Performs a JSONP request, using some default settings.
         jsonpGet: function (args) {
