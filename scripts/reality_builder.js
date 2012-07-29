@@ -17,7 +17,7 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderValidator, realityBuilderDojo.
+/*global realityBuilder, realityBuilderValidator, realityBuilderDojo,
   FlashCanvas, define */
 
 define(['./util',
@@ -28,23 +28,23 @@ define(['./util',
         './sensor',
         './shadow_obscuring_blocks',
         './shadow',
-        '../vendor/backbone-wrapped',
+        '../vendor/stapes', 
         '../vendor/jquery-wrapped',
-        '../vendor/underscore-wrapped'],
-       function (util,
-                 blockProperties,
-                 camera,
-                 constructionBlocks,
-                 newBlock,
-                 sensor,
-                 shadowObscuringBlocks,
-                 shadow,
-                 Backbone,
-                 $,
-                 _) {
-    return {
-        // Last construction validator version retrieved, or "-1" initially. Is a
-        // string in order to be able to contain very large integers.
+        '../vendor/underscore-wrapped'
+       ], function (util,
+                    blockProperties,
+                    camera,
+                    constructionBlocks,
+                    newBlock,
+                    sensor,
+                    shadowObscuringBlocks,
+                    shadow,
+                    Stapes,
+                    $,
+                    _) {
+    return Stapes.mixinEvents({
+        // Last construction validator version retrieved, or "-1" initially. Is
+        // a string in order to be able to contain very large integers.
         _validatorVersion: '-1',
 
         // Handle for the timeout between requests to the server for new
@@ -169,8 +169,8 @@ define(['./util',
             }
         },
 
-        // (Re-)renders new block, but only if all necessary components have been
-        // initialized, which is relevant only in the beginning.
+        // (Re-)renders new block, but only if all necessary components have
+        // been initialized, which is relevant only in the beginning.
         _renderNewBlockIfFullyInitialized: function () {
             // Note that construction blocks are needed also for rendering the new
             // block, e.g. to know which parts of it are obscured.
@@ -184,9 +184,9 @@ define(['./util',
             this._renderNewBlockIfFullyInitialized();
         },
 
-        // Updates the state (including position) of the new block, but only if all
-        // necessary components have been initialized, which is relevant only in
-        // the beginning.
+        // Updates the state (including position) of the new block, but only if
+        // all necessary components have been initialized, which is relevant
+        // only in the beginning.
         _updateNewBlockStateIfFullyInitialized: function (unfreeze) {
             if (constructionBlocks.isInitializedWithServerData() &&
                 newBlock.isInitializedWithServerData() &&
@@ -230,8 +230,8 @@ define(['./util',
             this._checkIfReady();
         },
 
-        // Checks if the widget is ready to be used. If so, signals that by calling
-        // the "onReady" function, but only the first time.
+        // Checks if the widget is ready to be used. If so, signals that by
+        // calling the "onReady" function, but only the first time.
         _checkIfReady: function () {
             if (constructionBlocks.isInitializedWithServerData() &&
                 camera.isInitializedWithServerData() &&
@@ -245,8 +245,8 @@ define(['./util',
         // Second step of the construction update process.
         //
         // Updates client data with server data, but only where there have been
-        // changes. Note that update of certain client data may trigger a redraw of
-        // blocks.
+        // changes. Note that update of certain client data may trigger a
+        // redraw of blocks.
         //
         // Finally, sets timeout after which a new check for an update is
         // performed.
@@ -288,8 +288,8 @@ define(['./util',
         },
 
         // Triggers an update of the construction with the data stored on the
-        // server. Only updates data where there is a new version. Fails silently
-        // on error.
+        // server. Only updates data where there is a new version. Fails
+        // silently on error.
         _update: function () {
             util.jsonpGet({
                 url: util.baseUrl() + "rpc/construction",
@@ -308,7 +308,8 @@ define(['./util',
 
         // Called if updating the settings on the server succeeded. Triggers
         // retrieval of the latest settings from the server, which would happen
-        // anyhow sooner or later, since the version of the settings has changed.
+        // anyhow sooner or later, since the version of the settings has
+        // changed.
         _storeSettingsOnServerSucceeded: function () {
             this._update(); // Will check for new settings.
         },
@@ -350,8 +351,8 @@ define(['./util',
             delete window.realityBuilderValidator;
         },
 
-        // Returns true, if the new block together with all real and pending blocks
-        // forms a valid construction.
+        // Returns true, if the new block together with all real and pending
+        // blocks forms a valid construction.
         newConstructionWouldBeValid: function () {
             return (typeof realityBuilderValidator !== 'undefined' &&
                     realityBuilderValidator(constructionBlocks, newBlock));
@@ -368,5 +369,5 @@ define(['./util',
         _: function () {
             return _;
         }
-    }
+    });
 });
