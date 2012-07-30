@@ -85,8 +85,7 @@ define(['./util',
                                   this._onNewBlockMakePendingRequested);
             this.subscribeToTopic(newBlock, 'onNewBlockMakeRealRequested',
                                   this._onNewBlockMakeRealRequested);
-            realityBuilderDojo.subscribe('realityBuilder/Camera/changed',
-                                         this, this._onCameraChanged);
+            this.subscribeToTopic(camera, 'changed', this._onCameraChanged);
             realityBuilderDojo.subscribe('realityBuilder/BlockProperties/changed',
                                          this, this._onBlockPropertiesChanged);
 

@@ -33,15 +33,10 @@
 
 /*global realityBuilder, realityBuilderDojo, define */
 
-define(['../vendor/sylvester.src-wrapped',
-        './sensor',
-        './util',
-        '../vendor/underscore-wrapped'
-       ], function (sylvester,
-                    sensor,
-                    util,
-                    _) {
-    var object = {
+define(['./sensor', './util', './block_properties', './topic_mixin',
+        '../vendor/sylvester.src-wrapped', '../vendor/underscore-wrapped'
+       ], function (sensor, util, blockProperties, topicMixin, sylvester, _) {
+    var object = _.extend({
         // Position of the camera in world space (mm):
         _pos: [0, 0, 1],
 
@@ -126,7 +121,7 @@ define(['../vendor/sylvester.src-wrapped',
             this._updateRotationMatrices();
             this._updateId();
 
-            realityBuilderDojo.publish('realityBuilder/Camera/changed');
+            this.publishTopic('changed');
         },
 
         // Updates the settings of the camera to the version on the server,
@@ -199,7 +194,7 @@ define(['../vendor/sylvester.src-wrapped',
                 util.blockToWorld(pointB, blockProperties)
             ));
         }
-    };
+    }, topicMixin);
 
     object.init();
 
