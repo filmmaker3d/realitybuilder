@@ -16,41 +16,17 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true */
 
-/*global realityBuilderDojo, realityBuilderDojoUncompressed, acme, LazyLoad, $,
-  _, define */
+/*global define */
 
-window.djConfig = {
-    isDebug: true,
-    locale: "en",
-    debugContainerId: "firebugLite",
-    baseUrl: window.baseUrl,
-    scopeMap: [
-        ["dojo", "realityBuilderDojo"],
-        ["dijit", "realityBuilderDijit"],
-        ["dojox", "realityBuilderDojox"]
-    ],
-    modulePaths: {
-        "realityBuilder": window.hostUrl + "/javascripts/realityBuilder"
-    }
-};
-
-define(['./scripts/reality_builder',
-        './javascripts/dojo-release-1.6.1/dojo/dojo.js.uncompressed'
-       ], function (realityBuilderFixme) {
-    var settings,
-        exportsFixme = {};
+define(['./scripts/reality_builder', './vendor/underscore-wrapped'
+       ], function (realityBuilderFixme, _) {
+    var exportsFixme = {};
 
     // Instanciates the widget and merges its global members into the
     // "realityBuilder" name space.
-    function setupWidget() {
+    function setupWidget(settings) {
         realityBuilderFixme.init(settings);
-        realityBuilderDojo.mixin(realityBuilder, realityBuilderFixme);
-    }
-
-    // Some old browsers may support JavaScript but not Dojo. In this case,
-    // this function returns false.
-    function dojoIsSupported() {
-        return typeof realityBuilderDojo !== 'undefined';
+        _.extend(realityBuilder, realityBuilderFixme);
     }
 
     // Returns false for some old browsers.
@@ -58,35 +34,6 @@ define(['./scripts/reality_builder',
         // The check does not use "in" since older browsers such as Netscape 4
         // don't support that operator.
         return document.getElementById && document.createElement;
-    }
-
-    // Sets up the widget after waiting for Dojo to be ready.
-    function requestSetupWidget() {
-        if (dojoIsSupported()) {
-            // "addOnLoad" is necessary to wait for Dojo dependencies to be
-            // resolved.
-            realityBuilderDojo.addOnLoad(function () {
-                setupWidget();
-            });
-        } else {
-            settings.onBrowserNotSupportedError();
-        }
-    }
-
-    // Necessary to work around a bug in Dojo 1.6 where "scopeMap" breaks
-    // "dojo.query":
-    //
-    // <url:http://groups.google.com/group/dojo-interest/browse_thread/thread/2
-    // bcd6c8aff0487cb/4a164ecba59d16f9>
-    function fixDojoQueryBug() {
-        if (!(realityBuilderDojo.hasOwnProperty('query')) &&
-                typeof acme !== 'undefined' && acme.hasOwnProperty('query')) {
-            realityBuilderDojo.query = acme.query;
-        }
-    }
-
-    function onDojoScriptLoaded() {
-        fixDojoQueryBug();
     }
 
     function mergeIntoSettings(newSettings) {
@@ -200,18 +147,11 @@ define(['./scripts/reality_builder',
             // continuing.
             settings.onBrowserNotSupportedError();
         } else {
-            mergeIntoSettings(defaultSettings);
-            mergeIntoSettings(settings);
-            requestSetupWidget();
+            setupWidget(_.extend({}, defaultSettings, settings));
         }
     }
 
     settings = {};
-
-    if (w3cDomIsSupported()) {
-        onDojoScriptLoaded();
-    } // else: don't do anything - "settings.onBrowserNotSupportedError" is not
-      // yet set.
 
     exportsFixme.init = init;
 
