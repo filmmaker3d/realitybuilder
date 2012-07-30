@@ -20,9 +20,10 @@
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
 define(['./util', './shadow', './block', './sensor', './construction_blocks',
-        '../vendor/underscore-wrapped'
-       ], function (util, shadow, block, sensor, constructionBlocks, _) {
-    return block.extend({
+        './topic_mixin', '../vendor/underscore-wrapped'
+       ], function (util, shadow, block, sensor,
+                    constructionBlocks, topicMixin, _) {
+    return _.extend(block.extend({
         // May change later:
         _posB: [0, 0, 0],
         _a: 0,
@@ -72,8 +73,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
                 this._versionOnServer = serverData.version;
 
                 if (positionAngleWereInitialized) {
-                    realityBuilderDojo.publish('realityBuilder/NewBlock/' +
-                                               'positionAngleInitialized');
+                    this.publishTopic('positionAngleInitialized');
                 }
             }
         },
@@ -83,12 +83,12 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
             return constructionBlocks.realBlocksCollideWith(this);
         },
 
-        // Moves the block in block space, by "delta", unless the move would make
-        // it go out of range, and unless the block is frozen.
+        // Moves the block in block space, by "delta", unless the move would
+        // make it go out of range, and unless the block is frozen.
         move: function (deltaB) {
             if (!this._wouldGoOutOfRange(deltaB, 0) && !this._isFrozen) {
                 this._posB = util.addVectorsB(this._posB, deltaB);
-                realityBuilderDojo.publish('realityBuilder/NewBlock/movedOrRotated');
+                this.publishTopic('movedOrRotated');
             }
         },
 
@@ -97,7 +97,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
         rotate90: function () {
             if (!this._wouldGoOutOfRange([0, 0, 0], 1) && !this._isFrozen) {
                 this._a = (this._a + 1) % 4; // multiples of 90°
-                realityBuilderDojo.publish('realityBuilder/NewBlock/movedOrRotated');
+                this.publishTopic('movedOrRotated');
             }
         },
 
@@ -107,7 +107,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
             if (this.canBeMadeReal()) {
                 this._freeze(); // until construction is updated
                 this._createPendingOnServer();
-                realityBuilderDojo.publish('realityBuilder/NewBlock/makePendingRequested');
+                this.publishTopic('makePendingRequested');
             }
         },
 
@@ -117,7 +117,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
             if (this.canBeMadeReal()) {
                 this._freeze(); // until construction is updated
                 this._createRealOnServer();
-                realityBuilderDojo.publish('realityBuilder/NewBlock/makeRealRequested');
+                this.publishTopic('makeRealRequested');
             }
         },
 
@@ -127,12 +127,12 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
 
         _freeze: function () {
             this._isFrozen = true;
-            realityBuilderDojo.publish('realityBuilder/NewBlock/frozen');
+            this.publishTopic('frozen');
         },
 
         unfreeze: function () {
             this._isFrozen = false;
-            realityBuilderDojo.publish('realityBuilder/NewBlock/unfrozen');
+            this.publishTopic('unfrozen');
         },
 
         // Returns true, iff this block equals a construction block that has been
@@ -461,7 +461,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
 
         // Called if storing the block as pending on the server succeeded.
         _createPendingOnServerSucceeded: function () {
-            realityBuilderDojo.publish('realityBuilder/NewBlock/createdPendingOnServer');
+            this.publishTopic('createdPendingOnServer');
         },
 
         // Adds this block to the list of blocks on the server, with state pending.
@@ -480,7 +480,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
 
         // Called if storing the block as pending on the server succeeded.
         _createRealOnServerSucceeded: function () {
-            realityBuilderDojo.publish('realityBuilder/NewBlock/createdRealOnServer');
+            this.publishTopic('createdRealOnServer');
         },
 
         // Adds this block to the list of blocks on the server, with state pending.
@@ -496,5 +496,5 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
                 load: _.bind(this._createRealOnServerSucceeded, this)
             });
         }
-    });
+    }), topicMixin);
 });

@@ -28,7 +28,7 @@ define(['./util',
         './sensor',
         './shadow_obscuring_blocks',
         './shadow',
-        '../vendor/stapes', 
+        './topic_mixin',
         '../vendor/jquery-wrapped',
         '../vendor/underscore-wrapped'
        ], function (util,
@@ -39,10 +39,10 @@ define(['./util',
                     sensor,
                     shadowObscuringBlocks,
                     shadow,
-                    Stapes,
+                    topicMixin,
                     $,
                     _) {
-    return Stapes.mixinEvents({
+    return _.extend({
         // Last construction validator version retrieved, or "-1" initially. Is
         // a string in order to be able to contain very large integers.
         _validatorVersion: '-1',
@@ -68,25 +68,22 @@ define(['./util',
 
             $('#' + settings.id).append(sensor.node());
 
-            realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changedOnServer',
-                                         this, this._update); // Speeds up responsiveness.
-            realityBuilderDojo.subscribe('realityBuilder/NewBlock/createdPendingOnServer',
-                                         this, this._update); // Speeds up responsiveness.
-            realityBuilderDojo.subscribe('realityBuilder/NewBlock/' +
-                                         'positionAngleInitialized',
-                                         this, this._onNewBlockPositionAngleInitialized);
-            realityBuilderDojo.subscribe('realityBuilder/NewBlock/frozen',
-                                         this, this._onNewBlockFrozen);
-            realityBuilderDojo.subscribe('realityBuilder/NewBlock/unfrozen',
-                                         this, this._onNewBlockUnfrozen);
-            realityBuilderDojo.subscribe('realityBuilder/NewBlock/movedOrRotated',
-                                         this, this._onNewBlockMovedOrRotated);
-            realityBuilderDojo.subscribe('realityBuilder/NewBlock/' +
-                                         'onNewBlockMakePendingRequested',
-                                         this, this._onNewBlockMakePendingRequested);
-            realityBuilderDojo.subscribe('realityBuilder/NewBlock/' +
-                                         'onNewBlockMakeRealRequested',
-                                         this, this._onNewBlockMakeRealRequested);
+            realityBuilderDojo.subscribe(
+                'realityBuilder/ConstructionBlocks/changedOnServer',
+                this, this._update); // Speeds up responsiveness.
+            this.subscribeToTopic(newBlock, 'createdPendingOnServer',
+                                  this._update); // Speeds up responsiveness.
+            this.subscribeToTopic(newBlock, 'positionAngleInitialized',
+                                  this._onNewBlockPositionAngleInitialized);
+            this.subscribeToTopic(newBlock, 'movedOrRotated',
+                                  this._onNewBlockMovedOrRotated);
+            this.subscribeToTopic(newBlock, 'frozen', this._onNewBlockFrozen);
+            this.subscribeToTopic(newBlock, 'unfrozen',
+                                  this._onNewBlockUnfrozen);
+            this.subscribeToTopic(newBlock, 'onNewBlockMakePendingRequested',
+                                  this._onNewBlockMakePendingRequested);
+            this.subscribeToTopic(newBlock, 'onNewBlockMakeRealRequested',
+                                  this._onNewBlockMakeRealRequested);
             realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changed',
                                          this, this._onConstructionBlocksChanged);
             realityBuilderDojo.subscribe('realityBuilder/Camera/changed',
@@ -369,5 +366,5 @@ define(['./util',
         _: function () {
             return _;
         }
-    });
+    }, topicMixin);
 });
