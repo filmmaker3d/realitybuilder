@@ -19,7 +19,7 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
+/*global define */
 
 define(['./util', './construction_block', './sensor', './topic_mixin',
         '../vendor/jquery-wrapped', '../vendor/underscore-wrapped'

@@ -21,7 +21,7 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderDojo, define */
+/*global define */
 
 define(['./util', './topic_mixin', '../vendor/underscore-wrapped'
        ], function (util, topicMixin, _) {
