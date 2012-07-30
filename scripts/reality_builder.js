@@ -68,9 +68,10 @@ define(['./util',
 
             $('#' + settings.id).append(sensor.node());
 
-            realityBuilderDojo.subscribe(
-                'realityBuilder/ConstructionBlocks/changedOnServer',
-                this, this._update); // Speeds up responsiveness.
+            this.subscribeToTopic(constructionBlocks, 'changedOnServer',
+                                  this._update); // Speeds up responsiveness.
+            this.subscribeToTopic(constructionBlocks, 'changed',
+                                  this._onConstructionBlocksChanged);
             this.subscribeToTopic(newBlock, 'createdPendingOnServer',
                                   this._update); // Speeds up responsiveness.
             this.subscribeToTopic(newBlock, 'positionAngleInitialized',
@@ -84,8 +85,6 @@ define(['./util',
                                   this._onNewBlockMakePendingRequested);
             this.subscribeToTopic(newBlock, 'onNewBlockMakeRealRequested',
                                   this._onNewBlockMakeRealRequested);
-            realityBuilderDojo.subscribe('realityBuilder/ConstructionBlocks/changed',
-                                         this, this._onConstructionBlocksChanged);
             realityBuilderDojo.subscribe('realityBuilder/Camera/changed',
                                          this, this._onCameraChanged);
             realityBuilderDojo.subscribe('realityBuilder/BlockProperties/changed',

@@ -21,11 +21,10 @@
 
 /*global realityBuilder, realityBuilderDojo. FlashCanvas, define */
 
-define(['./util', './construction_block', './sensor',
-        '../vendor/jquery-wrapped',
-        '../vendor/underscore-wrapped'
-       ], function (util, constructionBlock, sensor, $, _) {
-    return {
+define(['./util', './construction_block', './sensor', './topic_mixin',
+        '../vendor/jquery-wrapped', '../vendor/underscore-wrapped'
+       ], function (util, constructionBlock, sensor, topicMixin, $, _) {
+    return _.extend({
         // Version of blocks data last retrieved from the server, or "-1"
         // initially. Is a string in order to be able to contain very large
         // integers.
@@ -119,7 +118,7 @@ define(['./util', './construction_block', './sensor',
                 this._updateRealBlocksSorted();
                 this._updatePendingBlocks();
                 this._updateNonDeletedBlocks();
-                realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changed');
+                this.publishTopic('changed');
             }
         },
 
@@ -203,13 +202,12 @@ define(['./util', './construction_block', './sensor',
 
         // Called if making the block pending on the server succeeded.
         _makePendingOnServerSucceeded: function () {
-            realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
+            this.publishTopic('changedOnServer');
         },
 
         // Called if making the block pending on the server failed.
         _makePendingOnServerFailed: function () {
-            realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/' +
-                                       'changeOnServerFailed');
+            this.publishTopic('changeOnServerFailed');
         },
 
         // Triggers setting the state of the construction block at the position
@@ -231,7 +229,7 @@ define(['./util', './construction_block', './sensor',
 
         // Called if deleting the block on the server succeeded.
         _deleteOnServerSucceeded: function () {
-            realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
+            this.publishTopic('changedOnServer');
         },
 
         // Deletes the block positioned at the block space position "posB" and
@@ -251,13 +249,12 @@ define(['./util', './construction_block', './sensor',
 
         // Called if making the block real on the server succeeded.
         _makeRealOnServerSucceeded: function () {
-            realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
+            this.publishTopic('changedOnServer');
         },
 
         // Called if making the block real on the server failed.
         _makeRealOnServerFailed: function () {
-            realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/' +
-                                       'changeOnServerFailed');
+            this.publishTopic('changeOnServerFailed');
         },
 
         // Triggers setting the state of the block at the block space position
@@ -295,7 +292,7 @@ define(['./util', './construction_block', './sensor',
 
         // Called if replacing the blocks on the server succeeded.
         _replaceBlocksOnServerSucceeded: function () {
-            realityBuilderDojo.publish('realityBuilder/ConstructionBlocks/changedOnServer');
+            this.publishTopic('changedOnServer');
         },
 
         // Deletes all blocks on the server, and sets the real blocks to those
@@ -363,5 +360,5 @@ define(['./util', './construction_block', './sensor',
                                    this._pendingBlocks);
             }
         }
-    }
+    }, topicMixin);
 });
