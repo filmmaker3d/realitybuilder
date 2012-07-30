@@ -17,7 +17,7 @@
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true, sloppy: true,
   unparam: true */
 
-/*global realityBuilder, realityBuilderDojo. FlashCanvas, camera, define */
+/*global realityBuilder, realityBuilderDojo, FlashCanvas, camera, define */
 
 define(['./util',
         './block_properties',
@@ -32,8 +32,8 @@ define(['./util',
         // Rotation angle, about center of rotation:
         _a: null, // mulitples of 90°, CCW when viewed from above
 
-        // Coordinates of the vertexes in block space, world space, view space, and
-        // sensor space.
+        // Coordinates of the vertexes in block space, world space, view space,
+        // and sensor space.
         _bottomVertexesB: null,
         _bottomVertexes: null,
         _bottomVertexesV: null,
@@ -58,20 +58,20 @@ define(['./util',
         // 
         // The vertexes, correspondingly, are x-z pairs.
         //
-        // The projection is a parallel projection. It works simply by extending
-        // the vertical edges of the block to the x-z-plane.
+        // The projection is a parallel projection. It works simply by
+        // extending the vertical edges of the block to the x-z-plane.
         //
-        // If not all vertexes can be determined, for example due to problems with
-        // precision in calculations, the value is null. This should normally not
-        // happen.
+        // If not all vertexes can be determined, for example due to problems
+        // with precision in calculations, the value is null. This should
+        // normally not happen.
         _projectedVertexesVXZ: null,
 
         // The vertexes of the block projected to the view space x-z-plane, in
         // sensor space.
         _projectedVertexesVXZS: null,
 
-        // The sensor space bounding box of the block, i.e. the smallest rectangle,
-        // which encloses the block in sensor space.
+        // The sensor space bounding box of the block, i.e. the smallest
+        // rectangle, which encloses the block in sensor space.
         _boundingBoxS: null,
 
         // Ids, data version numbers and block position and angle when last
@@ -84,17 +84,17 @@ define(['./util',
         // True, if the coordinates changed after the last rendering:
         _coordinatesChangedAfterLastRendering: false,
 
-        // Horizontal extents of the block in sensor space: Indexes of the vertexes
-        // that correspond to the leftmost and rightmost edges, as displayed on the
-        // sensor.
+        // Horizontal extents of the block in sensor space: Indexes of the
+        // vertexes that correspond to the leftmost and rightmost edges, as
+        // displayed on the sensor.
         //
-        // Note: depending on orientation of the block, the leftmost index may be
-        // bigger than the rightmost index!
+        // Note: depending on orientation of the block, the leftmost index may
+        // be bigger than the rightmost index!
         _indexOfLeftmostVertex: null,
         _indexOfRightmostVertex: null,
 
-        // True, iff only the bottom of the block should be subtracted when using
-        // the "subtract" function:
+        // True, iff only the bottom of the block should be subtracted when
+        // using the "subtract" function:
         _onlySubtractBottom: false,
 
         extend: function (properties) {
@@ -107,8 +107,8 @@ define(['./util',
             return newObject;
         },
 
-        // Returns the block's position in block space. From the position the block
-        // extends in positive direction along the x-, y-, and z-axis.
+        // Returns the block's position in block space. From the position the
+        // block extends in positive direction along the x-, y-, and z-axis.
         posB: function () {
             return this._posB;
         },
@@ -139,8 +139,8 @@ define(['./util',
         //
         // * If the block has two-fold symmetry:
         //
-        //   coordinates and rotation angle so that rotation angle is either 0° or
-        //   90°
+        //   coordinates and rotation angle so that rotation angle is either 0°
+        //   or 90°
         //
         // * Otherwise: unchanged pose
         simPoseB: function () {
@@ -175,8 +175,8 @@ define(['./util',
         },
 
         // If not all vertexes could be determined, for example due to problems
-        // with precision in calculations, the return value is false. This should
-        // normally not happen.
+        // with precision in calculations, the return value is false. This
+        // should normally not happen.
         projectedVertexesVXZ: function () {
             this._updateCoordinates();
 
@@ -184,11 +184,13 @@ define(['./util',
                     false : this._projectedVertexesVXZ);
         },
 
-        // Updates the vertexes of the block projected to the view space x-z-plane.
+        // Updates the vertexes of the block projected to the view space
+        // x-z-plane.
         //
         // Depends on up to date view space coordinates.
         _updateViewSpaceXZPlaneCoordinates: function () {
-            var i, bottomVertexesV, topVertexesV, len, tmp = [], lineV, pointVXZ;
+            var i, bottomVertexesV, topVertexesV, len, tmp = [], lineV,
+                pointVXZ;
 
             bottomVertexesV = this._bottomVertexesV;
             topVertexesV = this._topVertexesV;
@@ -229,7 +231,8 @@ define(['./util',
             return false;
         },
 
-        // Returns true, iff the current block is attachable to the block "block".
+        // Returns true, iff the current block is attachable to the block
+        // "block".
         attachableTo: function (block) {
             var testPosB, attachmentOffsetsB, attachmentOffsetB, i;
 
@@ -250,17 +253,16 @@ define(['./util',
             return false;
         },
 
-        // Updates the vertexes of the block and its center of rotation in block
-        // space.
+        // Updates the vertexes of the block and its center of rotation in
+        // block space.
         _updateBlockSpaceCoordinates: function () {
-            var
-            xB = this.posB()[0],
-            yB = this.posB()[1],
-            zB = this.posB()[2],
-            blockOutlineBXY =
-                blockProperties.rotatedOutlineBXY(this.a()),
-            rotCenterBXY = blockProperties.rotCenterBXY(),
-            that = this;
+            var xB = this.posB()[0],
+                yB = this.posB()[1],
+                zB = this.posB()[2],
+                blockOutlineBXY =
+                    blockProperties.rotatedOutlineBXY(this.a()),
+                rotCenterBXY = blockProperties.rotCenterBXY(),
+                that = this;
 
             this._bottomVertexesB = [];
             this._topVertexesB = [];
@@ -287,8 +289,8 @@ define(['./util',
             return util.blockToWorld(pB, blockProperties);
         },
 
-        // Updates the vertexes of the block and its center of rotation in world
-        // space.
+        // Updates the vertexes of the block and its center of rotation in
+        // world space.
         //
         // Depends of up to date block space coordinates.
         _updateWorldSpaceCoordinates: function () {
@@ -301,8 +303,8 @@ define(['./util',
             this._topRotCenter = this._blockToWorld(this._topRotCenterB);
         },
 
-        // Calculates the vertexes of the block and its center of rotation in view
-        // space.
+        // Calculates the vertexes of the block and its center of rotation in
+        // view space.
         //
         // Depends on up to date world space coordinates.
         _updateViewSpaceCoordinates: function () {
@@ -317,9 +319,8 @@ define(['./util',
 
         // Returns true, iff coordinates need to be updated.
         _coordinatesNeedToBeUpdated: function () {
-            var
-            cameraHasChanged, blockPropertiesHaveChanged, posBHasChanged,
-            aHasChanged;
+            var cameraHasChanged, blockPropertiesHaveChanged, posBHasChanged,
+                aHasChanged;
 
             cameraHasChanged = this._lastCameraId !== camera.id();
             blockPropertiesHaveChanged =
@@ -347,23 +348,24 @@ define(['./util',
             this._coordinatesChangedAfterLastRendering = true;
         },
 
-        // Finds the indexes of the vertexes that correspond to the leftmost and
-        // rightmost edges, as displayed on the sensor.
+        // Finds the indexes of the vertexes that correspond to the leftmost
+        // and rightmost edges, as displayed on the sensor.
         //
         // Note that these vertexes often, but not always, are identical to the
         // leftmost and rightmost vertex of the top or bottom.
         _updateHorizontalExtentsInSensorSpace: function () {
-            var vertexesS, vertexS, leftmostVertexS, rightmostVertexS, i, ilv, irv;
+            var vertexesS, vertexS, leftmostVertexS, rightmostVertexS, i, ilv,
+                irv;
 
-            // Ideas behind the following algorithm, by example for the rightmost
-            // edge:
+            // Ideas behind the following algorithm, by example for the
+            // rightmost edge:
             //
-            // * The rightmost edge doesn't change it the block is extended to a
-            //   prism with infinite vertical extents.
+            // * The rightmost edge doesn't change it the block is extended to
+            //   a prism with infinite vertical extents.
             //
-            // * The rightmost edge goes through the rightmost (as displayed on the
-            //   sensor) intersection point between the prism and the view space
-            //   x-z-plane.
+            // * The rightmost edge goes through the rightmost (as displayed on
+            //   the sensor) intersection point between the prism and the view
+            //   space x-z-plane.
 
             vertexesS = this._projectedVertexesVXZS;
 
@@ -398,9 +400,9 @@ define(['./util',
                 });
         },
 
-        // Updates the vertices (top left, lower right) defining the bounding box
-        // of the block in sensor space. Depends on the vertices of the block in
-        // sensor space.
+        // Updates the vertices (top left, lower right) defining the bounding
+        // box of the block in sensor space. Depends on the vertices of the
+        // block in sensor space.
         _updateSensorSpaceBoundingBox: function () {
             var minX, minY, maxX, maxY, vertexesS, vertexS, i;
 
@@ -501,8 +503,8 @@ define(['./util',
             vertexS = bottomVertexesS[ilv];
             context.lineTo(vertexS[0], vertexS[1]);
 
-            // bottom, from leftmost to rightmost vertex, counterclockwise (when
-            // viewed from top in block space):
+            // bottom, from leftmost to rightmost vertex, counterclockwise
+            // (when viewed from top in block space):
             for (i = ilv + 1; i <= len + irv; i += 1) {
                 vertexS = bottomVertexesS[i % len];
                 context.lineTo(vertexS[0], vertexS[1]);
@@ -516,8 +518,7 @@ define(['./util',
         // Subtracts the shape of the block from the drawing on the canvas with
         // rendering context "context".
         subtract: function (context) {
-            var bottomVertexesS, topVertexesS,
-            len, vertexS, i, ilv, irv;
+            var bottomVertexesS, topVertexesS, len, vertexS, i, ilv, irv;
 
             this._updateCoordinates();
 
@@ -537,19 +538,19 @@ define(['./util',
             context.globalCompositeOperation = "source-over";
         },
 
-        // Renders the foreground of the block, i.e. the part of that block that
-        // was visible were the block solid.
+        // Renders the foreground of the block, i.e. the part of that block
+        // that was visible were the block solid.
         _renderForeground: function (context) {
             var topVertexesS = this._topVertexesS,
-            bottomVertexesS = this._bottomVertexesS,
-            topRotCenterS = this._topRotCenterS,
-            len = topVertexesS.length, // same for top and bottom
-            vertexS,
-            firstVertexS,
-            i,
-            ilv = this._indexOfLeftmostVertex,
-            irv = this._indexOfRightmostVertex,
-            imax;
+                bottomVertexesS = this._bottomVertexesS,
+                topRotCenterS = this._topRotCenterS,
+                len = topVertexesS.length, // same for top and bottom
+                vertexS,
+                firstVertexS,
+                i,
+                ilv = this._indexOfLeftmostVertex,
+                irv = this._indexOfRightmostVertex,
+                imax;
 
             context.globalAlpha = 1;
 
@@ -593,19 +594,19 @@ define(['./util',
             context.fill();
         },
 
-        // Renders the background of the block, i.e. the part of that block that
-        // was invisible were the block solid.
+        // Renders the background of the block, i.e. the part of that block
+        // that was invisible were the block solid.
         _renderBackground: function (context) {
             var bottomVertexesS = this._bottomVertexesS,
-            topVertexesS = this._topVertexesS,
-            bottomRotCenterS = this._bottomRotCenterS,
-            topRotCenterS = this._topRotCenterS,
-            len = topVertexesS.length, // same for top and bottom
-            vertexS,
-            i,
-            ilv = this._indexOfLeftmostVertex,
-            irv = this._indexOfRightmostVertex,
-            imax;
+                topVertexesS = this._topVertexesS,
+                bottomRotCenterS = this._bottomRotCenterS,
+                topRotCenterS = this._topRotCenterS,
+                len = topVertexesS.length, // same for top and bottom
+                vertexS,
+                i,
+                ilv = this._indexOfLeftmostVertex,
+                irv = this._indexOfRightmostVertex,
+                imax;
 
             context.globalAlpha = blockProperties.backgroundAlpha();
 
@@ -640,8 +641,8 @@ define(['./util',
             context.globalAlpha = 1;
         },
 
-        // Draws the block in the color "color" (CSS format) as seen by the sensor,
-        // on the canvas with rendering context "context".
+        // Draws the block in the color "color" (CSS format) as seen by the
+        // sensor, on the canvas with rendering context "context".
         render: function (context, color) {
             this._updateCoordinates();
 
@@ -651,5 +652,5 @@ define(['./util',
             this._renderForeground(context);
             this._renderBackground(context);
         }
-    }
+    };
 });
