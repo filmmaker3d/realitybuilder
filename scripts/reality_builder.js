@@ -86,8 +86,8 @@ define(['./util',
             this.subscribeToTopic(newBlock, 'onNewBlockMakeRealRequested',
                                   this._onNewBlockMakeRealRequested);
             this.subscribeToTopic(camera, 'changed', this._onCameraChanged);
-            realityBuilderDojo.subscribe('realityBuilder/BlockProperties/changed',
-                                         this, this._onBlockPropertiesChanged);
+            this.subscribeToTopic(blockProperties, 'changed',
+                                  this._onBlockPropertiesChanged);
 
             this._update();
         },

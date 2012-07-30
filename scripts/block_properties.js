@@ -23,8 +23,9 @@
 
 /*global realityBuilder, realityBuilderDojo, define */
 
-define(['./util', '../vendor/underscore-wrapped'], function (util, _) {
-    return {
+define(['./util', './topic_mixin', '../vendor/underscore-wrapped'
+       ], function (util, topicMixin, _) {
+    return _.extend({
         // Version of data last retrieved from the server, or "-1" initially. Is a
         // string in order to be able to contain very large integers.
         _versionOnServer: '-1',
@@ -288,8 +289,7 @@ define(['./util', '../vendor/underscore-wrapped'], function (util, _) {
                 this._completeAttachmentOffsetsListB();
                 this._updateRotatedAttachmentOffsetsListsB();
 
-                realityBuilderDojo.publish('realityBuilder/BlockProperties/' +
-                                           'changed');
+                this.publishTopic('changed');
             }
         },
 
@@ -344,5 +344,5 @@ define(['./util', '../vendor/underscore-wrapped'], function (util, _) {
         rotCenterBXY: function () {
             return this._rotCenterBXY;
         }
-    }
+    }, topicMixin);
 });
