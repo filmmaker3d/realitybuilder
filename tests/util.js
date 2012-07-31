@@ -20,17 +20,19 @@
 
 var requirejs = require('requirejs');
 
-requirejs.config({ nodeRequire: require });
-
-requirejs(['../scripts/util.js'], function (util) {
-    console.log('fixme');
+requirejs.config({
+    nodeRequire: require,
+    baseUrl: 'scripts'
 });
 
-exports.testSomething = function(test){
-    test.expect(1);
-    test.ok(true, "this assertion should pass");
-    test.done();
-};
+requirejs(['util'], function (util) {
+    console.log('fixme2');
+    exports.testSomething = function(test){
+        test.expect(1);
+        test.ok(true, "this assertion should pass");
+        test.done();
+    };
+});
 
 /*fixme:
 doh.register("tests.util.all", [

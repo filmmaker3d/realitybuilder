@@ -20,9 +20,11 @@
 /*global define */
 
 define(['./util', './shadow', './block', './sensor', './construction_blocks',
-        './topic_mixin', './jsonp', '../vendor/underscore-wrapped'
+        './topic_mixin', './jsonp',
+        '../vendor/underscore-wrapped', '../vendor/jquery-wrapped'
        ], function (util, shadow, block, sensor,
-                    constructionBlocks, topicMixin, jsonp, _) {
+                    constructionBlocks, topicMixin, jsonp,
+                    _, $) {
     return _.extend(block.extend({
         // May change later:
         _posB: [0, 0, 0],
@@ -225,15 +227,29 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
             return !this._wouldGoOutOfRange(deltaB, 0) && !this._isFrozen;
         },
 
-        // Returns true, iff this block is attachable to another block or to the
-        // ground.
+        // Returns true, iff this block is attachable to another block or to
+        // the ground.
         _isAttachable: function () {
             return (constructionBlocks.realBlocksAreAttachableTo(this) ||
                     this.zB() === 0);
         },
 
+        // Unsets the construction validator, then reloads it from the server.
+        loadValidator: function (src) {
+            this._unsetValidator();
+            $.getScript(src);
+        },
+
+        _unsetValidator: function () {
+            delete window.realityBuilderValidator;
+        },
+
+        // Returns true, if the new block together with all real and pending
+        // blocks forms a valid construction.
         _formsValidConstruction: function () {
-            return realityBuilder.newConstructionWouldBeValid();
+            return (window.realityBuilderValidator &&
+                    window.realityBuilderValidator(constructionBlocks,
+                                                   this, util, _));
         },
 
         // Returns true, iff the new block can be made real in its current

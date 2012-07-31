@@ -9,6 +9,10 @@
         root.amdWeb = factory(root.b);
     }
 }(this, function () {
+    if (typeof window === 'undefined') {
+        window = this; // necessary when including in Node.js (e.g. as
+                       // dependency when unit testing)
+    }
 
 // underscore.js: start -------------------------------------------------------
 

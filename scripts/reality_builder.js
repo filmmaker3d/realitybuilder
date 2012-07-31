@@ -345,7 +345,7 @@ define(['./util', './block_properties', './camera', './construction_blocks',
 
             if (data.validatorData.versionChanged) {
                 this._validatorVersion = data.validatorData.version;
-                this._loadValidator(data.validatorData.src);
+                newBlock.loadValidator(data.validatorData.src);
             }
 
             if (this._updateTimeout) {
@@ -413,23 +413,6 @@ define(['./util', './block_properties', './camera', './construction_blocks',
                 content: content,
                 load: _.bind(this._storeSettingsOnServerSucceeded, this)
             });
-        },
-
-        // Unsets the construction validator, then reloads it from the server.
-        _loadValidator: function (src) {
-            this._unsetValidator();
-            $.getScript(src);
-        },
-
-        _unsetValidator: function () {
-            delete window.realityBuilderValidator;
-        },
-
-        // Returns true, if the new block together with all real and pending
-        // blocks forms a valid construction.
-        newConstructionWouldBeValid: function () {
-            return (typeof realityBuilderValidator !== 'undefined' &&
-                    realityBuilderValidator(constructionBlocks, newBlock));
         },
 
         camera: function () {

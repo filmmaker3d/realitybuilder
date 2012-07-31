@@ -14,29 +14,35 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realityBuilder, realityBuilderSimPosesBList */
+/*global realityBuilderSimPosesBList */
 
 // This function returns true, iff the passed construction blocks plus new
 // block describe a valid construction.
-var realityBuilderValidator = (function () {
+window.realityBuilderValidator = (function () {
     'use strict';
 
-    // List of prerendered poses:
-    var util = realityBuilder.util(),
-        _ = realityBuilder._(),
-        validSrtSimPosesBList = realityBuilderSimPosesBList; // sorted in a
-                                                             // moment
+    var validSrtSimPosesBList;
 
-    _.each(validSrtSimPosesBList, function (simPosesB) {
-        util.sortPosesB(simPosesB);
-    });
+    // List of valid prerendered sorted poses.
+    function setValidSrtSimPosesBList(util, _) {
+        validSrtSimPosesBList = [];
 
-    return function (constructionBlocks, newBlock) {
-        var simPosesBAreValid, srtSimPosesB;
+        _.each(realityBuilderSimPosesBList, function (simPosesB) {
+            util.sortPosesB(simPosesB);
+            validSrtSimPosesBList.push(simPosesB);
+        });
+    }
 
-        srtSimPosesB = constructionBlocks.nonDeletedSimPosesB();
+    return function (constructionBlocks, newBlock, util, _) {
+        // poses to be tested:
+        var srtSimPosesB = constructionBlocks.nonDeletedSimPosesB();
+
         srtSimPosesB.push(newBlock.simPoseB());
         util.sortPosesB(srtSimPosesB);
+
+        if (validSrtSimPosesBList === undefined) {
+            setValidSrtSimPosesBList(util, _);
+        }
 
         return util.posInSrtSimPosesBList(srtSimPosesB,
                                           validSrtSimPosesBList) !== false;
