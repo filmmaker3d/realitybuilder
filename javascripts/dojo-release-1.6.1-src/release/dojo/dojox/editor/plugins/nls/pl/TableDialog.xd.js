@@ -1,5 +1,0 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
-return {depends: [["provide", "dojox.editor.plugins.nls.pl.TableDialog"]],
-defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.pl.TableDialog");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "TableDialog", "pl", ({"buttonSet":"Ustaw","insertTableTitle":"Wstawianie tabeli","insertTableRowAfterLabel":"Dodaj wiersz po","buttonCancel":"Anuluj","center":"środek","deleteTableColumnLabel":"Usuń kolumnę","right":"prawa strona","insertTableColumnBeforeLabel":"Dodaj kolumnę przed","tableWidth":"Szerokość tabeli:","buttonInsert":"Wstaw","default":"domyślna","align":"Wyrównanie:","insertTableRowBeforeLabel":"Dodaj wiersz przed","cellSpacing":"Odstępy między komórkami:","pixels":"piksle","selectTableLabel":"Wybierz tabelę","rows":"Wiersze:","modifyTableTitle":"Modyfikowanie tabeli","cellPadding":"Dopełnianie komórek:","deleteTableRowLabel":"Usuń wiersz","backgroundColor":"Kolor tła:","insertTableColumnAfterLabel":"Dodaj kolumnę po","left":"lewa strona","borderThickness":"Grubość ramki","columns":"Kolumny:","percent":"procent","borderColor":"Kolor ramki:"})
-);
-}};});

@@ -1,8 +1,0 @@
-/*
-	Copyright (c) 2004-2011, The Dojo Foundation All Rights Reserved.
-	Available via Academic Free License >= 2.1 OR the modified BSD license.
-	see: http://dojotoolkit.org/license for details
-*/
-
-
-realityBuilderDojo._xdResourceLoaded(function(_1,_2,_3){return {depends:[["provide","dojox.mobile.parser"],["provide","dojo.parser"]],defineResource:function(_4,_5,_6){if(!_4._hasResource["dojox.mobile.parser"]){_4._hasResource["dojox.mobile.parser"]=true;_4.provide("dojox.mobile.parser");_4.provide("dojo.parser");_6.mobile.parser=new function(){this.instantiate=function(_7,_8){var ws=[];if(_7){var i,_9;_9=_7.length;for(i=0;i<_9;i++){var _a=_7[i];var _b=_4.getObject(_4.attr(_a,"dojoType"));var _c=_b.prototype;var _d={};if(_8){for(var _e in _8){_d[_e]=_8[_e];}}for(var _f in _c){var val=_4.attr(_a,_f);if(!val){continue;}if(typeof _c[_f]=="string"){_d[_f]=val;}else{if(typeof _c[_f]=="number"){_d[_f]=val-0;}else{if(typeof _c[_f]=="boolean"){_d[_f]=(val!="false");}else{if(typeof _c[_f]=="object"){_d[_f]=eval("("+val+")");}}}}}_d["class"]=_a.className;_d["style"]=_a.style&&_a.style.cssText;var _10=new _b(_d,_a);ws.push(_10);var _11=_a.getAttribute("jsId");if(_11){_4.setObject(_11,_10);}}_9=ws.length;for(i=0;i<_9;i++){var w=ws[i];w.startup&&!w._started&&(!w.getParent||!w.getParent())&&w.startup();}}return ws;};this.parse=function(_12,_13){if(!_12){_12=_4.body();}else{if(!_13&&_12.rootNode){_12=_12.rootNode;}}var _14=_12.getElementsByTagName("*");var _15=[];for(var i=0,len=_14.length;i<len;i++){if(_14[i].getAttribute("dojoType")){_15.push(_14[i]);}}return this.instantiate(_15,_13);};}();_4._loaders.unshift(function(){if(_4.config.parseOnLoad){_6.mobile.parser.parse();}});}}};});

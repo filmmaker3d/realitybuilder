@@ -18,10 +18,10 @@
 
 /*global $, define */
 
-define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
+define(['reality_builder/reality_builder',
+        'scene/prerendered/sim_poses_b_list.js'
+       ], function (realityBuilder, simPosesBList) {
     'use strict';
-
-// fixme    var realityBuilder;
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible,
                                           setVisibility) {

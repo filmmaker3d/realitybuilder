@@ -1,5 +1,0 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
-return {depends: [["provide", "dojox.editor.plugins.nls.kk.TableDialog"]],
-defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.editor.plugins.nls.kk.TableDialog");dojo._xdLoadFlattenedBundle("dojox.editor.plugins", "TableDialog", "kk", ({"buttonSet":"Орнату","insertTableTitle":"Кесте кірістіру","insertTableRowAfterLabel":"Жолды артына қосу","buttonCancel":"Болдырмау","center":"ортасы","deleteTableColumnLabel":"Бағанды жою","right":"оң жақ","insertTableColumnBeforeLabel":"Бағанды алдына қосу","tableWidth":"Кесте ені:","buttonInsert":"Кірістіру","default":"әдепкі","align":"Туралау:","insertTableRowBeforeLabel":"Жолды алдына қосу","cellSpacing":"Ұяшық аралығы:","pixels":"нүктелер","selectTableLabel":"Кестені таңдау","rows":"Жолдар:","modifyTableTitle":"Кестені өзгерту","cellPadding":"Ұяшық өрісі:","deleteTableRowLabel":"Жолды жою","backgroundColor":"Өң түсі:","insertTableColumnAfterLabel":"Бағанды артына қосу","left":"сол жақ","borderThickness":"Жиек қалыңдығы","columns":"Бағандар:","percent":"пайыз","borderColor":"Жиек түсі:"})
-);
-}};});

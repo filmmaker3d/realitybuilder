@@ -1,5 +1,0 @@
-realityBuilderDojo._xdResourceLoaded(function(dojo, dijit, dojox){
-return {depends: [["provide", "dojox.grid.enhanced.nls.ar.Pagination"]],
-defineResource: function(dojo, dijit, dojox){dojo.provide("dojox.grid.enhanced.nls.ar.Pagination");dojo._xdLoadFlattenedBundle("dojox.grid.enhanced", "Pagination", "ar", ({"gotoButtonTitle":"اذهب الى الصفحة المحددة","prevTip":"الصفحة السابقة","pageCountIndication":" (${0} صفحات)","pageStepLabelTemplate":"الصفحة ${0}","descTemplate":"${2} - ${3} من ${1} ${0}","lastTip":"الصفحة الأخيرة","nextTip":"الصفحة التالية","pageSizeLabelTemplate":"${0} بند/بنود بكل صفحة","dialogCancel":"الغاء","itemTitle":"بنود","dialogConfirm":"بدء","firstTip":"الصفحة الأولى","allItemsLabelTemplate":"كل البنود","dialogIndication":"حدد رقم الصفحة","dialogTitle":"اذهب الى الصفحة"})
-);
-}};});

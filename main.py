@@ -817,13 +817,13 @@ class RealityBuilderJs(webapp.RequestHandler):
             'host': self.request.host
             }
         
-        path = os.path.join(os.path.dirname(__file__), 'realitybuilder.js')
+        path = os.path.join(os.path.dirname(__file__), 'reality_builder.js')
         self.response.headers['Content-Type'] = \
             'application/javascript; charset=utf-8';
         self.response.out.write(template.render(path, template_values))
 
 application = webapp.WSGIApplication([
-    ('/realitybuilder.js', RealityBuilderJs),
+    ('/reality_builder.js', RealityBuilderJs),
     ('/rpc/delete', RPCDelete),
     ('/rpc/make_real', RPCMakeReal),
     ('/rpc/make_pending', RPCMakePending),

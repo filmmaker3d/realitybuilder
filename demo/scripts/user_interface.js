@@ -18,7 +18,9 @@
 
 /*global $, _, define */
 
-define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
+define(['reality_builder/reality_builder',
+        'scene/prerendered/sim_poses_b_list.js'
+       ], function (realityBuilder, simPosesBList) {
     'use strict';
 
     var coordinateButtonDeltaBs = {
@@ -32,7 +34,6 @@ define(['scene/prerendered/sim_poses_b_list.js'], function (simPosesBList) {
         backgroundImageIsLoaded = false, // initially only a placeholder is
                                          // loaded
         realityBuilderIsReady = false,
-//fixme        realityBuilder,
         prerenderedSrtSimPosesBList;
 
     function forEachCoordinateButton(f) {

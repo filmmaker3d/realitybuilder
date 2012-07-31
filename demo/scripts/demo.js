@@ -20,13 +20,13 @@
 
 require(['user_interface',
          'admin_interface',
-         'realitybuilder/realitybuilder' // Loaded with a path. Loading
-                                         // directly from a remote domain
-                                         // requires appending ".js", and that
-                                         // then breaks the dependency chain
-                                         // (probably only during debugging - a
-                                         // monolythic AMD module shouldn't be
-                                         // a problem).
+         'reality_builder/reality_builder' // Loaded with a path. Loading
+                                           // directly from a remote domain
+                                           // requires appending ".js", and
+                                           // that then breaks the dependency
+                                           // chain (probably only during
+                                           // debugging - a monolythic AMD
+                                           // module shouldn't be a problem).
         ], function (userInterface,
                      adminInterface,
                      realityBuilder) {
@@ -39,11 +39,6 @@ require(['user_interface',
         namespace: 'demo',
         baseUrl: realityBuilderBaseUrl,
         onReady: function () {
-
-// fixme:
-//    userInterface.init({realityBuilder: realityBuilder});
-//    adminInterface.init({realityBuilder: realityBuilder});
-
             userInterface.onReady();
             adminInterface.onReady();
         },

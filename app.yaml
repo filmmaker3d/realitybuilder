@@ -33,42 +33,11 @@ handlers:
 - url: /documentation
   static_dir: documentation
 
-- url: /javascripts/dojo
-  static_dir: javascripts/dojo
-
-- url: /javascripts/dojo-release-1.6.1
-  static_dir: javascripts/dojo-release-1.6.1
-
-- url: /javascripts/dojo-release-1.6.1-src
-  static_dir: javascripts/dojo-release-1.6.1-src
-
-- url: /javascripts/realityBuilder
-  static_dir: javascripts/realityBuilder
-
 - url: /scripts
   static_dir: scripts
 
 - url: /vendor
   static_dir: vendor
-
-- url: /demo/stylesheets
-  static_dir: demo/stylesheets
-
-- url: /demo/javascripts
-  static_dir: demo/javascripts
-
-- url: /demo/vendor
-  static_dir: demo/vendor
-
-- url: /demo/images
-  static_dir: demo/images
-
-- url: /demo/admin
-  script: demo/main.py
-  login: required # admin check is done separately
-
-- url: /demo
-  script: demo/main.py
 
 - url: /.*
   script: main.py
