@@ -19,28 +19,13 @@
 
 /*global define */
 
-define(['./util',
-        './block_properties',
-        './camera',
-        './construction_blocks',
-        './new_block',
-        './sensor',
-        './shadow_obscuring_blocks',
-        './shadow',
-        './topic_mixin',
-        '../vendor/jquery-wrapped',
-        '../vendor/underscore-wrapped'
-       ], function (util,
-                    blockProperties,
-                    camera,
-                    constructionBlocks,
-                    newBlock,
-                    sensor,
-                    shadowObscuringBlocks,
-                    shadow,
-                    topicMixin,
-                    $,
-                    _) {
+define(['./util', './block_properties', './camera', './construction_blocks',
+        './new_block', './sensor', './shadow_obscuring_blocks', './shadow',
+        './topic_mixin', './jsonp',
+        '../vendor/jquery-wrapped', '../vendor/underscore-wrapped'
+       ], function (util, blockProperties, camera, constructionBlocks,
+                    newBlock, sensor, shadowObscuringBlocks, shadow,
+                    topicMixin, jsonp, $, _) {
     return _.extend({
         // Last construction validator version retrieved, or "-1" initially. Is
         // a string in order to be able to contain very large integers.
@@ -380,7 +365,7 @@ define(['./util',
         // server. Only updates data where there is a new version. Fails
         // silently on error.
         _update: function () {
-            util.jsonpGet({
+            jsonp.get({
                 url: util.baseUrl() + "rpc/construction",
                 content: {
                     "blocksDataVersion":
@@ -423,7 +408,7 @@ define(['./util',
                 _.extend(content, this._preparedCameraData(settings.cameraData));
             }
 
-            util.jsonpGet({
+            jsonp.get({
                 url: util.baseUrl() + "rpc/update_settings",
                 content: content,
                 load: _.bind(this._storeSettingsOnServerSucceeded, this)

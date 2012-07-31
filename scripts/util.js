@@ -19,8 +19,7 @@
 
 /*global define, FlashCanvas, swfobject */
 
-define(['../vendor/jquery-wrapped',
-        '../vendor/underscore-wrapped'], function ($, _) {
+define(['../vendor/underscore-wrapped'], function (_) {
     return {
         // Tolerance when comparing coordinates in sensor space.
         TOLERANCE_S: 0.5,
@@ -424,24 +423,6 @@ define(['../vendor/jquery-wrapped',
         baseUrl: _.memoize(function () {
             var url = this.SETTINGS.baseUrl;
             return url[url.length - 1] === '/' ? url : url + '/';
-        }),
-
-        // Performs a JSONP request, using some default settings.
-        jsonpGet: function (args) {
-            if (typeof args.content === 'undefined') {
-                args.content = {};
-            }
-
-            args.content.namespace = this.SETTINGS.namespace;
-
-            $.ajax({
-                dataType: 'jsonp',
-                url: args.url,
-                data: args.content,
-                success: args.load,
-                timeout: this.SETTINGS.jsonpTimeout,
-                error: this.SETTINGS.onJsonpError
-            });
-        }
+        })
     };
 });

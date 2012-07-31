@@ -22,8 +22,8 @@
 /*global define */
 
 define(['./util', './construction_block', './sensor', './topic_mixin',
-        '../vendor/jquery-wrapped', '../vendor/underscore-wrapped'
-       ], function (util, constructionBlock, sensor, topicMixin, $, _) {
+        './jsonp', '../vendor/jquery-wrapped', '../vendor/underscore-wrapped'
+       ], function (util, constructionBlock, sensor, topicMixin, jsonp, $, _) {
     return _.extend({
         // Version of blocks data last retrieved from the server, or "-1"
         // initially. Is a string in order to be able to contain very large
@@ -215,7 +215,7 @@ define(['./util', './construction_block', './sensor', './topic_mixin',
         // the server. Once the server has completed the request, the list of
         // blocks is updated.
         makePendingOnServer: function (posB, a) {
-            util.jsonpGet({
+            jsonp.get({
                 url: util.baseUrl() + "rpc/make_pending",
                 content: {
                     "xB": posB[0],
@@ -235,7 +235,7 @@ define(['./util', './construction_block', './sensor', './topic_mixin',
         // Deletes the block positioned at the block space position "posB" and
         // rotated by the angle "a", on the client and on the server.
         deleteOnServer: function (posB, a) {
-            util.jsonpGet({
+            jsonp.get({
                 url: util.baseUrl() + "rpc/delete",
                 content: {
                     "xB": posB[0],
@@ -261,7 +261,7 @@ define(['./util', './construction_block', './sensor', './topic_mixin',
         // "posB" and rotated by the angle "a" to real: on the client and on
         // the server.
         makeRealOnServer: function (posB, a) {
-            util.jsonpGet({
+            jsonp.get({
                 url: util.baseUrl() + "rpc/make_real",
                 content: {
                     "xB": posB[0],
@@ -304,7 +304,7 @@ define(['./util', './construction_block', './sensor', './topic_mixin',
                 content[String(i)] = poseB;
             });
 
-            util.jsonpGet({
+            jsonp.get({
                 url: util.baseUrl() + "rpc/replace_blocks",
                 content: content,
                 load: _.bind(this._replaceBlocksOnServerSucceeded, this)

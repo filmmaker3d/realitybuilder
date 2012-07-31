@@ -20,9 +20,9 @@
 /*global define */
 
 define(['./util', './shadow', './block', './sensor', './construction_blocks',
-        './topic_mixin', '../vendor/underscore-wrapped'
+        './topic_mixin', './jsonp', '../vendor/underscore-wrapped'
        ], function (util, shadow, block, sensor,
-                    constructionBlocks, topicMixin, _) {
+                    constructionBlocks, topicMixin, jsonp, _) {
     return _.extend(block.extend({
         // May change later:
         _posB: [0, 0, 0],
@@ -466,7 +466,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
 
         // Adds this block to the list of blocks on the server, with state pending.
         _createPendingOnServer: function () {
-            util.jsonpGet({
+            jsonp.get({
                 url: util.baseUrl() + "rpc/create_pending",
                 content: {
                     "xB": this.xB(),
@@ -485,7 +485,7 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
 
         // Adds this block to the list of blocks on the server, with state pending.
         _createRealOnServer: function () {
-            util.jsonpGet({
+            jsonp.get({
                 url: util.baseUrl() + "rpc/create_real",
                 content: {
                     "xB": this.xB(),

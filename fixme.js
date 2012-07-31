@@ -18,11 +18,11 @@
 
 'use strict';
 
-var requirejs = require('requirejs');
+var requirejs = require('requirejs'), window;
 
 requirejs.config({ nodeRequire: require });
 
-requirejs(['../scripts/util.js'], function (util) {
+requirejs(['./scripts/util.js'], function (util) {
     console.log('fixme');
 });
 
