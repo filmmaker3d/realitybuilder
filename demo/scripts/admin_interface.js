@@ -19,8 +19,8 @@
 /*global $, define */
 
 define(['reality_builder/reality_builder',
-        'scene/prerendered/sim_poses_b_list.js'
-       ], function (realityBuilder, simPosesBList) {
+        'scene/prerendered_sim_poses_b_list.js'
+       ], function (realityBuilder, prerenderedSimPosesBList) {
     'use strict';
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible,
@@ -110,7 +110,7 @@ define(['reality_builder/reality_builder',
     // Resets the construction to the blocks matching the first prerendered
     // block configuration.
     function resetBlocks() {
-        var simPosesB = simPosesBList[0];
+        var simPosesB = prerenderedSimPosesBList[0];
         realityBuilder.constructionBlocks().replaceBlocksOnServer(simPosesB);
     }
 

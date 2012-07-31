@@ -14,11 +14,11 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global realityBuilderSimPosesBList */
+/*global prerenderedSimPosesBList */
 
 // This function returns true, iff the passed construction blocks plus new
 // block describe a valid construction.
-window.realityBuilderValidator = (function () {
+var validator = (function () {
     'use strict';
 
     var validSrtSimPosesBList;
@@ -27,7 +27,7 @@ window.realityBuilderValidator = (function () {
     function setValidSrtSimPosesBList(util, _) {
         validSrtSimPosesBList = [];
 
-        _.each(realityBuilderSimPosesBList, function (simPosesB) {
+        _.each(prerenderedSimPosesBList, function (simPosesB) {
             util.sortPosesB(simPosesB);
             validSrtSimPosesBList.push(simPosesB);
         });

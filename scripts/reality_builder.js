@@ -345,14 +345,15 @@ define(['./util', './block_properties', './camera', './construction_blocks',
 
             if (data.validatorData.versionChanged) {
                 this._validatorVersion = data.validatorData.version;
-                newBlock.loadValidator(data.validatorData.src);
+                newBlock.setValidator(data.validatorData.src,
+                                      data.validatorData.functionName);
             }
 
             if (this._updateTimeout) {
                 // Clears the last timeout. May be necessary if the call to the
                 // function has not been triggered by that timeout. Without
-                // clearing the timeout, it may happen that two "timeout chains"
-                // run concurrently.
+                // clearing the timeout, it may happen that two "timeout
+                // chains" run concurrently.
                 clearTimeout(this._updateTimeout);
             }
             this._updateTimeout =

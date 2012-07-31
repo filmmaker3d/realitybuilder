@@ -235,7 +235,9 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
         },
 
         // Unsets the construction validator, then reloads it from the server.
-        loadValidator: function (src) {
+        setValidator: function (src, validatorFunctionName) {
+            this.validatorFunctionName = validatorFunctionName;
+
             this._unsetValidator();
             $.getScript(src);
         },
@@ -247,9 +249,9 @@ define(['./util', './shadow', './block', './sensor', './construction_blocks',
         // Returns true, if the new block together with all real and pending
         // blocks forms a valid construction.
         _formsValidConstruction: function () {
-            return (window.realityBuilderValidator &&
-                    window.realityBuilderValidator(constructionBlocks,
-                                                   this, util, _));
+            return (window.hasOwnProperty(this.validatorFunctionName) &&
+                    window[this.validatorFunctionName](constructionBlocks,
+                                                       this, util, _));
         },
 
         // Returns true, iff the new block can be made real in its current

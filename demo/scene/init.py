@@ -74,6 +74,7 @@ construction = Construction(key_name = 'main')
 construction.update_interval_client = 2000
 construction.validator_version = '0'
 construction.validator_src = 'scene/validator.js'
+construction.validator_function_name = 'validator' # attached to "window"!
 construction.blocks_data_version = '0'
 construction.camera_data_version = '0'
 construction.camera_pos = [189.57, -159.16, 140.11]

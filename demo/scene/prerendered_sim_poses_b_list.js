@@ -17,7 +17,7 @@
 /*global define */
 
 // List of prerendered simplified poses in block space.
-var realityBuilderSimPosesBList = [
+var prerenderedSimPosesBList = [
     [
         [1, 4, 3, 1], [1, 4, 2, 0], [1, 4, 1, 3], [1, 4, 0, 2],
         [5, 5, 1, 2], [5, 5, 0, 2], [0, 1, 0, 3], [3, 0, 0, 2],
@@ -67,5 +67,5 @@ var realityBuilderSimPosesBList = [
 
 define(function () {
     'use strict';
-    return realityBuilderSimPosesBList;
+    return prerenderedSimPosesBList;
 });

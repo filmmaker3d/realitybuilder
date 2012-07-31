@@ -19,8 +19,8 @@
 /*global $, _, define */
 
 define(['reality_builder/reality_builder',
-        'scene/prerendered/sim_poses_b_list.js'
-       ], function (realityBuilder, simPosesBList) {
+        'scene/prerendered_sim_poses_b_list.js'
+       ], function (realityBuilder, prerenderedSimPosesBList) {
     'use strict';
 
     var coordinateButtonDeltaBs = {
@@ -67,7 +67,7 @@ define(['reality_builder/reality_builder',
     // Returns the list of sorted simplified poses of prerendered construction
     // blocks:
     prerenderedSrtSimPosesBList = _.memoize(function () {
-        var srtSimPosesBList = simPosesBList;
+        var srtSimPosesBList = prerenderedSimPosesBList;
         _.each(srtSimPosesBList, function (simPosesB) {
             realityBuilder.util().sortPosesB(simPosesB);
         });

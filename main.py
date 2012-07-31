@@ -54,6 +54,7 @@ class Construction(db.Model):
     # whether a given construction is valid.
     validator_version = db.StringProperty()
     validator_src = db.StringProperty()
+    validator_function_name = db.StringProperty()
 
     # Version of the blocks configuration. Is the string representation of an
     # integer because the integer may become very large. The version is
@@ -288,7 +289,8 @@ class RPCConstruction(webapp.RequestHandler):
             # Validator version on server not the same as on client. => Provide
             # URL, which may or may not be changed (it could also be that just
             # the data behind the URL changed).
-            data.update({'src': construction.validator_src})
+            data.update({'src': construction.validator_src,
+                         'functionName': construction.validator_function_name})
         return data
 
     # Returns the blocks as an array of dictionaries.
