@@ -34,7 +34,7 @@
 /*global define */
 
 define(['./sensor', './util', './block_properties', './topic_mixin',
-        '../vendor/sylvester.src-wrapped', '../vendor/underscore-wrapped'
+        './vendor/sylvester.src-wrapped', './vendor/underscore-wrapped'
        ], function (sensor, util, blockProperties, topicMixin, sylvester, _) {
     var object = _.extend({
         // Position of the camera in world space (mm):

@@ -16,20 +16,9 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global $, require, realityBuilderBaseUrl */
+/*global $, realityBuilder, baseUrl, userInterface, adminInterface */
 
-require(['user_interface',
-         'admin_interface',
-         'reality_builder/reality_builder' // Loaded with a path. Loading
-                                           // directly from a remote domain
-                                           // requires appending ".js", and
-                                           // that then breaks the dependency
-                                           // chain (probably only during
-                                           // debugging - a monolythic AMD
-                                           // module shouldn't be a problem).
-        ], function (userInterface,
-                     adminInterface,
-                     realityBuilder) {
+(function () {
     'use strict';
 
     // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
@@ -37,7 +26,7 @@ require(['user_interface',
         width: 640,
         height: 480,
         namespace: 'demo',
-        baseUrl: realityBuilderBaseUrl,
+        baseUrl: baseUrl,
         onReady: function () {
             userInterface.onReady();
             adminInterface.onReady();
@@ -58,4 +47,4 @@ require(['user_interface',
         onServerError: userInterface.onServerError,
         onBrowserNotSupportedError: userInterface.onBrowserNotSupportedError
     });
-});
+}());

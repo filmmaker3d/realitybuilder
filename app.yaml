@@ -36,9 +36,6 @@ handlers:
 - url: /scripts
   static_dir: scripts
 
-- url: /vendor
-  static_dir: vendor
-
 - url: /.*
   script: main.py
 

@@ -19,7 +19,7 @@
 
 /*global define, FlashCanvas, swfobject */
 
-define(['./util', '../vendor/jquery-wrapped'], function (util, $) {
+define(['./util', './vendor/jquery-modified'], function (util, $) {
     return {
         // Performs a JSONP request, using some default settings.
         get: function (args) {

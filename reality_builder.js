@@ -18,6 +18,6 @@
 
 /*global define */
 
-define(['./scripts/reality_builder'], function (realityBuilder) {
-    return realityBuilder;
+define(['./scripts/main'], function (main) {
+    return main;
 });

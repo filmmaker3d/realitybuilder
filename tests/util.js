@@ -91,8 +91,8 @@ requirejs(['util'], function (util) {
 
     exports.cartesianToPolar = function (test) {
         var pp, // polar point
-        toleranceA = 0.001, // tolerance when comparing angles
-        tolerance = util.TOLERANCE_S;
+            toleranceA = 0.001, // tolerance when comparing angles
+            tolerance = util.TOLERANCE_S;
 
         // right
         pp = util.cartesianToPolar([5, 0]);
@@ -203,7 +203,7 @@ requirejs(['util'], function (util) {
 
     exports.intersectionSegmentLineVXZ = function (test) {
         var segmentVXZ, lineVXZ, pVXZ,
-        tolerance = util.TOLERANCE_VXZ;
+            tolerance = util.TOLERANCE_VXZ;
 
         // Intersection in the origin:
         segmentVXZ = [[-1, 0], [1, 0]];
@@ -278,7 +278,7 @@ requirejs(['util'], function (util) {
 
     exports.relationPointSegmentVXZ = function (test) {
         var segmentVXZ, pVXZ, rel,
-        tolerance = util.TOLERANCE_VXZ;
+            tolerance = util.TOLERANCE_VXZ;
 
         segmentVXZ = [[-16, 4], [-12, 8]];
 

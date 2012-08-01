@@ -20,8 +20,8 @@
 /*global define */
 
 define(['./util',
-        '../vendor/jquery-wrapped',
-        '../vendor/underscore-wrapped'], function (util, $, _) {
+        './vendor/jquery-modified',
+        './vendor/underscore-wrapped'], function (util, $, _) {
     var object = {
         // Canvases for drawing various parts.
         _canvasNodes: null,

@@ -16,11 +16,9 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global $, _, define */
+/*global $, _, realityBuilder, prerenderedSimPosesBList */
 
-define(['reality_builder/reality_builder',
-        'scene/prerendered_sim_poses_b_list.js'
-       ], function (realityBuilder, prerenderedSimPosesBList) {
+var userInterface = (function () {
     'use strict';
 
     var coordinateButtonDeltaBs = {
@@ -210,13 +208,7 @@ define(['reality_builder/reality_builder',
         unhideViewIfAllReady();
     }
 
-    function init(settings) {
-        realityBuilder = settings.realityBuilder;
-    }
-
     return {
-        init: init,
-
         onReady: onReady,
 
         onBrowserNotSupportedError: onBrowserNotSupportedError,
@@ -227,4 +219,4 @@ define(['reality_builder/reality_builder',
 
         onServerError: onServerError
     };
-});
+}());

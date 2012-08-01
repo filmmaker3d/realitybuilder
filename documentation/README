@@ -79,9 +79,9 @@ Notes:
 Unit tests
 ==========
 
-Run unit tests by visiting (relative to the root URL) with debug mode enabled:
+Run unit tests with Nodeunit <https://github.com/caolan/nodeunit/>:
 
-  /javascript/realityBuilder/tests/runTests.html
+$ nodeunit tests
 
 
 About blocks

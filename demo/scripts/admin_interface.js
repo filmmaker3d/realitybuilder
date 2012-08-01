@@ -16,11 +16,9 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global $, define */
+/*global $, realityBuilder, prerenderedSimPosesBList */
 
-define(['reality_builder/reality_builder',
-        'scene/prerendered_sim_poses_b_list.js'
-       ], function (realityBuilder, prerenderedSimPosesBList) {
+var adminInterface = (function () {
     'use strict';
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible,
@@ -255,13 +253,7 @@ define(['reality_builder/reality_builder',
         setUpResetBlocksButton();
     }
 
-    function init(settings) {
-        realityBuilder = settings.realityBuilder;
-    }
-
     return {
-        init: init,
-
         onReady: onReady,
 
         onJsonpError: onJsonpError,
@@ -276,4 +268,4 @@ define(['reality_builder/reality_builder',
 
         onMovedOrRotated: updatePosAndADisplay
     };
-});
+}());

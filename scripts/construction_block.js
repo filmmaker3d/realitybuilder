@@ -21,7 +21,7 @@
 /*global define */
 
 define(['./util', './block',
-        '../vendor/underscore-wrapped'
+        './vendor/underscore-wrapped'
        ], function (util, block, _) {
     return block.extend({
         // State of the block: 0 = deleted, 1 = pending (= requested to be

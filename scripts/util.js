@@ -19,7 +19,7 @@
 
 /*global define, FlashCanvas, swfobject */
 
-define(['../vendor/underscore-wrapped'], function (_) {
+define(['./vendor/underscore-wrapped'], function (_) {
     return {
         // Tolerance when comparing coordinates in sensor space.
         TOLERANCE_S: 0.5,

@@ -814,15 +814,10 @@ class RPCUpdateSettings(webapp.RequestHandler):
 
 class RealityBuilderJs(webapp.RequestHandler):
     def get(self):
-        template_values = {
-            'debug': debug,
-            'host': self.request.host
-            }
-        
-        path = os.path.join(os.path.dirname(__file__), 'reality_builder.js')
+        path = os.path.join(os.path.dirname(__file__), 'scripts.build/main.js')
         self.response.headers['Content-Type'] = \
             'application/javascript; charset=utf-8';
-        self.response.out.write(template.render(path, template_values))
+        self.response.out.write(template.render(path, {}))
 
 application = webapp.WSGIApplication([
     ('/reality_builder.js', RealityBuilderJs),

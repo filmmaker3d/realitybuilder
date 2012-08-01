@@ -21,7 +21,7 @@
 
 /*global define */
 
-define(['../vendor/underscore-wrapped'], function (_) {
+define(['./vendor/underscore-wrapped'], function (_) {
     return {
         topicHandlersList: {}, // list of handlers per topic (for this object)
 

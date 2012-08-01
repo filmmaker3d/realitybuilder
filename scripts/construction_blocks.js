@@ -22,7 +22,7 @@
 /*global define */
 
 define(['./util', './construction_block', './sensor', './topic_mixin',
-        './jsonp', '../vendor/jquery-wrapped', '../vendor/underscore-wrapped'
+        './jsonp', './vendor/jquery-modified', './vendor/underscore-wrapped'
        ], function (util, constructionBlock, sensor, topicMixin, jsonp, $, _) {
     return _.extend({
         // Version of blocks data last retrieved from the server, or "-1"

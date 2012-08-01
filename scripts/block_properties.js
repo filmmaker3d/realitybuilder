@@ -23,7 +23,7 @@
 
 /*global define */
 
-define(['./util', './topic_mixin', '../vendor/underscore-wrapped'
+define(['./util', './topic_mixin', './vendor/underscore-wrapped'
        ], function (util, topicMixin, _) {
     return _.extend({
         // Version of data last retrieved from the server, or "-1" initially. Is a

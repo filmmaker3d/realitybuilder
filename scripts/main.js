@@ -22,7 +22,7 @@
 define(['./util', './block_properties', './camera', './construction_blocks',
         './new_block', './sensor', './shadow_obscuring_blocks', './shadow',
         './topic_mixin', './jsonp',
-        '../vendor/jquery-wrapped', '../vendor/underscore-wrapped'
+        './vendor/jquery-modified', './vendor/underscore-wrapped'
        ], function (util, blockProperties, camera, constructionBlocks,
                     newBlock, sensor, shadowObscuringBlocks, shadow,
                     topicMixin, jsonp, $, _) {

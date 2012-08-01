@@ -35,8 +35,8 @@ define(['./construction_blocks',
         './block_properties',
         './camera',
         './util',
-        '../vendor/jquery-wrapped',
-        '../vendor/underscore-wrapped'
+        './vendor/jquery-modified',
+        './vendor/underscore-wrapped'
        ], function (constructionBlocks,
                     sensor,
                     blockProperties,

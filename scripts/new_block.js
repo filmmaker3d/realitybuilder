@@ -21,7 +21,7 @@
 
 define(['./util', './shadow', './block', './sensor', './construction_blocks',
         './topic_mixin', './jsonp',
-        '../vendor/underscore-wrapped', '../vendor/jquery-wrapped'
+        './vendor/underscore-wrapped', './vendor/jquery-modified'
        ], function (util, shadow, block, sensor,
                     constructionBlocks, topicMixin, jsonp,
                     _, $) {

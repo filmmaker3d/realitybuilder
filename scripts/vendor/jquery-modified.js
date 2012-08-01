@@ -1,14 +1,17 @@
 // Wrapped by Felix E. Klee <felix.klee@inka.de> in 2012, to play nicely with
 // AMD and not pollute the global namespace.
 
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(factory);
-        // Browser globals
-        root.amdWeb = factory(root.b);
-    }
-}(this, function () {
+define(function () {
+
+// As the only modification to the original jquery.js code, the following code
+// is commented out (see below):
+//
+//   if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
+//       define( "jquery", [], function () { return jQuery; } );
+//   }
+//
+// Rationale: The code is in conflict with the AMD wrapper.
+
 
 // jquery.js: start ------------------------------------------------------------
 
@@ -9409,9 +9412,9 @@ window.jQuery = window.$ = jQuery;
 // file names, and jQuery is normally delivered in a lowercase file name.
 // Do this after creating the global so that if an AMD module wants to call
 // noConflict to hide this version of jQuery, it will work.
-if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
+/*if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 	define( "jquery", [], function () { return jQuery; } );
-}
+}*/
 
 
 
@@ -9422,4 +9425,4 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
     var $ = window.$;
     $.noConflict(true);
     return $;
-}));
+});
