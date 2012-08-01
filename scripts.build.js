@@ -5,7 +5,7 @@
     removeCombined: true,
     optimize: 'none', // fixme: uglify
     paths: {
-        'requireLib': '../node_modules/requirejs/require'
+        'requireLib': 'vendor/require'
     },
     wrap: {
         startFile: 'scripts.build.start.js',

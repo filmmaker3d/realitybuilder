@@ -1,4 +1,12 @@
-(function() {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(factory);
+    } else {
+        // Browser globals
+        root.realityBuilder = factory();
+    }
+}(this, function () {
 
 /** vim: et:ts=4:sw=4:sts=4
  * @license RequireJS 2.0.4 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
@@ -17598,27 +17606,11 @@ define('main',['./util', './block_properties', './camera', './construction_block
         }
     }, topicMixin);
 });
+    var realityBuilder;
+
     require(['main'], function (main) {
-        window.realityBuilder = main;
+        realityBuilder = main;
     });
-}());
 
-/*fixme:
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(factory);
-    } else {
-        // Browser globals
-        root.realityBuilder = factory();
-    }
-}(this, function () {
-
-    //use b in some fashion.
-
-    // Just return a value to define the module export.
-    // This example returns an object, but the module
-    // can return a function as the exported value.
-    return {};
+    return realityBuilder;
 }));
-*/

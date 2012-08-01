@@ -1,7 +1,7 @@
 
 main.js
 ----------------
-C:/Scratch/realitybuilder_for_GAE/node_modules/requirejs/require.js
+vendor/require.js
 vendor/underscore-wrapped.js
 util.js
 topic_mixin.js
