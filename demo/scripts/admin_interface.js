@@ -16,9 +16,11 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79 */
 
-/*global $, realityBuilder, prerenderedSimPosesBList */
+/*global $, define */
 
-var adminInterface = (function () {
+define(['reality_builder',
+        'scene/prerendered_sim_poses_b_list.js'
+       ], function (realityBuilder, prerenderedSimPosesBList) {
     'use strict';
 
     function updateBlocksVisibilityButton(type, text, blocksAreVisible,
@@ -268,4 +270,4 @@ var adminInterface = (function () {
 
         onMovedOrRotated: updatePosAndADisplay
     };
-}());
+});

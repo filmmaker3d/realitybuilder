@@ -64,3 +64,8 @@ var prerenderedSimPosesBList = [
         [1, 1, 1, 3]
     ]
 ];
+
+define(function () {
+    'use strict';
+    return prerenderedSimPosesBList;
+});

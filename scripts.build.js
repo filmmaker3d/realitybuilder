@@ -3,7 +3,7 @@
     baseUrl: '.',
     dir: 'scripts.build',
     removeCombined: true,
-    optimize: 'none', // fixme: uglify
+    optimize: 'uglify',
     paths: {
         'requireLib': 'vendor/require'
     },

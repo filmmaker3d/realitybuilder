@@ -19,15 +19,6 @@
 
 /*global define */
 
-require(
-    ['http://example.com/reality_builder.js'],
-    function (realityBuilder) {
-        var fixme = 5;
-        return fixme;
-    }
-);
-
-
 define(['./util', './block_properties', './camera', './construction_blocks',
         './new_block', './sensor', './shadow_obscuring_blocks', './shadow',
         './topic_mixin', './jsonp',

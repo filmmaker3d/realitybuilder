@@ -44,8 +44,9 @@ There are two ways to embed the Reality Builder:
       }
   );
 
-See the demo for more information, also on how to include the Reality Builder
-when developing / debugging it.
+See the demo for more information, also on how to include the Reality Builder.
+The demo uses AMD with RequireJS to load either the production or the
+development version of the Reality Builder.
 
 
 Unit tests

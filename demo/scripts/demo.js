@@ -14,37 +14,71 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-/*jslint browser: true, maxerr: 50, maxlen: 79 */
+/*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global $, realityBuilder, baseUrl, userInterface, adminInterface */
+/*global $, _, require */
 
 (function () {
     'use strict';
 
-    // Note for IE < 9: FlashCanvas needs to be ready at this point in time!
-    realityBuilder.init({
-        width: 640,
-        height: 480,
-        namespace: 'demo',
-        baseUrl: baseUrl,
-        onReady: function () {
-            userInterface.onReady();
-            adminInterface.onReady();
+    var baseUrl, develModeIsRequested;
+
+    // Returns the value of the named URL parameter, or an empty string if not
+    // available.
+    function urlParamVal(name) {
+        var regexp = new RegExp('[?&]' + name + '=([^&]*)'), matches;
+        matches = regexp.exec(window.location.search);
+        return (_.isArray(matches) && matches.length === 2 ?
+                decodeURIComponent(matches[1]) :
+                '');
+    }
+
+    baseUrl = 'http://' + urlParamVal('demoHost');
+    develModeIsRequested = urlParamVal('demoDevelMode') === 'on';
+
+    require.config({
+        baseUrl: 'scripts',
+        paths: {
+            'reality_builder_base': baseUrl
         },
-        jsonpTimeout: 20000,
-        onJsonpError: userInterface.onJsonpError,
-        onRealBlocksVisibilityChanged:
-            adminInterface.onRealBlocksVisibilityChanged,
-        onPendingBlocksVisibilityChanged:
-            adminInterface.onPendingBlocksVisibilityChanged,
-        onCameraChanged: adminInterface.onCameraChanged,
-        onConstructionBlocksChanged: function () {
-            userInterface.onConstructionBlocksChanged();
-            adminInterface.onConstructionBlocksChanged();
-        },
-        onMovedOrRotated: adminInterface.onMovedOrRotated,
-        onDegreesOfFreedomChanged: userInterface.onDegreesOfFreedomChanged,
-        onServerError: userInterface.onServerError,
-        onBrowserNotSupportedError: userInterface.onBrowserNotSupportedError
+        map: {
+            '*': {
+                'reality_builder': (develModeIsRequested ?
+                                    'reality_builder_base/scripts/main' :
+                                    'reality_builder_base/reality_builder')
+            }
+        }
+    });
+
+    require(['reality_builder', 'user_interface', 'admin_interface'
+            ], function (realityBuilder, userInterface, adminInterface) {
+        // Note for IE < 9: FlashCanvas needs to be ready at this point in
+        // time!
+        realityBuilder.init({
+            width: 640,
+            height: 480,
+            namespace: 'demo',
+            baseUrl: baseUrl,
+            onReady: function () {
+                userInterface.onReady();
+                adminInterface.onReady();
+            },
+            jsonpTimeout: 20000,
+            onJsonpError: userInterface.onJsonpError,
+            onRealBlocksVisibilityChanged:
+                adminInterface.onRealBlocksVisibilityChanged,
+            onPendingBlocksVisibilityChanged:
+                adminInterface.onPendingBlocksVisibilityChanged,
+            onCameraChanged: adminInterface.onCameraChanged,
+            onConstructionBlocksChanged: function () {
+                userInterface.onConstructionBlocksChanged();
+                adminInterface.onConstructionBlocksChanged();
+            },
+            onMovedOrRotated: adminInterface.onMovedOrRotated,
+            onDegreesOfFreedomChanged: userInterface.onDegreesOfFreedomChanged,
+            onServerError: userInterface.onServerError,
+            onBrowserNotSupportedError:
+                userInterface.onBrowserNotSupportedError
+        });
     });
 }());

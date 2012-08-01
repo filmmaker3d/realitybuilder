@@ -16,9 +16,11 @@
 
 /*jslint browser: true, maxerr: 50, maxlen: 79, nomen: true */
 
-/*global $, _, realityBuilder, prerenderedSimPosesBList */
+/*global $, _, define */
 
-var userInterface = (function () {
+define(['reality_builder',
+        'scene/prerendered_sim_poses_b_list.js'
+       ], function (realityBuilder, prerenderedSimPosesBList) {
     'use strict';
 
     var coordinateButtonDeltaBs = {
@@ -219,4 +221,4 @@ var userInterface = (function () {
 
         onServerError: onServerError
     };
-}());
+});
