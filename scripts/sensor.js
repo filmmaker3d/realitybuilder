@@ -32,7 +32,6 @@ define(['./util',
 
         _sensorNode: null,
 
-        // fixme: implement
         setDimensions: function (width, height) {
             this._width = width;
             this._height = height;

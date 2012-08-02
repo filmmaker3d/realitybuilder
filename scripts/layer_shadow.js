@@ -62,7 +62,7 @@ define(['./construction_blocks',
         init: function (settings) {
             var shadowCanvas;
 
-            shadowCanvas = sensor.shadowCanvas(); // fixme: doesn't exist yet - perhaps call init (of parent) only later, after sensor has been initialized
+            shadowCanvas = sensor.shadowCanvas();
             this._canvas = $('<canvas>').
                 attr('width', shadowCanvas.width).
                 attr('height', shadowCanvas.height).

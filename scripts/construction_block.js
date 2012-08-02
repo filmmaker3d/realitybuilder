@@ -49,7 +49,6 @@ define(['./util', './block',
         // viewed from above). A time stamp - in seconds since the epoch - of
         // the date-time when the bocks status was last changed is "timeStamp".
         constructor: function (posB, a, state, timeStamp) {
-            // fixme: inherit from block, chain constructor
             this._state = state;
             this._timeStamp = timeStamp;
         },
