@@ -30,31 +30,12 @@
 
   <ol>
     <li>
-      If necessary, set up a MongoDB database.
+      Start serving Reality Builder widget on Google App Engine.
     </li>
 
     <li>
-      Set MongoDB database connection in Reality Builder configuration. Perhaps
-      use an environment variable for that.
-    </li>
-
-    <li>
-      Start serving Reality Builder widget.
-    </li>
-
-    <li>
-      Initialize the database with demo data:
-      <form action="initialize_db.html">
-        <fieldset>
-          <label for="dbHost">Database <em>host:port</em> (see step 1):</label>
-          <input type="text" id="dbHost" name="dbHost"
-                 value="something:3000"></input><br>
-          <label for="dbName">Database <em>name</em>:</label>
-          <input type="text" id="dbName" name="dbName"
-                 value="demo_database"></input><br>
-          <input type="submit" value="Initialize"></input>
-        </fieldset>
-      </form>
+      Initialize database by initializing data store according to documentation
+      at the top of: <a href="scene/init.py">scene/init.py</a>
     </li>
 
     <li>
