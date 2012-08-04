@@ -33,31 +33,39 @@ See also sub directory: [documentation][5]
 Embedding the Reality Builder in a web page
 ===========================================
 
-There are two ways to embed the Reality Builder:
+Example where the Reality Builder is hosted on *example.com*:
 
-  * As a standard JavaScript file, by example:
+ 1. Embed Socket.IO into you page. You may use the distribution which comes
+   with the Reality Builder. Example:
+   
+       <script src="http://example.com/socket.io/socket.io.js"></script>
 
-        <script src="http://example.com/reality_builder.js"></script>
+ 2. Embed the Reality Builder:
 
-        <script type="text/javascript">
-          realityBuilder.init({
-              baseUrl: 'http://example.com',
-              width: 640,
-              height: 480
-              // ...
-          });
-        </script>
+      * Either as a standard JavaScript file:
 
-        <div id="RealityBuilder"></div>
+            <script src="http://example.com/reality_builder.js"></script>
+            <script src="http://example.com/reality_builder.js"></script>
 
-  * As an AMD module (no global variable is exposed):
+            <script type="text/javascript">
+              realityBuilder.init({
+                  baseUrl: 'http://example.com',
+                  width: 640,
+                  height: 480
+                  // ...
+              });
+            </script>
 
-        require(
-            ['http://example.com/reality_builder.js'],
-            function (realityBuilder) {
-                realityBuilder.init(/* see above */);
-            }
-        );
+            <div id="RealityBuilder"></div>
+
+      * Or as an AMD module (no global variable is exposed):
+
+            require(
+                ['http://example.com/reality_builder.js'],
+                function (realityBuilder) {
+                    realityBuilder.init(/* see above */);
+                }
+            );
 
 See the [demo][1] for more information. The demo uses AMD with RequireJS to
 load either the production or the development version of the Reality Builder.

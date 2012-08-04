@@ -21,19 +21,23 @@
 (function () {
     'use strict';
 
-    var baseUrl, develModeIsRequested;
+    var baseUrl, develModeIsRequested, host;
 
-    // Returns the value of the named URL parameter, or an empty string if not
-    // available.
+    // Returns the value of the named URL parameter, or null if not available.
     function urlParamVal(name) {
         var regexp = new RegExp('[?&]' + name + '=([^&]*)'), matches;
         matches = regexp.exec(window.location.search);
         return (_.isArray(matches) && matches.length === 2 ?
                 decodeURIComponent(matches[1]) :
-                '');
+                null);
     }
 
-    baseUrl = 'http://' + urlParamVal('demoHost');
+    host = urlParamVal('demoHost');
+    if (_.isNull(host)) {
+        window.alert('Host not specified!');
+        window.location = 'index.html'; // error: host needs to be specified
+    }
+    baseUrl = 'http://' + host;
     develModeIsRequested = urlParamVal('demoDevelMode') === 'on';
 
     require.config({
@@ -50,7 +54,8 @@
         }
     });
 
-    require(['reality_builder', 'user_interface', 'admin_interface'
+    require(['reality_builder', 'user_interface', 'admin_interface',
+             'reality_builder_base/socket.io/socket.io'
             ], function (realityBuilder, userInterface, adminInterface) {
         // Note for IE < 9: FlashCanvas needs to be ready at this point in
         // time!
@@ -58,7 +63,7 @@
             width: 640,
             height: 480,
             namespace: 'demo',
-            baseUrl: baseUrl,
+            baseUrl: 'http://localhost:8080', // fixme: make configurable
             onReady: function () {
                 userInterface.onReady();
                 adminInterface.onReady();

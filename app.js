@@ -18,37 +18,62 @@
 
 'use strict';
 
-var requirejs = require('requirejs');
+var requirejs = require('requirejs'), url = require('url');
 
 requirejs.config({ nodeRequire: require });
 
-requirejs(['http', 'socket.io', 'fs', 'fixme_data'], function (http, socketio,
-                                                               fs, fixmeData) {
-    var httpServer, io;
+requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
+                                                                    socketio,
+                                                                    fixmeData,
+                                                                    Lactate) {
+    var httpServer, io,
+        lactateOptions = {
+            cache: false
+        },
+        scriptsLactate = Lactate.dir('scripts', lactateOptions),
+        scriptsBuildLactate = Lactate.dir('scripts.build', lactateOptions);
 
-    /*jslint unparam:true */
+    function tryToHandleScripts(req, res, path) {
+        var matches = /^\/scripts\/([a-z_\-\/]*[.]js)/.exec(path);
+        return ((matches !== null && matches.length === 2) ?
+                scriptsLactate.serve(matches[1], req, res) :
+                false);
+    }
+
+    function tryToHandleRealityBuilder(req, res, path) {
+        return ((path === '/reality_builder.js') ?
+                scriptsBuildLactate.serve('main.js', req, res) :
+                false);
+    }
+
     function handler(req, res) {
-        
-        /*jslint unparam:false */
-        fs.readFile(__dirname + '/fixme.html', function (err, data) {
-            if (err) {
-                res.writeHead(500);
-                return res.end('Error loading fixme.html');
-            }
+        var path = url.parse(req.url).pathname, tmp;
 
-            res.writeHead(200);
-            res.end(data);
-        });
+        tmp = tryToHandleRealityBuilder(req, res, path);
+        if (tmp !== false) {
+            return tmp;
+        }
+
+        tmp = tryToHandleScripts(req, res, path);
+        if (tmp !== false) {
+            return tmp;
+        }
+
+        // path not found
+        res.writeHead(404);
+        return res.end();
     }
 
     httpServer = http.createServer(handler);
     io = socketio.listen(httpServer);
-    httpServer.listen(80);
+    httpServer.listen(8080);
 
     io.sockets.on('connection', function (socket) {
-        socket.emit('updated blocks', fixmeData.blocks);
+        socket.emit('updated new block', fixmeData.newBlock);
         socket.on('my other event', function (data) {
             console.log(data);
         });
     });
+
+    console.log('HTTP server listening on port', httpServer.address().port);
 });

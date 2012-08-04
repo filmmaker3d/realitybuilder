@@ -1,14 +1,7 @@
 // Wrapped by Felix E. Klee <felix.klee@inka.de> in 2012, to play nicely with
 // AMD and not pollute the global namespace.
 
-(function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(factory);
-        // Browser globals
-        root.amdWeb = factory(root.b);
-    }
-}(this, function () {
+define(function () {
     if (typeof window === 'undefined') {
         window = this; // necessary when including in Node.js (e.g. as
                        // dependency when unit testing)
@@ -1079,4 +1072,4 @@
 // underscore.js: end ---------------------------------------------------------
 
     return window._.noConflict();
-}));
+});
