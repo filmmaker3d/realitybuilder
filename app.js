@@ -84,6 +84,7 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
     io.sockets.on('connection', function (socket) {
         console.log('fixme: connected');
         socket.emit('updated new block', fixmeData.newBlock);
+        socket.emit('camera data', fixmeData.camera);
         socket.on('my other event', function (data) {
             console.log(data);
         });

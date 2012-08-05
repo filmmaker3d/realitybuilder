@@ -44,7 +44,7 @@ define(['./construction_blocks',
                     util,
                     $,
                     _) {
-    var object = {
+    var exports = {
         // Coordinates of the full shadow's vertexes in world space, view space,
         // and sensor space.
         _fullVertexes: null,
@@ -212,6 +212,6 @@ define(['./construction_blocks',
         }
     };
 
-    object.init();
-    return object;
+    exports.init();
+    return exports;
 });

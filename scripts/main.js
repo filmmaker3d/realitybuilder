@@ -232,7 +232,7 @@ define(['./util', './block_properties', './camera', './construction_blocks',
         _blocksAreFullyInitialized: function () {
             return (constructionBlocks.isInitializedWithServerData() &&
                     newBlock.isInitializedWithServerData() &&
-                    camera.isInitializedWithServerData() &&
+                    camera.isInitialized &&
                     blockProperties.isInitializedWithServerData());
         },
 
@@ -310,7 +310,7 @@ define(['./util', './block_properties', './camera', './construction_blocks',
         // calling the "onReady" function, but only the first time.
         _checkIfReady: function () {
             if (constructionBlocks.isInitializedWithServerData() &&
-                camera.isInitializedWithServerData() &&
+                camera.isInitialized &&
                 blockProperties.isInitializedWithServerData() &&
                 this._onReadyCalled === false) {
                 util.SETTINGS.onReady();
@@ -331,10 +331,6 @@ define(['./util', './block_properties', './camera', './construction_blocks',
 
             if (data.blocksData.changed) {
                 constructionBlocks.updateWithServerData(data.blocksData);
-            }
-
-            if (data.cameraData.changed) {
-                camera.updateWithServerData(data.cameraData);
             }
 
             if (data.blockPropertiesData.changed) {
@@ -373,7 +369,6 @@ define(['./util', './block_properties', './camera', './construction_blocks',
                 content: {
                     "blocksDataVersion":
                     constructionBlocks.versionOnServer(),
-                    "cameraDataVersion": camera.versionOnServer(),
                     "blockPropertiesDataVersion":
                     blockProperties.versionOnServer(),
                     "newBlockDataVersion": newBlock.versionOnServer(),

@@ -34,75 +34,76 @@
 /*global define */
 
 define(['./sensor', './util', './block_properties', './topic_mixin',
+        './socket',
         './vendor/sylvester.src-wrapped', './vendor/underscore-wrapped'
-       ], function (sensor, util, blockProperties, topicMixin, sylvester, _) {
-    var object = _.extend({
-        // Position of the camera in world space (mm):
-        _pos: [0, 0, 1],
+       ], function (sensor, util, blockProperties, topicMixin, socket,
+                    sylvester, _) {
+    var isInitialized = false, // true, iff initialized with server data
+        pos = [0, 0, 1], // position of the camera in world space (mm)
+        aX = 0, // rotation angle about x axis (rad)
+        aY = 0,
+        aZ = 0,
+        fl = 1, // focal length (mm)
+        sensorResolution = 100, // sensor resolution (px/mm)
+        rZYX = null, // matrix describing rotation about x, then y, then z axis
+        exports;
 
-        // Angles defining orientation (rad):
-        _aX: 0,
-        _aY: 0,
-        _aZ: 0,
 
-        // Focal length (mm):
-        _fl: 1,
+    // Updates matrices describing the rotation of the camera. Should be
+    // called every time the rotation angles have been changed.
+    function updateRotationMatrices() {
+        var rYX, rX, rY, rZ;
 
-        // Sensor resolution (px/mm) and dimensions (px):
-        _sensorResolution: 100,
+        // Matrices are for rotating view space points, and that rotation is in
+        // the oposite direction as that of the camera, which is rotated
+        // counterclockwise. Therefore the matrices rotate clockwise.
+        rX = sylvester.Matrix.RotationX(aX);
+        rY = sylvester.Matrix.RotationY(-aY);
+        rZ = sylvester.Matrix.RotationZ(aZ);
+        rYX = rY.multiply(rX);
+        rZYX = rZ.multiply(rYX);
+    }
 
-        // Rotation matrices.
-        _rZYX: null, // rotation about X, then Y, then Z
+    updateRotationMatrices();
+    socket.on('camera data', function (data) {
+        console.log('fixme: updating camera');
+        exports.update(data);
+    });
 
-        // Version of data last retrieved from the server, or "-1" initially.
-        // Is a string in order to be able to contain very large integers.
-        _versionOnServer: '-1',
-
+    exports = _.extend({
         // Identifier of the camera settings. It is a random string that is
         // updated on every change of camera settings, not only on those on the
         // server.
+        //
+        // fixme: maybe remove
         _id: null,
-
-        init: function () {
-            this._updateRotationMatrices();
-        },
 
         _updateId: function () {
             this._id = Math.random().toString();
         },
 
-        versionOnServer: function () {
-            return this._versionOnServer;
-        },
-
-        // Returns false when the object is new and has not yet been updated
-        // with server data.
-        isInitializedWithServerData: function () {
-            return this._versionOnServer !== '-1';
-        },
-
         pos: function () {
-            return this._pos;
+            return pos;
         },
 
         aX: function () {
-            return this._aX;
+            return aX;
         },
 
         aY: function () {
-            return this._aY;
+            return aY;
         },
 
         aZ: function () {
-            return this._aZ;
+            return aZ;
         },
 
         fl: function () {
-            return this._fl;
+            return fl;
         },
 
         sensorResolution: function () {
-            return this._sensorResolution;
+            return sensorResolution;
         },
 
         id: function () {
@@ -112,53 +113,30 @@ define(['./sensor', './util', './block_properties', './topic_mixin',
         // Updates the settings of the camera using the "data" which is a
         // subset of the data that also the server delivers.
         update: function (data) {
-            this._pos = data.pos;
-            this._aX = data.aX;
-            this._aY = data.aY;
-            this._aZ = data.aZ;
-            this._fl = data.fl;
-            this._sensorResolution = data.sensorResolution;
-            this._updateRotationMatrices();
+            pos = data.pos;
+            aX = data.aX;
+            aY = data.aY;
+            aZ = data.aZ;
+            fl = data.fl;
+            sensorResolution = data.sensorResolution;
+            updateRotationMatrices();
             this._updateId();
 
+            isInitialized = true;
+
             this.publishTopic('changed');
-        },
-
-        // Updates the settings of the camera to the version on the server,
-        // which is described by "serverData".
-        updateWithServerData: function (serverData) {
-            if (this._versionOnServer !== serverData.version) {
-                this._versionOnServer = serverData.version;
-                this.update(serverData);
-            }
-        },
-
-        // Updates matrices describing the rotation of the camera. Should be
-        // called every time the rotation angles have been changed.
-        _updateRotationMatrices: function () {
-            var rYX, rX, rY, rZ;
-
-            // Matrices are for rotating view space points, and that rotation
-            // is in the oposite direction as that of the camera, which is
-            // rotated counterclockwise. Therefore the matrices rotate
-            // clockwise.
-            rX = sylvester.Matrix.RotationX(this._aX);
-            rY = sylvester.Matrix.RotationY(-this._aY);
-            rZ = sylvester.Matrix.RotationZ(this._aZ);
-            rYX = rY.multiply(rX);
-            this._rZYX = rZ.multiply(rYX);
         },
 
         // Returns the coordinates of the world space point "point" in view
         // space.
         worldToView: function (point) {
             var tmp = util.subtractVectors3D(point,
-                                                            this._pos);
+                                                            pos);
 
             // Rotation matrices are applied to the vector tmp, from the left
             // side:
             tmp = sylvester.Vector.create(tmp);
-            tmp = this._rZYX.multiply(tmp);
+            tmp = rZYX.multiply(tmp);
 
             return tmp.elements;
         },
@@ -166,7 +144,7 @@ define(['./sensor', './util', './block_properties', './topic_mixin',
         // Scale of distances parallel to the screen at view space position
         // "zV", when projected to the screen.
         scale: function (zV) {
-            return this._sensorResolution * this._fl / zV; // px / mm
+            return sensorResolution * fl / zV; // px / mm
         },
 
         // Returns the coordinates of the view space point "pointV" in sensor
@@ -196,7 +174,8 @@ define(['./sensor', './util', './block_properties', './topic_mixin',
         }
     }, topicMixin);
 
-    object.init();
+    Object.defineProperty(exports, "isInitialized",
+                          {get: function () { return isInitialized; }});
 
-    return object;
+    return exports;
 });

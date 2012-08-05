@@ -22,7 +22,7 @@
 define(['./util',
         './vendor/jquery-modified',
         './vendor/underscore-wrapped'], function (util, $, _) {
-    var object = {
+    var exports = {
         // Canvases for drawing various parts.
         _canvasNodes: null,
 
@@ -150,7 +150,7 @@ define(['./util',
         }
     };
 
-    object.init();
+    exports.init();
 
-    return object;
+    return exports;
 });
