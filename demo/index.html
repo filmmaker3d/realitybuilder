@@ -28,14 +28,29 @@
 
   <h2>Steps</h2>
 
+  <p>
+    Paths are relative to current directory.
+  </p>
+
   <ol>
     <li>
-      Start serving Reality Builder widget on Google App Engine.
+      If necessary, set up a <a href="http://www.mongodb.org/">MongoDB</a>
+      server.
     </li>
 
     <li>
-      Initialize database by initializing data store according to documentation
-      at the top of: <a href="scene/init.py">scene/init.py</a>
+      Set MongoDB database connection in Reality Builder configuration.
+    </li>
+
+    <li>
+      Start serving Reality Builder. Example:
+      <pre><code>node ../app.js</code></pre>
+    </li>
+
+    <li>
+      Create the demo database <em>realitybuilder</em>. Example (path relative
+      to current directory):
+      <pre><code>mongo realitybuilder scene/create_db.js</code></pre>
     </li>
 
     <li>

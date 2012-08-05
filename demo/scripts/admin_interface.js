@@ -59,6 +59,7 @@ define(['reality_builder',
 
     function setUpSaveSettingsButton() {
         $('.admin.interface button.saveSettings').click(function () {
+            updateCamera();
             realityBuilder.camera.saveToServer();
         });
     }

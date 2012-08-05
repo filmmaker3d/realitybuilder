@@ -18,14 +18,13 @@
 
 'use strict';
 
-var requirejs = require('requirejs'), url = require('url');
+var requirejs = require('requirejs'), url = require('url'),
+    camera = require('./lib/camera');
 
 requirejs.config({ nodeRequire: require });
 
-requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
-                                                                    socketio,
-                                                                    fixmeData,
-                                                                    Lactate) {
+requirejs(['http', 'socket.io', 'fixme_data', 'lactate'
+          ], function (http, socketio, fixmeData, Lactate) {
     var httpServer, io,
         lactateOptions = {},
         scriptsFixmeLactate = Lactate.dir('.', lactateOptions),
@@ -95,4 +94,6 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
 
     console.log('HTTP server listening on port %d in %s mode',
                 httpServer.address().port, env);
+
+    camera.fixme2();
 });
