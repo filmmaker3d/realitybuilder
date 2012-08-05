@@ -83,17 +83,12 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'
     io.sockets.on('connection', function (socket) {
         console.log('fixme: connected');
         socket.emit('updated new block', fixmeData.newBlock);
-        socket.emit('camera data', fixmeData.camera);
         socket.on('my other event', function (data) {
             console.log(data);
         });
-        socket.on('camera data', function (data) {
-            console.log('camera data', data);
-        });
+        camera.onSocketConnection(socket);
     });
 
     console.log('HTTP server listening on port %d in %s mode',
                 httpServer.address().port, env);
-
-    camera.fixme2();
 });
