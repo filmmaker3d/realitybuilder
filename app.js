@@ -27,9 +27,7 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
                                                                     fixmeData,
                                                                     Lactate) {
     var httpServer, io,
-        lactateOptions = {
-            cache: false
-        },
+        lactateOptions = {},
         scriptsLactate = Lactate.dir('scripts', lactateOptions),
         scriptsBuildLactate = Lactate.dir('scripts.build', lactateOptions);
 
@@ -51,6 +49,7 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
 
         tmp = tryToHandleRealityBuilder(req, res, path);
         if (tmp !== false) {
+            console.log(tmp);
             return tmp;
         }
 
@@ -66,7 +65,7 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
 
     httpServer = http.createServer(handler);
     io = socketio.listen(httpServer);
-    httpServer.listen(8080);
+    httpServer.listen(3000);
 
     io.sockets.on('connection', function (socket) {
         socket.emit('updated new block', fixmeData.newBlock);
