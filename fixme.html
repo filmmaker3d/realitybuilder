@@ -1,15 +1,9 @@
-<script src="/socket.io/socket.io.js"></script>
+<script src="http://localhost:3000/socket.io/socket.io.js"></script>
 
 <script>
-  var socket = io.connect('http://localhost');
-  socket.on('updated blocks', function (data) {
-      console.log(data);
-  });
-  socket.on('connection', function (data) {
-      console.log('fixme: connected');
-  });
-  socket.on('news', function (data) {
-      console.log(data);
-      socket.emit('my other event', { my: 'data' });
+  var socket = io.connect('http://localhost:3000');
+  console.log('fixme: start');
+  socket.on('updated new block', function (data) {
+      console.log('new block:', data);
   });
 </script>

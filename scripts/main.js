@@ -21,11 +21,11 @@
 
 define(['./util', './block_properties', './camera', './construction_blocks',
         './new_block', './sensor', './shadow_obscuring_blocks', './shadow',
-        './topic_mixin', './jsonp',
+        './topic_mixin', './jsonp', './socket',
         './vendor/jquery-modified', './vendor/underscore-wrapped'
        ], function (util, blockProperties, camera, constructionBlocks,
                     newBlock, sensor, shadowObscuringBlocks, shadow,
-                    topicMixin, jsonp, $, _) {
+                    topicMixin, jsonp, socket, $, _) {
     return _.extend({
         // Last construction validator version retrieved, or "-1" initially. Is
         // a string in order to be able to contain very large integers.
@@ -136,6 +136,8 @@ define(['./util', './block_properties', './camera', './construction_blocks',
                 };
 
             util.SETTINGS = _.extend({}, defaultSettings, settings);
+
+            socket.init();
 
             if (!util.isCanvasSupported()) {
                 // canvas not supported => abort

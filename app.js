@@ -28,15 +28,19 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
                                                                     Lactate) {
     var httpServer, io,
         lactateOptions = {},
+        scriptsFixmeLactate = Lactate.dir('.', lactateOptions),
         scriptsLactate = Lactate.dir('scripts', lactateOptions),
-        scriptsBuildLactate = Lactate.dir('scripts.build', lactateOptions);
+        scriptsBuildLactate = Lactate.dir('scripts.build', lactateOptions),
+        env = process.env.NODE_ENV || 'development';
+
+    function tryToHandleFixme(req, res, path) {
+        return ((path === '/fixme.html') ?
+                scriptsFixmeLactate.serve('fixme.html', req, res) :
+                false);
+    }
 
     function tryToHandleScripts(req, res, path) {
         var matches = /^\/scripts\/([a-z_\-\/\.]*[.]js)/.exec(path);
-        console.log('fixme: scripts');
-        if (matches !== null) {
-            console.log('fixmematches:', matches[1]);
-        }
         return ((matches !== null && matches.length === 2) ?
                 scriptsLactate.serve(matches[1], req, res) :
                 false);
@@ -56,9 +60,16 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
             return tmp;
         }
 
-        tmp = tryToHandleScripts(req, res, path);
-        if (tmp !== false) {
-            return tmp;
+        if (env === 'development') {
+            tmp = tryToHandleScripts(req, res, path);
+            if (tmp !== false) {
+                return tmp;
+            }
+
+            tmp = tryToHandleFixme(req, res, path);
+            if (tmp !== false) {
+                return tmp;
+            }
         }
 
         // path not found
@@ -71,11 +82,13 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
     httpServer.listen(3000);
 
     io.sockets.on('connection', function (socket) {
+        console.log('fixme: connected');
         socket.emit('updated new block', fixmeData.newBlock);
         socket.on('my other event', function (data) {
             console.log(data);
         });
     });
 
-    console.log('HTTP server listening on port', httpServer.address().port);
+    console.log('HTTP server listening on port %d in %s mode',
+                httpServer.address().port, env);
 });

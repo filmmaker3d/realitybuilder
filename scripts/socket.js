@@ -19,6 +19,35 @@
 
 /*global define, io */
 
-define(['./util'], function (util) {
-    return io.connect(util.baseUrl());
+define(['./util', './vendor/underscore-wrapped'], function (util, _) {
+    var exports = {}, onParamsList = [];
+
+    function init() {
+        var socket = io.connect('http://localhost:3000'); // fixme: make
+                                                          // configurable
+
+        _.each(onParamsList, function (onParams) {
+            socket.on(onParams[0], onParams[1]);
+        });
+
+        exports.on = _.bind(socket.on, socket);
+        exports.emit = _.bind(socket.emit, socket);
+    }
+
+    // Used as long as socket has not been initialized. Collects event handlers
+    // for later assignment.
+    function on(name, fn) {
+        onParamsList.push([name, fn]);
+    }
+
+    // Used as long as socket has not been initialized. Does nothing.
+    function emit() { }
+
+    exports = {
+        init: init,
+        on: on,
+        emit: emit
+    };
+
+    return exports;
 });

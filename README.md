@@ -30,6 +30,15 @@ About documentation
 See also sub directory: [documentation][5]
 
 
+Hosting the Reality Builder
+===========================
+
+Host it using [Node.js][6], and - in production - don't forget to set the
+environment variable:
+
+    NODE_ENV=production
+
+
 Embedding the Reality Builder in a web page
 ===========================================
 
@@ -99,7 +108,7 @@ Development
 Unit tests
 ----------
 
-Run unit tests from the shell with [Nodeunit][6]:
+Run unit tests from the shell with [Nodeunit][7]:
 
     nodeunit tests
 
@@ -316,7 +325,7 @@ Miscellaneous
   * Canvas seems to have automatic "double buffering", i.e. Gecko and WebKit
     browsers don't draw to screen while executing code.
 
-    According to a [mailing list post][7] by [Robert O'Callahan][8]:
+    According to a [mailing list post][8] by [Robert O'Callahan][9]:
 
     > I assume you have a setTimeout handler (or similar) which renders a
     > complete frame before returning. If so, then in Gecko and I think also in
@@ -382,6 +391,7 @@ specific language governing permissions and limitations under the License.
 [3]: http://github.org/feklee/realitybuilder.com
 [4]: http://www.youtube.com/watch?v=XiI6lOvQLRM
 [5]: documentation
-[6]: https://github.com/caolan/nodeunit/
-[7]: http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2009-September/022702.html
-[8]: mailto:robert@ocallahan.org
+[6]: http://nodejs.org/
+[7]: https://github.com/caolan/nodeunit/
+[8]: http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2009-September/022702.html
+[9]: mailto:robert@ocallahan.org
