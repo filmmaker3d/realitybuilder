@@ -32,7 +32,11 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
         scriptsBuildLactate = Lactate.dir('scripts.build', lactateOptions);
 
     function tryToHandleScripts(req, res, path) {
-        var matches = /^\/scripts\/([a-z_\-\/]*[.]js)/.exec(path);
+        var matches = /^\/scripts\/([a-z_\-\/\.]*[.]js)/.exec(path);
+        console.log('fixme: scripts');
+        if (matches !== null) {
+            console.log('fixmematches:', matches[1]);
+        }
         return ((matches !== null && matches.length === 2) ?
                 scriptsLactate.serve(matches[1], req, res) :
                 false);
@@ -49,7 +53,6 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
 
         tmp = tryToHandleRealityBuilder(req, res, path);
         if (tmp !== false) {
-            console.log(tmp);
             return tmp;
         }
 
