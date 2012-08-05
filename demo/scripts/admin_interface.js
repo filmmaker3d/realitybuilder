@@ -57,34 +57,27 @@ define(['reality_builder',
                                      blocksAreVisible, setVisibility);
     }
 
-    // Returns data read entered using the camera controls.
-    function cameraDataFromControls() {
-        return {
-            "pos": [parseFloat($('#cameraXTextField').val()) || 0,
-                    parseFloat($('#cameraYTextField').val()) || 0,
-                    parseFloat($('#cameraZTextField').val()) || 0],
-            "aX": parseFloat($('#cameraAXTextField').val()) || 0,
-            "aY": parseFloat($('#cameraAYTextField').val()) || 0,
-            "aZ": parseFloat($('#cameraAZTextField').val()) || 0,
-            "fl": parseFloat($('#cameraFlTextField').val()) || 1,
-            "sensorResolution":
-                (parseFloat($('#cameraSensorResolutionTextField').val())
-                 || 100)
-        };
-    }
-
     function setUpSaveSettingsButton() {
         $('.admin.interface button.saveSettings').click(function () {
-            var cameraData = cameraDataFromControls();
-
-            realityBuilder.storeSettingsOnServer({cameraData: cameraData});
-            realityBuilder.camera().update(cameraData);
+            realityBuilder.camera.saveToServer();
         });
     }
 
     // Updates the camera, reading data from the camera controls.
     function updateCamera() {
-        realityBuilder.camera().update(cameraDataFromControls());
+        var data = {
+            pos: [parseFloat($('#cameraXTextField').val()) || 0,
+                  parseFloat($('#cameraYTextField').val()) || 0,
+                  parseFloat($('#cameraZTextField').val()) || 0],
+            aX: parseFloat($('#cameraAXTextField').val()) || 0,
+            aY: parseFloat($('#cameraAYTextField').val()) || 0,
+            aZ: parseFloat($('#cameraAZTextField').val()) || 0,
+            fl: parseFloat($('#cameraFlTextField').val()) || 1,
+            sensorResolution:
+                parseFloat($('#cameraSensorResolutionTextField').val()) || 100
+        };
+
+        realityBuilder.camera.update(data);
     }
 
     function setUpPreviewCameraButton() {
@@ -95,7 +88,7 @@ define(['reality_builder',
     function updateCameraControls() {
         var camera, pos;
 
-        camera = realityBuilder.camera();
+        camera = realityBuilder.camera;
         pos = camera.pos();
         $('#cameraXTextField').val(pos[0]);
         $('#cameraYTextField').val(pos[1]);

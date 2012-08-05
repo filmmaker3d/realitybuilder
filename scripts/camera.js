@@ -48,7 +48,6 @@ define(['./sensor', './util', './block_properties', './topic_mixin',
         rZYX = null, // matrix describing rotation about x, then y, then z axis
         exports;
 
-
     // Updates matrices describing the rotation of the camera. Should be
     // called every time the rotation angles have been changed.
     function updateRotationMatrices() {
@@ -66,7 +65,6 @@ define(['./sensor', './util', './block_properties', './topic_mixin',
 
     updateRotationMatrices();
     socket.on('camera data', function (data) {
-        console.log('fixme: updating camera');
         exports.update(data);
     });
 
@@ -130,8 +128,7 @@ define(['./sensor', './util', './block_properties', './topic_mixin',
         // Returns the coordinates of the world space point "point" in view
         // space.
         worldToView: function (point) {
-            var tmp = util.subtractVectors3D(point,
-                                                            pos);
+            var tmp = util.subtractVectors3D(point, pos);
 
             // Rotation matrices are applied to the vector tmp, from the left
             // side:
@@ -171,6 +168,18 @@ define(['./sensor', './util', './block_properties', './topic_mixin',
             return this.viewToSensor(this.worldToView(
                 util.blockToWorld(pointB, blockProperties)
             ));
+        },
+
+        // Stores camera settings on server.
+        saveToServer: function () {
+            socket.emit('camera data', {
+                pos: pos,
+                aX: aX,
+                aY: aY,
+                aZ: aZ,
+                fl: fl,
+                sensorResolution: sensorResolution
+            });
         }
     }, topicMixin);
 

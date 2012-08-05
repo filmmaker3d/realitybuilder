@@ -69,7 +69,7 @@ define(['reality_builder',
     prerenderedSrtSimPosesBList = _.memoize(function () {
         var srtSimPosesBList = prerenderedSimPosesBList;
         _.each(srtSimPosesBList, function (simPosesB) {
-            realityBuilder.util().sortPosesB(simPosesB);
+            realityBuilder.util.sortPosesB(simPosesB);
         });
         return srtSimPosesBList;
     });
@@ -77,7 +77,7 @@ define(['reality_builder',
     // Returns the index of the prerendered image that matches the current
     // construction, or false if there is no matching image.
     function prerenderedImageIndex() {
-        var util = realityBuilder.util(), srtSimPosesB;
+        var util = realityBuilder.util, srtSimPosesB;
 
         srtSimPosesB =
             realityBuilder.constructionBlocks().nonDeletedSimPosesB();

@@ -26,7 +26,7 @@ define(['./util', './block_properties', './camera', './construction_blocks',
        ], function (util, blockProperties, camera, constructionBlocks,
                     newBlock, sensor, shadowObscuringBlocks, shadow,
                     topicMixin, jsonp, socket, $, _) {
-    return _.extend({
+    var exports = _.extend({
         // Last construction validator version retrieved, or "-1" initially. Is
         // a string in order to be able to contain very large integers.
         _validatorVersion: '-1',
@@ -378,14 +378,6 @@ define(['./util', './block_properties', './camera', './construction_blocks',
             });
         },
 
-        // Called if updating the settings on the server succeeded. Triggers
-        // retrieval of the latest settings from the server, which would happen
-        // anyhow sooner or later, since the version of the settings has
-        // changed.
-        _storeSettingsOnServerSucceeded: function () {
-            this._update(); // Will check for new settings.
-        },
-
         // Returns camera data, prepared to sending it to the server.
         _preparedCameraData: function (cameraData) {
             var preparedCameraData;
@@ -396,33 +388,15 @@ define(['./util', './block_properties', './camera', './construction_blocks',
             preparedCameraData['camera.y'] = cameraData.pos[1];
             preparedCameraData['camera.z'] = cameraData.pos[2];
             return preparedCameraData;
-        },
-
-        // Updates certain settings on the server. Fails silently on error.
-        storeSettingsOnServer: function (settings) {
-            var content = {};
-
-            if (settings.hasOwnProperty('cameraData')) {
-                _.extend(content, this._preparedCameraData(settings.cameraData));
-            }
-
-            jsonp.get({
-                url: util.baseUrl() + "rpc/update_settings",
-                content: content,
-                load: _.bind(this._storeSettingsOnServerSucceeded, this)
-            });
-        },
-
-        camera: function () {
-            return camera;
-        },
-
-        util: function () {
-            return util;
-        },
-
-        _: function () {
-            return _;
         }
     }, topicMixin);
+
+    Object.defineProperty(exports, "camera",
+                          {get: function () { return camera; }});
+
+
+    Object.defineProperty(exports, "util",
+                          {get: function () { return util; }});
+
+    return exports;
 });

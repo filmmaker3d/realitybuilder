@@ -88,6 +88,9 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'], function (http,
         socket.on('my other event', function (data) {
             console.log(data);
         });
+        socket.on('camera data', function (data) {
+            console.log('camera data', data);
+        });
     });
 
     console.log('HTTP server listening on port %d in %s mode',
