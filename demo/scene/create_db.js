@@ -22,9 +22,9 @@ db.dropDatabase();
 
 db.cameras.save({
     pos: [189.57, -159.16, 140.11],
-    a_x: 2.1589,
-    a_y: -0.46583,
-    a_z: 0.29,
+    aX: 2.1589,
+    aY: -0.46583,
+    aZ: 0.29,
     fl: 40.0,
-    sensor_resolution: 19.9
+    sensorResolution: 19.9
 });

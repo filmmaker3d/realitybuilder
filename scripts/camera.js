@@ -172,7 +172,7 @@ define(['./sensor', './util', './block_properties', './topic_mixin',
 
         // Stores camera settings on server.
         saveToServer: function () {
-            socket.emit('camera data', {
+            socket.emit('camera data fixme', {
                 pos: pos,
                 aX: aX,
                 aY: aY,
