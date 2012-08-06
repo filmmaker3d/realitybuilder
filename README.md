@@ -119,7 +119,7 @@ Creating a new build
 To create a new build, i.e. to compile all JavaScript files into
 `reality_builder.js`, run from the shell:
 
-    node node_modules/requirejs/bin/r.js -o scripts.build.js
+    node node_modules/requirejs/bin/r.js -o client.build.js
 
 
 Camera data

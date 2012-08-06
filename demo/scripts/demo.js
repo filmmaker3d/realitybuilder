@@ -48,7 +48,7 @@
         map: {
             '*': {
                 'reality_builder': (develModeIsRequested ?
-                                    'reality_builder_base/scripts/main' :
+                                    'reality_builder_base/client/main' :
                                     'reality_builder_base/reality_builder')
             }
         }

@@ -19,7 +19,7 @@
 'use strict';
 
 var requirejs = require('requirejs'), url = require('url'),
-    camera = require('./lib/camera');
+    camera = require('./server/camera');
 
 requirejs.config({ nodeRequire: require });
 
@@ -27,27 +27,27 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'
           ], function (http, socketio, fixmeData, Lactate) {
     var httpServer, io,
         lactateOptions = {},
-        scriptsFixmeLactate = Lactate.dir('.', lactateOptions),
-        scriptsLactate = Lactate.dir('scripts', lactateOptions),
-        scriptsBuildLactate = Lactate.dir('scripts.build', lactateOptions),
+        clientFixmeLactate = Lactate.dir('.', lactateOptions),
+        clientLactate = Lactate.dir('client', lactateOptions),
+        clientBuildLactate = Lactate.dir('client.build', lactateOptions),
         env = process.env.NODE_ENV || 'development';
 
     function tryToHandleFixme(req, res, path) {
         return ((path === '/fixme.html') ?
-                scriptsFixmeLactate.serve('fixme.html', req, res) :
+                clientFixmeLactate.serve('fixme.html', req, res) :
                 false);
     }
 
-    function tryToHandleScripts(req, res, path) {
-        var matches = /^\/scripts\/([a-z_\-\/\.]*[.]js)/.exec(path);
+    function tryToHandleClient(req, res, path) {
+        var matches = /^\/client\/([a-z_\-\/\.]*[.]js)/.exec(path);
         return ((matches !== null && matches.length === 2) ?
-                scriptsLactate.serve(matches[1], req, res) :
+                clientLactate.serve(matches[1], req, res) :
                 false);
     }
 
     function tryToHandleRealityBuilder(req, res, path) {
         return ((path === '/reality_builder.js') ?
-                scriptsBuildLactate.serve('main.js', req, res) :
+                clientBuildLactate.serve('main.js', req, res) :
                 false);
     }
 
@@ -60,7 +60,7 @@ requirejs(['http', 'socket.io', 'fixme_data', 'lactate'
         }
 
         if (env === 'development') {
-            tmp = tryToHandleScripts(req, res, path);
+            tmp = tryToHandleClient(req, res, path);
             if (tmp !== false) {
                 return tmp;
             }
